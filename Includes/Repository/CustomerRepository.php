@@ -65,5 +65,43 @@ class LTLB_CustomerRepository {
 		if ( $res === false ) return false;
 		return (int) $wpdb->insert_id;
 	}
+
+	public function update_by_id( int $id, array $data ): bool {
+		global $wpdb;
+		if ( $id <= 0 ) return false;
+
+		$update = [];
+		$formats = [];
+
+		if ( isset( $data['email'] ) ) {
+			$email = sanitize_email( (string) $data['email'] );
+			if ( empty( $email ) ) return false;
+			$update['email'] = $email;
+			$formats[] = '%s';
+		}
+		if ( array_key_exists( 'first_name', $data ) ) {
+			$update['first_name'] = $data['first_name'] !== null ? sanitize_text_field( (string) $data['first_name'] ) : null;
+			$formats[] = '%s';
+		}
+		if ( array_key_exists( 'last_name', $data ) ) {
+			$update['last_name'] = $data['last_name'] !== null ? sanitize_text_field( (string) $data['last_name'] ) : null;
+			$formats[] = '%s';
+		}
+		if ( array_key_exists( 'phone', $data ) ) {
+			$update['phone'] = $data['phone'] !== null ? sanitize_text_field( (string) $data['phone'] ) : null;
+			$formats[] = '%s';
+		}
+		if ( array_key_exists( 'notes', $data ) ) {
+			$update['notes'] = $data['notes'] !== null ? wp_kses_post( (string) $data['notes'] ) : null;
+			$formats[] = '%s';
+		}
+
+		if ( empty( $update ) ) return false;
+		$update['updated_at'] = current_time('mysql');
+		$formats[] = '%s';
+
+		$res = $wpdb->update( $this->table_name, $update, [ 'id' => $id ], $formats, [ '%d' ] );
+		return $res !== false;
+	}
 }
 

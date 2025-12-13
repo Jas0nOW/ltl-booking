@@ -17,6 +17,12 @@ class LTLB_Admin_ServicesPage {
         if ( ! current_user_can('manage_options') ) {
             wp_die( esc_html__('You do not have permission to view this page.', 'ltl-bookings') );
         }
+        
+        // Context-aware labels
+        $settings = get_option('lazy_settings', []);
+        $is_hotel = isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
+        $label_singular = $is_hotel ? __('Room Type', 'ltl-bookings') : __('Service', 'ltl-bookings');
+        $label_plural = $is_hotel ? __('Room Types', 'ltl-bookings') : __('Services', 'ltl-bookings');
         // Handle form submissions
         if ( isset( $_POST['ltlb_service_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_service_save_action', 'ltlb_service_nonce' ) ) {
@@ -35,6 +41,39 @@ class LTLB_Admin_ServicesPage {
             $data['is_active'] = isset( $_POST['is_active'] ) ? 1 : 0;
             $data['is_group'] = isset( $_POST['is_group'] ) ? 1 : 0;
             $data['max_seats_per_booking'] = LTLB_Sanitizer::int( $_POST['max_seats_per_booking'] ?? 1 );
+
+            // Optional availability limits (per service)
+            $availability_mode = isset($_POST['availability_mode']) ? sanitize_key( wp_unslash($_POST['availability_mode']) ) : 'window';
+            if ( ! in_array( $availability_mode, [ 'window', 'fixed' ], true ) ) {
+                $availability_mode = 'window';
+            }
+            $data['availability_mode'] = $availability_mode;
+
+            $days = isset( $_POST['available_weekdays'] ) ? (array) $_POST['available_weekdays'] : [];
+            $days = array_values(array_unique(array_map('intval', $days)));
+            $days = array_filter($days, function($d){ return $d >= 0 && $d <= 6; });
+            sort($days);
+            $data['available_weekdays'] = ! empty($days) ? implode(',', $days) : '';
+
+            $start_time = isset($_POST['available_start_time']) ? sanitize_text_field( wp_unslash($_POST['available_start_time']) ) : '';
+            $end_time = isset($_POST['available_end_time']) ? sanitize_text_field( wp_unslash($_POST['available_end_time']) ) : '';
+            $time_ok = function($t){ return is_string($t) && preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $t); };
+            $data['available_start_time'] = $time_ok($start_time) ? ($start_time . ':00') : '';
+            $data['available_end_time'] = $time_ok($end_time) ? ($end_time . ':00') : '';
+
+            // Fixed weekly slots (optional)
+            $fixed_weekdays = isset($_POST['fixed_slot_weekday']) ? (array) $_POST['fixed_slot_weekday'] : [];
+            $fixed_times = isset($_POST['fixed_slot_time']) ? (array) $_POST['fixed_slot_time'] : [];
+            $fixed_slots = [];
+            $count = min(count($fixed_weekdays), count($fixed_times));
+            for ( $i = 0; $i < $count; $i++ ) {
+                $w = intval($fixed_weekdays[$i]);
+                $t = sanitize_text_field( wp_unslash( $fixed_times[$i] ) );
+                if ( $w < 0 || $w > 6 ) continue;
+                if ( ! $time_ok($t) ) continue;
+                $fixed_slots[] = [ 'weekday' => $w, 'time' => $t ];
+            }
+            $data['fixed_weekly_slots'] = ! empty($fixed_slots) ? wp_json_encode($fixed_slots) : '';
 
             if ( $id > 0 ) {
                 $ok = $this->service_repository->update( $id, $data );
@@ -71,8 +110,9 @@ class LTLB_Admin_ServicesPage {
 
         $services = $this->service_repository->get_all();
         ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Services', 'ltl-bookings'); ?></h1>
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <?php endif; ?>
@@ -92,11 +132,49 @@ class LTLB_Admin_ServicesPage {
                 $is_active = $editing ? ( ! empty( $service['is_active'] ) ) : true;
                 $is_group = $editing ? ( ! empty( $service['is_group'] ) ) : false;
                 $max_seats = $editing ? intval($service['max_seats_per_booking'] ?? 1) : 1;
+
+                $available_weekdays = $editing ? (string)($service['available_weekdays'] ?? '') : '';
+                $available_weekdays_arr = array_map('intval', array_filter(preg_split('/\s*,\s*/', $available_weekdays), 'strlen'));
+                $available_start_time = $editing ? (string)($service['available_start_time'] ?? '') : '';
+                $available_end_time = $editing ? (string)($service['available_end_time'] ?? '') : '';
+
+                $availability_mode = $editing ? (string)($service['availability_mode'] ?? 'window') : 'window';
+                if ( ! in_array($availability_mode, ['window','fixed'], true) ) $availability_mode = 'window';
+                $fixed_weekly_slots_raw = $editing ? (string)($service['fixed_weekly_slots'] ?? '') : '';
+                $fixed_weekly_slots = [];
+                if ( $fixed_weekly_slots_raw !== '' ) {
+                    $decoded = json_decode( $fixed_weekly_slots_raw, true );
+                    if ( is_array($decoded) ) {
+                        foreach ( $decoded as $row ) {
+                            if ( ! is_array($row) ) continue;
+                            if ( ! isset($row['weekday'], $row['time']) ) continue;
+                            $w = intval($row['weekday']);
+                            $t = (string)$row['time'];
+                            if ( $w < 0 || $w > 6 ) continue;
+                            if ( ! preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $t) ) continue;
+                            $fixed_weekly_slots[] = [ 'weekday' => $w, 'time' => $t ];
+                        }
+                    }
+                }
+
+                // Normalize TIME to HH:MM for inputs
+                if ( preg_match('/^(\d{2}:\d{2})/', $available_start_time, $m1) ) $available_start_time = $m1[1];
+                if ( preg_match('/^(\d{2}:\d{2})/', $available_end_time, $m2) ) $available_end_time = $m2[1];
+
+                $weekdays = [
+                    1 => __('Mon', 'ltl-bookings'),
+                    2 => __('Tue', 'ltl-bookings'),
+                    3 => __('Wed', 'ltl-bookings'),
+                    4 => __('Thu', 'ltl-bookings'),
+                    5 => __('Fri', 'ltl-bookings'),
+                    6 => __('Sat', 'ltl-bookings'),
+                    0 => __('Sun', 'ltl-bookings'),
+                ];
                 ?>
                 
                 <div class="ltlb-card" style="max-width: 800px; margin-top: 20px;">
-                    <h2 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px;">
-                        <?php echo $editing ? esc_html__('Edit Service', 'ltl-bookings') : esc_html__('Add New Service', 'ltl-bookings'); ?>
+                    <h2>
+                        <?php echo $editing ? sprintf(esc_html__('Edit %s', 'ltl-bookings'), $label_singular) : sprintf(esc_html__('Add New %s', 'ltl-bookings'), $label_singular); ?>
                     </h2>
                     
                     <form method="post">
@@ -107,7 +185,7 @@ class LTLB_Admin_ServicesPage {
                         <table class="form-table">
                             <tr>
                                 <th><label for="name"><?php echo esc_html__('Service Name', 'ltl-bookings'); ?></label></th>
-                                <td><input name="name" type="text" id="name" value="<?php echo esc_attr( $name ); ?>" class="regular-text" required></td>
+                                <td><input name="name" type="text" id="name" value="<?php echo esc_attr( $name ); ?>" class="regular-text" required aria-required="true"></td>
                             </tr>
                             <tr>
                                 <th><label for="description"><?php echo esc_html__('Description', 'ltl-bookings'); ?></label></th>
@@ -115,7 +193,8 @@ class LTLB_Admin_ServicesPage {
                             </tr>
                             <tr>
                                 <th><label for="duration_min"><?php echo esc_html__('Duration (minutes)', 'ltl-bookings'); ?></label></th>
-                                <td><input name="duration_min" type="number" id="duration_min" value="<?php echo esc_attr( $duration ); ?>" class="small-text" min="1" required></td>
+                                <td><input name="duration_min" type="number" id="duration_min" value="<?php echo esc_attr( $duration ); ?>" class="small-text" min="1" required aria-required="true" aria-describedby="duration-desc">
+                                <p class="description" id="duration-desc"><?php echo esc_html__('Service duration in minutes', 'ltl-bookings'); ?></p></td>
                             </tr>
                             <tr>
                                 <th><label for="price_eur"><?php echo esc_html__('Price', 'ltl-bookings'); ?></label></th>
@@ -163,7 +242,146 @@ class LTLB_Admin_ServicesPage {
                                 <th><label for="is_active"><?php echo esc_html__('Active', 'ltl-bookings'); ?></label></th>
                                 <td><input name="is_active" type="checkbox" id="is_active" value="1" <?php checked( $is_active ); ?>></td>
                             </tr>
+
+                            <?php if ( ! $is_hotel ) : ?>
+                            <tr>
+                                <th><label><?php echo esc_html__('Availability (optional)', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <p class="description" style="margin-top:0;">
+                                        <?php echo esc_html__('Limit this class to specific days/times. Choose a window (any time inside) or fixed weekly start times (e.g. Fri 18:00). If left empty, global working hours apply.', 'ltl-bookings'); ?>
+                                    </p>
+
+                                    <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin: 10px 0 14px;">
+                                        <label style="display:inline-flex;align-items:center;gap:6px;">
+                                            <input type="radio" name="availability_mode" value="window" <?php checked($availability_mode, 'window'); ?>>
+                                            <?php echo esc_html__('Window (any start time within)', 'ltl-bookings'); ?>
+                                        </label>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;">
+                                            <input type="radio" name="availability_mode" value="fixed" <?php checked($availability_mode, 'fixed'); ?>>
+                                            <?php echo esc_html__('Fixed weekly start times', 'ltl-bookings'); ?>
+                                        </label>
+                                    </div>
+
+                                    <div id="ltlb-fixed-slots" style="border:1px solid #e5e5e5; border-radius:6px; padding:12px; margin-bottom:14px;">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                                            <strong><?php echo esc_html__('Fixed weekly times', 'ltl-bookings'); ?></strong>
+                                            <button type="button" class="button" id="ltlb-add-fixed-slot"><?php echo esc_html__('Add time', 'ltl-bookings'); ?></button>
+                                        </div>
+                                        <p class="description" style="margin:8px 0 10px;">
+                                            <?php echo esc_html__('Add one or more weekly start times. Example: Fri 18:00. The customer will only see these times (still respecting staff/global hours and existing bookings).', 'ltl-bookings'); ?>
+                                        </p>
+                                        <table class="widefat striped" style="max-width:520px;">
+                                            <thead>
+                                                <tr>
+                                                    <th><?php echo esc_html__('Weekday', 'ltl-bookings'); ?></th>
+                                                    <th><?php echo esc_html__('Start time', 'ltl-bookings'); ?></th>
+                                                    <th><?php echo esc_html__('Remove', 'ltl-bookings'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ltlb-fixed-slots-body">
+                                                <?php
+                                                $render_row = function($w, $t) use ($weekdays) {
+                                                    echo '<tr>';
+                                                    echo '<td><select name="fixed_slot_weekday[]">';
+                                                    foreach ( $weekdays as $idx => $label ) {
+                                                        echo '<option value="' . esc_attr($idx) . '" ' . selected(intval($w), intval($idx), false) . '>' . esc_html($label) . '</option>';
+                                                    }
+                                                    echo '</select></td>';
+                                                    echo '<td><input type="time" name="fixed_slot_time[]" value="' . esc_attr($t) . '"></td>';
+                                                    echo '<td><button type="button" class="button ltlb-remove-fixed-slot">' . esc_html__('Remove', 'ltl-bookings') . '</button></td>';
+                                                    echo '</tr>';
+                                                };
+
+                                                if ( empty($fixed_weekly_slots) ) {
+                                                    $render_row( 5, '18:00' );
+                                                } else {
+                                                    foreach ( $fixed_weekly_slots as $row ) {
+                                                        $render_row( intval($row['weekday']), (string)$row['time'] );
+                                                    }
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div style="display:flex;flex-wrap:wrap;gap:10px; margin-bottom:10px;">
+                                        <?php
+                                        foreach ( $weekdays as $idx => $label ) {
+                                            $checked_day = in_array( intval($idx), $available_weekdays_arr, true ) ? 'checked' : '';
+                                            echo '<label style="display:inline-flex;align-items:center;gap:6px;">'
+                                                . '<input type="checkbox" name="available_weekdays[]" value="' . esc_attr($idx) . '" ' . $checked_day . '>'
+                                                . esc_html($label)
+                                                . '</label>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                                        <label>
+                                            <?php echo esc_html__('From', 'ltl-bookings'); ?>
+                                            <input type="time" name="available_start_time" value="<?php echo esc_attr($available_start_time); ?>" style="margin-left:6px;">
+                                        </label>
+                                        <label>
+                                            <?php echo esc_html__('To', 'ltl-bookings'); ?>
+                                            <input type="time" name="available_end_time" value="<?php echo esc_attr($available_end_time); ?>" style="margin-left:6px;">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endif; ?>
                         </table>
+
+                        <?php if ( ! $is_hotel ) : ?>
+                        <script>
+                        (function(){
+                            function qs(sel, root){ return (root || document).querySelector(sel); }
+                            function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+                            var fixedWrap = qs('#ltlb-fixed-slots');
+                            var addBtn = qs('#ltlb-add-fixed-slot');
+                            var body = qs('#ltlb-fixed-slots-body');
+                            if (!fixedWrap || !addBtn || !body) return;
+
+                            function getMode(){
+                                var checked = qs('input[name="availability_mode"]:checked');
+                                return checked ? checked.value : 'window';
+                            }
+
+                            function updateVisibility(){
+                                fixedWrap.style.display = (getMode() === 'fixed') ? 'block' : 'none';
+                            }
+
+                            qsa('input[name="availability_mode"]').forEach(function(r){
+                                r.addEventListener('change', updateVisibility);
+                            });
+
+                            addBtn.addEventListener('click', function(){
+                                var tr = document.createElement('tr');
+                                tr.innerHTML = body.querySelector('tr') ? body.querySelector('tr').innerHTML : '';
+                                if (!tr.innerHTML) return;
+                                // reset time value
+                                var timeInput = tr.querySelector('input[type="time"]');
+                                if (timeInput) timeInput.value = '18:00';
+                                body.appendChild(tr);
+                            });
+
+                            body.addEventListener('click', function(e){
+                                var btn = e.target && e.target.classList && e.target.classList.contains('ltlb-remove-fixed-slot') ? e.target : null;
+                                if (!btn) return;
+                                var tr = btn.closest('tr');
+                                if (!tr) return;
+                                if (body.querySelectorAll('tr').length <= 1) {
+                                    // keep at least one row for UX; just clear
+                                    var time = tr.querySelector('input[type="time"]');
+                                    if (time) time.value = '';
+                                    return;
+                                }
+                                tr.remove();
+                            });
+
+                            updateVisibility();
+                        })();
+                        </script>
+                        <?php endif; ?>
 
                         <p class="submit">
                             <?php submit_button( esc_html__('Save Service', 'ltl-bookings'), 'primary', 'ltlb_service_save', false ); ?>

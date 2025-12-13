@@ -69,6 +69,61 @@ class LTLB_AppointmentRepository {
 		return $rows ?: [];
 	}
 
+	public function get_by_id( int $id ): ?array {
+		global $wpdb;
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$this->table_name} WHERE id = %d", $id ), ARRAY_A );
+		return $row ?: null;
+	}
+
+	public function delete( int $id ): bool {
+		global $wpdb;
+		$res = $wpdb->delete( $this->table_name, [ 'id' => $id ], [ '%d' ] );
+		return $res !== false;
+	}
+
+	public function update_times( int $id, string $start_at, string $end_at ): bool {
+		global $wpdb;
+		$start_at = sanitize_text_field( $start_at );
+		$end_at = sanitize_text_field( $end_at );
+		$res = $wpdb->update(
+			$this->table_name,
+			[ 'start_at' => $start_at, 'end_at' => $end_at, 'updated_at' => current_time('mysql') ],
+			[ 'id' => $id ],
+			[ '%s', '%s', '%s' ],
+			[ '%d' ]
+		);
+		return $res !== false;
+	}
+
+	/**
+	 * Fetch appointments for calendar view including service + customer names.
+	 *
+	 * @param string $from_mysql 'Y-m-d H:i:s'
+	 * @param string $to_mysql   'Y-m-d H:i:s'
+	 * @return array
+	 */
+	public function get_calendar_rows( string $from_mysql, string $to_mysql ): array {
+		global $wpdb;
+		$customers_table = $wpdb->prefix . 'lazy_customers';
+		$services_table = $wpdb->prefix . 'lazy_services';
+
+		$sql = "
+			SELECT a.*, 
+				COALESCE(s.name, '') AS service_name,
+				COALESCE(c.first_name, '') AS customer_first_name,
+				COALESCE(c.last_name, '') AS customer_last_name,
+				COALESCE(c.email, '') AS customer_email
+			FROM {$this->table_name} a
+			LEFT JOIN {$services_table} s ON a.service_id = s.id
+			LEFT JOIN {$customers_table} c ON a.customer_id = c.id
+			WHERE a.start_at < %s AND a.end_at > %s
+			ORDER BY a.start_at ASC
+		";
+
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $to_mysql, $from_mysql ), ARRAY_A );
+		return $rows ?: [];
+	}
+
 	/**
 	 * Creates a new appointment.
 	 *
@@ -79,10 +134,16 @@ class LTLB_AppointmentRepository {
 		global $wpdb;
 
 		$now = current_time('mysql');
+		$service_id = isset($data['service_id']) ? intval($data['service_id']) : 0;
+		$customer_id = isset($data['customer_id']) ? intval($data['customer_id']) : 0;
+		$staff_user_id = ( isset( $data['staff_user_id'] ) && $data['staff_user_id'] !== null && $data['staff_user_id'] !== '' ) ? intval( $data['staff_user_id'] ) : null;
+
+		$skip_conflict_check = ! empty( $data['skip_conflict_check'] );
+
 		$insert = [
-			'service_id' => isset($data['service_id']) ? intval($data['service_id']) : 0,
-			'customer_id' => isset($data['customer_id']) ? intval($data['customer_id']) : 0,
-			'staff_user_id' => isset($data['staff_user_id']) ? intval($data['staff_user_id']) : null,
+			'service_id' => $service_id,
+			'customer_id' => $customer_id,
+			'staff_user_id' => $staff_user_id,
 			'start_at' => '',
 			'end_at' => '',
 			'status' => isset($data['status']) ? sanitize_text_field($data['status']) : 'pending',
@@ -91,6 +152,9 @@ class LTLB_AppointmentRepository {
 			'created_at' => $now,
 			'updated_at' => $now,
 		];
+		if ( $staff_user_id === null || $staff_user_id <= 0 ) {
+			unset( $insert['staff_user_id'] );
+		}
 		// start_at / end_at may be DateTimeInterface or strings
 		if ( isset( $data['start_at'] ) ) {
 			if ( $data['start_at'] instanceof DateTimeInterface ) {
@@ -114,38 +178,43 @@ class LTLB_AppointmentRepository {
 			$blocking_statuses[] = 'pending';
 		}
 
-		// Basic lock to reduce race conditions: attempt to add an option as a mutex.
-		$lock_key = 'ltlb_lock_' . md5( $insert['service_id'] . '|' . $insert['start_at'] . '|' . $insert['end_at'] );
-		$got_lock = add_option( $lock_key, 1, '', 'no' );
-		if ( $got_lock === false ) {
-			// someone else is inserting for this exact slot
-			return new WP_Error( 'db_lock', __( 'Could not acquire a database lock for this appointment slot.', 'ltl-bookings' ) );
-		}
-
-		try {
+		$lock_key = 'appointment_' . $service_id . '_' . ( $staff_user_id ? $staff_user_id : 'none' ) . '_' . $insert['start_at'] . '_' . $insert['end_at'];
+		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $wpdb, $insert, $blocking_statuses, $staff_user_id, $skip_conflict_check ) {
 			// final conflict check immediately before insert
-			if ( $this->has_conflict( $insert['start_at'], $insert['end_at'], intval( $insert['service_id'] ), intval( $insert['staff_user_id'] ), $blocking_statuses ) ) {
-				return new WP_Error( 'conflict', __( 'This time slot is no longer available.', 'ltl-bookings' ) );
+			if ( ! $skip_conflict_check ) {
+				if ( $this->has_conflict( $insert['start_at'], $insert['end_at'], intval( $insert['service_id'] ), $staff_user_id, $blocking_statuses ) ) {
+					return new WP_Error( 'conflict', __( 'This time slot is no longer available.', 'ltl-bookings' ) );
+				}
 			}
 
-			$formats = ['%d','%d','%d','%s','%s','%s','%s','%d','%s','%s'];
+			$formats = [ '%d', '%d' ];
+			if ( array_key_exists( 'staff_user_id', $insert ) ) {
+				$formats[] = '%d';
+			}
+			$formats = array_merge( $formats, [ '%s', '%s', '%s', '%s', '%d', '%s', '%s' ] );
+
 			$res = $wpdb->insert( $this->table_name, $insert, $formats );
 			if ( $res === false ) {
 				return new WP_Error( 'db_error', __( 'Could not save the appointment to the database.', 'ltl-bookings' ) );
 			}
-			$appointment_id = (int) $wpdb->insert_id;
+			return (int) $wpdb->insert_id;
+		} );
 
-			// Send email notifications
-			list( $service, $customer ) = $this->_get_service_and_customer( $insert['service_id'], $insert['customer_id'] );
-			if ( $service && $customer ) {
-				LTLB_Mailer::send_booking_notifications( $appointment_id, $service, $customer, $insert['start_at'], $insert['end_at'], $insert['status'] );
-			}
-
-			return $appointment_id;
-		} finally {
-			// release lock
-			delete_option( $lock_key );
+		if ( $result === false ) {
+			return new WP_Error( 'lock_timeout', __( 'Another booking is in progress. Please try again.', 'ltl-bookings' ) );
 		}
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		$appointment_id = (int) $result;
+
+		// Send email notifications
+		list( $service, $customer ) = $this->_get_service_and_customer( $insert['service_id'], $insert['customer_id'] );
+		if ( $service && $customer ) {
+			LTLB_Mailer::send_booking_notifications( $appointment_id, $service, $customer, $insert['start_at'], $insert['end_at'], $insert['status'] );
+		}
+
+		return $appointment_id;
 	}
 
 	/**
@@ -172,7 +241,7 @@ class LTLB_AppointmentRepository {
 	 * @param array $blocking_statuses
 	 * @return bool
 	 */
-	public function has_conflict(string $start_at, string $end_at, int $service_id, ?int $staff_user_id, array $blocking_statuses = ['confirmed']): bool {
+	public function has_conflict(string $start_at, string $end_at, int $service_id, ?int $staff_user_id, array $blocking_statuses = ['confirmed'], ?int $exclude_appointment_id = null): bool {
 		global $wpdb;
 
 		if ( empty( $blocking_statuses ) ) {
@@ -194,6 +263,10 @@ class LTLB_AppointmentRepository {
 		if ( $staff_user_id > 0 ) {
 			$sql .= " AND staff_user_id = %d";
 			$params[] = $staff_user_id;
+		}
+		if ( $exclude_appointment_id && $exclude_appointment_id > 0 ) {
+			$sql .= " AND id != %d";
+			$params[] = $exclude_appointment_id;
 		}
 
 		$count = $wpdb->get_var( $wpdb->prepare( $sql, ...$params ) );

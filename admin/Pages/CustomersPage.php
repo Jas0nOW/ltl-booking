@@ -46,7 +46,8 @@ class LTLB_Admin_CustomersPage {
 
 		$customers = $this->customer_repo->get_all();
 		?>
-		<div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_customers'); } ?>
 			<h1 class="wp-heading-inline"><?php echo esc_html__('Customers', 'ltl-bookings'); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
 			    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
@@ -65,7 +66,7 @@ class LTLB_Admin_CustomersPage {
 				$notes = $editing ? $customer['notes'] : '';
 				?>
                 <div class="ltlb-card" style="max-width:800px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo $editing ? esc_html__('Edit Customer', 'ltl-bookings') : esc_html__('Add New Customer', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo $editing ? esc_html__('Edit Customer', 'ltl-bookings') : esc_html__('Add New Customer', 'ltl-bookings'); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ); ?>
                         <input type="hidden" name="ltlb_customer_save" value="1" />

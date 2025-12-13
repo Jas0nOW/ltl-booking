@@ -84,7 +84,44 @@ class LTLB_Logger {
     }
 
     /**
-     * Write log message to WordPress debug.log.
+     * Get custom log file path.
+     */
+    private static function get_log_file(): string {
+        $upload_dir = wp_upload_dir();
+        $log_dir = $upload_dir['basedir'] . '/ltlb-logs';
+        if (!file_exists($log_dir)) {
+            wp_mkdir_p($log_dir);
+            // Add .htaccess to protect log files
+            file_put_contents($log_dir . '/.htaccess', 'deny from all');
+        }
+        return $log_dir . '/ltlb-' . date('Y-m-d') . '.log';
+    }
+
+    /**
+     * Rotate log file if it exceeds max size (10MB).
+     */
+    private static function rotate_if_needed(string $log_file): void {
+        if (!file_exists($log_file)) return;
+        
+        $max_size = 10 * 1024 * 1024; // 10MB
+        if (filesize($log_file) > $max_size) {
+            $archive = $log_file . '.' . time() . '.old';
+            rename($log_file, $archive);
+            
+            // Keep only last 5 rotated logs
+            $pattern = dirname($log_file) . '/ltlb-*.log.*.old';
+            $old_logs = glob($pattern);
+            if (count($old_logs) > 5) {
+                usort($old_logs, function($a, $b) { return filemtime($a) - filemtime($b); });
+                foreach (array_slice($old_logs, 0, -5) as $old) {
+                    @unlink($old);
+                }
+            }
+        }
+    }
+
+    /**
+     * Write log message to custom log file with rotation.
      */
     private static function write(string $level, string $message, array $context = []): void {
         if (!self::should_log($level)) {
@@ -95,13 +132,23 @@ class LTLB_Logger {
         $context_str = !empty($context) ? ' | Context: ' . wp_json_encode($context) : '';
         
         $log_message = sprintf(
-            '[LTLB-%s] %s%s',
+            "[%s] [LTLB-%s] %s%s\n",
+            date('Y-m-d H:i:s'),
             strtoupper($level),
             $message,
             $context_str
         );
 
-        error_log($log_message);
+        $log_file = self::get_log_file();
+        self::rotate_if_needed($log_file);
+        
+        // Write to custom log file
+        error_log($log_message, 3, $log_file);
+        
+        // Also write to WordPress debug.log for errors
+        if ($level === self::LEVEL_ERROR) {
+            error_log('[LTLB] ' . $message);
+        }
     }
 
     /**

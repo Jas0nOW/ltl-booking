@@ -7,11 +7,31 @@
  * $is_hotel_mode (bool)
  */
 if ( ! defined('ABSPATH') ) exit;
+
+$start_mode = isset( $start_mode ) ? strval( $start_mode ) : 'wizard';
+if ( $start_mode !== 'calendar' ) {
+    $start_mode = 'wizard';
+}
+
+$prefill_service_id = isset( $prefill_service_id ) ? intval( $prefill_service_id ) : 0;
+
+$prefill_service_exists = false;
+if ( $prefill_service_id > 0 && is_array( $services ?? null ) ) {
+    foreach ( $services as $s ) {
+        if ( intval( $s['id'] ?? 0 ) === $prefill_service_id ) {
+            $prefill_service_exists = true;
+            break;
+        }
+    }
+}
+
+// With the JS stepper, we always keep steps available so the user can go back.
+$hide_service_step = false;
 ?>
-<div class="ltlb-booking">
+<div class="ltlb-booking<?php echo $start_mode === 'calendar' ? ' ltlb-start-calendar' : ''; ?>" role="region" aria-label="Booking Wizard" data-ltlb-start-mode="<?php echo esc_attr( $start_mode ); ?>" data-ltlb-prefill-service="<?php echo esc_attr( $prefill_service_id ); ?>">
     <a href="#ltlb-form-start" class="ltlb-skip-link screen-reader-text"><?php echo esc_html__('Skip to booking form', 'ltl-bookings'); ?></a>
     
-    <form method="post" aria-label="<?php echo esc_attr__('Booking form', 'ltl-bookings'); ?>" class="ltlb-wizard-form">
+    <form method="post" aria-label="<?php echo esc_attr__('Booking form', 'ltl-bookings'); ?>" class="ltlb-wizard-form" novalidate>
         <?php wp_nonce_field( 'ltlb_book_action', 'ltlb_book_nonce' ); ?>
         
         <!-- Honeypot -->
@@ -20,6 +40,8 @@ if ( ! defined('ABSPATH') ) exit;
         </div>
         
         <span id="ltlb-form-start"></span>
+        
+        <!-- Debug: Mode = <?php echo $is_hotel_mode ? 'HOTEL' : 'SERVICE'; ?> -->
         
         <h3 class="ltlb-wizard-title">
             <?php echo $is_hotel_mode ? esc_html__( 'Book a room', 'ltl-bookings' ) : esc_html__( 'Book a service', 'ltl-bookings' ); ?>
@@ -32,114 +54,138 @@ if ( ! defined('ABSPATH') ) exit;
             </div>
         <?php endif; ?>
 
-        <!-- Step 1: Service/Room Selection -->
-        <fieldset class="ltlb-step">
-            <legend><?php echo $is_hotel_mode ? esc_html__('Room Type', 'ltl-bookings') : esc_html__('Service', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span></legend>
-            
-            <div class="ltlb-form-group">
-                <select name="service_id" class="ltlb-service-select" required aria-required="true" data-price-cents="">
-                    <option value=""><?php echo $is_hotel_mode ? esc_html__('Select a room type', 'ltl-bookings') : esc_html__('Select a service', 'ltl-bookings'); ?></option>
-                    <?php foreach ( $services as $s ): ?>
-                        <option value="<?php echo esc_attr( $s['id'] ); ?>" data-price="<?php echo esc_attr( $s['price_cents'] ?? 0 ); ?>">
-                            <?php echo esc_html( $s['name'] ); ?>
-                            <?php if ( isset($s['price_cents']) && $s['price_cents'] > 0 ) : ?> 
-                                — <?php echo number_format($s['price_cents']/100, 2) . ' ' . ($s['currency'] ?? 'EUR'); ?>
-                            <?php endif; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <?php if ( $is_hotel_mode ) : ?>
-                    <span class="ltlb-field-hint"><?php echo esc_html__('Price shown is per night', 'ltl-bookings'); ?></span>
-                <?php endif; ?>
-            </div>
-        </fieldset>
+        <div class="ltlb-stepper" data-ltlb-stepper>
+            <!-- Step 1: Service/Room Selection -->
+            <fieldset class="ltlb-step ltlb-step-panel" aria-labelledby="ltlb-step-service" data-ltlb-step="service">
+                <legend id="ltlb-step-service"><?php echo $is_hotel_mode ? esc_html__('Room Type', 'ltl-bookings') : esc_html__('Service', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span></legend>
+                
+                <div class="ltlb-form-group">
+                    <select name="service_id" class="ltlb-service-select ltlb-input" required aria-required="true" data-price-cents="">
+                        <option value=""><?php echo $is_hotel_mode ? esc_html__('Select a room type', 'ltl-bookings') : esc_html__('Select a service', 'ltl-bookings'); ?></option>
+                        <?php foreach ( $services as $s ): ?>
+							<?php $sid = intval( $s['id'] ); ?>
+                            <option value="<?php echo esc_attr( $sid ); ?>" data-price="<?php echo esc_attr( $s['price_cents'] ?? 0 ); ?>"<?php echo ( $prefill_service_id && $sid === $prefill_service_id ) ? ' selected' : ''; ?>>
+                                <?php echo esc_html( $s['name'] ); ?>
+                                <?php if ( isset($s['price_cents']) && $s['price_cents'] > 0 ) : ?> 
+                                    — <?php echo number_format($s['price_cents']/100, 2) . ' ' . ($s['currency'] ?? 'EUR'); ?>
+                                <?php endif; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if ( $is_hotel_mode ) : ?>
+                        <span class="ltlb-field-hint"><?php echo esc_html__('Price shown is per night', 'ltl-bookings'); ?></span>
+                    <?php endif; ?>
+                </div>
 
-        <!-- Step 2: Date & Time -->
-        <?php if ( $is_hotel_mode ) : ?>
-            <fieldset class="ltlb-step">
-                <legend><?php echo esc_html__('Dates', 'ltl-bookings'); ?></legend>
+                <div class="ltlb-step-nav">
+                    <button type="button" class="button-secondary" data-ltlb-back disabled><?php echo esc_html__('Back', 'ltl-bookings'); ?></button>
+                    <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__('Next', 'ltl-bookings'); ?></button>
+                </div>
+            </fieldset>
+
+            <!-- Step 2: Date & Time -->
+            <?php if ( $is_hotel_mode ) : ?>
+                <fieldset class="ltlb-step ltlb-step-panel" aria-labelledby="ltlb-step-dates" data-ltlb-step="datetime">
+                    <legend id="ltlb-step-dates"><?php echo esc_html__('Dates', 'ltl-bookings'); ?></legend>
+                    <div class="ltlb-form-row">
+                        <div class="ltlb-form-group">
+                            <label for="ltlb-checkin">
+                                <?php echo esc_html__('Check-in', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                            </label>
+                            <input type="date" id="ltlb-checkin" name="checkin" required aria-required="true" class="ltlb-input">
+                        </div>
+                        <div class="ltlb-form-group">
+                            <label for="ltlb-checkout">
+                                <?php echo esc_html__('Check-out', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                            </label>
+                            <input type="date" id="ltlb-checkout" name="checkout" required aria-required="true" class="ltlb-input">
+                        </div>
+                    </div>
+                    <div class="ltlb-form-group">
+                        <label for="ltlb-guests">
+                            <?php echo esc_html__('Guests', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                        </label>
+                        <input type="number" id="ltlb-guests" name="guests" min="1" value="1" required aria-required="true" class="ltlb-input">
+                    </div>
+
+                    <div class="ltlb-step-nav">
+                        <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__('Back', 'ltl-bookings'); ?></button>
+                        <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__('Next', 'ltl-bookings'); ?></button>
+                    </div>
+                </fieldset>
+            <?php else : ?>
+                <fieldset class="ltlb-step ltlb-step-panel" aria-labelledby="ltlb-step-datetime" data-ltlb-step="datetime">
+                    <legend id="ltlb-step-datetime"><?php echo esc_html__('Date & Time', 'ltl-bookings'); ?></legend>
+                    <div class="ltlb-form-group">
+                        <label for="ltlb-date">
+                            <?php echo esc_html__('Date', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                        </label>
+                        <input type="date" id="ltlb-date" name="date" required aria-required="true" class="ltlb-input">
+                    </div>
+                    <div class="ltlb-form-group">
+                        <label for="ltlb-time-slot">
+                            <?php echo esc_html__('Time', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                        </label>
+                        <select id="ltlb-time-slot" name="time_slot" required aria-required="true" class="ltlb-input">
+                            <option value=""><?php echo esc_html__('Select date first', 'ltl-bookings'); ?></option>
+                        </select>
+                        <span class="ltlb-field-hint"><?php echo esc_html__('Available time slots will load after selecting a date', 'ltl-bookings'); ?></span>
+                    </div>
+
+                    <div class="ltlb-step-nav">
+                        <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__('Back', 'ltl-bookings'); ?></button>
+                        <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__('Next', 'ltl-bookings'); ?></button>
+                    </div>
+                </fieldset>
+            <?php endif; ?>
+
+            <!-- Step 3: Resource (Optional) -->
+            <fieldset class="ltlb-step ltlb-step-panel" id="ltlb-resource-step" aria-labelledby="ltlb-step-resource" style="display:none;" data-ltlb-step="resource">
+                <legend id="ltlb-step-resource"><?php echo $is_hotel_mode ? esc_html__('Room Preference', 'ltl-bookings') : esc_html__('Resource', 'ltl-bookings'); ?></legend>
+                <div class="ltlb-form-group">
+                    <select id="ltlb-resource-select" name="resource_id" class="ltlb-input">
+                        <option value=""><?php echo esc_html__('Any available', 'ltl-bookings'); ?></option>
+                    </select>
+                    <span class="ltlb-field-hint" id="ltlb-resource-hint">
+                        <?php echo $is_hotel_mode ? esc_html__('Multiple rooms available for your dates', 'ltl-bookings') : esc_html__('Multiple resources available for this time', 'ltl-bookings'); ?>
+                    </span>
+                </div>
+
+                <div class="ltlb-step-nav">
+                    <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__('Back', 'ltl-bookings'); ?></button>
+                    <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__('Next', 'ltl-bookings'); ?></button>
+                </div>
+            </fieldset>
+
+            <!-- Step 4: User Details + Submit -->
+            <fieldset class="ltlb-step ltlb-step-panel" aria-labelledby="ltlb-step-details" data-ltlb-step="details">
+                <legend id="ltlb-step-details"><?php echo esc_html__('Your details', 'ltl-bookings'); ?></legend>
+                <div class="ltlb-form-group">
+                    <label for="ltlb-email">
+                        <?php echo esc_html__('Email', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
+                    </label>
+                    <input type="email" id="ltlb-email" name="email" required aria-required="true" placeholder="you@example.com" autocomplete="email" class="ltlb-input">
+                </div>
                 <div class="ltlb-form-row">
                     <div class="ltlb-form-group">
-                        <label for="ltlb-checkin">
-                            <?php echo esc_html__('Check-in', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                        </label>
-                        <input type="date" id="ltlb-checkin" name="checkin" required aria-required="true">
+                        <label for="ltlb-first-name"><?php echo esc_html__('First name', 'ltl-bookings'); ?></label>
+                        <input type="text" id="ltlb-first-name" name="first_name" autocomplete="given-name" placeholder="John" class="ltlb-input">
                     </div>
                     <div class="ltlb-form-group">
-                        <label for="ltlb-checkout">
-                            <?php echo esc_html__('Check-out', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                        </label>
-                        <input type="date" id="ltlb-checkout" name="checkout" required aria-required="true">
+                        <label for="ltlb-last-name"><?php echo esc_html__('Last name', 'ltl-bookings'); ?></label>
+                        <input type="text" id="ltlb-last-name" name="last_name" autocomplete="family-name" placeholder="Doe" class="ltlb-input">
                     </div>
                 </div>
                 <div class="ltlb-form-group">
-                    <label for="ltlb-guests">
-                        <?php echo esc_html__('Guests', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                    </label>
-                    <input type="number" id="ltlb-guests" name="guests" min="1" value="1" required aria-required="true">
+                    <label for="ltlb-phone"><?php echo esc_html__('Phone', 'ltl-bookings'); ?></label>
+                    <input type="tel" id="ltlb-phone" name="phone" placeholder="+1234567890" autocomplete="tel" class="ltlb-input">
+                </div>
+
+                <div class="ltlb-step-nav">
+                    <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__('Back', 'ltl-bookings'); ?></button>
+                    <?php submit_button( esc_html__('Complete Booking', 'ltl-bookings'), 'primary', 'ltlb_book_submit', false, ['aria-label' => esc_attr__('Submit booking form', 'ltl-bookings')] ); ?>
                 </div>
             </fieldset>
-        <?php else : ?>
-            <fieldset class="ltlb-step">
-                <legend><?php echo esc_html__('Date & Time', 'ltl-bookings'); ?></legend>
-                <div class="ltlb-form-group">
-                    <label for="ltlb-date">
-                        <?php echo esc_html__('Date', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                    </label>
-                    <input type="date" id="ltlb-date" name="date" required aria-required="true">
-                </div>
-                <div class="ltlb-form-group">
-                    <label for="ltlb-time-slot">
-                        <?php echo esc_html__('Time', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                    </label>
-                    <select id="ltlb-time-slot" name="time_slot" required aria-required="true">
-                        <option value=""><?php echo esc_html__('Select date first', 'ltl-bookings'); ?></option>
-                    </select>
-                    <span class="ltlb-field-hint"><?php echo esc_html__('Available time slots will load after selecting a date', 'ltl-bookings'); ?></span>
-                </div>
-            </fieldset>
-        <?php endif; ?>
-
-        <!-- Step 3: Resource (Optional) -->
-        <fieldset class="ltlb-step" id="ltlb-resource-step" style="display:none;">
-            <legend><?php echo $is_hotel_mode ? esc_html__('Room Preference', 'ltl-bookings') : esc_html__('Resource', 'ltl-bookings'); ?></legend>
-            <div class="ltlb-form-group">
-                <select id="ltlb-resource-select" name="resource_id">
-                    <option value=""><?php echo esc_html__('Any available', 'ltl-bookings'); ?></option>
-                </select>
-                <span class="ltlb-field-hint" id="ltlb-resource-hint">
-                    <?php echo $is_hotel_mode ? esc_html__('Multiple rooms available for your dates', 'ltl-bookings') : esc_html__('Multiple resources available for this time', 'ltl-bookings'); ?>
-                </span>
-            </div>
-        </fieldset>
-
-        <!-- Step 4: User Details -->
-        <fieldset class="ltlb-step">
-            <legend><?php echo esc_html__('Your details', 'ltl-bookings'); ?></legend>
-            <div class="ltlb-form-group">
-                <label for="ltlb-email">
-                    <?php echo esc_html__('Email', 'ltl-bookings'); ?><span class="ltlb-required">*</span>
-                </label>
-                <input type="email" id="ltlb-email" name="email" required aria-required="true" placeholder="you@example.com" autocomplete="email">
-            </div>
-            <div class="ltlb-form-row">
-                <div class="ltlb-form-group">
-                    <label for="ltlb-first-name"><?php echo esc_html__('First name', 'ltl-bookings'); ?></label>
-                    <input type="text" id="ltlb-first-name" name="first_name" autocomplete="given-name">
-                </div>
-                <div class="ltlb-form-group">
-                    <label for="ltlb-last-name"><?php echo esc_html__('Last name', 'ltl-bookings'); ?></label>
-                    <input type="text" id="ltlb-last-name" name="last_name" autocomplete="family-name">
-                </div>
-            </div>
-            <div class="ltlb-form-group">
-                <label for="ltlb-phone"><?php echo esc_html__('Phone', 'ltl-bookings'); ?></label>
-                <input type="tel" id="ltlb-phone" name="phone" placeholder="+1234567890" autocomplete="tel">
-            </div>
-        </fieldset>
-
-        <div class="ltlb-form-actions">
-            <?php submit_button( esc_html__('Complete Booking', 'ltl-bookings'), 'primary', 'ltlb_book_submit', false, ['aria-label' => esc_attr__('Submit booking form', 'ltl-bookings')] ); ?>
         </div>
     </form>
 </div>

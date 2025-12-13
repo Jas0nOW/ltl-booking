@@ -25,13 +25,13 @@ class LTLB_Admin_SettingsPage {
 					$headers[] = 'Reply-To: ' . $reply_to;
 				}
 
-				$subject = 'LazyBookings Test Email';
-				$body = '<p>This is a test email from LazyBookings plugin.</p>';
-				$body .= '<p>From: ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
+                $subject = __( 'LazyBookings Test Email', 'ltl-bookings' );
+                $body = '<p>' . esc_html__( 'This is a test email from LazyBookings plugin.', 'ltl-bookings' ) . '</p>';
+                $body .= '<p>' . esc_html__( 'From:', 'ltl-bookings' ) . ' ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
 				if ( ! empty( $reply_to ) ) {
-					$body .= '<p>Reply-To: ' . esc_html($reply_to) . '</p>';
+                    $body .= '<p>' . esc_html__( 'Reply-To:', 'ltl-bookings' ) . ' ' . esc_html($reply_to) . '</p>';
 				}
-				$body .= '<p>Sent at: ' . current_time('Y-m-d H:i:s') . '</p>';
+                $body .= '<p>' . esc_html__( 'Sent at:', 'ltl-bookings' ) . ' ' . esc_html( current_time('Y-m-d H:i:s') ) . '</p>';
 
 				$sent = wp_mail( $test_email, $subject, $body, $headers );
 				if ( $sent ) {
@@ -73,6 +73,9 @@ class LTLB_Admin_SettingsPage {
 				// Logging settings
 				$settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
 				$settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? 'error' );
+				
+				// Template Mode
+				$settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? 'service' );
 
 				update_option( 'lazy_settings', $settings );
 
@@ -102,20 +105,27 @@ class LTLB_Admin_SettingsPage {
 			
 			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
 			$log_level = $settings['log_level'] ?? 'error';
+			$template_mode = $settings['template_mode'] ?? 'service';
 
 		$timezones = timezone_identifiers_list();
 		?>
-		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php echo esc_html__('Settings', 'ltl-bookings'); ?></h1>
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_settings'); } ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html__('Settings', 'ltl-bookings'); ?></h1>
             <hr class="wp-header-end">
 
 			<form method="post">
 				<?php wp_nonce_field( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ); ?>
 				<input type="hidden" name="ltlb_settings_save" value="1" />
 
+				<!-- Save Button at Top -->
+				<p class="submit" style="margin-top:10px; padding-top:0;">
+					<?php submit_button( esc_html__('Save Settings', 'ltl-bookings'), 'primary', 'ltlb_settings_save_top', false ); ?>
+				</p>
+
                 <!-- GENERAL SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('General Settings', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('General Settings', 'ltl-bookings'); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -161,13 +171,23 @@ class LTLB_Admin_SettingsPage {
                                     <label><input name="pending_blocks" id="pending_blocks" type="checkbox" value="1" <?php checked( $pending_blocks ); ?>> <?php echo esc_html__('Yes, pending bookings block the time slot', 'ltl-bookings'); ?></label>
                                 </td>
                             </tr>
+                            <tr>
+                                <th><label for="template_mode"><?php echo esc_html__('Booking Template Mode', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <select name="template_mode" id="template_mode">
+                                        <option value="service" <?php selected( $template_mode, 'service' ); ?>><?php echo esc_html__('Service Booking (Appointments)', 'ltl-bookings'); ?></option>
+                                        <option value="hotel" <?php selected( $template_mode, 'hotel' ); ?>><?php echo esc_html__('Hotel Booking (Check-in/Check-out)', 'ltl-bookings'); ?></option>
+                                    </select>
+                                    <p class="description"><?php echo esc_html__('Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings'); ?></p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- EMAIL SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -207,7 +227,7 @@ class LTLB_Admin_SettingsPage {
 
                 <!-- LOGGING SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Logging', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('Logging', 'ltl-bookings'); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -236,7 +256,7 @@ class LTLB_Admin_SettingsPage {
 
             <!-- TEST EMAIL -->
             <div class="ltlb-card" style="margin-top:20px;">
-                <h3 style="margin-top:0;"><?php echo esc_html__('Test Email Configuration', 'ltl-bookings'); ?></h3>
+                <h3><?php echo esc_html__('Test Email Configuration', 'ltl-bookings'); ?></h3>
                 <form method="post" style="display:flex; gap:10px; align-items:flex-end;">
                     <?php wp_nonce_field( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ); ?>
                     <input type="hidden" name="ltlb_send_test_email" value="1">

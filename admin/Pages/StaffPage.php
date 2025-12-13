@@ -93,12 +93,13 @@ class LTLB_Admin_StaffPage {
         $staff_users = get_users( ['role' => 'ltlb_staff'] );
 
         ?>
-        <div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_staff'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__('Staff', 'ltl-bookings'); ?></h1>
             <hr class="wp-header-end">
 
             <div class="ltlb-card" style="margin-top:20px;">
-                <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Staff Members', 'ltl-bookings'); ?></h2>
+                <h2><?php echo esc_html__('Staff Members', 'ltl-bookings'); ?></h2>
                 <table class="wp-list-table widefat striped">
                     <thead>
                         <tr><th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Email', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
@@ -128,7 +129,7 @@ class LTLB_Admin_StaffPage {
                 ?>
                 
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Edit Working Hours', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('Edit Working Hours', 'ltl-bookings'); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_staff_save_action', 'ltlb_staff_nonce' ); ?>
                         <input type="hidden" name="ltlb_staff_save" value="1" />
@@ -163,7 +164,7 @@ class LTLB_Admin_StaffPage {
                 </div>
                 
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Exceptions', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('Exceptions', 'ltl-bookings'); ?></h2>
 
                     <?php
                     $from = date('Y-m-d', strtotime('-365 days'));
@@ -182,7 +183,7 @@ class LTLB_Admin_StaffPage {
                                 <?php foreach ( $exceptions as $e ) : ?>
                                     <tr>
                                         <td><?php echo esc_html( $e['date'] ); ?></td>
-                                        <td><?php echo esc_html( ! empty($e['is_off_day']) ? 'Yes' : 'No' ); ?></td>
+                                        <td><?php echo esc_html( ! empty($e['is_off_day']) ? __( 'Yes', 'ltl-bookings' ) : __( 'No', 'ltl-bookings' ) ); ?></td>
                                         <td><?php echo esc_html( $e['start_time'] ?? '' ); ?></td>
                                         <td><?php echo esc_html( $e['end_time'] ?? '' ); ?></td>
                                         <td><?php echo esc_html( $e['note'] ?? '' ); ?></td>
@@ -203,7 +204,7 @@ class LTLB_Admin_StaffPage {
                 </div>
 
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h3 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo esc_html__('Create Exception', 'ltl-bookings'); ?></h3>
+                    <h3><?php echo esc_html__('Create Exception', 'ltl-bookings'); ?></h3>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_exception_create_action', 'ltlb_exception_nonce' ); ?>
                         <input type="hidden" name="ltlb_exception_create" value="1">

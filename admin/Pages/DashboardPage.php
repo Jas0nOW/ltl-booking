@@ -22,8 +22,9 @@ class LTLB_Admin_DashboardPage {
 		$last5 = array_slice($last5, 0, 5);
 
 		?>
-		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php echo esc_html__('LazyBookings Dashboard', 'ltl-bookings'); ?></h1>
+        <div class="wrap ltlb-admin ltlb-admin--dashboard">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_dashboard'); } ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html__('LazyBookings Dashboard', 'ltl-bookings'); ?></h1>
             <hr class="wp-header-end">
 
             <div class="ltlb-dashboard-stats">
@@ -88,7 +89,15 @@ class LTLB_Admin_DashboardPage {
                                     ?></td>
                                     <td><?php echo esc_html( $cust_name ); ?></td>
                                     <td><?php echo esc_html( $a['start_at'] ); ?></td>
-                                    <td><span class="ltlb-status-badge status-<?php echo esc_attr($a['status']); ?>"><?php echo esc_html( ucfirst($a['status']) ); ?></span></td>
+                                    <td>
+                                        <?php
+                                        $status_label = $a['status'];
+                                        if ( $a['status'] === 'confirmed' ) $status_label = __( 'Confirmed', 'ltl-bookings' );
+                                        if ( $a['status'] === 'pending' ) $status_label = __( 'Pending', 'ltl-bookings' );
+                                        if ( $a['status'] === 'cancelled' ) $status_label = __( 'Cancelled', 'ltl-bookings' );
+                                        ?>
+                                        <span class="ltlb-status-badge status-<?php echo esc_attr($a['status']); ?>"><?php echo esc_html( $status_label ); ?></span>
+                                    </td>
                                     <td><?php
                                         $rid = null;
                                         if ( $appt_res_repo ) {

@@ -28,7 +28,13 @@ foreach ( $tables as $table ) {
 	$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 }
 
+// Remove scheduled cron jobs
+if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
+	wp_clear_scheduled_hook( 'ltlb_retention_cleanup' );
+}
+
 // Delete plugin options
 delete_option('lazy_settings');
 delete_option('lazy_design');
+delete_option('lazy_design_backend');
 delete_option('ltlb_db_version');

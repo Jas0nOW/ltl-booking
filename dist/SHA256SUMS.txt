@@ -1,1 +1,1 @@
-f59d05d2cb343bdb6dee9b20f4f2f64e1c73ad3f2e39be1c34ad13a6ee0ea2f4  ltl-bookings-0.4.0.zip
+b3f73fbd1981fc8a99fa74745aa5492fbb19c6f3b3b1eeb8e16ddae5f822f1b5  ltl-bookings-0.4.4.zip

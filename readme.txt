@@ -4,11 +4,11 @@ Tags: bookings, appointments, services, resources
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 0.4.0
+Stable tag: 0.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-LazyBookings is a high-end booking and resource management plugin for WordPress (Amelia alternative). Phase 1 provides PHP-first MVP with custom tables, admin pages, REST API, and a minimal frontend wizard.
+LazyBookings is a booking and resource management plugin for WordPress (Amelia alternative). It provides custom tables, admin pages, REST endpoints for availability, and a modern frontend booking wizard.
 
 == Description ==
 LazyBookings provides services, customers, and appointments management with custom database tables for performance. Admin pages support CRUD operations. Frontend shortcode `[lazy_book]` offers a minimal booking wizard.
@@ -24,7 +24,7 @@ The REST namespace is `ltlb/v1`.
 
 = Which shortcodes exist? =
 - `[lazy_book]` – Standard wizard.
-- `[lazy_book service="123" mode="calendar"]` – Starts in calendar mode.
+- `[lazy_book_calendar]` – Wizard starting in calendar-first mode.
 
 == Screenshots ==
 1. Services admin list.
@@ -33,8 +33,16 @@ The REST namespace is `ltlb/v1`.
 4. Booking wizard.
 
 == Changelog ==
-= 0.4.0 =
-- Release candidate with stable admin pages and shortcode.
+= 0.4.4 =
+- Admin calendar management (drag & drop rescheduling).
+- Admin REST endpoints for calendar + appointment/customer edits.
+- Conflict-safe rescheduling (409 + UI revert).
+- Per-user admin language switch (EN/DE).
+
+= 0.4.3 =
+- Per-service availability rules incl. fixed weekly start times.
+- Schema update: appointments include `seats` column.
+- Docs and API behavior aligned to current implementation.
 
 == Upgrade Notice ==
-Version 0.4.0: Database migrations run automatically on activation and when plugin version changes.
+Version 0.4.4: Database migrations run automatically on activation and when plugin version changes.

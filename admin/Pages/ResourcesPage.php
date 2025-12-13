@@ -2,7 +2,6 @@
 if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_ResourcesPage {
-
     private $resource_repository;
 
     public function __construct() {
@@ -13,6 +12,13 @@ class LTLB_Admin_ResourcesPage {
         if ( ! current_user_can('manage_options') ) {
             wp_die( esc_html__('You do not have permission to view this page.', 'ltl-bookings') );
         }
+        
+        // Context-aware labels
+        $settings = get_option('lazy_settings', []);
+        $is_hotel = isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
+        $label_singular = $is_hotel ? __('Room', 'ltl-bookings') : __('Resource', 'ltl-bookings');
+        $label_plural = $is_hotel ? __('Rooms', 'ltl-bookings') : __('Resources', 'ltl-bookings');
+        $services_label = $is_hotel ? __('Room Types', 'ltl-bookings') : __('Services', 'ltl-bookings');
         // Handle form submissions
         if ( isset( $_POST['ltlb_resource_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_resource_save_action', 'ltlb_resource_nonce' ) ) {
@@ -52,16 +58,17 @@ class LTLB_Admin_ResourcesPage {
 
         $resources = $this->resource_repository->get_all();
         ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Resources', 'ltl-bookings'); ?></h1>
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_resources'); } ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <?php endif; ?>
             <hr class="wp-header-end">
             
             <p class="description" style="margin-bottom:20px;">
-                <?php echo esc_html__('Resources are rooms, equipment, or staff capacity. Link them to services to manage availability.', 'ltl-bookings'); ?> 
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services') ); ?>"><?php echo esc_html__('Manage Services', 'ltl-bookings'); ?></a>
+                <?php echo $is_hotel ? esc_html__('Rooms are the bookable units (e.g., Room 101, Room 102). Link them to room types to manage availability.', 'ltl-bookings') : esc_html__('Resources are rooms, equipment, or staff capacity. Link them to services to manage availability.', 'ltl-bookings'); ?> 
+                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services') ); ?>"><?php echo esc_html(sprintf(__('Manage %s', 'ltl-bookings'), $services_label)); ?></a>
             </p>
 
             <?php if ( $action === 'add' || $editing ) :
@@ -72,7 +79,7 @@ class LTLB_Admin_ResourcesPage {
                 $is_active = $editing ? ( ! empty( $resource['is_active'] ) ) : true;
                 ?>
                 <div class="ltlb-card" style="max-width:800px;">
-                    <h2 style="margin-top:0;border-bottom:1px solid #eee;padding-bottom:15px;"><?php echo $editing ? esc_html__('Edit Resource', 'ltl-bookings') : esc_html__('Add New Resource', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo $editing ? sprintf(esc_html__('Edit %s', 'ltl-bookings'), $label_singular) : sprintf(esc_html__('Add New %s', 'ltl-bookings'), $label_singular); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_resource_save_action', 'ltlb_resource_nonce' ); ?>
                         <input type="hidden" name="ltlb_resource_save" value="1" />

@@ -48,7 +48,7 @@ class LTLB_Mailer {
             $admin_subject = sprintf( 'New booking: %s - %s', $placeholders['service'], $placeholders['start'] );
         }
         if ( empty( $admin_body ) ) {
-            $admin_body = "A new booking was created:\n\nService: {service}\nStart: {start}\nEnd: {end}\nCustomer: {name} <{email}>\nPhone: {phone}\nStatus: {status}\nAppointment ID: {appointment_id}";
+			$admin_body = "A new booking was created:\n\nService: {service}\nStart: {start}\nEnd: {end}\nSeats/Guests: {seats}\nCustomer: {name} <{email}>\nPhone: {phone}\nStatus: {status}\nAppointment ID: {appointment_id}";
         }
 
         $subj = self::replace_placeholders( $admin_subject, $placeholders );
@@ -70,7 +70,7 @@ class LTLB_Mailer {
                 $customer_subject = sprintf( 'Your booking %s on %s', $placeholders['service'], $placeholders['start'] );
             }
             if ( empty( $customer_body ) ) {
-                $customer_body = "Hello {name},\n\nThank you for your booking. Details:\nService: {service}\nStart: {start}\nEnd: {end}\nStatus: {status}\nAppointment ID: {appointment_id}\n\nRegards";
+				$customer_body = "Hello {name},\n\nThank you for your booking. Details:\nService: {service}\nStart: {start}\nEnd: {end}\nSeats/Guests: {seats}\nStatus: {status}\nAppointment ID: {appointment_id}\n\nRegards";
             }
 
             $csubj = self::replace_placeholders( $customer_subject, $placeholders );

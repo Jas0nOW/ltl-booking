@@ -5,13 +5,34 @@ class LTLB_PrivacyPage {
 
     public function render(): void {
         if (!current_user_can('manage_options')) {
-            wp_die(__('Insufficient permissions', 'ltl-bookings'));
+            wp_die( esc_html__( 'Insufficient permissions', 'ltl-bookings' ) );
+        }
+
+        // Handle manual cleanup trigger
+        if ( isset( $_GET['action'] ) && $_GET['action'] === 'run_cleanup' ) {
+            $nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'ltlb_run_cleanup' ) ) {
+                wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
+            }
+            if ( class_exists( 'LTLB_Retention' ) ) {
+                $result = LTLB_Retention::run( true );
+                LTLB_Notices::add(
+                    sprintf(
+                        __( 'Cleanup completed. Deleted appointments: %d. Anonymized customers: %d.', 'ltl-bookings' ),
+                        intval( $result['deleted_appointments'] ?? 0 ),
+                        intval( $result['anonymized_customers'] ?? 0 )
+                    ),
+                    'success'
+                );
+            }
+            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_privacy' ) );
+            exit;
         }
 
         // Handle anonymize customer action
         if (isset($_POST['ltlb_anonymize_customer']) && !empty($_POST['customer_email'])) {
             if (!check_admin_referer('ltlb_anonymize_customer', 'ltlb_anonymize_nonce')) {
-                wp_die(__('Nonce verification failed', 'ltl-bookings'));
+				wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
             }
 
             $email = sanitize_email($_POST['customer_email']);
@@ -32,7 +53,7 @@ class LTLB_PrivacyPage {
         // Handle retention settings save
         if (isset($_POST['ltlb_save_retention'])) {
             if (!check_admin_referer('ltlb_save_retention', 'ltlb_retention_nonce')) {
-                wp_die(__('Nonce verification failed', 'ltl-bookings'));
+				wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
             }
 
             $settings = get_option('lazy_settings', []);
@@ -53,7 +74,8 @@ class LTLB_PrivacyPage {
         $anonymize_after_days = $settings['retention_anonymize_after_days'] ?? 0;
 
         ?>
-        <div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_privacy'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__('Privacy & GDPR', 'ltl-bookings'); ?></h1>
             <hr class="wp-header-end">
 
@@ -65,10 +87,10 @@ class LTLB_PrivacyPage {
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label for="delete_canceled_days"><?php echo esc_html__('Delete canceled appointments after (days)', 'ltl-bookings'); ?></label></th>
+                                <th><label for="delete_canceled_days"><?php echo esc_html__('Delete cancelled appointments after (days)', 'ltl-bookings'); ?></label></th>
                                 <td>
                                     <input name="delete_canceled_days" id="delete_canceled_days" type="number" value="<?php echo esc_attr($delete_canceled_days); ?>" class="small-text" min="0">
-                                    <p class="description"><?php echo esc_html__('Set to 0 to disable automatic deletion. Appointments with status "canceled" older than this will be permanently deleted.', 'ltl-bookings'); ?></p>
+                                    <p class="description"><?php echo esc_html__('Set to 0 to disable automatic deletion. Appointments with status "cancelled" older than this will be permanently deleted.', 'ltl-bookings'); ?></p>
                                 </td>
                             </tr>
                             <tr>

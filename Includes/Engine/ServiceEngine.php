@@ -81,7 +81,9 @@ class ServiceEngine implements BookingEngineInterface {
             $allowed_resources = array_map(function($r){ return intval($r['id']); }, $all );
         }
 
-        $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) $ls = [];
+        $include_pending = ! empty( $ls['pending_blocks'] );
         $blocked_counts = $appt_resource_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
 
         $chosen = isset($payload['resource_id']) ? intval($payload['resource_id']) : 0;

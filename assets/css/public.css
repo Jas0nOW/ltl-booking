@@ -1,3 +1,25 @@
+.ltlb-booking .ltlb-input {
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+
+/* Nuclear-level input shadow enforcement */
+.ltlb-booking input.ltlb-input[type="text"],
+.ltlb-booking input.ltlb-input[type="email"],
+.ltlb-booking input.ltlb-input[type="date"],
+.ltlb-booking input.ltlb-input[type="tel"],
+.ltlb-booking input.ltlb-input[type="number"],
+.ltlb-booking select.ltlb-input,
+.ltlb-booking textarea.ltlb-input {
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+
+.ltlb-booking .ltlb-wizard-form .ltlb-input {
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+
+.ltlb-booking fieldset .ltlb-input {
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
 /**
  * LazyBookings Public Styles
  * Mobile-first, using CSS variables from plugin
@@ -9,32 +31,195 @@
 .ltlb-booking {
     background: var(--lazy-bg, #fff);
     color: var(--lazy-text, #111);
-    padding: 1rem;
-    border-radius: var(--lazy-border-radius, 8px);
+    padding: 1.5rem;
+    border-radius: var(--lazy-border-radius, 12px);
     max-width: 100%;
-    box-shadow: var(--lazy-box-shadow, 0 2px 8px rgba(0,0,0,0.08));
-    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, transparent);
+    box-shadow: var(--lazy-shadow-container, 0 4px 20px rgba(0,0,0,0.08));
+    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #e5e7eb);
+    margin: 2rem auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Prevent theme CSS from breaking internal layout */
+.ltlb-booking,
+.ltlb-booking *,
+.ltlb-booking *::before,
+.ltlb-booking *::after {
+    box-sizing: border-box;
+}
+
+.ltlb-booking .ltlb-skip-link:focus {
+    position: static;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.ltlb-booking .ltlb-wizard-form {
+    margin: 0;
+    display: block;
+}
+
+.ltlb-booking .ltlb-wizard-title {
+    margin: 0 0 1.25rem 0;
+}
+
+.ltlb-booking .ltlb-step {
+    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #e5e7eb);
+    border-radius: var(--lazy-border-radius, 12px);
+    padding: 1rem;
+    margin: 0 0 1.25rem 0;
+    background: var(--lazy-panel-bg, transparent);
+    min-width: 0;
+}
+
+.ltlb-booking .ltlb-step legend {
+    padding: 0 0.25rem;
+    font-weight: 700;
+    color: var(--lazy-text, #111);
+}
+
+.ltlb-booking .ltlb-required {
+    margin-left: 0.25rem;
+    color: var(--lazy-accent, #ffcc00);
+    font-weight: 700;
+}
+
+.ltlb-booking .ltlb-form-group {
+    margin: 0 0 1rem 0;
+}
+
+.ltlb-booking .ltlb-form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+    .ltlb-booking .ltlb-form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ltlb-booking .ltlb-field-hint {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--lazy-text, #111);
+    opacity: 0.75;
+}
+
+.ltlb-booking .ltlb-price-preview {
+    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #e5e7eb);
+    border-radius: var(--lazy-border-radius, 12px);
+    padding: 1rem;
+    margin: 0 0 1.25rem 0;
+    background: var(--lazy-panel-bg, transparent);
+}
+
+.ltlb-booking .ltlb-form-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
 }
 
 @media (min-width: 640px) {
     .ltlb-booking {
-        padding: 1.5rem;
-        max-width: 600px;
+        padding: 2rem;
+        max-width: 560px;
     }
 }
 
+/* Stepper: window-style wizard */
+.ltlb-booking .ltlb-stepper {
+    display: grid;
+    grid-template-columns: 1fr;
+    position: relative;
+    width: 100%;
+}
+
+/* Calendar-start without JS: keep the page short */
+.ltlb-booking.ltlb-start-calendar:not(.ltlb-js) [data-ltlb-step="service"] {
+    display: none;
+}
+
+.ltlb-booking.ltlb-js .ltlb-stepper {
+    overflow: hidden;
+    height: auto;
+    transition: height var(--lazy-transition-duration, 200ms) ease;
+    align-items: start;
+}
+
+.ltlb-booking.ltlb-js .ltlb-step-panel {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    opacity: 0;
+    transform: translateX(12px);
+    pointer-events: none;
+    align-self: start;
+    transition:
+        opacity var(--lazy-transition-duration, 200ms) ease,
+        transform var(--lazy-transition-duration, 200ms) ease;
+}
+
+.ltlb-booking.ltlb-js .ltlb-step-panel.is-active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.ltlb-booking.ltlb-js .ltlb-step-panel.is-left {
+    transform: translateX(-12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ltlb-booking.ltlb-js .ltlb-step-panel {
+        transition: none;
+        transform: none;
+    }
+}
+
+.ltlb-booking .ltlb-step-nav {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.ltlb-booking .ltlb-step-nav .button-secondary,
+.ltlb-booking .ltlb-step-nav .button-primary {
+    width: auto;
+    min-width: 10rem;
+}
+
+.ltlb-booking .ltlb-step-nav input[type="submit"],
+.ltlb-booking .ltlb-step-nav button[type="submit"] {
+    width: auto !important;
+    min-width: 10rem;
+}
+
+.ltlb-booking .button-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .ltlb-booking h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.5rem;
-    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.875rem;
+    font-weight: 700;
     color: var(--lazy-text, #111);
+    letter-spacing: -0.025em;
+    line-height: 1.2;
 }
 
 .ltlb-booking h4 {
-    margin: 1.5rem 0 1rem 0;
-    font-size: 1.125rem;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--lazy-text, #111);
+    letter-spacing: -0.02em;
 }
 
 .ltlb-booking p {
@@ -43,27 +228,60 @@
 
 .ltlb-booking label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    font-size: 0.875rem;
+    margin-bottom: 0.625rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
     color: var(--lazy-text, #111);
+    letter-spacing: -0.01em;
 }
 
 .ltlb-booking input[type="text"],
 .ltlb-booking input[type="email"],
 .ltlb-booking input[type="date"],
 .ltlb-booking input[type="tel"],
+.ltlb-booking input[type="number"],
 .ltlb-booking select,
 .ltlb-booking textarea {
     width: 100%;
-    padding: 0.625rem;
-    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #ddd);
-    border-radius: var(--lazy-border-radius, 6px);
+    padding: 0.875rem 1rem;
+    border: var(--lazy-border-width, 2px) solid var(--lazy-border-color, #e5e7eb);
+    border-radius: var(--lazy-border-radius, 8px);
     box-sizing: border-box;
     font-size: 1rem;
+    line-height: 1.25;
+    min-height: 48px;
     transition: all var(--lazy-transition-duration, 200ms) ease;
     background: #fff;
     color: var(--lazy-text, #111);
+    font-family: inherit;
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+
+/* Selects often get clipped by theme/browser default line-heights */
+.ltlb-booking select {
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 1.1rem) 50%, calc(100% - 0.9rem) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+}
+
+.ltlb-booking select::-ms-expand { display: none; }
+
+/* Increase specificity to ensure input shadow applies against theme overrides */
+.ltlb-booking .ltlb-wizard-form input[type="text"],
+.ltlb-booking .ltlb-wizard-form input[type="email"],
+.ltlb-booking .ltlb-wizard-form input[type="date"],
+.ltlb-booking .ltlb-wizard-form input[type="tel"],
+.ltlb-booking .ltlb-wizard-form input[type="number"],
+.ltlb-booking .ltlb-wizard-form select,
+.ltlb-booking .ltlb-wizard-form textarea {
+    box-shadow: var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
 }
 
 .ltlb-booking input[type="text"]::placeholder,
@@ -76,26 +294,27 @@
 .ltlb-booking input:focus,
 .ltlb-booking select:focus,
 .ltlb-booking textarea:focus {
-    outline: 2px solid var(--lazy-primary, #2b7cff);
-    outline-offset: 2px;
+    outline: none;
     border-color: var(--lazy-primary, #2b7cff);
-    box-shadow: var(--lazy-box-shadow, none);
+    box-shadow: 0 0 0 3px rgba(43, 124, 255, 0.1), var(--lazy-shadow-input, 0 1px 2px rgba(0,0,0,0.05)) !important;
 }
 
 /* Service cards with rounded styles */
 .ltlb-booking .service-card {
-    padding: 1rem;
-    margin: 0.5rem 0;
-    border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #ddd);
-    border-radius: var(--lazy-border-radius, 6px);
+    padding: 1.25rem;
+    margin: 0.75rem 0;
+    border: var(--lazy-border-width, 2px) solid var(--lazy-border-color, #e5e7eb);
+    border-radius: var(--lazy-border-radius, 10px);
     cursor: pointer;
     transition: all var(--lazy-transition-duration, 200ms) ease;
     background: #fff;
+    box-shadow: var(--lazy-shadow-card, 0 2px 4px rgba(0,0,0,0.04));
 }
 
 .ltlb-booking .service-card:hover {
     border-color: var(--lazy-primary, #2b7cff);
-    box-shadow: var(--lazy-box-shadow, 0 2px 8px rgba(0,0,0,0.08));
+    box-shadow: var(--lazy-shadow-card, 0 8px 16px rgba(0,0,0,0.08));
+    transform: translateY(-2px);
 }
 
 .ltlb-booking .service-card input[type="radio"] {
@@ -104,16 +323,18 @@
 
 .ltlb-booking .button-primary {
     background: var(--lazy-primary, #2b7cff);
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--lazy-border-radius, 6px);
+    color: var(--lazy-button-text, #fff);
+    border: var(--lazy-border-width, 2px) solid var(--lazy-primary, #2b7cff);
+    padding: 1rem 2rem;
+    border-radius: var(--lazy-border-radius, 8px);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.0625rem;
     font-weight: 600;
     transition: all var(--lazy-transition-duration, 200ms) ease;
     width: 100%;
-    box-shadow: var(--lazy-box-shadow, 0 2px 4px rgba(0,0,0,0.1));
+    box-shadow: var(--lazy-shadow-button, 0 4px 12px rgba(43, 124, 255, 0.2));
+    letter-spacing: -0.01em;
+    font-family: inherit;
 }
 
 @media (min-width: 640px) {
@@ -123,9 +344,10 @@
 }
 
 .ltlb-booking .button-primary:hover {
-    background: var(--lazy-accent, #8DA399);
+    background: var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9));
+    border-color: var(--lazy-border-color, #cccccc);
     transform: translateY(-2px);
-    box-shadow: var(--lazy-box-shadow, 0 4px 8px rgba(0,0,0,0.15));
+    box-shadow: 0 0 0 2px var(--lazy-border-color, #cccccc), var(--lazy-shadow-button, 0 6px 20px rgba(43, 124, 255, 0.3));
 }
 
 .ltlb-booking .button-primary:active {
@@ -143,18 +365,55 @@
     transform: none;
 }
 
+/* WordPress submit button override */
+.ltlb-booking input[type="submit"],
+.ltlb-booking button[type="submit"] {
+    background: var(--lazy-primary, #2b7cff) !important;
+    color: var(--lazy-button-text, #fff) !important;
+    border: var(--lazy-border-width, 2px) solid var(--lazy-primary, #2b7cff) !important;
+    padding: 1rem 2rem !important;
+    border-radius: var(--lazy-border-radius, 8px) !important;
+    cursor: pointer;
+    font-size: 1.0625rem !important;
+    font-weight: 600 !important;
+    transition: all var(--lazy-transition-duration, 200ms) ease !important;
+    box-shadow: var(--lazy-shadow-button, 0 4px 12px rgba(43, 124, 255, 0.2)) !important;
+    letter-spacing: -0.01em !important;
+    font-family: inherit !important;
+    text-shadow: none !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+}
+
+.ltlb-booking input[type="submit"]:hover,
+.ltlb-booking button[type="submit"]:hover {
+    background: var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9)) !important;
+    border-color: var(--lazy-border-color, #cccccc) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px var(--lazy-border-color, #cccccc), var(--lazy-shadow-button, 0 6px 20px rgba(43, 124, 255, 0.3)) !important;
+}
+
 /* Secondary/ghost buttons */
 .ltlb-booking .button-secondary {
     background: transparent;
-    color: var(--lazy-primary, #2b7cff);
-    border: var(--lazy-border-width, 1px) solid var(--lazy-primary, #2b7cff);
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--lazy-border-radius, 6px);
+    color: var(--lazy-secondary, var(--lazy-primary, #2b7cff));
+    border: var(--lazy-border-width, 2px) solid var(--lazy-secondary, var(--lazy-primary, #2b7cff));
+    padding: 1rem 2rem;
+    border-radius: var(--lazy-border-radius, 8px);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.0625rem;
     font-weight: 600;
     transition: all var(--lazy-transition-duration, 200ms) ease;
     width: 100%;
+    box-shadow: var(--lazy-shadow-button, 0 2px 8px rgba(43, 124, 255, 0.1));
+    letter-spacing: -0.01em;
+    font-family: inherit;
+}
+
+/* Ensure WP generic .button class inside booking also gets shadow */
+.ltlb-booking .button {
+    box-shadow: var(--lazy-shadow-button, none);
+    transition: all var(--lazy-transition-duration, 200ms) ease;
 }
 
 @media (min-width: 640px) {
@@ -164,8 +423,53 @@
 }
 
 .ltlb-booking .button-secondary:hover {
-    background: var(--lazy-primary, #2b7cff);
-    color: #fff;
+    background: var(--lazy-secondary-hover, var(--lazy-secondary, var(--lazy-primary, #2b7cff)));
+    border-color: var(--lazy-border-color, #cccccc);
+    color: var(--lazy-secondary-text, #fff);
+    box-shadow: 0 0 0 2px var(--lazy-border-color, #cccccc), var(--lazy-shadow-button, 0 4px 12px rgba(43, 124, 255, 0.2));
+    transform: translateY(-2px);
+}
+
+@supports (color: color-mix(in srgb, #000, #fff)) {
+    .ltlb-booking .button-primary:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9)) 78%,
+            var(--lazy-text, #222222) 22%
+        );
+        box-shadow: 0 0 0 2px color-mix(
+            in srgb,
+            var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9)) 78%,
+            var(--lazy-text, #222222) 22%
+        ), var(--lazy-shadow-button, 0 6px 20px rgba(43, 124, 255, 0.3));
+    }
+
+    .ltlb-booking input[type="submit"]:hover,
+    .ltlb-booking button[type="submit"]:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9)) 78%,
+            var(--lazy-text, #222222) 22%
+        ) !important;
+        box-shadow: 0 0 0 2px color-mix(
+            in srgb,
+            var(--lazy-primary-hover, var(--lazy-accent, #1e5fd9)) 78%,
+            var(--lazy-text, #222222) 22%
+        ), var(--lazy-shadow-button, 0 6px 20px rgba(43, 124, 255, 0.3)) !important;
+    }
+
+    .ltlb-booking .button-secondary:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--lazy-secondary-hover, var(--lazy-secondary, var(--lazy-primary, #2b7cff))) 78%,
+            var(--lazy-text, #222222) 22%
+        );
+        box-shadow: 0 0 0 2px color-mix(
+            in srgb,
+            var(--lazy-secondary-hover, var(--lazy-secondary, var(--lazy-primary, #2b7cff))) 78%,
+            var(--lazy-text, #222222) 22%
+        ), var(--lazy-shadow-button, 0 4px 12px rgba(43, 124, 255, 0.2));
+    }
 }
 
 /* Success and error messages */
@@ -202,33 +506,8 @@
     line-height: 1.5;
 }
 
-.ltlb-booking .ltlb-field-hint {
-    font-size: 0.8125rem;
-    color: #666;
-    margin-top: 0.25rem;
-    display: block;
-}
-
-.ltlb-booking .ltlb-required {
-    color: #c33;
-    margin-left: 0.125rem;
-}
-
-/* Hotel mode price preview */
-.ltlb-booking .ltlb-price-preview {
-    background: rgba(var(--lazy-accent-rgb, 141, 163, 153), 0.1);
-    border: var(--lazy-border-width, 1px) solid var(--lazy-accent, #8DA399);
-    border-radius: var(--lazy-border-radius, 6px);
-    padding: 1rem;
-    margin: 1rem 0;
-    text-align: center;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--lazy-primary, #2b7cff);
-}
-
-/* Skip link for accessibility */
-.ltlb-skip-link {
+/* Skip link for accessibility (scoped to booking widget) */
+.ltlb-booking .ltlb-skip-link {
     position: absolute;
     top: -40px;
     left: 0;
@@ -241,7 +520,7 @@
     transition: top var(--lazy-transition-duration, 200ms) ease;
 }
 
-.ltlb-skip-link:focus {
+.ltlb-booking .ltlb-skip-link:focus {
     top: 0;
 }
 
@@ -265,34 +544,5 @@
     border-width: 0;
 }
 
-/* Wizard steps styling */
-.ltlb-booking .ltlb-steps {
-    display: flex;
-    gap: 0.5rem;
-    margin: 0 0 1.5rem 0;
-    flex-wrap: wrap;
-}
-
-.ltlb-booking .ltlb-step {
-    flex: 1;
-    min-width: 60px;
-    padding: 0.5rem;
-    text-align: center;
-    border-radius: var(--lazy-border-radius, 6px);
-    background: var(--lazy-border-color, #eee);
-    color: var(--lazy-text, #111);
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all var(--lazy-transition-duration, 200ms) ease;
-}
-
-.ltlb-booking .ltlb-step.active {
-    background: var(--lazy-primary, #2b7cff);
-    color: #fff;
-}
-
-.ltlb-booking .ltlb-step.completed {
-    background: var(--lazy-accent, #8DA399);
-    color: #fff;
-}
+/* (Removed older duplicate fieldset/form/steps rules to avoid overriding the wizard layout.) */
 

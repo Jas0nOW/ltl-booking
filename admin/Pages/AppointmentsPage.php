@@ -22,6 +22,9 @@ class LTLB_Admin_AppointmentsPage {
 
         // Handle CSV Export
         if ( isset($_GET['action']) && $_GET['action'] === 'export_csv' ) {
+            if ( ! isset($_GET['_wpnonce']) || ! wp_verify_nonce($_GET['_wpnonce'], 'ltlb_export_csv') ) {
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
+            }
             $this->export_csv();
             return; // Stop rendering
         }
@@ -52,10 +55,10 @@ class LTLB_Admin_AppointmentsPage {
         $filter_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
         $filter_service = isset($_GET['service_id']) ? intval($_GET['service_id']) : 0;
 
-        // Build query args
+        // Build query args (repository expects: from/to/status/service_id)
         $args = [];
-        if ( $filter_date_from ) $args['date_from'] = $filter_date_from;
-        if ( $filter_date_to ) $args['date_to'] = $filter_date_to;
+        if ( $filter_date_from ) $args['from'] = $filter_date_from . ' 00:00:00';
+        if ( $filter_date_to ) $args['to'] = $filter_date_to . ' 23:59:59';
         if ( $filter_status ) $args['status'] = $filter_status;
         if ( $filter_service ) $args['service_id'] = $filter_service;
 
@@ -63,10 +66,11 @@ class LTLB_Admin_AppointmentsPage {
         $services = $this->service_repository->get_all();
 
         ?>
-        <div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_appointments'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__('Appointments', 'ltl-bookings'); ?></h1>
             <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_calendar') ); ?>" class="page-title-action"><?php echo esc_html__('View Calendar', 'ltl-bookings'); ?></a>
-            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_appointments&action=export_csv') ); ?>" class="page-title-action"><?php echo esc_html__('Export CSV', 'ltl-bookings'); ?></a>
+            <a href="<?php echo esc_attr( wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=export_csv'), 'ltlb_export_csv' ) ); ?>" class="page-title-action"><?php echo esc_html__('Export CSV', 'ltl-bookings'); ?></a>
             <hr class="wp-header-end">
 
             <?php // Notices rendered via hook ?>
@@ -76,10 +80,10 @@ class LTLB_Admin_AppointmentsPage {
                     <input type="hidden" name="page" value="ltlb_appointments" />
                     <div class="tablenav top" style="height:auto;">
                         <div class="alignleft actions">
-                            <input type="date" name="date_from" value="<?php echo esc_attr($filter_date_from); ?>" placeholder="<?php echo esc_attr__('From Date', 'ltl-bookings'); ?>">
-                            <input type="date" name="date_to" value="<?php echo esc_attr($filter_date_to); ?>" placeholder="<?php echo esc_attr__('To Date', 'ltl-bookings'); ?>">
+                            <input type="date" name="date_from" value="<?php echo esc_attr($filter_date_from); ?>" placeholder="<?php echo esc_attr__('From Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter from date', 'ltl-bookings'); ?>">
+                            <input type="date" name="date_to" value="<?php echo esc_attr($filter_date_to); ?>" placeholder="<?php echo esc_attr__('To Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter to date', 'ltl-bookings'); ?>">
                             
-                            <select name="status">
+                            <select name="status" aria-label="<?php echo esc_attr__('Filter by status', 'ltl-bookings'); ?>">
                                 <option value=""><?php echo esc_html__('All Statuses', 'ltl-bookings'); ?></option>
                                 <option value="confirmed" <?php selected($filter_status, 'confirmed'); ?>><?php echo esc_html__('Confirmed', 'ltl-bookings'); ?></option>
                                 <option value="pending" <?php selected($filter_status, 'pending'); ?>><?php echo esc_html__('Pending', 'ltl-bookings'); ?></option>
@@ -118,26 +122,51 @@ class LTLB_Admin_AppointmentsPage {
                         </thead>
                         <tbody>
                             <?php foreach ( $appointments as $appt ): 
-                                $cust = $this->customer_repository->get_by_id( $appt['customer_id'] );
-                                $svc = $this->service_repository->get_by_id( $appt['service_id'] );
-                                $res = $this->resource_repository->get_by_id( $appt['resource_id'] );
-                                $start_ts = strtotime( $appt['start_time'] );
-                                $end_ts = strtotime( $appt['end_time'] );
+                                $cust = isset($appt['customer_id']) ? $this->customer_repository->get_by_id( (int) $appt['customer_id'] ) : null;
+                                $svc = isset($appt['service_id']) ? $this->service_repository->get_by_id( (int) $appt['service_id'] ) : null;
+                                $res = null;
+                                if ( isset($appt['resource_id']) && $appt['resource_id'] !== null && $appt['resource_id'] !== '' ) {
+                                    $res = $this->resource_repository->get_by_id( (int) $appt['resource_id'] );
+                                }
+
+                                $start_raw = $appt['start_at'] ?? '';
+                                $end_raw = $appt['end_at'] ?? '';
+                                $start_ts = $start_raw ? strtotime( $start_raw ) : 0;
+                                $end_ts = $end_raw ? strtotime( $end_raw ) : 0;
+
+                                $cust_name = '—';
+                                $cust_email = '';
+                                $cust_phone = '';
+                                if ( is_array($cust) ) {
+                                    $first = trim( (string)($cust['first_name'] ?? '') );
+                                    $last = trim( (string)($cust['last_name'] ?? '') );
+                                    $full = trim( $first . ' ' . $last );
+                                    $cust_name = $full !== '' ? $full : (string)($cust['name'] ?? '—');
+                                    $cust_email = (string)($cust['email'] ?? '');
+                                    $cust_phone = (string)($cust['phone'] ?? '');
+                                }
                                 ?>
                                 <tr>
                                     <td>#<?php echo intval($appt['id']); ?></td>
                                     <td>
-                                        <?php echo date_i18n( get_option('date_format'), $start_ts ); ?> <br>
-                                        <small><?php echo date_i18n( get_option('time_format'), $start_ts ); ?> - <?php echo date_i18n( get_option('time_format'), $end_ts ); ?></small>
+                                        <?php if ( $start_ts ) : ?>
+                                            <?php echo date_i18n( get_option('date_format'), $start_ts ); ?> <br>
+                                            <small>
+                                                <?php echo date_i18n( get_option('time_format'), $start_ts ); ?>
+                                                <?php if ( $end_ts ) : ?> - <?php echo date_i18n( get_option('time_format'), $end_ts ); ?><?php endif; ?>
+                                            </small>
+                                        <?php else : ?>
+                                            —
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php 
-                                        if ($cust) {
-                                            echo '<strong>' . esc_html($cust['name']) . '</strong><br>';
-                                            echo '<a href="mailto:' . esc_attr($cust['email']) . '">' . esc_html($cust['email']) . '</a><br>';
-                                            echo esc_html($cust['phone']);
-                                        } else {
-                                            echo '—';
+                                        echo '<strong>' . esc_html($cust_name) . '</strong><br>';
+                                        if ( $cust_email !== '' ) {
+                                            echo '<a href="mailto:' . esc_attr($cust_email) . '">' . esc_html($cust_email) . '</a><br>';
+                                        }
+                                        if ( $cust_phone !== '' ) {
+                                            echo esc_html($cust_phone);
                                         }
                                         ?>
                                     </td>
@@ -148,18 +177,23 @@ class LTLB_Admin_AppointmentsPage {
                                         $status_class = 'status-pending';
                                         if ( $appt['status'] === 'confirmed' ) $status_class = 'status-active';
                                         if ( $appt['status'] === 'cancelled' ) $status_class = 'status-inactive';
+
+                                        $status_label = $appt['status'];
+                                        if ( $appt['status'] === 'confirmed' ) $status_label = __( 'Confirmed', 'ltl-bookings' );
+                                        if ( $appt['status'] === 'pending' ) $status_label = __( 'Pending', 'ltl-bookings' );
+                                        if ( $appt['status'] === 'cancelled' ) $status_label = __( 'Cancelled', 'ltl-bookings' );
                                         ?>
-                                        <span class="ltlb-status-badge <?php echo esc_attr($status_class); ?>"><?php echo esc_html( ucfirst($appt['status']) ); ?></span>
+                                        <span class="ltlb-status-badge <?php echo esc_attr($status_class); ?>"><?php echo esc_html( $status_label ); ?></span>
                                     </td>
                                     <td>
                                         <?php if ( $appt['status'] !== 'cancelled' ) : ?>
-                                            <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=status&new_status=cancelled&id='.$appt['id']), 'ltlb_status_appointment' ); ?>" class="button button-small" onclick="return confirm('<?php echo esc_js__('Cancel this appointment?', 'ltl-bookings'); ?>');"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+                                            <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=status&new_status=cancelled&id='.$appt['id']), 'ltlb_status_appointment' ); ?>" class="button button-small" onclick="return confirm('<?php echo esc_js( __( 'Cancel this appointment?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                                         <?php endif; ?>
                                         <?php if ( $appt['status'] === 'pending' ) : ?>
                                             <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=status&new_status=confirmed&id='.$appt['id']), 'ltlb_status_appointment' ); ?>" class="button button-small button-primary"><?php echo esc_html__('Confirm', 'ltl-bookings'); ?></a>
                                         <?php endif; ?>
                                         
-                                        <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=delete&id='.$appt['id']), 'ltlb_delete_appointment' ); ?>" class="button button-small" style="color:#a00;" onclick="return confirm('<?php echo esc_js__('Permanently delete?', 'ltl-bookings'); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></a>
+                                        <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=delete&id='.$appt['id']), 'ltlb_delete_appointment' ); ?>" class="button button-small" style="color:#a00;" onclick="return confirm('<?php echo esc_js( __( 'Permanently delete?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -177,21 +211,46 @@ class LTLB_Admin_AppointmentsPage {
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         
         $output = fopen('php://output', 'w');
-        fputcsv($output, ['ID', 'Start', 'End', 'Customer Name', 'Customer Email', 'Customer Phone', 'Service', 'Resource', 'Status']);
+        fputcsv($output, [
+            __( 'ID', 'ltl-bookings' ),
+            __( 'Start', 'ltl-bookings' ),
+            __( 'End', 'ltl-bookings' ),
+            __( 'Customer Name', 'ltl-bookings' ),
+            __( 'Customer Email', 'ltl-bookings' ),
+            __( 'Customer Phone', 'ltl-bookings' ),
+            __( 'Service', 'ltl-bookings' ),
+            __( 'Resource', 'ltl-bookings' ),
+            __( 'Status', 'ltl-bookings' ),
+        ]);
 
         $appointments = $this->appointment_repository->get_all();
         foreach ($appointments as $appt) {
-            $cust = $this->customer_repository->get_by_id( $appt['customer_id'] );
-            $svc = $this->service_repository->get_by_id( $appt['service_id'] );
-            $res = $this->resource_repository->get_by_id( $appt['resource_id'] );
+            $cust = isset($appt['customer_id']) ? $this->customer_repository->get_by_id( (int) $appt['customer_id'] ) : null;
+            $svc = isset($appt['service_id']) ? $this->service_repository->get_by_id( (int) $appt['service_id'] ) : null;
+            $res = null;
+            if ( isset($appt['resource_id']) && $appt['resource_id'] !== null && $appt['resource_id'] !== '' ) {
+                $res = $this->resource_repository->get_by_id( (int) $appt['resource_id'] );
+            }
+
+            $cust_name = '';
+            $cust_email = '';
+            $cust_phone = '';
+            if ( is_array($cust) ) {
+                $first = trim( (string)($cust['first_name'] ?? '') );
+                $last = trim( (string)($cust['last_name'] ?? '') );
+                $full = trim( $first . ' ' . $last );
+                $cust_name = $full !== '' ? $full : (string)($cust['name'] ?? '');
+                $cust_email = (string)($cust['email'] ?? '');
+                $cust_phone = (string)($cust['phone'] ?? '');
+            }
 
             fputcsv($output, [
                 $appt['id'],
-                $appt['start_time'],
-                $appt['end_time'],
-                $cust ? $cust['name'] : '',
-                $cust ? $cust['email'] : '',
-                $cust ? $cust['phone'] : '',
+                $appt['start_at'] ?? '',
+                $appt['end_at'] ?? '',
+                $cust_name,
+                $cust_email,
+                $cust_phone,
                 $svc ? $svc['name'] : '',
                 $res ? $res['name'] : '',
                 $appt['status']

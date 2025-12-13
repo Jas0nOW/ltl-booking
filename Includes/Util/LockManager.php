@@ -15,10 +15,17 @@ if (!defined('ABSPATH')) exit;
  */
 class LTLB_LockManager {
 
+    private static function fallback_option_key( string $lock_key ): string {
+        return 'ltlb_lock_opt_' . md5( $lock_key );
+    }
+
     /**
-     * Timeout for GET_LOCK in seconds.
+     * Get lock timeout from settings (default 3 seconds).
      */
-    const LOCK_TIMEOUT = 3;
+    private static function get_timeout(): int {
+        $settings = get_option('lazy_settings', []);
+        return isset($settings['lock_timeout']) ? intval($settings['lock_timeout']) : 3;
+    }
 
     /**
      * Acquire a named lock for a specific resource/time slot.
@@ -35,14 +42,24 @@ class LTLB_LockManager {
         $result = $wpdb->get_var($wpdb->prepare(
             "SELECT GET_LOCK(%s, %d)",
             $lock_key,
-            self::LOCK_TIMEOUT
+            self::get_timeout()
         ));
 
         // GET_LOCK returns:
         // 1 = lock acquired
         // 0 = timeout
         // NULL = error (lock unavailable on this MySQL version)
-        return ($result === '1');
+        if ( $result === '1' ) {
+            return true;
+        }
+
+        // Fallback: option-based mutex for hosts without GET_LOCK
+        if ( $result === null ) {
+            $opt_key = self::fallback_option_key( $lock_key );
+            return add_option( $opt_key, 1, '', 'no' ) ? true : false;
+        }
+
+        return false;
     }
 
     /**
@@ -60,6 +77,9 @@ class LTLB_LockManager {
             "SELECT RELEASE_LOCK(%s)",
             $lock_key
         ));
+
+		// Always try to delete the fallback option lock as well.
+		delete_option( self::fallback_option_key( $lock_key ) );
 
         // RELEASE_LOCK returns:
         // 1 = lock released
