@@ -12,6 +12,8 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `price_cents` INT UNSIGNED NOT NULL DEFAULT 0
 - `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
+- `is_group` TINYINT(1) NOT NULL DEFAULT 0 (Group Booking Feature)
+- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
@@ -34,6 +36,7 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
+- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 

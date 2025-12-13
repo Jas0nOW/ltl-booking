@@ -81,6 +81,44 @@ Stabilization & Code Quality decisions (Dec 2025):
 - All repository classes created or populated with minimal CRUD methods to ensure no fatal errors on activation.
 - Availability engine uses `LTLB_Time::wp_timezone()` and considers resource-blocking via `AppointmentResourcesRepository::get_blocked_resources()`.
 
+Group Booking Feature decisions (Implementation Phase):
+
+**Commit 1-3: Data Model**
+- Added `seats` SMALLINT UNSIGNED column to `lazy_appointments` (default 1, for group size).
+- Added `is_group` TINYINT(1) column to `lazy_services` (flag to enable group mode for a service).
+- Added `max_seats_per_booking` SMALLINT UNSIGNED column to `lazy_services` (maximum seats allowed per booking, default 1).
+- DB version bumped to 0.3.0 to track schema change.
+- Modified `AppointmentRepository::create()` to accept and store seats value.
+- Modified `ServiceRepository::create()/update()` to handle `is_group` and `max_seats_per_booking` fields.
+
+**Commit 2: Capacity Calculation**
+- Changed `AppointmentResourcesRepository::get_blocked_resources()` from `COUNT(*)` to `SUM(a.seats)` to properly calculate total seat occupancy per resource.
+- This ensures that when multiple bookings with different seat counts exist on the same resource, the capacity is correctly calculated as the sum of all seats.
+
+**Commit 4: Availability API**
+- Added `spots_left` field to time-slot responses (both in Availability class and REST endpoint).
+- `spots_left` = minimum available seats across all free resources for that slot (for group services).
+- Frontend can use this to limit the max seats selector UI.
+
+**Commit 5: Frontend UX**
+- Added dynamic "Number of Seats" field in `[lazy_book]` shortcode form.
+- Field only shows when a group-enabled service is selected (via JavaScript).
+- Seats selector has min=1 and max=service.max_seats_per_booking (validated on form).
+- Frontend passes `seats` value to engine via payload.
+
+**Commit 6: Admin UX**
+- Added "Group Booking" checkbox (enable/disable) in Services admin page.
+- Added "Max Seats per Booking" input field in Services admin page.
+- Added "Seats" column to Appointments list showing booked seat count.
+
+**Commit 7: Email**
+- Added `{seats}` placeholder to email templates (Mailer).
+- Admin and customer notification emails can include seat count via this placeholder.
+
+**Pricing note:** In Phase 1, group bookings use the service's single price (no per-seat multiplier). Per-seat pricing can be added in Phase 2 if needed.
+
+**Validation:** Max seats validation happens on the frontend (HTML max attribute) and should be enforced in the engine for security. No backend hard limit enforced on seats value — this allows for manual admin adjustments if needed, but should be tightened in Phase 2.
+
 
 
 

@@ -30,6 +30,6 @@ class LTLB_DB_Migrator {
         }
 
         // store current DB version for future migrations
-        update_option('ltlb_db_version', '0.2.0');
+        update_option('ltlb_db_version', '0.3.0');
     }
 }

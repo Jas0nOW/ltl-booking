@@ -11,7 +11,8 @@ require_once LTLB_PATH . 'Includes/Util/Time.php';
 class Availability {
     /**
      * Compute time slots for a given service and date.
-     * Returns array of slots with keys: time, start, end, free_resources_count, resource_ids
+     * Returns array of slots with keys: time, start, end, free_resources_count, resource_ids, spots_left
+     * For group services: spots_left = min available seats across all free resources
      */
     public function compute_time_slots(int $service_id, string $date, int $step = 15): array {
         $service_repo = new LTLB_ServiceRepository();
@@ -58,13 +59,21 @@ class Availability {
 
             // compute free resources from allowed list
             $free_ids = [];
+            $min_available = PHP_INT_MAX; // for group services
             foreach ( $allowed_resources as $rid ) {
                 $res = $res_repo->get_by_id( intval($rid) );
                 if ( ! $res ) continue;
                 $cap = intval($res['capacity'] ?? 1);
                 $used = isset($blocked[$rid]) ? intval($blocked[$rid]) : 0;
-                if ( $used < $cap ) $free_ids[] = intval($rid);
+                $available = max(0, $cap - $used);
+                if ( $available > 0 ) {
+                    $free_ids[] = intval($rid);
+                    $min_available = min($min_available, $available);
+                }
             }
+
+            // spots_left = minimum available seats across all free resources (for group bookings)
+            $spots_left = ($min_available === PHP_INT_MAX) ? 0 : $min_available;
 
             $slots[] = [
                 'time' => $slot_start->format('H:i'),
@@ -72,6 +81,7 @@ class Availability {
                 'end' => $end_sql,
                 'free_resources_count' => count($free_ids),
                 'resource_ids' => $free_ids,
+                'spots_left' => $spots_left,
             ];
 
             $cursor = $cursor->modify('+' . intval($step) . ' minutes');

@@ -54,13 +54,38 @@ class LTLB_Shortcodes {
 
 				<p>
 					<label><?php echo esc_html__('Service', 'ltl-bookings'); ?>
-						<select name="service_id" required>
+						<select name="service_id" id="ltlb-service-select" required>
 							<?php foreach ( $services as $s ): ?>
-								<option value="<?php echo esc_attr( $s['id'] ); ?>"><?php echo esc_html( $s['name'] ); ?></option>
+								<option value="<?php echo esc_attr( $s['id'] ); ?>" data-is-group="<?php echo esc_attr( ! empty( $s['is_group'] ) ? '1' : '0' ); ?>" data-max-seats="<?php echo esc_attr( intval( $s['max_seats_per_booking'] ?? 1 ) ); ?>"><?php echo esc_html( $s['name'] ); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</label>
 				</p>
+				<script>
+				(function() {
+					const serviceSelect = document.getElementById('ltlb-service-select');
+					const seatsField = document.getElementById('ltlb-seats-field');
+					const seatsInput = document.getElementById('seats');
+					function updateSeatsField() {
+						const selected = serviceSelect.options[serviceSelect.selectedIndex];
+						const isGroup = selected.getAttribute('data-is-group') === '1';
+						const maxSeats = parseInt(selected.getAttribute('data-max-seats')) || 1;
+						if (isGroup) {
+							seatsField.style.display = 'block';
+							seatsInput.max = maxSeats;
+							seatsInput.required = true;
+						} else {
+							seatsField.style.display = 'none';
+							seatsInput.required = false;
+							seatsInput.value = '1';
+						}
+					}
+					if (serviceSelect) {
+						serviceSelect.addEventListener('change', updateSeatsField);
+						updateSeatsField();
+					}
+				})();
+				</script>
 				<p>
 					<label><?php echo esc_html__('Date', 'ltl-bookings'); ?> <input type="date" name="date" required></label>
 				</p>
@@ -83,6 +108,11 @@ class LTLB_Shortcodes {
 							}
 							?>
 						</select>
+					</label>
+				</p>
+				<p id="ltlb-seats-field" style="display:none;">
+					<label><?php echo esc_html__('Number of Seats', 'ltl-bookings'); ?>
+						<input type="number" name="seats" id="seats" min="1" max="10" value="1">
 					</label>
 				</p>
 				<h4><?php echo esc_html__('Your details', 'ltl-bookings'); ?></h4>
@@ -133,6 +163,7 @@ class LTLB_Shortcodes {
 		'last' => LTLB_Sanitizer::text( $_POST['last_name'] ?? '' ),
 		'phone' => LTLB_Sanitizer::text( $_POST['phone'] ?? '' ),
 		'resource_id' => isset($_POST['resource_id']) ? intval($_POST['resource_id']) : 0,
+		'seats' => isset($_POST['seats']) ? intval($_POST['seats']) : 1,
 	];
 
 	$engine = EngineFactory::get_engine();

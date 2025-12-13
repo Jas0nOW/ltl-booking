@@ -20,10 +20,15 @@ Returns:
     "start": "2025-12-13 09:00:00",
     "end": "2025-12-13 10:00:00",
     "free_resources_count": 2,
-    "resource_ids": [1, 2]
+    "resource_ids": [1, 2],
+    "spots_left": 5
   }
 ]
 ```
+
+Notes:
+- For group services: `spots_left` = minimum available seats across all free resources
+- For regular services: `spots_left` = minimum resource capacity available
 
 ### Slot Resources
 `GET /ltlb/v1/slot-resources`
@@ -50,6 +55,22 @@ Returns:
 
 ### Booking Creation
 Booking is handled via shortcode form submission (not direct REST endpoint for security).
+
+**Form Parameters:**
+- `service_id` - Selected service
+- `date` - Booking date (YYYY-MM-DD)
+- `time_slot` - Selected time slot
+- `email` - Customer email
+- `first_name` - Customer first name
+- `last_name` - Customer last name
+- `phone` - Customer phone
+- `resource_id` - (optional) Explicitly chosen resource
+- `seats` - (optional) Number of seats for group bookings (1..max_seats_per_booking)
+
+**Notes:**
+- For group-enabled services, the `seats` field becomes required and is limited to 1..max_seats_per_booking.
+- For regular services, `seats` defaults to 1.
+- Email templates support placeholder `{seats}` for including seat count in notifications.
 
 ## Planned Future Endpoints
 - `GET /services` - list services

@@ -71,19 +71,21 @@ class LTLB_Admin_AppointmentsPage {
 						<th><?php echo esc_html__('Customer ID', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Start', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('End', 'ltl-bookings'); ?></th>
+						<th><?php echo esc_html__('Seats', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php if ( empty($rows) ): ?>
-						<tr><td colspan="6"><?php echo esc_html__('No appointments', 'ltl-bookings'); ?></td></tr>
+						<tr><td colspan="7"><?php echo esc_html__('No appointments', 'ltl-bookings'); ?></td></tr>
 					<?php else: foreach($rows as $r): ?>
 						<tr>
 							<td><?php echo esc_html($r['service_id']); ?></td>
 							<td><?php echo esc_html($r['customer_id']); ?></td>
 							<td><?php echo esc_html($r['start_at']); ?></td>
 							<td><?php echo esc_html($r['end_at']); ?></td>
+							<td><?php echo esc_html( $r['seats'] ?? 1 ); ?></td>
 							<td><?php echo esc_html($r['status']); ?></td>
 							<td>
 								<?php if ( $r['status'] !== 'confirmed' ): ?>

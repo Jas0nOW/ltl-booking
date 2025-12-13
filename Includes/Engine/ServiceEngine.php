@@ -63,6 +63,7 @@ class ServiceEngine implements BookingEngineInterface {
             'end_at'      => $end_dt,
             'status'      => $default_status,
             'timezone'    => LTLB_Time::get_site_timezone_string(),
+            'seats'       => isset($payload['seats']) ? intval($payload['seats']) : 1,
         ] );
 
         if ( is_wp_error( $appt_id ) ) {
@@ -109,8 +110,9 @@ class ServiceEngine implements BookingEngineInterface {
         // Send notifications as before
         $service = $service_repo->get_by_id( $payload['service_id'] );
         $customer = $customer_repo->get_by_id( $customer_id );
+        $seats = isset($payload['seats']) ? intval($payload['seats']) : 1;
         if ( class_exists( 'LTLB_Mailer' ) ) {
-            LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
+            LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status, $seats );
         }
 
         return $appt_id;

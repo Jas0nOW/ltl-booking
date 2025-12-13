@@ -145,6 +145,8 @@ lazy-bookings/
 - `price_cents` INT UNSIGNED NOT NULL DEFAULT 0
 - `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
+- `is_group` TINYINT(1) NOT NULL DEFAULT 0 (Group Booking Feature)
+- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 INDEX: `is_active`
@@ -168,6 +170,7 @@ INDEX: `is_active`
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'  (pending|confirmed|canceled)
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
+- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 INDEX: `service_id`, `customer_id`, `start_at`, `status`

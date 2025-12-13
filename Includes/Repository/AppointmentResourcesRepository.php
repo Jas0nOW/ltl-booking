@@ -13,7 +13,7 @@ class LTLB_AppointmentResourcesRepository {
     }
 
     /**
-     * Return map resource_id => used_count for overlapping appointments
+     * Return map resource_id => used_seats (SUM of seats, not just COUNT)
      */
     public function get_blocked_resources(string $start_at, string $end_at, bool $include_pending = false): array {
         global $wpdb;
@@ -23,7 +23,7 @@ class LTLB_AppointmentResourcesRepository {
 
         $placeholders = implode( ',', array_fill(0, count($statuses), '%s') );
 
-        $sql = "SELECT ar.resource_id AS resource_id, COUNT(*) AS used FROM {$this->table_name} ar JOIN {$this->appt_table} a ON a.id = ar.appointment_id WHERE a.start_at < %s AND a.end_at > %s AND a.status IN ($placeholders) GROUP BY ar.resource_id";
+        $sql = "SELECT ar.resource_id AS resource_id, SUM(a.seats) AS used FROM {$this->table_name} ar JOIN {$this->appt_table} a ON a.id = ar.appointment_id WHERE a.start_at < %s AND a.end_at > %s AND a.status IN ($placeholders) GROUP BY ar.resource_id";
 
         $params = array_merge( [ $end_at, $start_at ], $statuses );
         $rows = $wpdb->get_results( $wpdb->prepare( $sql, ...$params ), ARRAY_A );
