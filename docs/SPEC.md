@@ -344,4 +344,3 @@ Seiten:
 
 - KI-Features (Gemini): erst ab Phase 3/4, wenn die Datenmodelle stabil sind.
 - DSGVO: Datenminimierung + Löschkonzept (uninstall/retention) später.
-
