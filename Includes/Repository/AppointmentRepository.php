@@ -76,6 +76,7 @@ class LTLB_AppointmentRepository {
 			'end_at' => '',
 			'status' => isset($data['status']) ? sanitize_text_field($data['status']) : 'pending',
 			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : LTLB_Time::get_site_timezone_string(),
+			'seats' => isset($data['seats']) ? intval($data['seats']) : 1,
 			'created_at' => $now,
 			'updated_at' => $now,
 		];
@@ -116,7 +117,7 @@ class LTLB_AppointmentRepository {
 				return new WP_Error( 'conflict', __( 'This time slot is no longer available.', 'ltl-bookings' ) );
 			}
 
-			$formats = ['%d','%d','%d','%s','%s','%s','%s','%s','%s'];
+			$formats = ['%d','%d','%d','%s','%s','%s','%s','%d','%s','%s'];
 			$res = $wpdb->insert( $this->table_name, $insert, $formats );
 			if ( $res === false ) {
 				return new WP_Error( 'db_error', __( 'Could not save the appointment to the database.', 'ltl-bookings' ) );
