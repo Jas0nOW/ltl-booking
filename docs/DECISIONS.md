@@ -1,7 +1,7 @@
 Commit 1 decisions:
 
 - Sanitizer: implemented `LTLB_Sanitizer` with basic helpers (`text`, `int`, `money_cents`, `email`, `datetime`). Uses WP sanitize helpers where available.
-- Loading: For Phase 1 we use explicit `require_once` in `Includes/Core/Plugin.php` instead of an autoloader.
+- Loading: For Phase 1 we use explicit `require_once` in `Includes/Core/Plugin.php` instead of an autoloader. All include paths use `Includes/` (capital I) for consistency and portability.
 - Table prefix: per SPEC we use `$wpdb->prefix . 'lazy_' . name` (ServiceRepository will read `lazy_services`).
 
 Commit 4 decisions:
@@ -62,6 +62,24 @@ Commit X decisions (Template modes & Engine refactor):
 - Introduce `template_mode` stored in `lazy_settings` with possible values `service` (default) and `hotel` (stub). This allows switching booking UX and backend engines.
 - Implement an `EngineFactory` returning an engine implementing `BookingEngineInterface`. Existing service logic is moved into `ServiceEngine`; `HotelEngine` is a safe stub returning friendly errors or placeholders until implemented.
 - All frontend shortcode booking and REST time-slot endpoints now call the engine via `EngineFactory` to keep behavior pluggable per template mode.
+
+Phase 2c decisions (Resources & Resource-Blocking):
+
+- Added three tables: `lazy_resources`, `lazy_service_resources` (service→resource mapping), `lazy_appointment_resources` (appointment→resource assignment).
+- Resources have `capacity` (default 1) allowing multiple concurrent bookings per resource.
+- Services can be restricted to specific resources via `lazy_service_resources`; if no mapping exists, all active resources are considered available.
+- Availability logic now considers resource capacity: a slot is available if at least one allowed resource has free capacity (`used < capacity`).
+- Frontend wizard shows a resource dropdown when multiple resources are available for the selected slot; if only one or auto-assigned, the dropdown is hidden.
+- REST endpoint `/ltlb/v1/slot-resources` returns per-resource availability details for a given slot.
+- Appointment creation assigns a resource (user-selected or auto-selected based on availability); assignment is stored in `lazy_appointment_resources`.
+
+Stabilization & Code Quality decisions (Dec 2025):
+
+- Normalized all `require_once` include paths to use `Includes/` (capital I) for portability on case-sensitive filesystems.
+- Auto-migration: `Migrator` now stores `ltlb_db_version` and can be extended to auto-run on version change via `plugins_loaded` hook.
+- Dashboard restored: shows status cards (Services, Customers, Appointments, Resources counts) and last 5 appointments with resource assignments.
+- All repository classes created or populated with minimal CRUD methods to ensure no fatal errors on activation.
+- Availability engine uses `LTLB_Time::wp_timezone()` and considers resource-blocking via `AppointmentResourcesRepository::get_blocked_resources()`.
 
 
 

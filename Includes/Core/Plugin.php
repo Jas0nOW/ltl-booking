@@ -13,22 +13,30 @@ class LTLB_Plugin {
         
         // Load required classes
         $this->load_classes();
+
+        // Initialize shortcodes
+        if ( class_exists('LTLB_Shortcodes') ) {
+            LTLB_Shortcodes::init();
+        }
     }
 
     private function load_classes(): void {
 
         // Utilities
-        require_once LTLB_PATH . 'includes/Util/Sanitizer.php';
-        require_once LTLB_PATH . 'includes/Util/Time.php';
-        require_once LTLB_PATH . 'includes/Util/Notices.php';
+        require_once LTLB_PATH . 'Includes/Util/Sanitizer.php';
+        require_once LTLB_PATH . 'Includes/Util/Time.php';
+        require_once LTLB_PATH . 'Includes/Util/Notices.php';
 
         // Engines
-        require_once LTLB_PATH . 'includes/Engine/EngineFactory.php';
+        require_once LTLB_PATH . 'Includes/Engine/EngineFactory.php';
 
         // Repositories
-        require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ServiceRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/CustomerRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/AppointmentRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ResourceRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/AppointmentResourcesRepository.php';
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
@@ -37,6 +45,9 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
+
+        // Public components
+        require_once LTLB_PATH . 'public/Shortcodes.php';
     }
 
     public function on_init(): void {

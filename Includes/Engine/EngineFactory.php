@@ -1,9 +1,9 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
-require_once LTLB_PATH . 'includes/Engine/BookingEngineInterface.php';
-require_once LTLB_PATH . 'includes/Engine/ServiceEngine.php';
-require_once LTLB_PATH . 'includes/Engine/HotelEngine.php';
+require_once LTLB_PATH . 'Includes/Engine/BookingEngineInterface.php';
+require_once LTLB_PATH . 'Includes/Engine/ServiceEngine.php';
+require_once LTLB_PATH . 'Includes/Engine/HotelEngine.php';
 
 class EngineFactory {
     public static function get_engine(): BookingEngineInterface {

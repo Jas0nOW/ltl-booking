@@ -1,12 +1,12 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
-require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
-require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
-require_once LTLB_PATH . 'includes/Repository/ResourceRepository.php';
-require_once LTLB_PATH . 'includes/Repository/AppointmentResourcesRepository.php';
-require_once LTLB_PATH . 'includes/Repository/ServiceResourcesRepository.php';
-require_once LTLB_PATH . 'includes/Util/Time.php';
+require_once LTLB_PATH . 'Includes/Repository/ServiceRepository.php';
+require_once LTLB_PATH . 'Includes/Repository/AppointmentRepository.php';
+require_once LTLB_PATH . 'Includes/Repository/ResourceRepository.php';
+require_once LTLB_PATH . 'Includes/Repository/AppointmentResourcesRepository.php';
+require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
+require_once LTLB_PATH . 'Includes/Util/Time.php';
 
 class Availability {
     /**
