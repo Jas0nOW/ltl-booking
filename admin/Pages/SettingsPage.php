@@ -6,6 +6,46 @@ class LTLB_Admin_SettingsPage {
 	public function render(): void {
 		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
 
+		// Handle test email
+		if ( isset( $_POST['ltlb_send_test_email'] ) ) {
+			if ( ! check_admin_referer( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ) ) {
+				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+			}
+			$test_email = sanitize_email( $_POST['test_email_address'] ?? '' );
+			if ( ! empty( $test_email ) && is_email( $test_email ) ) {
+				$settings = get_option( 'lazy_settings', [] );
+				$from_name = $settings['mail_from_name'] ?? get_bloginfo('name');
+				$from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+				$reply_to = $settings['mail_reply_to'] ?? '';
+				
+				$headers = [];
+				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+				$headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
+				if ( ! empty( $reply_to ) && is_email( $reply_to ) ) {
+					$headers[] = 'Reply-To: ' . $reply_to;
+				}
+
+				$subject = 'LazyBookings Test Email';
+				$body = '<p>This is a test email from LazyBookings plugin.</p>';
+				$body .= '<p>From: ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
+				if ( ! empty( $reply_to ) ) {
+					$body .= '<p>Reply-To: ' . esc_html($reply_to) . '</p>';
+				}
+				$body .= '<p>Sent at: ' . current_time('Y-m-d H:i:s') . '</p>';
+
+				$sent = wp_mail( $test_email, $subject, $body, $headers );
+				if ( $sent ) {
+					LTLB_Notices::add( __( 'Test email sent successfully to ', 'ltl-bookings' ) . $test_email, 'success' );
+				} else {
+					LTLB_Notices::add( __( 'Failed to send test email.', 'ltl-bookings' ), 'error' );
+				}
+			} else {
+				LTLB_Notices::add( __( 'Invalid email address.', 'ltl-bookings' ), 'error' );
+			}
+			wp_safe_redirect( admin_url( 'admin.php?page=ltlb_settings' ) );
+			exit;
+		}
+
 		// Handle save
 			if ( isset( $_POST['ltlb_settings_save'] ) ) {
 			if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
@@ -20,19 +60,21 @@ class LTLB_Admin_SettingsPage {
 				$settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? '' );
 				$settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? 'pending' );
 				$settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
-				$settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? 'service' );
 				$settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
 				$settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
 				$settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? '' );
 				$settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? '' );
+				$settings['mail_reply_to'] = LTLB_Sanitizer::email( $_POST['ltlb_email_reply_to'] ?? '' );
 				$settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? '' );
 				$settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' );
 				$settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? '' );
 				$settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? '' );
-			$settings['hotel_checkin_time'] = LTLB_Sanitizer::text( $_POST['hotel_checkin_time'] ?? '15:00' );
-			$settings['hotel_checkout_time'] = LTLB_Sanitizer::text( $_POST['hotel_checkout_time'] ?? '11:00' );
-			$settings['hotel_min_nights'] = LTLB_Sanitizer::int( $_POST['hotel_min_nights'] ?? 1 );
-			$settings['hotel_max_nights'] = LTLB_Sanitizer::int( $_POST['hotel_max_nights'] ?? 30 );
+				
+				// Logging settings
+				$settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
+				$settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? 'error' );
+
+				update_option( 'lazy_settings', $settings );
 
 			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
 			LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
@@ -46,20 +88,21 @@ class LTLB_Admin_SettingsPage {
 			$end = (int) ( $settings['working_hours_end'] ?? 17 );
 			$slot = (int) ( $settings['slot_size_minutes'] ?? 60 );
 			$tz = $settings['timezone'] ?? '';
-			$template_mode = $settings['template_mode'] ?? 'service';
 			$default_status = $settings['default_status'] ?? 'pending';
 			$pending_blocks = $settings['pending_blocks'] ?? 0;
 			$mail_from_name = $settings['mail_from_name'] ?? '';
 			$mail_from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+			$mail_reply_to = $settings['mail_reply_to'] ?? '';
 			$mail_admin_template = $settings['mail_admin_template'] ?? '';
 			$mail_customer_template = $settings['mail_customer_template'] ?? '';
 			$mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
 			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
 			$mail_admin_subject = $settings['mail_admin_subject'] ?? '';
-			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';		$hotel_checkin_time = $settings['hotel_checkin_time'] ?? '15:00';
-		$hotel_checkout_time = $settings['hotel_checkout_time'] ?? '11:00';
-		$hotel_min_nights = (int) ( $settings['hotel_min_nights'] ?? 1 );
-		$hotel_max_nights = (int) ( $settings['hotel_max_nights'] ?? 30 );
+			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';
+			
+			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
+			$log_level = $settings['log_level'] ?? 'error';
+
 		$timezones = timezone_identifiers_list();
 		?>
 		<div class="wrap">
@@ -110,16 +153,29 @@ class LTLB_Admin_SettingsPage {
 							<td><label><input name="pending_blocks" type="checkbox" value="1" <?php checked( $pending_blocks ); ?>> <?php echo esc_html__('Treat pending appointments as blocking slots', 'ltl-bookings'); ?></label></td>
 						</tr>
 						<tr>
-							<th colspan="2"><h2><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2></th>
+							<th colspan="2"><h2><?php echo esc_html__('Logging Settings', 'ltl-bookings'); ?></h2></th>
 						</tr>
 						<tr>
-							<th><?php echo esc_html__('Template Mode', 'ltl-bookings'); ?></th>
+							<th><?php echo esc_html__('Enable Logging', 'ltl-bookings'); ?></th>
 							<td>
-								<label><input type="radio" name="template_mode" value="service" <?php checked( $template_mode, 'service' ); ?>> <?php echo esc_html__('Service / Courses', 'ltl-bookings'); ?></label>
-								<br>
-								<label><input type="radio" name="template_mode" value="hotel" <?php checked( $template_mode, 'hotel' ); ?>> <?php echo esc_html__('Hotel (coming soon)', 'ltl-bookings'); ?></label>
-								<p class="description"><?php echo esc_html__('Choose the booking template mode. Default: Service.', 'ltl-bookings'); ?></p>
+								<label><input name="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?>> <?php echo esc_html__('Enable internal logging to wp-content/debug.log', 'ltl-bookings'); ?></label>
+								<p class="description"><?php echo esc_html__('Requires WP_DEBUG_LOG to be enabled in wp-config.php. PII is automatically hashed/truncated.', 'ltl-bookings'); ?></p>
 							</td>
+						</tr>
+						<tr>
+							<th><label for="log_level"><?php echo esc_html__('Log Level', 'ltl-bookings'); ?></label></th>
+							<td>
+								<select name="log_level" id="log_level">
+									<option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__('Error (critical issues only)', 'ltl-bookings'); ?></option>
+									<option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__('Warning (errors + warnings)', 'ltl-bookings'); ?></option>
+									<option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info (errors + warnings + info)', 'ltl-bookings'); ?></option>
+									<option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug (all messages)', 'ltl-bookings'); ?></option>
+								</select>
+								<p class="description"><?php echo esc_html__('Lower levels include higher levels (e.g., Info includes Error and Warning).', 'ltl-bookings'); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th colspan="2"><h2><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2></th>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_from_name"><?php echo esc_html__('From name', 'ltl-bookings'); ?></label></th>
@@ -128,6 +184,12 @@ class LTLB_Admin_SettingsPage {
 						<tr>
 							<th><label for="ltlb_email_from_address"><?php echo esc_html__('From email', 'ltl-bookings'); ?></label></th>
 							<td><input name="ltlb_email_from_address" id="ltlb_email_from_address" type="email" value="<?php echo esc_attr( $mail_from_email ); ?>" class="regular-text"></td>
+						</tr>
+						<tr>
+							<th><label for="ltlb_email_reply_to"><?php echo esc_html__('Reply-To email (optional)', 'ltl-bookings'); ?></label></th>
+							<td><input name="ltlb_email_reply_to" id="ltlb_email_reply_to" type="email" value="<?php echo esc_attr( $mail_reply_to ); ?>" class="regular-text">
+								<p class="description"><?php echo esc_html__('If set, replies will go to this address instead of From email.', 'ltl-bookings'); ?></p>
+							</td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_admin_subject"><?php echo esc_html__('Admin email subject', 'ltl-bookings'); ?></label></th>
@@ -157,29 +219,28 @@ class LTLB_Admin_SettingsPage {
 								<label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( $mail_customer_enabled ); ?>> <?php echo esc_html__('Send confirmation email to customer after booking', 'ltl-bookings'); ?></label>
 							</td>
 						</tr>
-						<tr>
-							<th colspan="2"><h2><?php echo esc_html__('Hotel Settings (Phase 4)', 'ltl-bookings'); ?></h2></th>
-						</tr>
-						<tr>
-							<th><label for="hotel_checkin_time"><?php echo esc_html__('Check-in Time', 'ltl-bookings'); ?></label></th>
-							<td><input name="hotel_checkin_time" id="hotel_checkin_time" type="time" value="<?php echo esc_attr( $hotel_checkin_time ); ?>"> <span class="description"><?php echo esc_html__('Default: 15:00', 'ltl-bookings'); ?></span></td>
-						</tr>
-						<tr>
-							<th><label for="hotel_checkout_time"><?php echo esc_html__('Check-out Time', 'ltl-bookings'); ?></label></th>
-							<td><input name="hotel_checkout_time" id="hotel_checkout_time" type="time" value="<?php echo esc_attr( $hotel_checkout_time ); ?>"> <span class="description"><?php echo esc_html__('Default: 11:00', 'ltl-bookings'); ?></span></td>
-						</tr>
-						<tr>
-							<th><label for="hotel_min_nights"><?php echo esc_html__('Minimum Nights', 'ltl-bookings'); ?></label></th>
-							<td><input name="hotel_min_nights" id="hotel_min_nights" type="number" min="1" value="<?php echo esc_attr( $hotel_min_nights ); ?>" class="small-text"></td>
-						</tr>
-						<tr>
-							<th><label for="hotel_max_nights"><?php echo esc_html__('Maximum Nights', 'ltl-bookings'); ?></label></th>
-							<td><input name="hotel_max_nights" id="hotel_max_nights" type="number" min="1" value="<?php echo esc_attr( $hotel_max_nights ); ?>" class="small-text"></td>
-						</tr>
 					</tbody>
 				</table>
 
 				<?php submit_button( esc_html__('Save Settings', 'ltl-bookings') ); ?>
+			</form>
+
+			<hr>
+			<h2><?php echo esc_html__('Email Deliverability Test', 'ltl-bookings'); ?></h2>
+			<form method="post">
+				<?php wp_nonce_field( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ); ?>
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th><label for="test_email_address"><?php echo esc_html__('Send test email to', 'ltl-bookings'); ?></label></th>
+							<td>
+								<input name="test_email_address" id="test_email_address" type="email" value="<?php echo esc_attr( get_option('admin_email') ); ?>" class="regular-text">
+								<p class="description"><?php echo esc_html__('Sends a test email using current From/Reply-To settings.', 'ltl-bookings'); ?></p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<p><button type="submit" name="ltlb_send_test_email" class="button button-secondary"><?php echo esc_html__('Send Test Email', 'ltl-bookings'); ?></button></p>
 			</form>
 		</div>
 		<?php

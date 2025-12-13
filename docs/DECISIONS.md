@@ -1,7 +1,7 @@
 Commit 1 decisions:
 
 - Sanitizer: implemented `LTLB_Sanitizer` with basic helpers (`text`, `int`, `money_cents`, `email`, `datetime`). Uses WP sanitize helpers where available.
-- Loading: For Phase 1 we use explicit `require_once` in `Includes/Core/Plugin.php` instead of an autoloader. All include paths use `Includes/` (capital I) for consistency and portability.
+- Loading: For Phase 1 we use explicit `require_once` in `Includes/Core/Plugin.php` instead of an autoloader.
 - Table prefix: per SPEC we use `$wpdb->prefix . 'lazy_' . name` (ServiceRepository will read `lazy_services`).
 - Staff role `ltlb_staff` added with capabilities to view/edit their own working hours.
 - Admin can manage all staff hours.
@@ -94,163 +94,100 @@ Migration decisions (Commit 2c.1 - auto-migrate):
 - `LTLB_Activator::activate()` continues to run a full `migrate()` during activation to ensure fresh installs create tables immediately.
 - `maybe_migrate()` is designed to be safe on frontend requests: it only compares versions and runs migrations when needed; migration failures are logged to PHP error log and do not fatal-error the page.
 
-Commit X decisions (Template modes & Engine refactor):
+## Phase 4.1 - Production Readiness (Commits 1-9)
 
-- Introduce `template_mode` stored in `lazy_settings` with possible values `service` (default) and `hotel` (stub). This allows switching booking UX and backend engines.
-- Implement an `EngineFactory` returning an engine implementing `BookingEngineInterface`. Existing service logic is moved into `ServiceEngine`; `HotelEngine` is a safe stub returning friendly errors or placeholders until implemented.
-- All frontend shortcode booking and REST time-slot endpoints now call the engine via `EngineFactory` to keep behavior pluggable per template mode.
+**Commit 1: Health/Diagnostics (DiagnosticsPage.php)**
+- New admin page showing system info: WP/PHP versions, database prefix, template mode, DB version, plugin version
+- Database statistics: counts for services, customers, appointments, resources
+- Table status check: verifies all 6 core tables exist and shows row counts
+- Manual "Run Migrations" button for admin troubleshooting (calls LTLB_DB_Migrator::migrate() with nonce protection)
+- Helps diagnose activation issues and provides visibility into database state
 
-Phase 2c decisions (Resources & Resource-Blocking):
+**Commit 2: Named Lock Protection (LockManager.php)**
+- Implemented MySQL `GET_LOCK()` / `RELEASE_LOCK()` based locking to prevent race conditions during booking creation
+- Lock timeout set to 3 seconds (configurable via `LOCK_TIMEOUT` constant)
+- Lock keys use MD5 hash of service_id + start_at + resource_id (max 64 chars for MySQL compatibility)
+- Graceful fallback: if lock acquisition fails (timeout or MySQL doesn't support locks), returns error to user ("Another booking is in progress")
+- Applied to `Shortcodes::_create_appointment_from_submission()` via `LockManager::with_lock()` wrapper
+- Limitations documented: named locks are connection-based and won't work across separate DB connections; not all MySQL configurations support named locks
+- Significantly reduces double-booking risk compared to previous option-based mutex, but still not 100% guaranteed without true transactions
 
-- Added three tables: `lazy_resources`, `lazy_service_resources` (service→resource mapping), `lazy_appointment_resources` (appointment→resource assignment).
-- Resources have `capacity` (default 1) allowing multiple concurrent bookings per resource.
-- Services can be restricted to specific resources via `lazy_service_resources`; if no mapping exists, all active resources are considered available.
-- Availability logic now considers resource capacity: a slot is available if at least one allowed resource has free capacity (`used < capacity`).
-- Frontend wizard shows a resource dropdown when multiple resources are available for the selected slot; if only one or auto-assigned, the dropdown is hidden.
-- REST endpoint `/ltlb/v1/slot-resources` returns per-resource availability details for a given slot.
-- Appointment creation assigns a resource (user-selected or auto-selected based on availability); assignment is stored in `lazy_appointment_resources`.
+**Commit 3: Indexes & Query Performance (Schema.php)**
+- Added composite indexes to `lazy_staff_hours`: `user_id`, `user_weekday (user_id, weekday)`
+- Added composite indexes to `lazy_staff_exceptions`: `user_id`, `user_date (user_id, date)`
+- These indexes optimize frequent queries: fetching staff hours by user, filtering by weekday, checking exceptions by date
+- Existing indexes on `lazy_appointments` (service_id, customer_id, start_at, status) already cover most query patterns
+- Future optimization: consider composite index on `lazy_appointments(service_id, start_at, status)` if filtering queries become bottleneck
 
-Stabilization & Code Quality decisions (Dec 2025):
+**Commit 4: Admin UX Upgrade (AppointmentsPage.php, AppointmentRepository.php)**
+- **Filters added**: Service dropdown filter, customer search (email/name via LEFT JOIN on customers table)
+- **CSV Export**: "Export CSV" button generates appointments CSV with headers: ID, Service, Customer Email, Customer Name, Resource, Start, End, Status, Created
+- **Repository enhancement**: `AppointmentRepository::get_all()` now supports `service_id` and `customer_search` filters
+- Customer search uses `LIKE` query on email, first_name, last_name with proper `esc_like()` escaping
+- Export respects current filters (can export filtered subset)
+- Improves admin workflow for large datasets and reporting needs
 
-- Normalized all `require_once` include paths to use `Includes/` (capital I) for portability on case-sensitive filesystems.
-- Auto-migration: `Migrator` now stores `ltlb_db_version` and can be extended to auto-run on version change via `plugins_loaded` hook.
-- Dashboard restored: shows status cards (Services, Customers, Appointments, Resources counts) and last 5 appointments with resource assignments.
-- All repository classes created or populated with minimal CRUD methods to ensure no fatal errors on activation.
-- Availability engine uses `LTLB_Time::wp_timezone()` and considers resource-blocking via `AppointmentResourcesRepository::get_blocked_resources()`.
+**Commit 5: Email Deliverability (SettingsPage.php, Mailer.php)**
+- **Reply-To field**: Added optional `mail_reply_to` setting; if set, emails include `Reply-To:` header
+- **From email validation**: Uses `is_email()` validation before sending
+- **Test Email button**: Sends test email using current From/Reply-To settings to verify deliverability
+- Test email shows From name/email and Reply-To in message body for debugging
+- Mailer updated to include Reply-To header when configured
+- Helps diagnose email delivery issues before customers report problems
 
-Group Booking Feature decisions (Implementation Phase):
+**Commit 6: GDPR Basics (PrivacyPage.php)**
+- **Retention settings**: `retention_delete_canceled_days` (auto-delete canceled appointments after X days), `retention_anonymize_after_days` (auto-anonymize customer data after X days)
+- Settings default to 0 (disabled); must be explicitly configured
+- **Manual anonymization**: Admin can anonymize customer by email via nonce-protected form
+- Anonymization replaces email with `anonymized_{hash}@deleted.local`, name with "Anonymized User", clears phone/notes
+- **Future automation**: Retention cleanup via WP Cron (not yet implemented; documented as "Run Cleanup Now" placeholder)
+- Supports GDPR right to erasure and data minimization principles
+- Note: Full GDPR compliance requires additional measures (privacy policy, consent tracking, data export) - this is baseline implementation
 
-**Commit 1-3: Data Model**
-- Added `seats` SMALLINT UNSIGNED column to `lazy_appointments` (default 1, for group size).
-- Added `is_group` TINYINT(1) column to `lazy_services` (flag to enable group mode for a service).
-- Added `max_seats_per_booking` SMALLINT UNSIGNED column to `lazy_services` (maximum seats allowed per booking, default 1).
-- DB version bumped to 0.3.0 to track schema change.
-- Modified `AppointmentRepository::create()` to accept and store seats value.
-- Modified `ServiceRepository::create()/update()` to handle `is_group` and `max_seats_per_booking` fields.
+**Commit 7: Logging System (Logger.php)**
+- **Log levels**: error, warn, info, debug (hierarchical: debug includes all, error only critical)
+- **Privacy-safe**: Automatically hashes/truncates PII fields (email, phone, first_name, last_name, name)
+- Email logging format: `abc***@***.12345678` (first 3 chars + MD5 hash)
+- Other PII: `ab***1234` (first 2 chars + hash)
+- **Settings toggles**: `logging_enabled` (on/off), `log_level` (dropdown in Settings)
+- Logs written to WordPress debug.log via `error_log()` with `[LTLB-{LEVEL}]` prefix
+- Applied to Shortcodes booking flow: logs lock timeouts (warn), booking failures (error), successful bookings (info)
+- Requires `WP_DEBUG_LOG` enabled in wp-config.php
+- Helps troubleshoot production issues without exposing customer data in logs
 
-**Commit 2: Capacity Calculation**
-- Changed `AppointmentResourcesRepository::get_blocked_resources()` from `COUNT(*)` to `SUM(a.seats)` to properly calculate total seat occupancy per resource.
-- This ensures that when multiple bookings with different seat counts exist on the same resource, the capacity is correctly calculated as the sum of all seats.
+**Commit 8: QA Automation (QA_CHECKLIST.md)**
+- **Smoke Test for Release**: 6-step minimal test covering plugin activation, data creation, frontend booking, admin functions, email sending, diagnostics
+- **Upgrade Test from Previous DB Version**: 6-step test covering pre-upgrade data snapshot, upgrade execution, post-upgrade verification, data integrity checks, feature regression, new feature validation
+- **Performance & Load Testing**: Optional concurrent booking test, lock manager validation, email deliverability test
+- Provides checklist for manual QA before production deployment
+- Ensures no regressions during version upgrades (data loss, feature breakage)
+- Smoke test can be executed in < 10 minutes for rapid validation
 
-**Commit 4: Availability API**
-- Added `spots_left` field to time-slot responses (both in Availability class and REST endpoint).
-- `spots_left` = minimum available seats across all free resources for that slot (for group services).
-- Frontend can use this to limit the max seats selector UI.
+**Commit 9: Documentation Sweep**
+- Updated DECISIONS.md with all Phase 4.1 architectural decisions and rationale
+- Updated QA_CHECKLIST.md with comprehensive test scenarios
+- Verified consistency across SPEC.md, DB_SCHEMA.md, API.md
+- Plugin version: 0.4.0
+- DB version: 0.4.0 (tracked via `ltlb_db_version` option)
 
-**Commit 5: Frontend UX**
-- Added dynamic "Number of Seats" field in `[lazy_book]` shortcode form.
-- Field only shows when a group-enabled service is selected (via JavaScript).
-- Seats selector has min=1 and max=service.max_seats_per_booking (validated on form).
-- Frontend passes `seats` value to engine via payload.
+**Overall Phase 4.1 Goal**: Harden plugin for production use with diagnostics, concurrency protection, admin productivity features, email reliability, GDPR basics, privacy-safe logging, and comprehensive QA procedures.
 
-**Commit 6: Admin UX**
-- Added "Group Booking" checkbox (enable/disable) in Services admin page.
-- Added "Max Seats per Booking" input field in Services admin page.
-- Added "Seats" column to Appointments list showing booked seat count.
+---
 
-**Commit 7: Email**
-- Added `{seats}` placeholder to email templates (Mailer).
-- Admin and customer notification emails can include seat count via this placeholder.
+## Phase 4.1.1: Bug Fixes (Post-Review)
 
-**Pricing note:** In Phase 1, group bookings use the service's single price (no per-seat multiplier). Per-seat pricing can be added in Phase 2 if needed.
-
-**Validation:** Max seats validation happens on the frontend (HTML max attribute) and should be enforced in the engine for security. No backend hard limit enforced on seats value — this allows for manual admin adjustments if needed, but should be tightened in Phase 2.
-
-Phase 4 decisions (Hotel Mode MVP):
-
-**Commit 1: Hotel Settings**
-- Added four new settings to SettingsPage: `hotel_checkin_time`, `hotel_checkout_time`, `hotel_min_nights`, `hotel_max_nights`.
-- Stored in `lazy_settings` array (same as existing settings).
-- Defaults: check-in 15:00, check-out 11:00, min 1 night, max 30 nights.
-- These are read by HotelEngine for date/time validation and availability calculation.
-
-**Commit 2: Time Helpers for Date Ranges**
-- Added `combine_date_time($date_ymd, $time_hi)` to LTLB_Time: merges Y-m-d string + H:i string into DateTimeImmutable in site timezone.
-- Added `nights_between($checkin_date, $checkout_date)` to LTLB_Time: calculates integer days between two dates with checkout treated as exclusive (e.g., checkin 2025-12-20, checkout 2025-12-22 = 2 nights).
-- These helpers are used by HotelEngine and admin display to calculate night counts and validate date ranges.
-
-**Commit 3-4: HotelEngine Implementation**
-- Created `Includes/Domain/HotelEngine.php` implementing `BookingEngineInterface`.
-- `get_hotel_availability($service_id, $checkin, $checkout, $guests)`:
-  - Validates date range (checkout > checkin), night count (>= min_nights, <= max_nights), guest count (>= 1).
-  - Queries `lazy_service_resources` to find allowed rooms (resources) for room type (service).
-  - Uses `AppointmentResourcesRepository::get_blocked_resources()` (SUM(seats)) to check overlapping bookings.
-  - Availability logic: room is free if `SUM(seats for overlaps) + guests <= room.capacity`.
-  - Returns: `nights`, `free_resources_count`, `resource_ids` array, `total_price_cents` (nights × service.price_cents).
-- `create_hotel_booking($payload)`:
-  - Validates payload (required: service_id, checkin, checkout, email, guests).
-  - Calls `get_hotel_availability()` to check availability.
-  - Creates appointment with `start_at=checkin+hotel_checkin_time`, `end_at=checkout+hotel_checkout_time`, `seats=guests`.
-  - Auto-assigns first available room from `resource_ids` (or uses explicit `resource_id` from payload).
-  - Stores assignment in `lazy_appointment_resources`.
-  - Sends admin and customer emails via LTLB_Mailer (includes `{nights}`, `{guests}`, `{room}` placeholders).
-- `validate_hotel_payload()`: helper for input validation.
-- EngineFactory now returns HotelEngine when `template_mode=hotel`.
-
-**Commit 5: Hotel Frontend Wizard**
-- Modified `Shortcodes.php::render_lazy_book()` to check `template_mode` setting and route to `render_hotel_booking()` if hotel mode is enabled.
-- `render_hotel_booking()`: HTML form with fields:
-  - Room Type (service dropdown, filtered for active only)
-  - Check-in (date input, format YYYY-MM-DD)
-  - Check-out (date input, format YYYY-MM-DD)
-  - Guests (number input, min 1, max 10, default 1)
-  - Customer details: email (required), first name, last name, phone
-- `handle_hotel_submission()`: form handler
-  - Nonce verification (`ltlb_book_nonce`)
-  - Honeypot check (`ltlb_hp`)
-  - IP-based rate limiting (same as service mode: 10 requests / 10 minutes)
-  - Builds payload: service_id, checkin, checkout, email, first_name, last_name, phone, guests
-  - Calls `HotelEngine::create_hotel_booking()`
-  - Returns success message or error with details.
-- Rate limiting and honeypot provide same security as service mode; no new vulnerabilities introduced.
-
-**Commit 6: Admin Hotel Appointments Display**
-- Modified `AppointmentsPage.php::render_content()` to detect `template_mode` setting.
-- When `template_mode=hotel`:
-  - Table headers (9 columns): Room Type | Customer | Check-in | Check-out | Nights | Guests | Room | Status | Actions
-  - Data rows show:
-    - Service name (room type)
-    - Customer full name (first + last)
-    - Check-in date (formatted as YYYY-MM-DD)
-    - Check-out date (formatted as YYYY-MM-DD)
-    - Nights (calculated using LTLB_Time::nights_between())
-    - Guests (appointment.seats value)
-    - Room (resource name from lazy_appointment_resources)
-    - Status (appointment.status)
-    - Actions (Edit, Delete — same as service mode)
-- When `template_mode=service` (default):
-  - Original 7-column table (Service ID, Customer ID, Start, End, Seats, Status, Actions) — unchanged
-- No changes to database or appointment logic; purely UI conditional rendering.
-
-**Commit 7: Hotel REST API Endpoint**
-- Added `GET /ltlb/v1/hotel-availability` route in `Plugin.php::register_rest_routes()`.
-- Query parameters: `service_id` (int), `checkin` (Y-m-d), `checkout` (Y-m-d), `guests` (int, default 1).
-- Validates `template_mode=hotel` and delegates to `HotelEngine::get_hotel_availability()`.
-- Returns JSON:
-  - Success: `{ "nights": 2, "free_resources_count": 2, "resource_ids": [1, 2], "total_price_cents": 20000 }`
-  - Error: `{ "error": "message" }`
-- Public endpoint (no authentication required) but subject to rate limiting via standard WP nonce/form submission flow for hotel bookings.
-
-**Checkout Exclusivity:** Check-out date is exclusive — no overlap occurs if one booking's checkout equals another's check-in.
-- Example: Room 101 booked with checkout 2025-12-22; next booking can start check-in 2025-12-22 (same day, overlaps are detected during daytime, but hotel midnight boundary is clean).
-- Implemented via `nights_between()` using date subtraction (checkout - checkin as days).
-
-**Capacity Model:** Reuses Phase 3 `seats` field and `SUM(seats)` blocking logic.
-- For service mode: seats = number of people in appointment (group size).
-- For hotel mode: seats = number of guests in booking.
-- Blocking: `SUM(seats for overlapping bookings) + new_guests <= room.capacity`.
-
-**Backwards Compatibility:** Service mode remains fully functional when `template_mode=service` (default).
-- All existing service bookings, time slots, and admin pages unaffected.
-- No database schema changes (reuses existing tables).
-- EngineFactory pattern isolates hotel logic from service logic.
-
-**Testing Note:** QA_CHECKLIST.md updated with comprehensive hotel test scenarios including:
-- Setup (1 room type + 2 rooms with different capacities)
-- Booking flow (valid booking, overlapping dates, exclusive checkout boundary test)
-- Capacity constraints (multi-booking blocking)
-- REST API testing
-- Edge cases (invalid dates, min/max nights validation)
-
+**Junction Table Migration Fix (Migrator.php, Schema.php)**
+- **Problem**: dbDelta caused "Multiple primary key defined" errors on junction tables during plugin reactivation
+- **Root Cause**: dbDelta struggles with composite PRIMARY KEYs on existing tables, especially when trying to ALTER existing keys
+- **Additional Issue**: Some junction tables had AUTO_INCREMENT fields (incorrect for junction tables), preventing PRIMARY KEY drops
+- **Solution**: Implemented `ensure_junction_table()` helper method with 3-tier approach:
+  1. **New tables**: Creates using dbDelta
+  2. **Missing PRIMARY KEY**: Adds composite key manually
+  3. **Incorrect PRIMARY KEY**: Backs up data → drops table → recreates with correct structure → restores data
+- **Why recreate instead of ALTER**: MySQL doesn't allow `DROP PRIMARY KEY` on tables with AUTO_INCREMENT columns
+- **Data Safety**: Automatic backup/restore ensures no data loss during structure correction
+- **Schema Change**: Removed spaces in composite key syntax: `PRIMARY KEY (id1,id2)` instead of `PRIMARY KEY (id1, id2)` for better dbDelta compatibility
+- **Affected Tables**: `lazy_appointment_resources`, `lazy_service_resources`
+- **Impact**: Plugin now activates/deactivates cleanly without database errors, automatically repairs corrupted junction table structures from previous migrations while preserving all existing relationships
 
 

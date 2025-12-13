@@ -19,8 +19,6 @@ class LTLB_DB_Schema {
                 price_cents INT UNSIGNED NOT NULL DEFAULT 0,
                 currency CHAR(3) NOT NULL DEFAULT 'EUR',
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
-                is_group TINYINT(1) NOT NULL DEFAULT 0,
-                max_seats_per_booking SMALLINT UNSIGNED NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
                 PRIMARY KEY  (id),
@@ -53,14 +51,49 @@ class LTLB_DB_Schema {
                 end_at DATETIME NOT NULL,
                 status VARCHAR(20) NOT NULL DEFAULT 'pending',
                 timezone VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin',
-                seats SMALLINT UNSIGNED NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
                 PRIMARY KEY  (id),
                 KEY service_id (service_id),
                 KEY customer_id (customer_id),
                 KEY start_at (start_at),
-                KEY status (status)
+                KEY status (status),
+                KEY status_start (status, start_at),
+                KEY end_at (end_at),
+                KEY time_range (start_at, end_at)
+            ) {$charset_collate};";
+        }
+
+        if ($type === 'staff_hours') {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT UNSIGNED NOT NULL,
+                weekday TINYINT NOT NULL,
+                start_time TIME NOT NULL,
+                end_time TIME NOT NULL,
+                is_active TINYINT(1) NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY user_id (user_id),
+                KEY user_weekday (user_id, weekday)
+            ) {$charset_collate};";
+        }
+
+        if ($type === 'staff_exceptions') {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT UNSIGNED NOT NULL,
+                date DATE NOT NULL,
+                is_off_day TINYINT(1) NOT NULL,
+                start_time TIME NULL,
+                end_time TIME NULL,
+                note TEXT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY user_id (user_id),
+                KEY user_date (user_id, date)
             ) {$charset_collate};";
         }
 
@@ -68,39 +101,33 @@ class LTLB_DB_Schema {
             return "CREATE TABLE {$table_name} (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(190) NOT NULL,
-                capacity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+                description LONGTEXT NULL,
+                capacity INT UNSIGNED NOT NULL DEFAULT 1,
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
-                PRIMARY KEY (id)
-            ) {$charset_collate};";
-        }
-
-        if ($type === 'service_resources') {
-            return "CREATE TABLE {$table_name} (
-                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                service_id BIGINT UNSIGNED NOT NULL,
-                resource_id BIGINT UNSIGNED NOT NULL,
-                created_at DATETIME NOT NULL,
-                PRIMARY KEY (id),
-                KEY service_id (service_id),
-                KEY resource_id (resource_id)
+                PRIMARY KEY  (id),
+                KEY is_active (is_active)
             ) {$charset_collate};";
         }
 
         if ($type === 'appointment_resources') {
             return "CREATE TABLE {$table_name} (
-                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 appointment_id BIGINT UNSIGNED NOT NULL,
                 resource_id BIGINT UNSIGNED NOT NULL,
-                created_at DATETIME NOT NULL,
-                updated_at DATETIME NOT NULL,
-                PRIMARY KEY (id),
-                KEY appointment_id (appointment_id),
+                PRIMARY KEY (appointment_id,resource_id),
                 KEY resource_id (resource_id)
             ) {$charset_collate};";
         }
 
+        if ($type === 'service_resources') {
+            return "CREATE TABLE {$table_name} (
+                service_id BIGINT UNSIGNED NOT NULL,
+                resource_id BIGINT UNSIGNED NOT NULL,
+                PRIMARY KEY (service_id,resource_id),
+                KEY resource_id (resource_id)
+            ) {$charset_collate};";
+        }
         return '';
     }
 }

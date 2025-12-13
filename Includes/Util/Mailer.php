@@ -21,6 +21,7 @@ class LTLB_Mailer {
 
         $from_name = $ls['mail_from_name'] ?? '';
         $from_addr = $ls['mail_from_email'] ?? get_option('admin_email');
+        $reply_to = $ls['mail_reply_to'] ?? '';
 
         $admin_to = get_option('admin_email');
         $admin_subject = $ls['mail_admin_subject'] ?? ($ls['mail_admin_template_subject'] ?? '');
@@ -56,6 +57,9 @@ class LTLB_Mailer {
         $headers = [];
         if ( ! empty( $from_name ) || ! empty( $from_addr ) ) {
             $headers[] = 'From: ' . ( $from_name ? $from_name : '' ) . ' <' . $from_addr . '>';
+        }
+        if ( ! empty( $reply_to ) && is_email( $reply_to ) ) {
+            $headers[] = 'Reply-To: ' . $reply_to;
         }
 
         $results['admin'] = wp_mail( $admin_to, $subj, $body, $headers );

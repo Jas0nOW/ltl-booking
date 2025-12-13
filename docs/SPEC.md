@@ -153,8 +153,6 @@ ltl-bookings/
 - `price_cents` INT UNSIGNED NOT NULL DEFAULT 0
 - `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
-- `is_group` TINYINT(1) NOT NULL DEFAULT 0 (Group Booking Feature)
-- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 INDEX: `is_active`
@@ -178,7 +176,6 @@ INDEX: `is_active`
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'  (pending|confirmed|canceled)
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
-- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 INDEX: `service_id`, `customer_id`, `start_at`, `status`
@@ -324,25 +321,24 @@ Seiten:
 - Invoices Table + PDF Export (später)
 
 ### Phase 4 – Hotel Mode MVP (Dual Template Engine)
-- **Template Mode Setting**: `template_mode` (service|hotel) in `lazy_settings`
-- **Service Mode**: Time-slot based booking (existing, unchanged)
-  - Services = appointments at specific times
-  - Customers select service + time slot + optional resource
-  - Example: Yoga class on 2025-12-15 at 10:00
-- **Hotel Mode**: Date-range based booking (new MVP)
-  - Services = Room Types (e.g., "Double Room")
-  - Resources = Rooms (e.g., "Room 101", "Room 102") with `capacity` field
-  - Booking = check-in date to check-out date (check-out is exclusive, no overlap at boundary)
-  - Guests parameter = `seats` in appointments table (reuses Phase 3 feature)
-  - Night count = exclusive checkout (e.g., check-in 2025-12-20, check-out 2025-12-22 = 2 nights)
-  - Availability = free rooms (capacity >= sum of guest counts for overlapping bookings)
-  - Resource Assignment = auto-assign first available room or explicit room selection
-  - Settings: hotel_checkin_time, hotel_checkout_time, hotel_min_nights, hotel_max_nights
-- **UI Layer**:
-  - Hotel Wizard: Service (Room Type) → Check-in date → Check-out date → Guests → Customer Details
-  - Admin Appointments: conditional columns (Service mode: Service/Time columns vs Hotel mode: Room Type/Dates/Nights/Guests/Room columns)
-  - REST API: GET /ltlb/v1/hotel-availability (returns nights, free_resources_count, resource_ids, total_price_cents)
-- **Test Coverage**: QA_CHECKLIST.md includes hotel setup, booking flow, capacity constraints, exclusive checkout edge case, REST API tests
+- Template mode: service (time-slot booking) vs hotel (date-range booking)
+- Hotel bookings: check-in/check-out dates, nights calculation, room assignment
+- Room types (services) and rooms (resources) with capacity management
+- Implemented in 9 commits (see DECISIONS.md Phase 4)
+
+### Phase 4.1 – Production Readiness (9 Commits)
+**Goal**: Harden plugin for production deployment
+- **Commit 1**: Health/Diagnostics page (system info, DB stats, manual migrations)
+- **Commit 2**: Named Lock Protection (MySQL GET_LOCK to prevent race conditions)
+- **Commit 3**: Indexes & Query Performance (composite indexes for staff queries)
+- **Commit 4**: Admin UX Upgrade (filters by service/customer, CSV export)
+- **Commit 5**: Email Deliverability (Reply-To field, test email button, validation)
+- **Commit 6**: GDPR Basics (retention settings, manual customer anonymization)
+- **Commit 7**: Logging System (privacy-safe logging with levels, PII hashing)
+- **Commit 8**: QA Automation (smoke test checklist, upgrade test procedures)
+- **Commit 9**: Documentation Sweep (updated DECISIONS, SPEC, QA_CHECKLIST)
+
+**Current Version**: 0.4.0 (DB version: 0.4.0)
 
 ### Phase 5 – React SPA (Optional, wenn MVP stabil)
 - Admin & Wizard als React ersetzen (REST bleibt)
