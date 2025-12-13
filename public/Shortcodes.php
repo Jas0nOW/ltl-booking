@@ -156,11 +156,19 @@ class LTLB_Shortcodes {
 			'timezone' => LTLB_Time::get_site_timezone_string(),
 		] );
 
-	if ( ! $appt_id ) {
+		if ( ! $appt_id ) {
 			return '<div class="ltlb-error">' . esc_html__( 'Unable to create appointment.', 'ltl-bookings' ) . '</div>';
-	}
+		}
 
-	return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We will contact you.', 'ltl-bookings' ) . '</div>';
+		// fetch fresh service and customer data and send notifications
+		$service = $service_repo->get_by_id( $service_id );
+		$customer = $customer_repo->get_by_id( $customer_id );
+
+		if ( class_exists( 'LTLB_Mailer' ) ) {
+			LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
+		}
+
+		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
 	}
 }
 

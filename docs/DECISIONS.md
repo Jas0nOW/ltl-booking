@@ -38,6 +38,20 @@ Commit 4 decisions (Settings):
 
 - The Shortcode and Time helpers now read these options. Slots are generated using `LTLB_Time::generate_slots_for_day()` with the configured start/end/slot minutes.
 
+Commit 5 decisions (Email basics):
+
+- Email templates and sender are stored in options and editable via Settings:
+	- `ltlb_email_from_name`
+	- `ltlb_email_from_address`
+	- `ltlb_email_admin_subject`
+	- `ltlb_email_admin_body`
+	- `ltlb_email_customer_subject`
+	- `ltlb_email_customer_body`
+	- `ltlb_email_send_customer` (bool)
+- Simple mailer `LTLB_Mailer` implemented in `Includes/Util/Mailer.php` which replaces placeholders `{service},{start},{end},{name},{email},{phone},{status},{appointment_id}` and sends admin and customer emails via `wp_mail()`.
+- Emails are sent after appointment creation in the frontend flow. Failures in sending do not block appointment creation.
+
+
 
 
 
