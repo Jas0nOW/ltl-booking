@@ -61,6 +61,35 @@ class LTLB_DB_Schema {
             ) {$charset_collate};";
         }
 
+        if ($type === 'staff_hours') {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT UNSIGNED NOT NULL,
+                weekday TINYINT NOT NULL,
+                start_time TIME NOT NULL,
+                end_time TIME NOT NULL,
+                is_active TINYINT(1) NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id)
+            ) {$charset_collate};";
+        }
+
+        if ($type === 'staff_exceptions') {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT UNSIGNED NOT NULL,
+                date DATE NOT NULL,
+                is_off_day TINYINT(1) NOT NULL,
+                start_time TIME NULL,
+                end_time TIME NULL,
+                note TEXT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id)
+            ) {$charset_collate};";
+        }
+
         return '';
     }
 }

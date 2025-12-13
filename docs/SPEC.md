@@ -25,12 +25,12 @@ Es soll **für service-basierte Unternehmen** (z.B. Yoga, Beratung) funktioniere
 ## 2) Plugin-Identität & Kompatibilität
 
 - **Name:** LazyBookings (Amelia Clone)
-- **Slug / Text Domain:** `lazy-bookings`
+- **Slug / Text Domain:** `ltl-bookings`
 - **Version:** `0.1.0` (Start)
 - **WP min:** 6.0
 - **PHP min:** 7.4 (empfohlen 8.0+)
 
-Repo-Name darf abweichen (z.B. `ltl-booking`), aber Plugin-Slug bleibt **lazy-bookings**.
+Repo-Name darf abweichen (z.B. `ltl-bookings`), aber Plugin-Slug bleibt **ltl-bookings**.
 
 ---
 
@@ -64,8 +64,8 @@ Auch wenn langfristig eine React-SPA geplant ist, wird **Phase 1** als **PHP-fir
 ## 5) Ordnerstruktur (Soll)
 
 ```
-lazy-bookings/
-  lazy-bookings.php
+ltl-bookings/
+  ltl-bookings.php
   uninstall.php
   readme.txt
   .gitignore
@@ -189,7 +189,7 @@ INDEX: `service_id`, `customer_id`, `start_at`, `status`
 
 ## 8) REST API (Phase 1)
 
-Namespace: `/lazy/v1`
+Namespace: `/ltlb/v1`
 
 ### Endpoints
 - `GET /services` (list)
@@ -232,7 +232,7 @@ Namespace: `/lazy/v1`
 
 ## 10) Admin UI (Phase 1)
 
-Top-Level Menü: **LazyBookings** (Slug: `lazy_bookings`)
+Top-Level Menü: **LazyBookings** (Slug: `ltl_bookings`)
 
 Seiten:
 - Dashboard (KPIs später)

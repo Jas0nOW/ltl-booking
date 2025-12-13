@@ -13,6 +13,15 @@ This checklist covers manual verification steps after installing or updating the
   - Honeypot: submit form with honeypot field filled — should be rejected (no booking created).
   - Rate limiting: submit form repeatedly >10 times within 10 minutes from same IP — should be blocked.
   - Double-booking: attempt booking overlapping slots — should be rejected by conflict check.
+- Staff Management:
+  - Create a new user with the `ltlb_staff` role.
+  - Edit the user's working hours in the "Staff" admin page.
+  - Add an exception for the user.
+  - Verify that the changes are saved correctly.
+- Availability Endpoint:
+  - Call the `GET /wp-json/ltlb/v1/availability` endpoint with a valid service and date.
+  - Check that the returned slots are correct based on the staff's working hours and exceptions.
+  - Test with a date where the staff member has an exception and ensure no slots are returned.
 - Timezone/DST:
   - Set site timezone and plugin timezone (Settings) and verify slot times and stored `start_at`/`end_at` values match expected local times.
 - Email:

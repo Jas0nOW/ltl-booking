@@ -1,11 +1,38 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
+use WP_REST_Request;
+use WP_REST_Response;
+
 class LTLB_Shortcodes {
 	public static function init(): void {
-	add_shortcode( 'lazy_book', [ __CLASS__, 'render_lazy_book' ] );
-	add_action( 'wp_enqueue_scripts', [ __CLASS__, 'maybe_enqueue_assets' ] );
+		add_shortcode( 'lazy_book', [ __CLASS__, 'render_lazy_book' ] );
+		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'maybe_enqueue_assets' ] );
+		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
+
+	public static function register_rest_routes(): void {
+		register_rest_route( 'ltlb/v1', '/time-slots', [
+			'methods'  => 'GET',
+			'callback' => [ __CLASS__, 'get_time_slots' ],
+			'permission_callback' => '__return_true',
+		] );
+	}
+
+	public static function get_time_slots( WP_REST_Request $request ): WP_REST_Response {
+		$service_id = $request->get_param( 'service_id' );
+		$date = $request->get_param( 'date' );
+
+		if ( ! $service_id || ! $date ) {
+			return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+		}
+
+		$availability = new Availability();
+		$slots = $availability->compute_time_slots( $service_id, $date );
+
+		return new WP_REST_Response( $slots, 200 );
+	}
+
 	public static function maybe_enqueue_assets(): void {
 	global $post;
 	if ( empty( $post ) ) return;
@@ -53,21 +80,7 @@ class LTLB_Shortcodes {
 				<p>
 					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
 						<select name="time_slot" required>
-							<?php
-							// generate slots for today using lazy_settings and LTLB_Time helper
-							$tz = LTLB_Time::wp_timezone();
-							$today = new DateTimeImmutable( 'now', $tz );
-							$ls = get_option( 'lazy_settings', [] );
-							if ( ! is_array( $ls ) ) $ls = [];
-							$start_hour = (int) ( $ls['working_hours_start'] ?? 9 );
-							$end_hour = (int) ( $ls['working_hours_end'] ?? 17 );
-							$slot_minutes = (int) ( $ls['slot_size_minutes'] ?? 60 );
-							$slots = LTLB_Time::generate_slots_for_day( $today, $start_hour, $end_hour, $slot_minutes );
-							foreach ( $slots as $slot ) {
-								$label = $slot->format('H:i');
-								echo '<option value="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</option>';
-							}
-							?>
+							<!-- Time slots will be loaded dynamically via JavaScript -->
 						</select>
 					</label>
 				</p>
@@ -84,13 +97,33 @@ class LTLB_Shortcodes {
 	return ob_get_clean();
 	}
 	private static function handle_submission(): string {
-		if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
+		if ( ! self::_validate_submission() ) {
 			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+		}
+
+		$data = self::_get_sanitized_submission_data();
+
+		if ( is_wp_error( $data ) ) {
+			return '<div class="ltlb-error">' . esc_html( $data->get_error_message() ) . '</div>';
+		}
+
+		$appointment_id = self::_create_appointment_from_submission( $data );
+
+		if ( is_wp_error( $appointment_id ) ) {
+			return '<div class="ltlb-error">' . esc_html( $appointment_id->get_error_message() ) . '</div>';
+		}
+
+		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
+	}
+
+	private static function _validate_submission(): bool {
+		if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
+			return false;
 		}
 
 		// Honeypot: if filled, silently fail
 		if ( ! empty( $_POST['ltlb_hp'] ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+			return false;
 		}
 
 		// Simple rate limit per IP: 10 submits per 10 minutes
@@ -105,81 +138,94 @@ class LTLB_Shortcodes {
 			$key = 'ltlb_rate_' . md5( $ip );
 			$count = (int) get_transient( $key );
 			if ( $count >= 10 ) {
-				return '<div class="ltlb-error">' . esc_html__( 'Too many requests. Please try again later.', 'ltl-bookings' ) . '</div>';
+				return false;
 			}
 			set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
 		}
-	$service_id = isset( $_POST['service_id'] ) ? intval( $_POST['service_id'] ) : 0;
-	$date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : '';
-	$time = isset( $_POST['time_slot'] ) ? sanitize_text_field( $_POST['time_slot'] ) : '';
 
-	$email = LTLB_Sanitizer::email( $_POST['email'] ?? '' );
-	$first = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
-	$last = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
-	$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
-
-	if ( empty( $service_id ) || empty( $date ) || empty( $time ) || empty( $email ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Please fill the required fields.', 'ltl-bookings' ) . '</div>';
+		return true;
 	}
 
-	// compute start_at and end_at based on service duration
-	$service_repo = new LTLB_ServiceRepository();
-	$service = $service_repo->get_by_id( $service_id );
-	$duration = $service && isset( $service['duration_min'] ) ? intval( $service['duration_min'] ) : 60;
+	private static function _get_sanitized_submission_data(): array|WP_Error {
+		$service_id = isset( $_POST['service_id'] ) ? intval( $_POST['service_id'] ) : 0;
+		$date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : '';
+		$time = isset( $_POST['time_slot'] ) ? sanitize_text_field( $_POST['time_slot'] ) : '';
 
-	    $start_dt = LTLB_Time::parse_date_and_time( $date, $time );
-	    if ( ! $start_dt ) return '<div class="ltlb-error">' . esc_html__( 'Invalid date/time.', 'ltl-bookings' ) . '</div>';
+		$email = LTLB_Sanitizer::email( $_POST['email'] ?? '' );
+		$first = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
+		$last = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
+		$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
 
-	    $end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
+		if ( empty( $service_id ) || empty( $date ) || empty( $time ) || empty( $email ) ) {
+			return new WP_Error( 'missing_fields', __( 'Please fill the required fields.', 'ltl-bookings' ) );
+		}
 
-	    $start_at_sql = LTLB_Time::format_wp_datetime( $start_dt );
-	    $end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
-
-	$appointment_repo = new LTLB_AppointmentRepository();
-
-	// conflict check
-	if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $service_id ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Selected slot is already booked.', 'ltl-bookings' ) . '</div>';
+		return compact( 'service_id', 'date', 'time', 'email', 'first', 'last', 'phone' );
 	}
 
-	// upsert customer
-	$customer_repo = new LTLB_CustomerRepository();
-	$customer_id = $customer_repo->upsert_by_email( [
-			'email' => $email,
-			'first_name' => $first,
-			'last_name' => $last,
-			'phone' => $phone,
-	] );
+	private static function _create_appointment_from_submission( array $data ): int|WP_Error {
+		// compute start_at and end_at based on service duration
+		$service_repo = new LTLB_ServiceRepository();
+		$service = $service_repo->get_by_id( $data['service_id'] );
+		$duration = $service && isset( $service['duration_min'] ) ? intval( $service['duration_min'] ) : 60;
 
-	if ( ! $customer_id ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to save customer.', 'ltl-bookings' ) . '</div>';
-	}
+		$start_dt = LTLB_Time::parse_date_and_time( $data['date'], $data['time'] );
+		if ( ! $start_dt ) {
+			return new WP_Error( 'invalid_date', __( 'Invalid date/time.', 'ltl-bookings' ) );
+		}
 
-    		$ls = get_option( 'lazy_settings', [] );
-    		if ( ! is_array( $ls ) ) $ls = [];
-    		$default_status = $ls['default_status'] ?? 'pending';
-		$appt_id = $appointment_repo->create( [
-			'service_id' => $service_id,
-			'customer_id' => $customer_id,
-			'start_at' => $start_dt,
-			'end_at' => $end_dt,
-			'status' => $default_status,
-			'timezone' => LTLB_Time::get_site_timezone_string(),
+		$end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
+
+		$start_at_sql = LTLB_Time::format_wp_datetime( $start_dt );
+		$end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
+
+		$appointment_repo = new LTLB_AppointmentRepository();
+
+		// conflict check
+		if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $data['service_id'], null ) ) {
+			return new WP_Error( 'conflict', __( 'Selected slot is already booked.', 'ltl-bookings' ) );
+		}
+
+		// upsert customer
+		$customer_repo = new LTLB_CustomerRepository();
+		$customer_id = $customer_repo->upsert_by_email( [
+			'email'      => $data['email'],
+			'first_name' => $data['first'],
+			'last_name'  => $data['last'],
+			'phone'      => $data['phone'],
 		] );
 
-		if ( ! $appt_id ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to create appointment.', 'ltl-bookings' ) . '</div>';
+		if ( ! $customer_id ) {
+			return new WP_Error( 'customer_error', __( 'Unable to save customer.', 'ltl-bookings' ) );
+		}
+
+		$ls = get_option( 'lazy_settings', [] );
+		if ( ! is_array( $ls ) ) {
+			$ls = [];
+		}
+		$default_status = $ls['default_status'] ?? 'pending';
+		$appt_id = $appointment_repo->create( [
+			'service_id'  => $data['service_id'],
+			'customer_id' => $customer_id,
+			'start_at'    => $start_dt,
+			'end_at'      => $end_dt,
+			'status'      => $default_status,
+			'timezone'    => LTLB_Time::get_site_timezone_string(),
+		] );
+
+		if ( is_wp_error( $appt_id ) ) {
+			return $appt_id;
 		}
 
 		// fetch fresh service and customer data and send notifications
-		$service = $service_repo->get_by_id( $service_id );
+		$service = $service_repo->get_by_id( $data['service_id'] );
 		$customer = $customer_repo->get_by_id( $customer_id );
 
 		if ( class_exists( 'LTLB_Mailer' ) ) {
 			LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
 		}
 
-		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
+		return $appt_id;
 	}
 }
 

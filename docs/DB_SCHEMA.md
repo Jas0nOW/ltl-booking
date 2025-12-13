@@ -37,3 +37,24 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
+`lazy_staff_hours`:
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `weekday` TINYINT NOT NULL
+- `start_time` TIME NOT NULL
+- `end_time` TIME NOT NULL
+- `is_active` TINYINT(1) NOT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+`lazy_staff_exceptions`:
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `date` DATE NOT NULL
+- `is_off_day` TINYINT(1) NOT NULL
+- `start_time` TIME NULL
+- `end_time` TIME NULL
+- `note` TEXT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
