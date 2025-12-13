@@ -4,9 +4,13 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_ServicesPage {
 
     private $service_repository;
+    private $resource_repository;
+    private $service_resources_repository;
 
     public function __construct() {
         $this->service_repository = new LTLB_ServiceRepository();
+        $this->resource_repository = new LTLB_ResourceRepository();
+        $this->service_resources_repository = new LTLB_ServiceResourcesRepository();
     }
 
     public function render(): void {
@@ -32,8 +36,17 @@ class LTLB_Admin_ServicesPage {
 
             if ( $id > 0 ) {
                 $ok = $this->service_repository->update( $id, $data );
+                $saved_id = $id;
             } else {
-                $ok = $this->service_repository->create( $data );
+                $created = $this->service_repository->create( $data );
+                $ok = $created !== false;
+                $saved_id = $created ?: 0;
+            }
+
+            // save service -> resource mappings
+            $resource_ids = isset( $_POST['resource_ids'] ) ? array_map( 'intval', (array) $_POST['resource_ids'] ) : [];
+            if ( $saved_id > 0 ) {
+                $this->service_resources_repository->set_resources_for_service( $saved_id, $resource_ids );
             }
 
             $redirect = admin_url( 'admin.php?page=ltlb_services' );
@@ -74,6 +87,8 @@ class LTLB_Admin_ServicesPage {
                 $price = $editing && isset( $service['price_cents'] ) ? number_format( $service['price_cents'] / 100, 2, '.', '' ) : '';
                 $currency = $editing ? ( $service['currency'] ?? 'EUR' ) : 'EUR';
                 $is_active = $editing ? ( ! empty( $service['is_active'] ) ) : true;
+                $available_resources = $this->resource_repository->get_all();
+                $selected_resources = $editing ? $this->service_resources_repository->get_resources_for_service( intval( $service['id'] ) ) : [];
                 ?>
                 <form method="post">
                     <?php wp_nonce_field( 'ltlb_service_save_action', 'ltlb_service_nonce' ); ?>
@@ -109,6 +124,17 @@ class LTLB_Admin_ServicesPage {
                             <tr>
                                 <th><?php echo esc_html__('Active', 'ltl-bookings'); ?></th>
                                 <td><label><input name="is_active" type="checkbox" value="1" <?php checked( $is_active ); ?>> <?php echo esc_html__('Yes', 'ltl-bookings'); ?></label></td>
+                            </tr>
+                            <tr>
+                                <th><label for="resource_ids"><?php echo esc_html__('Resources', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <select name="resource_ids[]" id="resource_ids" multiple style="min-width:300px;">
+                                        <?php foreach ( $available_resources as $r ) : ?>
+                                            <option value="<?php echo intval($r['id']); ?>" <?php echo in_array(intval($r['id']), $selected_resources, true) ? 'selected' : ''; ?>><?php echo esc_html($r['name']); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description"><?php echo esc_html__('Select resources that can be used for this service. Leave empty to allow any resource.', 'ltl-bookings'); ?></p>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

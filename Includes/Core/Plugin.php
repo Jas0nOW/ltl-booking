@@ -5,6 +5,8 @@ class LTLB_Plugin {
 
     public function run(): void {
         add_action('init', [ $this, 'on_init' ]);
+        // Ensure DB migrations run automatically when plugin version changes
+        add_action('plugins_loaded', [ 'LTLB_DB_Migrator', 'maybe_migrate' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
         add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
         add_action('wp_head', [ $this, 'print_design_css_frontend' ]);
@@ -26,6 +28,11 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
         require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
         require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/ResourceRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/AppointmentResourcesRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/ServiceResourcesRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/StaffHoursRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/StaffExceptionsRepository.php';
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
@@ -34,10 +41,20 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
+        require_once LTLB_PATH . 'admin/Pages/StaffPage.php';
+        require_once LTLB_PATH . 'admin/Pages/ResourcesPage.php';
+        // Admin: profile helpers
+        require_once LTLB_PATH . 'includes/Admin/StaffProfile.php';
     }
 
     public function on_init(): void {
         // Phase 1: Shortcodes/CPT/Assets registrieren
+        // instantiate profile handler
+        if ( is_admin() ) {
+            if ( class_exists('LTLB_Admin_StaffProfile') ) {
+                new LTLB_Admin_StaffProfile();
+            }
+        }
     }
 
     public function register_admin_menu(): void {
@@ -87,6 +104,26 @@ class LTLB_Plugin {
             'manage_options',
             'ltlb_settings',
             [ $this, 'render_settings_page' ]
+        );
+
+        // Staff
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Staff',
+            'Staff',
+            'manage_options',
+            'ltlb_staff',
+            [ $this, 'render_staff_page' ]
+        );
+
+        // Resources
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Resources',
+            'Resources',
+            'manage_options',
+            'ltlb_resources',
+            [ $this, 'render_resources_page' ]
         );
 
         // Design
@@ -152,8 +189,55 @@ class LTLB_Plugin {
         echo '<div class="wrap"><h1>Design</h1></div>';
     }
 
+    public function render_staff_page(): void {
+        if ( class_exists('LTLB_Admin_StaffPage') ) {
+            $page = new LTLB_Admin_StaffPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Staff</h1></div>';
+    }
+
+    public function render_resources_page(): void {
+        if ( class_exists('LTLB_Admin_ResourcesPage') ) {
+            $page = new LTLB_Admin_ResourcesPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Resources</h1></div>';
+    }
+
     public function register_rest_routes(): void {
-        // Phase 1: REST-Routen registrieren
+        register_rest_route('ltlb/v1', '/availability', [
+            'methods' => 'GET',
+            'callback' => [ $this, 'rest_availability' ],
+            'permission_callback' => function() { return true; }
+        ]);
+    }
+
+    public function rest_availability( WP_REST_Request $request ) {
+        $service_id = intval( $request->get_param('service_id') );
+        $date = sanitize_text_field( $request->get_param('date') );
+        if ( empty( $service_id ) || empty( $date ) ) {
+            return new WP_REST_Response( [ 'error' => 'service_id and date required' ], 400 );
+        }
+
+        // instantiate availability and compute
+        if ( ! class_exists('Availability') ) {
+            require_once LTLB_PATH . 'includes/Util/Availability.php';
+        }
+        $avail = new Availability();
+
+        $want_slots = $request->get_param('slots');
+        $slot_step = intval( $request->get_param('slot_step') );
+        if ( $want_slots ) {
+            $step = $slot_step > 0 ? $slot_step : 15;
+            $data = $avail->compute_time_slots( $service_id, $date, $step );
+            return new WP_REST_Response( $data, 200 );
+        }
+
+        $data = $avail->compute_availability( $service_id, $date );
+        return new WP_REST_Response( $data, 200 );
     }
 
     public function print_design_css_frontend(): void {
