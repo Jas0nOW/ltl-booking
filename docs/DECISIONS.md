@@ -198,6 +198,59 @@ Migration decisions (Commit 2c.1 - auto-migrate):
 
 ---
 
+## Phase 4.2: Final UX Polish (Commits 1-5)
+
+**Goal**: User-facing polish for mobile-first wizard, admin tables, hotel mode, and accessibility — no new features.
+
+**Commit 1: Mobile-First Wizard CSS (public.css)**
+- **Rationale**: Original wizard CSS used pixel-based layout with poor mobile behavior
+- **Changes**: 
+  - Converted to rem units for consistent spacing across devices
+  - Implemented mobile-first approach with `@media (min-width: 640px)` breakpoints
+  - Increased touch targets: buttons min-height 2.75rem, padding 0.75rem
+  - Improved spacing: consistent 1rem gutters, 1.5rem section spacing
+  - Enhanced visual hierarchy: larger step headings (1.25rem), clear service card structure
+- **Impact**: Wizard now fully responsive and touch-friendly on mobile devices
+
+**Commit 2: Admin Tables Polish (ServicesPage.php, CustomersPage.php, ResourcesPage.php)**
+- **Problem**: Empty states showed bare "No items" messages without guidance
+- **Solutions**:
+  - **Services**: Centered empty state with "Create your first service" CTA button (`.button-primary`)
+  - **Customers**: Added description "Customers are created automatically from bookings", clarified empty state
+  - **Resources**: Added description with hyperlinked quick link to Services page, improved context
+- **Rationale**: Empty states should guide users to next action, not dead-end screens
+- **Admin UX Philosophy**: Provide context and actionable next steps at every stage
+
+**Commit 3: Hotel Wizard Enhancements (Shortcodes.php, public.js, public.css)**
+- **Price Preview Calculator**: Real-time JavaScript calculates `nights × nightly_rate` when service/checkin/checkout change
+- **Display Format**: Shows "€XX.XX - N nights × €YY.YY" in styled preview box below date pickers
+- **Label Improvements**: Changed "Service" to "Room Type", "Date" to "Check-in Date"/"Check-out Date" for hotel mode
+- **Visual Styling**: Price preview box with salbei background (#E8EDE8), distinct from form fields
+- **Rationale**: Users need cost transparency before submitting booking; prevents surprise pricing
+
+**Commit 4: Accessibility Improvements (Shortcodes.php, public.css)**
+- **Skip Link**: Added keyboard navigation skip link to jump directly to booking form
+- **ARIA Attributes**: 
+  - Added `aria-label`, `aria-required`, `role` to all form elements
+  - Marked honeypot with `aria-hidden="true"` and `tabindex="-1"`
+  - Added `aria-label` to submit button
+- **Explicit Label Associations**: All inputs now have explicit IDs (e.g., `ltlb-email`) with corresponding `for` attributes
+- **Autocomplete Attributes**: Added proper autocomplete hints (`email`, `given-name`, `family-name`, `tel`) for autofill support
+- **Focus States**: Improved focus outlines (2px solid) for all interactive elements (buttons, links, inputs)
+- **Screen Reader Utilities**: Added `.ltlb-sr-only` class for screen reader only content
+- **Required Indicators**: Visual `*` with `aria-label="required"` for screen reader announcement
+- **Button States**: Added disabled button styles with opacity and cursor changes
+- **Rationale**: WCAG 2.1 Level AA compliance, keyboard navigation support, screen reader compatibility
+
+**Commit 5: Docs-Sweep (SPEC.md, DECISIONS.md, QA_CHECKLIST.md)**
+- Document all UX polish changes in appropriate locations
+- Add mobile viewport testing steps to QA checklist
+- Update DECISIONS.md with UX rationale and design philosophy
+
+**Overall Phase 4.2 Goal**: Polish user-facing surfaces for production launch — mobile users, admin operators, hotel bookings, and accessibility users all have smooth, professional experience.
+
+---
+
 ## Phase 4.1.1: Bug Fixes (Post-Review)
 
 **Junction Table Migration Fix (Migrator.php, Schema.php)**

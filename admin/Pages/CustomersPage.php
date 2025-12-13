@@ -51,6 +51,7 @@ class LTLB_Admin_CustomersPage {
 				<?php echo esc_html__('Customers', 'ltl-bookings'); ?>
 				<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
 			</h1>
+			<p class="description"><?php echo esc_html__('Manage customer information. Customers are created automatically from bookings.', 'ltl-bookings'); ?></p>
 
 			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -104,7 +105,12 @@ class LTLB_Admin_CustomersPage {
 					</thead>
 					<tbody>
 						<?php if ( empty( $customers ) ) : ?>
-							<tr><td colspan="4"><?php echo esc_html__('No customers yet', 'ltl-bookings'); ?></td></tr>
+							<tr>
+								<td colspan="4" style="padding: 2rem; text-align: center;">
+									<p style="margin: 0 0 1rem; font-size: 1.125rem; color: #666;"><?php echo esc_html__('No customers yet', 'ltl-bookings'); ?></p>
+									<p style="margin: 0; color: #999;"><?php echo esc_html__('Customers are created automatically when bookings are made.', 'ltl-bookings'); ?></p>
+								</td>
+							</tr>
 						<?php else: foreach ( $customers as $c ): ?>
 							<tr>
 								<td><?php echo esc_html( $c['email'] ); ?></td>

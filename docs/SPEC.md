@@ -336,11 +336,19 @@ Seiten:
 - **Commit 8**: QA Automation (smoke test checklist, upgrade test procedures)
 - **Commit 9**: Documentation Sweep (updated DECISIONS, SPEC, QA_CHECKLIST)
 
+### Phase 4.2 – Final UX Polish (5 Commits)
+**Goal**: User-facing polish for mobile, admin UX, hotel mode, accessibility — no new features after this phase
+- **Commit 1**: Mobile-First Wizard CSS (rem units, responsive breakpoints, improved touch targets)
+- **Commit 2**: Admin Tables Polish (empty states with CTAs, descriptions, quick links)
+- **Commit 3**: Hotel Wizard Enhancements (price preview calculator, mode-aware labels)
+- **Commit 4**: Accessibility Improvements (ARIA labels, skip links, focus states, autocomplete)
+- **Commit 5**: Docs-Sweep (updated SPEC, DECISIONS, QA_CHECKLIST with UX polish documentation)
+
 **Current Version**: 0.4.0 (DB version: 0.4.0)
 
 Status (0.4.0):
-- Implemented: Custom tables (services, customers, appointments, staff_hours, staff_exceptions, resources, junctions), automatic migrations, admin pages baseline, `[lazy_book]` shortcode, availability endpoint (`/ltlb/v1/availability`) with slot support, privacy-safe logger (defaults OFF, level error), Diagnostics & Privacy pages baseline.
-- Planned: Full Services/Customers/Appointments REST CRUD, group bookings, payments, hotel mode, React SPA.
+- Implemented: Custom tables (services, customers, appointments, staff_hours, staff_exceptions, resources, junctions), automatic migrations, admin pages baseline, `[lazy_book]` shortcode, availability endpoint (`/ltlb/v1/availability`) with slot support, privacy-safe logger (defaults OFF, level error), Diagnostics & Privacy pages baseline, mobile-first wizard UI, admin table UX polish, hotel mode wizard enhancements, WCAG 2.1 Level AA accessibility features.
+- Planned: Full Services/Customers/Appointments REST CRUD, group bookings, payments, React SPA.
 
 ### Phase 5 – React SPA (Optional, wenn MVP stabil)
 - Admin & Wizard als React ersetzen (REST bleibt)

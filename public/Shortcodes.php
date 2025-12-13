@@ -93,6 +93,11 @@ class LTLB_Shortcodes {
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['ltlb_book_submit'] ) ) {
 			return self::handle_submission();
 	}
+	
+	$settings = get_option( 'lazy_settings', [] );
+	$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
+	$is_hotel_mode = ( $template_mode === 'hotel' );
+	
 	$service_repo = new LTLB_ServiceRepository();
 	$services = $service_repo->get_all();
 	ob_start();
@@ -103,49 +108,121 @@ class LTLB_Shortcodes {
 		.ltlb-booking .button-primary{background:var(--lazy-primary,#2b7cff);color:var(--lazy-text,#fff);border:none}
 		.ltlb-booking .ltlb-success{color:var(--lazy-primary,#2b7cff)}
 		.ltlb-booking .ltlb-error{color:#c33}
+		.ltlb-price-preview{background:#f9f9f9;border:1px solid #ddd;padding:1rem;border-radius:6px;margin:1rem 0;font-size:0.9375rem}
+		.ltlb-price-preview strong{font-size:1.125rem;color:var(--lazy-primary,#2b7cff)}
 		</style>
 		<div class="ltlb-booking">
-			<form method="post">
+			<a href="#ltlb-form-start" class="ltlb-skip-link"><?php echo esc_html__('Skip to booking form', 'ltl-bookings'); ?></a>
+			<form method="post" aria-label="<?php echo esc_attr__('Booking form', 'ltl-bookings'); ?>">
 				<?php wp_nonce_field( 'ltlb_book_action', 'ltlb_book_nonce' ); ?>
 				<!-- honeypot field: bots will fill this -->
-				<div style="display:none;">
-					<label>Leave this empty<input type="text" name="ltlb_hp" value=""></label>
+				<div style="display:none;" aria-hidden="true">
+					<label>Leave this empty<input type="text" name="ltlb_hp" value="" tabindex="-1"></label>
 				</div>
-				<h3><?php echo esc_html__( 'Book a service', 'ltl-bookings' ); ?></h3>
+				<span id="ltlb-form-start"></span>
+				<h3><?php echo $is_hotel_mode ? esc_html__( 'Book a room', 'ltl-bookings' ) : esc_html__( 'Book a service', 'ltl-bookings' ); ?></h3>
+
+				<?php if ( $is_hotel_mode ) : ?>
+					<div id="ltlb-price-preview" class="ltlb-price-preview" style="display:none;">
+						<p style="margin:0 0 0.5rem 0;"><?php echo esc_html__('Price estimate:', 'ltl-bookings'); ?></p>
+						<p style="margin:0;"><strong id="ltlb-price-amount">—</strong> <span id="ltlb-price-breakdown" style="color:#666;font-size:0.875rem;"></span></p>
+					</div>
+				<?php endif; ?>
 
 				<p>
-					<label><?php echo esc_html__('Service', 'ltl-bookings'); ?>
-						<select name="service_id" required>
+					<label>
+						<?php echo $is_hotel_mode ? esc_html__('Room Type', 'ltl-bookings') : esc_html__('Service', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+						<select name="service_id" required aria-required="true" data-price-cents="">
+							<option value=""><?php echo $is_hotel_mode ? esc_html__('Select a room type', 'ltl-bookings') : esc_html__('Select a service', 'ltl-bookings'); ?></option>
 							<?php foreach ( $services as $s ): ?>
-								<option value="<?php echo esc_attr( $s['id'] ); ?>"><?php echo esc_html( $s['name'] ); ?></option>
+								<option value="<?php echo esc_attr( $s['id'] ); ?>" data-price="<?php echo esc_attr( $s['price_cents'] ?? 0 ); ?>"><?php echo esc_html( $s['name'] ); ?><?php if ( isset($s['price_cents']) && $s['price_cents'] > 0 ) : ?> — <?php echo number_format($s['price_cents']/100, 2) . ' ' . ($s['currency'] ?? 'EUR'); ?><?php endif; ?></option>
 							<?php endforeach; ?>
 						</select>
+						<?php if ( $is_hotel_mode ) : ?>
+							<span class="ltlb-field-hint"><?php echo esc_html__('Price shown is per night', 'ltl-bookings'); ?></span>
+						<?php endif; ?>
 					</label>
 				</p>
+				<?php if ( $is_hotel_mode ) : ?>
+					<p>
+						<label>
+							<?php echo esc_html__('Check-in', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+							<input type="date" name="checkin" required aria-required="true" id="ltlb-checkin">
+							<span class="ltlb-field-hint"><?php echo esc_html__('Arrival date', 'ltl-bookings'); ?></span>
+						</label>
+					</p>
+					<p>
+						<label>
+							<?php echo esc_html__('Check-out', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+							<input type="date" name="checkout" required aria-required="true" id="ltlb-checkout">
+							<span class="ltlb-field-hint"><?php echo esc_html__('Departure date', 'ltl-bookings'); ?></span>
+						</label>
+					</p>
+					<p>
+						<label>
+							<?php echo esc_html__('Guests', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+							<input type="number" name="guests" min="1" value="1" required aria-required="true">
+							<span class="ltlb-field-hint"><?php echo esc_html__('Number of guests', 'ltl-bookings'); ?></span>
+						</label>
+					</p>
+				<?php else : ?>
+					<p>
+						<label>
+							<?php echo esc_html__('Date', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+							<input type="date" name="date" required aria-required="true">
+							<span class="ltlb-field-hint"><?php echo esc_html__('Choose your preferred date', 'ltl-bookings'); ?></span>
+						</label>
+					</p>
+				<?php endif; ?>
+				<?php if ( ! $is_hotel_mode ) : ?>
+					<p>
+						<label>
+							<?php echo esc_html__('Time', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+							<select name="time_slot" required aria-required="true">
+								<option value=""><?php echo esc_html__('Select date first', 'ltl-bookings'); ?></option>
+							</select>
+							<span class="ltlb-field-hint"><?php echo esc_html__('Available time slots will load after selecting a date', 'ltl-bookings'); ?></span>
+						</label>
+					</p>
+				<?php endif; ?>
 				<p>
-					<label><?php echo esc_html__('Date', 'ltl-bookings'); ?> <input type="date" name="date" required></label>
-				</p>
-				<p>
-					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
-						<select name="time_slot" required>
-							<!-- Time slots will be loaded dynamically via JavaScript -->
+					<label>
+						<?php echo $is_hotel_mode ? esc_html__('Room Preference', 'ltl-bookings') : esc_html__('Resource', 'ltl-bookings'); ?>
+						<select name="resource_id" id="ltlb_resource_select" style="display:none;">
+							<option value=""><?php echo esc_html__('Any available', 'ltl-bookings'); ?></option>
 						</select>
-					</label>
-				</p>
-				<p>
-					<label><?php echo esc_html__('Resource (optional)', 'ltl-bookings'); ?>
-						<select name="resource_id" id="ltlb_resource_select" style="display:none; min-width:200px;">
-							<!-- filled via JS when multiple resources are available -->
-						</select>
+						<span class="ltlb-field-hint" id="ltlb_resource_hint" style="display:none;">
+							<?php echo $is_hotel_mode ? esc_html__('Multiple rooms available for your dates', 'ltl-bookings') : esc_html__('Multiple resources available for this time', 'ltl-bookings'); ?>
+						</span>
 					</label>
 				</p>
 				<h4><?php echo esc_html__('Your details', 'ltl-bookings'); ?></h4>
-				<p><label><?php echo esc_html__('Email', 'ltl-bookings'); ?> <input type="email" name="email" required></label></p>
-				<p><label><?php echo esc_html__('First name', 'ltl-bookings'); ?> <input type="text" name="first_name"></label></p>
-				<p><label><?php echo esc_html__('Last name', 'ltl-bookings'); ?> <input type="text" name="last_name"></label></p>
-				<p><label><?php echo esc_html__('Phone', 'ltl-bookings'); ?> <input type="text" name="phone"></label></p>
+				<p>
+					<label for="ltlb-email">
+						<?php echo esc_html__('Email', 'ltl-bookings'); ?><span class="ltlb-required" aria-label="required">*</span>
+						<input type="email" id="ltlb-email" name="email" required aria-required="true" placeholder="you@example.com" autocomplete="email">
+					</label>
+				</p>
+				<p>
+					<label for="ltlb-first-name">
+						<?php echo esc_html__('First name', 'ltl-bookings'); ?>
+						<input type="text" id="ltlb-first-name" name="first_name" autocomplete="given-name">
+					</label>
+				</p>
+				<p>
+					<label for="ltlb-last-name">
+						<?php echo esc_html__('Last name', 'ltl-bookings'); ?>
+						<input type="text" id="ltlb-last-name" name="last_name" autocomplete="family-name">
+					</label>
+				</p>
+				<p>
+					<label for="ltlb-phone">
+						<?php echo esc_html__('Phone', 'ltl-bookings'); ?>
+						<input type="tel" id="ltlb-phone" name="phone" placeholder="+1234567890" autocomplete="tel">
+					</label>
+				</p>
 
-				<p><?php submit_button( esc_html__('Book', 'ltl-bookings'), 'primary', 'ltlb_book_submit', false ); ?></p>
+				<p><?php submit_button( esc_html__('Complete Booking', 'ltl-bookings'), 'primary', 'ltlb_book_submit', false, ['aria-label' => esc_attr__('Submit booking form', 'ltl-bookings')] ); ?></p>
 			</form>
 	</div>
 	<?php
@@ -153,22 +230,22 @@ class LTLB_Shortcodes {
 	}
 	private static function handle_submission(): string {
 		if ( ! self::_validate_submission() ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Unable to process your request. Please try again.', 'ltl-bookings' ) . '</div></div>';
 		}
 
 		$data = self::_get_sanitized_submission_data();
 
 		if ( is_wp_error( $data ) ) {
-			return '<div class="ltlb-error">' . esc_html( $data->get_error_message() ) . '</div>';
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html( $data->get_error_message() ) . '</div></div>';
 		}
 
 		$appointment_id = self::_create_appointment_from_submission( $data );
 
 		if ( is_wp_error( $appointment_id ) ) {
-			return '<div class="ltlb-error">' . esc_html( $appointment_id->get_error_message() ) . '</div>';
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html( $appointment_id->get_error_message() ) . '</div></div>';
 		}
 
-		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
+		return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Success!', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Your booking has been received and is pending confirmation. Check your email for details.', 'ltl-bookings' ) . '</div></div>';
 	}
 
 	private static function _validate_submission(): bool {

@@ -1,67 +1,172 @@
 /**
  * LazyBookings Public Styles
- * Using CSS variables defined by the plugin
+ * Mobile-first, using CSS variables from plugin
  */
 
 .ltlb-booking {
     background: var(--lazy-bg, #fff);
     color: var(--lazy-text, #111);
-    padding: 16px;
-    border-radius: 6px;
-    max-width: 600px;
+    padding: 1rem;
+    border-radius: 8px;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.ltlb-booking h3,
+@media (min-width: 640px) {
+    .ltlb-booking {
+        padding: 1.5rem;
+        max-width: 600px;
+    }
+}
+
+.ltlb-booking h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--lazy-text, #111);
+}
+
 .ltlb-booking h4 {
-    margin-top: 0;
+    margin: 1.5rem 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--lazy-text, #111);
+}
+
+.ltlb-booking p {
+    margin: 0 0 1rem 0;
 }
 
 .ltlb-booking label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
     font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--lazy-text, #111);
 }
 
 .ltlb-booking input[type="text"],
 .ltlb-booking input[type="email"],
 .ltlb-booking input[type="date"],
+.ltlb-booking input[type="tel"],
 .ltlb-booking select,
 .ltlb-booking textarea {
     width: 100%;
-    padding: 8px;
+    padding: 0.625rem;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.ltlb-booking input:focus,
+.ltlb-booking select:focus,
+.ltlb-booking textarea:focus {
+    outline: 2px solid var(--lazy-primary, #2b7cff);
+    outline-offset: 2px;
+    border-color: var(--lazy-primary, #2b7cff);
 }
 
 .ltlb-booking .button-primary {
     background: var(--lazy-primary, #2b7cff);
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .ltlb-booking .button-primary {
+        width: auto;
+    }
 }
 
 .ltlb-booking .button-primary:hover {
-    background: var(--lazy-accent, #ffcc00);
+    background: var(--lazy-accent, #8DA399);
+}
+
+.ltlb-booking .button-primary:focus {
+    outline: 2px solid var(--lazy-primary, #2b7cff);
+    outline-offset: 2px;
+}
+
+.ltlb-booking .button-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .ltlb-booking .ltlb-success {
     background: #d4edda;
     border: 1px solid #c3e6cb;
     color: #155724;
-    padding: 12px;
-    border-radius: 4px;
-    margin: 16px 0;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
 }
 
 .ltlb-booking .ltlb-error {
     background: #f8d7da;
     border: 1px solid #f5c6cb;
     color: #721c24;
-    padding: 12px;
-    border-radius: 4px;
-    margin: 16px 0;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.ltlb-booking .ltlb-field-hint {
+    font-size: 0.8125rem;
+    color: #666;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.ltlb-booking .ltlb-required {
+    color: #c33;
+    margin-left: 0.125rem;
+}
+
+/* Skip link for accessibility */
+.ltlb-skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--lazy-primary, #2b7cff);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.ltlb-skip-link:focus {
+    top: 0;
+}
+
+/* Improved focus states for better keyboard navigation */
+.ltlb-booking a:focus {
+    outline: 2px solid var(--lazy-primary, #2b7cff);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Screen reader only text */
+.ltlb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }

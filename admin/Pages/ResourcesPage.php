@@ -57,6 +57,7 @@ class LTLB_Admin_ResourcesPage {
                 <?php echo esc_html__('Resources', 'ltl-bookings'); ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             </h1>
+            <p class="description"><?php echo esc_html__('Resources are rooms, equipment, or staff capacity. Link them to services to manage availability.', 'ltl-bookings'); ?> <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services') ); ?>"><?php echo esc_html__('Manage Services', 'ltl-bookings'); ?></a></p>
 
             <?php if ( $action === 'add' || $editing ) :
                 $form_id = $editing ? intval( $resource['id'] ) : 0;

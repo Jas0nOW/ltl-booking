@@ -154,7 +154,10 @@ class LTLB_Admin_ServicesPage {
                     <tbody>
                         <?php if ( empty( $services ) ) : ?>
                             <tr>
-                                <td colspan="5"><?php echo esc_html__('No services yet', 'ltl-bookings'); ?></td>
+                                <td colspan="5" style="padding: 2rem; text-align: center;">
+                                    <p style="margin: 0 0 1rem; font-size: 1.125rem; color: #666;"><?php echo esc_html__('No services yet', 'ltl-bookings'); ?></p>
+                                    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="button button-primary"><?php echo esc_html__('Create your first service', 'ltl-bookings'); ?></a>
+                                </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $services as $s ) : ?>

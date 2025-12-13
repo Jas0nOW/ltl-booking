@@ -2,90 +2,31 @@
 
 This checklist covers manual verification steps after installing or updating the plugin.
 
-- Activate plugin and run DB migrations (ensure tables: lazy_services, lazy_customers, lazy_appointments).
-- Admin pages:
-  - Open LazyBookings → Services: list, Add New, Edit, Save — confirm admin notice appears and persists only once.
-  - Open LazyBookings → Customers: add/edit customer — confirm notice shown.
-  - Open LazyBookings → Appointments: filter, change status (Confirm/Cancel) — confirm notices shown.
-  - Open LazyBookings → Settings: change settings, Save — confirm notice shown and settings persist.
-- Frontend booking (`[lazy_book]` shortcode):
-  - Render form, select a service and slot, submit with valid details — verify appointment created in DB and email(s) sent (if enabled).
-  - Honeypot: submit form with honeypot field filled — should be rejected (no booking created).
-  - Rate limiting: submit form repeatedly >10 times within 10 minutes from same IP — should be blocked.
-  - Double-booking: attempt booking overlapping slots — should be rejected by conflict check.
-- Staff Management:
-  - Create a new user with the `ltlb_staff` role.
-  - Edit the user's working hours in the "Staff" admin page.
-  - Add an exception for the user.
-  - Verify that the changes are saved correctly.
-- Availability Endpoint:
-  - Call the `GET /wp-json/ltlb/v1/availability` endpoint with a valid service and date.
-  - Check that the returned slots are correct based on the staff's working hours and exceptions.
-  - Test with a date where the staff member has an exception and ensure no slots are returned.
-- Timezone/DST:
-  - Set site timezone and plugin timezone (Settings) and verify slot times and stored `start_at`/`end_at` values match expected local times.
-- Email:
-  - Verify admin and customer email templates render placeholders: {service}, {start}, {end}, {name}, {email}, {phone}, {status}, {appointment_id}.
-- Notes & Logs:
-  - Check for PHP errors in debug log.
-  - Verify graceful failures: booking should still create if emails fail (errors logged but user sees success).
-
-If any step fails, collect screenshots, DB rows, and wp-debug.log entries and report.
-
-## Resource-specific tests (Phase 2c)
-
-- Service with single resource:
-  - Create a `Resource` and map it to a `Service` (Services → edit → Resources).
-  - Book the only available slot for that service twice (two different customers). Second booking should be rejected when capacity is exhausted.
-
-- Service with two resources:
-  - Create two `Resources` and map both to the same `Service`.
-  - Book the same slot twice (two customers) — both bookings should succeed if each maps to a different resource.
-  - Book the same slot a third time — should be rejected once both resources are occupied.
-
-- Slot blocking behavior:
-  - Create appointments with `confirmed` status and verify they block resource availability immediately.
-  - Toggle the `ltlb_pending_blocks` option and verify `pending` appointments also block when enabled.
-
-- Wizard UI checks:
-  - When multiple resources are free for a slot, the frontend should show a `Resource` dropdown.
-  - Selecting a resource should persist the chosen resource to the appointment (check `lazy_appointment_resources`).
-  - If the user doesn't choose a resource, verify the system auto-selects the first available resource.
-
-- Edge cases & race checks (manual):
-  - Rapidly submit the same slot from two browser windows to observe possible race conditions; verify at most capacity bookings are accepted.
-  - Check admin Appointments list shows the `Resource` column and the correct resource name or `—` when none.
-
-- Optional status page (admin):
-  - Visit the resource status admin page (if installed) and verify counts for resources, mappings, and active bookings per resource.
-## Production Readiness Tests (Phase 4.1)
-
-### Smoke Test for Release
-
-This minimal test verifies core functionality is working after plugin update/activation:
-
-**Prerequisites:**
-- Fresh WordPress installation OR existing site with LazyBookings installed
-- Admin access
-- Test email account accessible
-
 **Test Steps:**
 
 1. **Plugin Activation**
-   - [ ] Activate/Update plugin without fatal errors
-   - [ ] Visit LazyBookings → Diagnostics
-   - [ ] Verify DB version matches plugin version (0.4.0)
-   - [ ] Verify all 8 tables show "✓ Exists" status
+   - [X] Activate/Update plugin without fatal errors
+   - [X] Visit LazyBookings → Diagnostics
+   - [X] Verify DB version matches plugin version (0.4.0)
+   - [ ] Verify all 8 tables show "✓ Exists" status 
+   (Ich kann nur 6 sehen:
+    wp_lazy_services	✓ Exists	1
+    wp_lazy_customers	✓ Exists	1
+    wp_lazy_appointments	✓ Exists	0
+    wp_lazy_resources	✓ Exists	1
+    wp_lazy_service_resources	✓ Exists	0
+    wp_lazy_appointment_resources	✓ Exists	0
+    )
 
 2. **Create Test Data**
-   - [ ] Create 1 Service (e.g., "Test Service", 60min, 10€)
-   - [ ] Create 1 Resource (e.g., "Test Room", capacity 2)
-   - [ ] Map Resource to Service (Services → Edit → Resources)
-   - [ ] Verify saves without errors
+   - [X] Create 1 Service (e.g., "Test Service", 60min, 10€)
+   - [X] Create 1 Resource (e.g., "Test Room", capacity 2)
+   - [X] Map Resource to Service (Services → Edit → Resources)
+   - [X] Verify saves without errors
 
 3. **Frontend Booking Flow**
-   - [ ] Create test page with `[lazy_book]` shortcode
-   - [ ] Select service, date, time slot
+   - [X] Create test page with `[lazy_book]` shortcode
+   - [ ] Select service, date, time slot (Select a Date first obwohl Datum ausgewählt ist!)
    - [ ] Fill customer details with test email
    - [ ] Submit booking
    - [ ] Verify success message displayed
@@ -99,28 +40,28 @@ This minimal test verifies core functionality is working after plugin update/act
    - [ ] Test customer search filter (search by email)
 
 5. **WP-CLI Commands** (if WP-CLI available)
-   - [ ] Run `wp ltlb doctor` - verify output shows system info, table status, lock support
-   - [ ] Run `wp ltlb migrate` - verify migrations run without errors
-   - [ ] Enable dev tools (Settings → `enable_dev_tools=1` or set `WP_DEBUG=true`)
-   - [ ] Run `wp ltlb seed --mode=service` - verify demo data created (services, resources, staff)
-   - [ ] Run `wp ltlb seed --mode=hotel` - verify hotel demo data created and template mode switched
+   - [X] Run `wp ltlb doctor` - verify output shows system info, table status, lock support
+   - [X] Run `wp ltlb migrate` - verify migrations run without errors
+   - [X] Enable dev tools (Settings → `enable_dev_tools=1` or set `WP_DEBUG=true`)
+   - [X] Run `wp ltlb seed --mode=service` - verify demo data created (services, resources, staff)
+   - [X] Run `wp ltlb seed --mode=hotel` - verify hotel demo data created and template mode switched
 
 6. **Diagnostics Admin UI**
-   - [ ] Visit LazyBookings → Diagnostics
-   - [ ] Click "Run Doctor" button
-   - [ ] Verify diagnostics output displayed (version check, lock support, email config, logging status)
-   - [ ] Click "Run Migrations" button - verify migrations execute without errors
+   - [X] Visit LazyBookings → Diagnostics
+   - [X] Click "Run Doctor" button
+   - [X] Verify diagnostics output displayed (version check, lock support, email config, logging status)
+   - [X] Click "Run Migrations" button - verify migrations execute without errors
 
 7. **Settings & Email**
-   - [ ] Settings → Email section
-   - [ ] Enter test email in "Send test email to" field
+   - [X] Settings → Email section
+   - [X] Enter test email in "Send test email to" field
    - [ ] Click "Send Test Email"
    - [ ] Check email received with correct From/Reply-To headers
 
 8. **Diagnostics & Health** (legacy check)
-   - [ ] Visit Diagnostics page
-   - [ ] Verify system info displays (WP version, PHP version, template mode)
-   - [ ] Verify database statistics show correct counts
+   - [X] Visit Diagnostics page
+   - [X] Verify system info displays (WP version, PHP version, template mode)
+   - [X] Verify database statistics show correct counts
    - [ ] Click "Run Migrations" button - no errors
 
 **Expected Result:** All steps pass without fatal errors, bookings create successfully, emails send correctly.
@@ -224,3 +165,166 @@ If upgrade fails critically, restore database backup and reinstall previous plug
 - Create 10 bookings in quick succession
 - Verify all confirmation emails sent (check mail queue/logs)
 - Verify no email failures block booking creation (graceful failure)
+
+## UX Polish Tests (Phase 4.2)
+
+### Mobile-First Wizard Test
+
+**Prerequisites:**
+- Test page with `[lazy_book]` shortcode
+- Access to browser dev tools OR physical mobile device
+
+**Test Steps:**
+
+1. **Mobile Viewport (320px - 640px)**
+   - [ ] Open booking page in mobile viewport (Chrome DevTools → 375×667 iPhone SE)
+   - [ ] Verify wizard container uses full width with appropriate padding
+   - [ ] Verify all text is readable without horizontal scroll
+   - [ ] Verify buttons are touch-friendly (min-height 44px / 2.75rem)
+   - [ ] Verify form inputs have adequate spacing (1rem gutters)
+   - [ ] Verify date/time pickers work correctly on mobile
+   - [ ] Test entire booking flow on mobile without zoom issues
+
+2. **Tablet Viewport (640px - 1024px)**
+   - [ ] Switch to tablet viewport (768×1024 iPad)
+   - [ ] Verify wizard uses responsive breakpoint styles
+   - [ ] Verify service cards display in appropriate grid layout
+   - [ ] Verify increased spacing and larger touch targets applied
+   - [ ] Complete booking flow - all interactions smooth
+
+3. **Desktop Viewport (1024px+)**
+   - [ ] Switch to desktop viewport (1920×1080)
+   - [ ] Verify wizard max-width constraint (40rem) prevents excessive width
+   - [ ] Verify centered layout with appropriate margins
+   - [ ] Verify all responsive enhancements gracefully scale up
+
+4. **Touch Target Validation**
+   - [ ] Use browser accessibility inspector to verify:
+     - All buttons min-height 2.75rem (44px)
+     - All interactive elements have adequate padding (0.75rem minimum)
+     - No overlapping click targets
+
+**Expected Result:** Wizard is fully functional and visually consistent across all viewport sizes without layout breaks or usability issues.
+
+### Admin Tables UX Test
+
+**Prerequisites:**
+- Admin access to LazyBookings
+
+**Test Steps:**
+
+1. **Empty States**
+   - [ ] Visit Services page with 0 services
+   - [ ] Verify centered empty state message displayed
+   - [ ] Verify "Create your first service" CTA button present with `.button-primary` styling
+   - [ ] Click CTA button - redirects to Add New Service form
+   - [ ] Visit Customers page with 0 customers
+   - [ ] Verify description: "Customers are created automatically from bookings"
+   - [ ] Verify empty state messaging is clear and helpful
+   - [ ] Visit Resources page with 0 resources
+   - [ ] Verify description contains hyperlinked "Services page" quick link
+   - [ ] Click quick link - navigates to Services page
+
+2. **Non-Empty States**
+   - [ ] Create at least 1 service, 1 customer, 1 resource
+   - [ ] Verify descriptions persist at top of pages even with data present
+   - [ ] Verify quick links remain functional
+
+**Expected Result:** Empty states guide users to next action, descriptions provide context, quick links improve navigation.
+
+### Hotel Mode Wizard Test
+
+**Prerequisites:**
+- Plugin configured in hotel mode (Settings → `template_mode = hotel`)
+- At least 1 service (room type) created with nightly rate
+- Test page with `[lazy_book]` shortcode
+
+**Test Steps:**
+
+1. **Label Verification**
+   - [ ] Open booking page in hotel mode
+   - [ ] Verify service selector labeled "Room Type" (not "Service")
+   - [ ] Verify date inputs labeled "Check-in Date" and "Check-out Date" (not generic "Date")
+
+2. **Price Preview Calculator**
+   - [ ] Select a room type with price (e.g., 100€/night)
+   - [ ] Select check-in date (e.g., 2024-03-01)
+   - [ ] Select check-out date (e.g., 2024-03-03)
+   - [ ] Verify price preview box displays: "€200.00 - 2 nights × €100.00"
+   - [ ] Change check-out date to 2024-03-05
+   - [ ] Verify price updates in real-time: "€400.00 - 4 nights × €100.00"
+   - [ ] Change room type to different rate
+   - [ ] Verify price recalculates with new nightly rate
+
+3. **Visual Styling**
+   - [ ] Verify price preview box has distinct background (salbei/green tint)
+   - [ ] Verify price preview positioned below date pickers, above customer details
+   - [ ] Verify preview box scales properly on mobile viewports
+
+4. **Edge Cases**
+   - [ ] Select check-out date before check-in date
+   - [ ] Verify price preview doesn't show negative nights or confusing output
+   - [ ] Leave dates unselected - verify price preview hidden or shows appropriate placeholder
+   - [ ] Submit booking - verify nights calculation reflected in database
+
+**Expected Result:** Price preview provides transparent cost calculation, updates in real-time, and hotel-specific labels improve clarity.
+
+### Accessibility Test
+
+**Prerequisites:**
+- Keyboard (no mouse)
+- Screen reader (NVDA, JAWS, or VoiceOver) OR browser accessibility inspector
+
+**Test Steps:**
+
+1. **Keyboard Navigation**
+   - [ ] Open booking page, press Tab repeatedly
+   - [ ] Verify skip link appears with focus (keyboard only)
+   - [ ] Activate skip link with Enter - focus jumps to booking form
+   - [ ] Tab through entire form
+   - [ ] Verify all interactive elements focusable (service select, date inputs, text inputs, submit button)
+   - [ ] Verify focus outlines visible (2px solid) on all focused elements
+   - [ ] Verify honeypot field skipped (tabindex -1)
+
+2. **Screen Reader Compatibility** (if available)
+   - [ ] Activate screen reader
+   - [ ] Navigate to booking form
+   - [ ] Verify form announced with appropriate label
+   - [ ] Tab through each field:
+     - Email field: announces "Email, required"
+     - First Name: announces "First Name, required"
+     - Last Name: announces "Last Name, required"
+     - Phone: announces "Phone, optional"
+   - [ ] Verify required indicators (`*`) announced via aria-label
+   - [ ] Verify submit button announces "Complete Booking"
+   - [ ] Verify honeypot field hidden from screen reader (aria-hidden)
+
+3. **ARIA Attributes Validation**
+   - [ ] Inspect form HTML (browser dev tools)
+   - [ ] Verify all inputs have explicit `id` attributes (ltlb-email, ltlb-first-name, etc.)
+   - [ ] Verify all labels have corresponding `for` attributes matching input IDs
+   - [ ] Verify required inputs have `aria-required="true"` attribute
+   - [ ] Verify form has `aria-label` or appropriate role
+   - [ ] Verify submit button has descriptive `aria-label`
+
+4. **Autocomplete Attributes**
+   - [ ] Inspect email input - verify `autocomplete="email"`
+   - [ ] Inspect first name input - verify `autocomplete="given-name"`
+   - [ ] Inspect last name input - verify `autocomplete="family-name"`
+   - [ ] Inspect phone input - verify `autocomplete="tel"`
+   - [ ] Test browser autofill behavior - verify suggestions appear correctly
+
+5. **Visual Accessibility**
+   - [ ] Verify focus states are high contrast (not relying on color alone)
+   - [ ] Verify disabled button states have visual indication (opacity, cursor)
+   - [ ] Verify error messages are clearly visible and associated with fields
+   - [ ] Verify success messages are prominently displayed
+
+**Expected Result:** 
+- All functionality accessible via keyboard without mouse
+- Screen readers announce all form elements correctly with labels and required status
+- ARIA attributes present and semantically correct
+- Autocomplete works for common fields
+- Focus states clearly visible throughout
+
+**Accessibility Compliance:** These tests verify WCAG 2.1 Level AA compliance for perceivable, operable, understandable, and robust content.
