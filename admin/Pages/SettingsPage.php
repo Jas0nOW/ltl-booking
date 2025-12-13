@@ -26,6 +26,8 @@ class LTLB_Admin_SettingsPage {
 				$settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? '' );
 				$settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? '' );
 				$settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' );
+				$settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? '' );
+				$settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? '' );
 
 				update_option( 'lazy_settings', $settings );
 
@@ -49,6 +51,8 @@ class LTLB_Admin_SettingsPage {
 			$mail_customer_template = $settings['mail_customer_template'] ?? '';
 			$mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
 			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
+			$mail_admin_subject = $settings['mail_admin_subject'] ?? '';
+			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';
 
 		$timezones = timezone_identifiers_list();
 		?>
@@ -112,7 +116,7 @@ class LTLB_Admin_SettingsPage {
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_admin_subject"><?php echo esc_html__('Admin email subject', 'ltl-bookings'); ?></label></th>
-							<td><input name="ltlb_email_admin_subject" id="ltlb_email_admin_subject" type="text" value="<?php echo esc_attr( get_option('ltlb_email_admin_subject', '') ); ?>" class="regular-text"></td>
+							<td><input name="ltlb_email_admin_subject" id="ltlb_email_admin_subject" type="text" value="<?php echo esc_attr( $mail_admin_subject ); ?>" class="regular-text"></td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_admin_body"><?php echo esc_html__('Admin email body', 'ltl-bookings'); ?></label></th>
@@ -122,7 +126,7 @@ class LTLB_Admin_SettingsPage {
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_customer_subject"><?php echo esc_html__('Customer email subject', 'ltl-bookings'); ?></label></th>
-							<td><!-- subject kept for backwards compat; not used by new mailer --></td>
+							<td><input name="ltlb_email_customer_subject" id="ltlb_email_customer_subject" type="text" value="<?php echo esc_attr( $mail_customer_subject ); ?>" class="regular-text"></td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_customer_body"><?php echo esc_html__('Customer email body', 'ltl-bookings'); ?></label></th>
