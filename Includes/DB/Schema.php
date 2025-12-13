@@ -90,6 +90,37 @@ class LTLB_DB_Schema {
             ) {$charset_collate};";
         }
 
+        if ($type === 'resources') {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(190) NOT NULL,
+                description LONGTEXT NULL,
+                capacity INT UNSIGNED NOT NULL DEFAULT 1,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                created_at DATETIME NOT NULL,
+                updated_at DATETIME NOT NULL,
+                PRIMARY KEY  (id),
+                KEY is_active (is_active)
+            ) {$charset_collate};";
+        }
+
+        if ($type === 'appointment_resources') {
+            return "CREATE TABLE {$table_name} (
+                appointment_id BIGINT UNSIGNED NOT NULL,
+                resource_id BIGINT UNSIGNED NOT NULL,
+                PRIMARY KEY  (appointment_id, resource_id),
+                KEY resource_id (resource_id)
+            ) {$charset_collate};";
+        }
+
+        if ($type === 'service_resources') {
+            return "CREATE TABLE {$table_name} (
+                service_id BIGINT UNSIGNED NOT NULL,
+                resource_id BIGINT UNSIGNED NOT NULL,
+                PRIMARY KEY  (service_id, resource_id),
+                KEY resource_id (resource_id)
+            ) {$charset_collate};";
+        }
         return '';
     }
 }

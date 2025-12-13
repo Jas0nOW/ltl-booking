@@ -79,6 +79,15 @@ Notes:
 - This implementation prioritizes clarity and a workable Phase 2 delivery. Future improvements may include caching computed availability per-day, improving concurrency controls, and returning aggregated availability across staff (e.g., next N slots across all staff sorted by time).
 - Tests and QA checks for the availability engine are pending (see TODO list).
 
+Commit 10 decisions (Resource Model):
+
+- An appointment in Phase 2c is associated with exactly one resource (e.g., a specific room or a piece of equipment). The `lazy_appointment_resources` table therefore only contains `appointment_id` and `resource_id`.
+- Future enhancements (Phase 4) may allow an appointment to use multiple resources or resources with a capacity greater than one, which would require changes to this table and the availability logic. For now, we are keeping it simple.
+
+Commit 11 decisions (Service ↔ Resource mapping):
+
+- Services can be mapped to a set of allowed resources via the `lazy_service_resources` table. If a service has no mappings, it is considered compatible with any resource. When computing availability for a service, only resources allowed for that service are considered for blocking.
+
 
 
 

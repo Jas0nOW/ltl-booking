@@ -58,3 +58,22 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
 - `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
+`lazy_resources`:
+- `id` BIGINT UNSIGNED PK AI
+- `name` VARCHAR(190) NOT NULL
+- `description` LONGTEXT NULL
+- `capacity` INT UNSIGNED NOT NULL DEFAULT 1
+- `is_active` TINYINT(1) NOT NULL DEFAULT 1
+- `created_at` DATETIME NOT NULL
+- `updated_at` DATETIME NOT NULL
+
+`lazy_appointment_resources`:
+- `appointment_id` BIGINT UNSIGNED NOT NULL
+- `resource_id` BIGINT UNSIGNED NOT NULL
+- PRIMARY KEY (`appointment_id`, `resource_id`)
+ 
+`lazy_service_resources`:
+- `service_id` BIGINT UNSIGNED NOT NULL
+- `resource_id` BIGINT UNSIGNED NOT NULL
+- PRIMARY KEY (`service_id`, `resource_id`)
+

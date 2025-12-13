@@ -26,6 +26,9 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
         require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
         require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/ResourceRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/AppointmentResourcesRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/ServiceResourcesRepository.php';
         require_once LTLB_PATH . 'includes/Repository/StaffHoursRepository.php';
         require_once LTLB_PATH . 'includes/Repository/StaffExceptionsRepository.php';
 
@@ -37,6 +40,7 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
         require_once LTLB_PATH . 'admin/Pages/StaffPage.php';
+        require_once LTLB_PATH . 'admin/Pages/ResourcesPage.php';
         // Admin: profile helpers
         require_once LTLB_PATH . 'includes/Admin/StaffProfile.php';
     }
@@ -110,6 +114,16 @@ class LTLB_Plugin {
             [ $this, 'render_staff_page' ]
         );
 
+        // Resources
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Resources',
+            'Resources',
+            'manage_options',
+            'ltlb_resources',
+            [ $this, 'render_resources_page' ]
+        );
+
         // Design
         add_submenu_page(
             'ltlb_dashboard',
@@ -180,6 +194,15 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>Staff</h1></div>';
+    }
+
+    public function render_resources_page(): void {
+        if ( class_exists('LTLB_Admin_ResourcesPage') ) {
+            $page = new LTLB_Admin_ResourcesPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Resources</h1></div>';
     }
 
     public function register_rest_routes(): void {

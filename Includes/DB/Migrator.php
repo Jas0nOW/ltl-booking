@@ -13,20 +13,29 @@ class LTLB_DB_Migrator {
         $appointments_table = $wpdb->prefix . 'lazy_appointments';
         $staff_hours_table = $wpdb->prefix . 'lazy_staff_hours';
         $staff_exceptions_table = $wpdb->prefix . 'lazy_staff_exceptions';
+        $resources_table = $wpdb->prefix . 'lazy_resources';
+        $appointment_resources_table = $wpdb->prefix . 'lazy_appointment_resources';
+        $service_resources_table = $wpdb->prefix . 'lazy_service_resources';
 
         $sql_services     = LTLB_DB_Schema::get_create_table_sql($services_table, 'services');
         $sql_customers    = LTLB_DB_Schema::get_create_table_sql($customers_table, 'customers');
         $sql_appointments = LTLB_DB_Schema::get_create_table_sql($appointments_table, 'appointments');
         $sql_staff_hours = LTLB_DB_Schema::get_create_table_sql($staff_hours_table, 'staff_hours');
         $sql_staff_exceptions = LTLB_DB_Schema::get_create_table_sql($staff_exceptions_table, 'staff_exceptions');
+        $sql_resources = LTLB_DB_Schema::get_create_table_sql($resources_table, 'resources');
+        $sql_appointment_resources = LTLB_DB_Schema::get_create_table_sql($appointment_resources_table, 'appointment_resources');
+        $sql_service_resources = LTLB_DB_Schema::get_create_table_sql($service_resources_table, 'service_resources');
 
         if ($sql_services)     dbDelta($sql_services);
         if ($sql_customers)    dbDelta($sql_customers);
         if ($sql_appointments) dbDelta($sql_appointments);
         if ($sql_staff_hours) dbDelta($sql_staff_hours);
         if ($sql_staff_exceptions) dbDelta($sql_staff_exceptions);
+        if ($sql_resources) dbDelta($sql_resources);
+        if ($sql_appointment_resources) dbDelta($sql_appointment_resources);
+        if ($sql_service_resources) dbDelta($sql_service_resources);
 
         // Version merken für spätere Migrationen
-        update_option('ltlb_db_version', '0.2.0');
+        update_option('ltlb_db_version', '0.3.0');
     }
 }
