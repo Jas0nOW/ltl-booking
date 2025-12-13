@@ -21,7 +21,11 @@ class LTLB_Admin_AppointmentsPage {
 			if ( wp_verify_nonce( $nonce, 'ltlb_change_status_' . $id ) ) {
 				$ok = $this->repo->update_status( $id, $status );
 				$redirect = admin_url( 'admin.php?page=ltlb_appointments' );
-				$redirect = add_query_arg( 'message', $ok ? 'status_changed' : 'error', $redirect );
+				if ( $ok ) {
+					LTLB_Notices::add( __( 'Status updated.', 'ltl-bookings' ), 'success' );
+				} else {
+					LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
+				}
 				wp_safe_redirect( $redirect );
 				exit;
 			} else {
@@ -58,11 +62,7 @@ class LTLB_Admin_AppointmentsPage {
 				<?php submit_button( esc_html__('Filter'), 'secondary', '', false ); ?>
 			</form>
 
-			<?php if ( isset( $_GET['message'] ) && $_GET['message'] === 'status_changed' ) : ?>
-				<div id="message" class="updated notice is-dismissible"><p><?php echo esc_html__('Status updated.', 'ltl-bookings'); ?></p></div>
-			<?php elseif ( isset( $_GET['message'] ) && $_GET['message'] === 'error' ) : ?>
-				<div id="message" class="error notice is-dismissible"><p><?php echo esc_html__('An error occurred.', 'ltl-bookings'); ?></p></div>
-			<?php endif; ?>
+			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
 			<table class="wp-list-table widefat striped">
 				<thead>

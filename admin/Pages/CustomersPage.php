@@ -28,9 +28,9 @@ class LTLB_Admin_CustomersPage {
 
 			$redirect = admin_url( 'admin.php?page=ltlb_customers' );
 			if ( $res ) {
-				$redirect = add_query_arg( 'message', 'saved', $redirect );
+				LTLB_Notices::add( __( 'Customer saved.', 'ltl-bookings' ), 'success' );
 			} else {
-				$redirect = add_query_arg( 'message', 'error', $redirect );
+				LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
 			}
 			wp_safe_redirect( $redirect );
 			exit;
@@ -52,11 +52,7 @@ class LTLB_Admin_CustomersPage {
 				<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
 			</h1>
 
-			<?php if ( isset( $_GET['message'] ) && $_GET['message'] === 'saved' ) : ?>
-				<div id="message" class="updated notice is-dismissible"><p><?php echo esc_html__('Customer saved.', 'ltl-bookings'); ?></p></div>
-			<?php elseif ( isset( $_GET['message'] ) && $_GET['message'] === 'error' ) : ?>
-				<div id="message" class="error notice is-dismissible"><p><?php echo esc_html__('An error occurred.', 'ltl-bookings'); ?></p></div>
-			<?php endif; ?>
+			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
 			<?php if ( $action === 'add' || $editing ) :
 				$email = $editing ? $customer['email'] : '';

@@ -6,6 +6,7 @@ class LTLB_Plugin {
     public function run(): void {
         add_action('init', [ $this, 'on_init' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
+        add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
         
         // Load required classes
@@ -17,6 +18,7 @@ class LTLB_Plugin {
         // Utilities
         require_once LTLB_PATH . 'includes/Util/Sanitizer.php';
         require_once LTLB_PATH . 'includes/Util/Time.php';
+        require_once LTLB_PATH . 'includes/Util/Notices.php';
 
         // Repositories
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';

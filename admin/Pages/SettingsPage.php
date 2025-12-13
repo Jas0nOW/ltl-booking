@@ -11,48 +11,45 @@ class LTLB_Admin_SettingsPage {
 			if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
 				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
 			}
+				// Collect and sanitize into a single lazy_settings option
+				$settings = get_option( 'lazy_settings', [] );
+				if ( ! is_array( $settings ) ) $settings = [];
+				$settings['working_hours_start'] = LTLB_Sanitizer::int( $_POST['working_hours_start'] ?? 9 );
+				$settings['working_hours_end'] = LTLB_Sanitizer::int( $_POST['working_hours_end'] ?? 17 );
+				$settings['slot_size_minutes'] = LTLB_Sanitizer::int( $_POST['slot_size_minutes'] ?? 60 );
+				$settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? '' );
+				$settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? 'pending' );
+				$settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
+				$settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
+				$settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
+				$settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? '' );
+				$settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? '' );
+				$settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? '' );
+				$settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' );
 
-			$start = isset( $_POST['working_hours_start'] ) ? intval( $_POST['working_hours_start'] ) : 9;
-			$end = isset( $_POST['working_hours_end'] ) ? intval( $_POST['working_hours_end'] ) : 17;
-			$slot = isset( $_POST['slot_size_minutes'] ) ? intval( $_POST['slot_size_minutes'] ) : 60;
-			$tz = isset( $_POST['ltlb_timezone'] ) ? sanitize_text_field( $_POST['ltlb_timezone'] ) : '';
-			$default_status = isset( $_POST['default_status'] ) ? sanitize_text_field( $_POST['default_status'] ) : 'pending';
-			$pending_blocks = isset( $_POST['pending_blocks'] ) ? 1 : 0;
+				update_option( 'lazy_settings', $settings );
 
-			update_option( 'ltlb_working_hours_start', $start );
-			update_option( 'ltlb_working_hours_end', $end );
-			update_option( 'ltlb_slot_minutes', $slot );
-			update_option( 'ltlb_timezone', $tz );
-			update_option( 'ltlb_default_status', $default_status );
-			update_option( 'ltlb_pending_blocks', $pending_blocks );
-			update_option( 'ltlb_email_from_name', sanitize_text_field( $_POST['ltlb_email_from_name'] ?? '' ) );
-			update_option( 'ltlb_email_from_address', sanitize_email( $_POST['ltlb_email_from_address'] ?? '' ) );
-			update_option( 'ltlb_email_admin_subject', sanitize_text_field( $_POST['ltlb_email_admin_subject'] ?? '' ) );
-			update_option( 'ltlb_email_admin_body', wp_kses_post( $_POST['ltlb_email_admin_body'] ?? '' ) );
-			update_option( 'ltlb_email_customer_subject', sanitize_text_field( $_POST['ltlb_email_customer_subject'] ?? '' ) );
-			update_option( 'ltlb_email_customer_body', wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' ) );
-			update_option( 'ltlb_email_send_customer', isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0 );
-
-			$redirect = add_query_arg( 'message', 'saved', admin_url( 'admin.php?page=ltlb_settings' ) );
+			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
+			LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
 			wp_safe_redirect( $redirect );
 			exit;
 		}
 
-		$start = (int) get_option( 'ltlb_working_hours_start', 9 );
-		$end = (int) get_option( 'ltlb_working_hours_end', 17 );
-		$slot = (int) get_option( 'ltlb_slot_minutes', 60 );
-		$tz = get_option( 'ltlb_timezone', '' );
-		$default_status = get_option( 'ltlb_default_status', 'pending' );
-		$pending_blocks = get_option( 'ltlb_pending_blocks', 0 );
+			$settings = get_option( 'lazy_settings', [] );
+			if ( ! is_array( $settings ) ) $settings = [];
+			$start = (int) ( $settings['working_hours_start'] ?? 9 );
+			$end = (int) ( $settings['working_hours_end'] ?? 17 );
+			$slot = (int) ( $settings['slot_size_minutes'] ?? 60 );
+			$tz = $settings['timezone'] ?? '';
+			$default_status = $settings['default_status'] ?? 'pending';
+			$pending_blocks = $settings['pending_blocks'] ?? 0;
 
 		$timezones = timezone_identifiers_list();
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html__('LazyBookings Settings', 'ltl-bookings'); ?></h1>
 
-			<?php if ( isset( $_GET['message'] ) && $_GET['message'] === 'saved' ) : ?>
-				<div id="message" class="updated notice is-dismissible"><p><?php echo esc_html__('Settings saved.', 'ltl-bookings'); ?></p></div>
-			<?php endif; ?>
+			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
 			<form method="post">
 				<?php wp_nonce_field( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ); ?>
