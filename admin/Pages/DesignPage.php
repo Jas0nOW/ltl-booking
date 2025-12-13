@@ -78,7 +78,8 @@ class LTLB_Admin_DesignPage {
 
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('Design Settings', 'ltl-bookings'); ?></h1>
+            <h1 class="wp-heading-inline"><?php echo esc_html__('Design Settings', 'ltl-bookings'); ?></h1>
+            <hr class="wp-header-end">
             <p><?php echo esc_html__('Customize the appearance of your booking wizard.', 'ltl-bookings'); ?></p>
 
             <form method="post" class="ltlb-design-container">
@@ -301,51 +302,7 @@ class LTLB_Admin_DesignPage {
             </form>
         </div>
 
-        <style>
-            .ltlb-design-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                margin-top: 20px;
-                align-items: flex-start;
-            }
-            .ltlb-design-settings {
-                flex: 1;
-                min-width: 300px;
-                max-width: 800px;
-            }
-            .ltlb-design-preview-sidebar {
-                flex: 0 0 350px;
-                position: sticky;
-                top: 50px;
-                align-self: flex-start;
-            }
-            .ltlb-card, .ltlb-preview-card {
-                background: #fff;
-                border: 1px solid #ccd0d4;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-                padding: 20px;
-                border-radius: 4px;
-                margin-bottom: 20px;
-            }
-            .ltlb-color-input {
-                width: 60px;
-                height: 40px;
-                cursor: pointer;
-                border: 1px solid #ddd;
-                padding: 2px;
-                border-radius: 4px;
-            }
-            .form-table th { padding: 15px 10px 15px 0; width: 200px; }
-            .form-table td { padding: 15px 10px; }
-            h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #eee; font-size: 1.2em; }
-            
-            @media (max-width: 1100px) {
-                .ltlb-design-container { flex-direction: column-reverse; }
-                .ltlb-design-preview-sidebar { position: static; width: 100%; flex: none; }
-                .ltlb-design-settings { width: 100%; max-width: 100%; }
-            }
-        </style>
+
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {

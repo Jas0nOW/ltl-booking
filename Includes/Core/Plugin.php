@@ -11,6 +11,7 @@ class LTLB_Plugin {
         add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
         add_action('wp_head', [ $this, 'print_design_css_frontend' ]);
         add_action('admin_head', [ $this, 'print_design_css_admin' ]);
+        add_action('admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
         
         // Load required classes
@@ -298,6 +299,14 @@ class LTLB_Plugin {
 
         $data = $avail->compute_availability( $service_id, $date );
         return new WP_REST_Response( $data, 200 );
+    }
+
+    public function enqueue_admin_assets(): void {
+        if ( ! is_admin() ) return;
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+
+        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], LTLB_VERSION );
     }
 
     public function print_design_css_frontend(): void {

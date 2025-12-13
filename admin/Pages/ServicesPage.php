@@ -72,10 +72,11 @@ class LTLB_Admin_ServicesPage {
         $services = $this->service_repository->get_all();
         ?>
         <div class="wrap">
-            <h1>
-                <?php echo esc_html__('Services', 'ltl-bookings'); ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html__('Services', 'ltl-bookings'); ?></h1>
+            <?php if ( $action !== 'add' && ! $editing ) : ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
-            </h1>
+            <?php endif; ?>
+            <hr class="wp-header-end">
 
             <?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -92,90 +93,144 @@ class LTLB_Admin_ServicesPage {
                 $is_group = $editing ? ( ! empty( $service['is_group'] ) ) : false;
                 $max_seats = $editing ? intval($service['max_seats_per_booking'] ?? 1) : 1;
                 ?>
-                <form method="post">
-                    <?php wp_nonce_field( 'ltlb_service_save_action', 'ltlb_service_nonce' ); ?>
-                    <input type="hidden" name="ltlb_service_save" value="1" />
-                    <input type="hidden" name="id" value="<?php echo esc_attr( $form_id ); ?>" />
+                
+                <div class="ltlb-card" style="max-width: 800px; margin-top: 20px;">
+                    <h2 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px;">
+                        <?php echo $editing ? esc_html__('Edit Service', 'ltl-bookings') : esc_html__('Add New Service', 'ltl-bookings'); ?>
+                    </h2>
+                    
+                    <form method="post">
+                        <?php wp_nonce_field( 'ltlb_service_save_action', 'ltlb_service_nonce' ); ?>
+                        <input type="hidden" name="ltlb_service_save" value="1" />
+                        <input type="hidden" name="id" value="<?php echo esc_attr( $form_id ); ?>" />
 
-                    <table class="form-table">
-                        <tbody>
+                        <table class="form-table">
                             <tr>
-                                <th><label for="name"><?php echo esc_html__('Name', 'ltl-bookings'); ?></label></th>
-                                <td><input name="name" id="name" type="text" value="<?php echo esc_attr( $name ); ?>" class="regular-text" required></td>
+                                <th><label for="name"><?php echo esc_html__('Service Name', 'ltl-bookings'); ?></label></th>
+                                <td><input name="name" type="text" id="name" value="<?php echo esc_attr( $name ); ?>" class="regular-text" required></td>
                             </tr>
                             <tr>
                                 <th><label for="description"><?php echo esc_html__('Description', 'ltl-bookings'); ?></label></th>
-                                <td><textarea name="description" id="description" class="large-text" rows="5"><?php echo esc_textarea( $description ); ?></textarea></td>
+                                <td><textarea name="description" id="description" rows="3" class="large-text"><?php echo esc_textarea( $description ); ?></textarea></td>
                             </tr>
                             <tr>
-                                <th><label for="duration_min"><?php echo esc_html__('Duration (min)', 'ltl-bookings'); ?></label></th>
-                                <td><input name="duration_min" id="duration_min" type="number" value="<?php echo esc_attr( $duration ); ?>" class="small-text" required></td>
+                                <th><label for="duration_min"><?php echo esc_html__('Duration (minutes)', 'ltl-bookings'); ?></label></th>
+                                <td><input name="duration_min" type="number" id="duration_min" value="<?php echo esc_attr( $duration ); ?>" class="small-text" min="1" required></td>
                             </tr>
                             <tr>
-                                <th><label for="buffer_before_min"><?php echo esc_html__('Buffer before (min)', 'ltl-bookings'); ?></label></th>
-                                <td><input name="buffer_before_min" id="buffer_before_min" type="number" value="<?php echo esc_attr( $buffer_before ); ?>" class="small-text"></td>
-                            </tr>
-                            <tr>
-                                <th><label for="buffer_after_min"><?php echo esc_html__('Buffer after (min)', 'ltl-bookings'); ?></label></th>
-                                <td><input name="buffer_after_min" id="buffer_after_min" type="number" value="<?php echo esc_attr( $buffer_after ); ?>" class="small-text"></td>
-                            </tr>
-                            <tr>
-                                <th><label for="price_eur"><?php echo esc_html__('Price (EUR)', 'ltl-bookings'); ?></label></th>
-                                <td><input name="price_eur" id="price_eur" type="text" value="<?php echo esc_attr( $price ); ?>" class="small-text"> <input name="currency" type="hidden" value="<?php echo esc_attr( $currency ); ?>"></td>
-                            </tr>
-                            <tr>
-                                <th><?php echo esc_html__('Active', 'ltl-bookings'); ?></th>
-                                <td><label><input name="is_active" type="checkbox" value="1" <?php checked( $is_active ); ?>> <?php echo esc_html__('Yes', 'ltl-bookings'); ?></label></td>
-                            </tr>
-                            <tr>
-                                <th><?php echo esc_html__('Group Booking', 'ltl-bookings'); ?></th>
-                                <td><label><input name="is_group" type="checkbox" value="1" <?php checked( $is_group ); ?>> <?php echo esc_html__('Enable group bookings', 'ltl-bookings'); ?></label></td>
-                            </tr>
-                            <tr>
-                                <th><label for="max_seats_per_booking"><?php echo esc_html__('Max Seats per Booking', 'ltl-bookings'); ?></label></th>
-                                <td><input name="max_seats_per_booking" id="max_seats_per_booking" type="number" min="1" value="<?php echo esc_attr( $max_seats ); ?>" class="small-text"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <?php submit_button( $editing ? esc_html__('Update Service', 'ltl-bookings') : esc_html__('Create Service', 'ltl-bookings') ); ?>
-                </form>
-            <?php else : ?>
-                <table class="wp-list-table widefat striped">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th>
-                            <th><?php echo esc_html__('Duration (min)', 'ltl-bookings'); ?></th>
-                            <th><?php echo esc_html__('Price', 'ltl-bookings'); ?></th>
-                            <th><?php echo esc_html__('Active', 'ltl-bookings'); ?></th>
-                            <th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ( empty( $services ) ) : ?>
-                            <tr>
-                                <td colspan="5" style="padding: 2rem; text-align: center;">
-                                    <p style="margin: 0 0 1rem; font-size: 1.125rem; color: #666;"><?php echo esc_html__('No services yet', 'ltl-bookings'); ?></p>
-                                    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="button button-primary"><?php echo esc_html__('Create your first service', 'ltl-bookings'); ?></a>
+                                <th><label for="price_eur"><?php echo esc_html__('Price', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <input name="price_eur" type="number" id="price_eur" value="<?php echo esc_attr( $price ); ?>" class="small-text" step="0.01" min="0">
+                                    <select name="currency" style="vertical-align: top;">
+                                        <option value="EUR" <?php selected( $currency, 'EUR' ); ?>>EUR</option>
+                                        <option value="USD" <?php selected( $currency, 'USD' ); ?>>USD</option>
+                                        <option value="GBP" <?php selected( $currency, 'GBP' ); ?>>GBP</option>
+                                    </select>
                                 </td>
                             </tr>
-                        <?php else : ?>
-                            <?php foreach ( $services as $s ) : ?>
+                            <tr>
+                                <th><label><?php echo esc_html__('Buffer Time', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <label><input name="buffer_before_min" type="number" value="<?php echo esc_attr( $buffer_before ); ?>" class="small-text" min="0"> <?php echo esc_html__('Before (min)', 'ltl-bookings'); ?></label>
+                                    &nbsp;&nbsp;
+                                    <label><input name="buffer_after_min" type="number" value="<?php echo esc_attr( $buffer_after ); ?>" class="small-text" min="0"> <?php echo esc_html__('After (min)', 'ltl-bookings'); ?></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><label><?php echo esc_html__('Resources', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <?php
+                                    $all_resources = $this->resource_repository->get_all();
+                                    $assigned_ids = [];
+                                    if ( $editing ) {
+                                        $assigned_ids = $this->service_resources_repository->get_resources_for_service( $form_id );
+                                    }
+                                    if ( empty($all_resources) ) {
+                                        echo '<p class="description">' . esc_html__('No resources found. Please add resources first.', 'ltl-bookings') . '</p>';
+                                    } else {
+                                        echo '<div style="max-height:150px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:4px;">';
+                                        foreach ( $all_resources as $res ) {
+                                            $checked = in_array( intval($res['id']), $assigned_ids ) ? 'checked' : '';
+                                            echo '<label style="display:block;margin-bottom:5px;"><input type="checkbox" name="resource_ids[]" value="' . esc_attr($res['id']) . '" ' . $checked . '> ' . esc_html($res['name']) . '</label>';
+                                        }
+                                        echo '</div>';
+                                        echo '<p class="description">' . esc_html__('Select resources that can perform this service.', 'ltl-bookings') . '</p>';
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><label for="is_active"><?php echo esc_html__('Active', 'ltl-bookings'); ?></label></th>
+                                <td><input name="is_active" type="checkbox" id="is_active" value="1" <?php checked( $is_active ); ?>></td>
+                            </tr>
+                        </table>
+
+                        <p class="submit">
+                            <?php submit_button( esc_html__('Save Service', 'ltl-bookings'), 'primary', 'ltlb_service_save', false ); ?>
+                            <a href="<?php echo admin_url('admin.php?page=ltlb_services'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+                        </p>
+                    </form>
+                </div>
+
+            <?php else : ?>
+
+                <div class="ltlb-card" style="margin-top:20px;">
+                    <?php if ( empty($services) ) : ?>
+                        <div style="text-align:center; padding:40px;">
+                            <p style="font-size:1.2em; color:#666;"><?php echo esc_html__('No services defined yet.', 'ltl-bookings'); ?></p>
+                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="button button-primary button-hero"><?php echo esc_html__('Create Your First Service', 'ltl-bookings'); ?></a>
+                        </div>
+                    <?php else : ?>
+                        <table class="widefat striped">
+                            <thead>
                                 <tr>
-                                    <td><?php echo esc_html( $s['name'] ?? '' ); ?></td>
-                                    <td><?php echo esc_html( $s['duration_min'] ?? '' ); ?></td>
-                                    <td><?php echo esc_html( isset($s['price_cents']) ? number_format($s['price_cents']/100,2) . ' ' . ($s['currency'] ?? 'EUR') : '' ); ?></td>
-                                    <td><?php echo esc_html( ! empty( $s['is_active'] ) ? 'Yes' : 'No' ); ?></td>
-                                    <td>
-                                        <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=edit&id=' . intval($s['id'])) ); ?>"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
-                                    </td>
+                                    <th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th>
+                                    <th><?php echo esc_html__('Duration', 'ltl-bookings'); ?></th>
+                                    <th><?php echo esc_html__('Price', 'ltl-bookings'); ?></th>
+                                    <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
+                                    <th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ( $services as $s ): ?>
+                                    <tr>
+                                        <td>
+                                            <strong><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=edit&id='.$s['id']) ); ?>"><?php echo esc_html( $s['name'] ); ?></a></strong>
+                                            <?php if ( ! empty($s['description']) ) : ?>
+                                                <p class="description" style="margin:5px 0 0;"><?php echo esc_html( wp_trim_words($s['description'], 10) ); ?></p>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo intval( $s['duration_min'] ); ?> min</td>
+                                        <td>
+                                            <?php 
+                                            if ( isset($s['price_cents']) ) {
+                                                echo number_format( $s['price_cents'] / 100, 2 ) . ' ' . esc_html( $s['currency'] ?? 'EUR' );
+                                            } else {
+                                                echo '—';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if ( ! empty($s['is_active']) ) : ?>
+                                                <span class="ltlb-status-badge status-active"><?php echo esc_html__('Active', 'ltl-bookings'); ?></span>
+                                            <?php else : ?>
+                                                <span class="ltlb-status-badge status-inactive"><?php echo esc_html__('Inactive', 'ltl-bookings'); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=edit&id='.$s['id']) ); ?>" class="button button-small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+
             <?php endif; ?>
         </div>
+
+
         <?php
     }
 }
