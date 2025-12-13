@@ -10,6 +10,12 @@ class LTLB_Activator {
         // Default-Options (nur anlegen, wenn nicht vorhanden)
         add_option('lazy_settings', [
             'timezone' => 'Europe/Berlin',
+            // Production defaults
+            'logging_enabled' => 0,
+            'log_level' => 'error',
+            // Reserved flags for future privacy/rate limiting/email tests
+            'rate_limit_enabled' => 0,
+            'delete_data_on_uninstall' => 0,
         ]);
 
         add_option('lazy_design', [

@@ -2,59 +2,30 @@
 
 REST namespace: `/wp-json/ltlb/v1/`
 
-## Implemented Endpoints
+## Implemented Endpoints (0.4.0)
 
-### Time Slots
-`GET /ltlb/v1/time-slots`
+### Availability
+`GET /ltlb/v1/availability`
 
 Query parameters:
-- `service_id` (required) - Service ID
-- `date` (required) - Date in format YYYY-MM-DD
-- `slot_step` (optional) - Slot step in minutes (default from settings or 15)
+- `service_id` (required) — Service ID
+- `date` (required) — Date in format `YYYY-MM-DD`
+- `slots` (optional) — When present, returns discrete time slots
+- `slot_step` (optional) — Slot step in minutes (default 15)
 
-Returns:
+Returns (raw intervals or slot list depending on `slots`):
 ```json
 [
-  {
-    "time": "09:00",
-    "start": "2025-12-13 09:00:00",
-    "end": "2025-12-13 10:00:00",
-    "free_resources_count": 2,
-    "resource_ids": [1, 2],
-    "spots_left": 5
-  }
+  { "start": "2025-12-13 09:00:00", "end": "2025-12-13 10:00:00" }
 ]
 ```
 
 Notes:
-- For group services: `spots_left` = minimum available seats across all free resources
-- For regular services: `spots_left` = minimum resource capacity available
-
-### Slot Resources
-`GET /ltlb/v1/slot-resources`
-
-Query parameters:
-- `service_id` (required)
-- `start` (required) - Start datetime in format YYYY-MM-DD HH:MM:SS
-
-Returns:
-```json
-{
-  "free_resources_count": 2,
-  "resources": [
-    {
-      "id": 1,
-      "name": "Room A",
-      "capacity": 5,
-      "used": 2,
-      "available": 3
-    }
-  ]
-}
-```
+- Availability respects working hours, exceptions, existing appointments and service buffers.
+- Permissions: public for Phase 1 to allow frontend wizard; can be tightened later.
 
 ### Booking Creation
-Booking is handled via shortcode form submission (not direct REST endpoint for security).
+Booking is handled via shortcode form submission (not direct REST endpoint in Phase 1).
 
 **Form Parameters:**
 - `service_id` - Selected service
@@ -72,7 +43,7 @@ Booking is handled via shortcode form submission (not direct REST endpoint for s
 - For regular services, `seats` defaults to 1.
 - Email templates support placeholder `{seats}` for including seat count in notifications.
 
-### Hotel Availability (Phase 4)
+### Hotel Availability (Planned)
 `GET /ltlb/v1/hotel-availability`
 
 Query parameters:
@@ -111,10 +82,11 @@ Notes:
   - Room capacity >= guests (for each room in free_resources_count calculation)
 
 ## Planned Future Endpoints
-- `GET /services` - list services
-- `GET /services/{id}` - get service
-- `GET /customers` - list customers
-- `POST /customers` - create/upsert customer
-- `GET /appointments` - list appointments (filters: from,to,service_id,status)
-- `PUT /appointments/{id}` - update appointment status
+- `GET /services` — list services
+- `GET /services/{id}` — get service
+- `POST /services` — create service
+- `GET /customers` — list customers
+- `POST /customers` — create/upsert customer
+- `GET /appointments` — list appointments (filters: from,to,service_id,status)
+- `PUT /appointments/{id}` — update appointment status
 

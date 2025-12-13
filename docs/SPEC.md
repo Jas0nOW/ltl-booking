@@ -340,6 +340,10 @@ Seiten:
 
 **Current Version**: 0.4.0 (DB version: 0.4.0)
 
+Status (0.4.0):
+- Implemented: Custom tables (services, customers, appointments, staff_hours, staff_exceptions, resources, junctions), automatic migrations, admin pages baseline, `[lazy_book]` shortcode, availability endpoint (`/ltlb/v1/availability`) with slot support, privacy-safe logger (defaults OFF, level error), Diagnostics & Privacy pages baseline.
+- Planned: Full Services/Customers/Appointments REST CRUD, group bookings, payments, hotel mode, React SPA.
+
 ### Phase 5 – React SPA (Optional, wenn MVP stabil)
 - Admin & Wizard als React ersetzen (REST bleibt)
 

@@ -1,8 +1,8 @@
-(Phase 1) Tables and minimal schema
+Implemented (0.4.0) Tables and minimal schema
 
 All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 
-`lazy_services`:
+`lazy_services` (implemented):
 - `id` BIGINT UNSIGNED PK AI
 - `name` VARCHAR(190) NOT NULL
 - `description` LONGTEXT NULL
@@ -12,8 +12,7 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `price_cents` INT UNSIGNED NOT NULL DEFAULT 0
 - `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
-- `is_group` TINYINT(1) NOT NULL DEFAULT 0 (Group Booking Feature)
-- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
+  (planned) Group booking columns like `is_group`, `max_seats_per_booking` may be added later
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
@@ -27,7 +26,7 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_appointments`:
+`lazy_appointments` (implemented):
 - `id` BIGINT UNSIGNED PK AI
 - `service_id` BIGINT UNSIGNED NOT NULL
 - `customer_id` BIGINT UNSIGNED NOT NULL
@@ -36,11 +35,11 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
-- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
+  (planned) Group booking column `seats` may be added later
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_resources`:
+`lazy_resources` (implemented):
 - `id` BIGINT UNSIGNED PK AI
 - `name` VARCHAR(190) NOT NULL
 - `capacity` SMALLINT UNSIGNED NOT NULL DEFAULT 1
@@ -48,22 +47,19 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_service_resources` (mapping table):
-- `id` BIGINT UNSIGNED PK AI
+`lazy_service_resources` (implemented junction):
 - `service_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- `created_at` DATETIME NOT NULL
-- KEY service_id, resource_id
+- PRIMARY KEY (service_id,resource_id)
+- KEY resource_id (resource_id)
 
-`lazy_appointment_resources` (mapping table):
-- `id` BIGINT UNSIGNED PK AI
+`lazy_appointment_resources` (implemented junction):
 - `appointment_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- `created_at` DATETIME NOT NULL
-- `updated_at` DATETIME NOT NULL
-- KEY appointment_id, resource_id
+- PRIMARY KEY (appointment_id,resource_id)
+- KEY resource_id (resource_id)
 
-## Phase 4 (Hotel Mode) Schema Notes
+## Planned (Hotel Mode) Schema Notes
 
 **No new tables required.** Hotel mode reuses existing schema with different semantics:
 

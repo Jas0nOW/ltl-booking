@@ -79,6 +79,12 @@ Notes:
 - This implementation prioritizes clarity and a workable Phase 2 delivery. Future improvements may include caching computed availability per-day, improving concurrency controls, and returning aggregated availability across staff (e.g., next N slots across all staff sorted by time).
 - Tests and QA checks for the availability engine are pending (see TODO list).
 
+## Uninstall & Data Policy
+
+- Default behavior: data is preserved on uninstall. The option `delete_data_on_uninstall` defaults to `0` (disabled) in `lazy_settings`.
+- If an admin explicitly enables `delete_data_on_uninstall = 1`, uninstall will drop all custom tables and delete plugin options (`lazy_settings`, `lazy_design`, `ltlb_db_version`).
+- Rationale: safer default to avoid accidental data loss; explicit opt-in required for destructive actions.
+
 Commit 10 decisions (Resource Model):
 
 - An appointment in Phase 2c is associated with exactly one resource (e.g., a specific room or a piece of equipment). The `lazy_appointment_resources` table therefore only contains `appointment_id` and `resource_id`.
