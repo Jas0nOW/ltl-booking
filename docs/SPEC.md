@@ -296,7 +296,7 @@ Seiten:
 
 ## 13) “Kickoff Prompt” für Copilot Agent / Gemini
 
-> Du bist Senior WordPress Plugin Developer. Öffne dieses Repo und implementiere **Phase 0** komplett:
+> Du bist Senior WordPress Plugin Developer. Öffne dieses Repo und implementiere **Phase 1** komplett:
 > - Lege die Ordnerstruktur an
 > - Baue eine Plugin-Bootstrap-Klasse
 > - Implementiere Activator mit dbDelta für Phase-1 Tabellen
