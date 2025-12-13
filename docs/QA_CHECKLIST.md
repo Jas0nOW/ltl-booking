@@ -62,11 +62,11 @@ This checklist covers manual verification steps after installing or updating the
    - [X] Visit Diagnostics page
    - [X] Verify system info displays (WP version, PHP version, template mode)
    - [X] Verify database statistics show correct counts
-   - [ ] Click "Run Migrations" button - no errors
+   - [X] Click "Run Migrations" button - no errors
 
 **Expected Result:** All steps pass without fatal errors, bookings create successfully, emails send correctly.
 
-### Hotel Mode Flow (Phase 4)
+### Hotel Mode Flow (Phase 4) (HOTEL MODE IST NICHT DA!!!)
 
 This test validates the real hotel booking flow with check-in/out and room assignment.
 
