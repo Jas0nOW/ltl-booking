@@ -1,0 +1,127 @@
+<?php
+if ( ! defined('ABSPATH') ) exit;
+
+class LTLB_Admin_CustomersPage {
+
+	private $customer_repo;
+
+	public function __construct() {
+		$this->customer_repo = new LTLB_CustomerRepository();
+	}
+
+	public function render(): void {
+		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+		// Handle save
+		if ( isset( $_POST['ltlb_customer_save'] ) ) {
+			if ( ! check_admin_referer( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ) ) {
+				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+			}
+
+			$data = [];
+			$data['email'] = LTLB_Sanitizer::email( $_POST['email'] ?? '' );
+			$data['first_name'] = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
+			$data['last_name'] = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
+			$data['phone'] = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
+			$data['notes'] = isset( $_POST['notes'] ) ? wp_kses_post( $_POST['notes'] ) : null;
+
+			$res = $this->customer_repo->upsert_by_email( $data );
+
+			$redirect = admin_url( 'admin.php?page=ltlb_customers' );
+			if ( $res ) {
+				$redirect = add_query_arg( 'message', 'saved', $redirect );
+			} else {
+				$redirect = add_query_arg( 'message', 'error', $redirect );
+			}
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : 'list';
+		$editing = false;
+		$customer = null;
+		if ( $action === 'edit' && ! empty( $_GET['id'] ) ) {
+			$customer = $this->customer_repo->get_by_id( intval( $_GET['id'] ) );
+			if ( $customer ) $editing = true;
+		}
+
+		$customers = $this->customer_repo->get_all();
+		?>
+		<div class="wrap">
+			<h1>
+				<?php echo esc_html__('Customers', 'ltl-bookings'); ?>
+				<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
+			</h1>
+
+			<?php if ( isset( $_GET['message'] ) && $_GET['message'] === 'saved' ) : ?>
+				<div id="message" class="updated notice is-dismissible"><p><?php echo esc_html__('Customer saved.', 'ltl-bookings'); ?></p></div>
+			<?php elseif ( isset( $_GET['message'] ) && $_GET['message'] === 'error' ) : ?>
+				<div id="message" class="error notice is-dismissible"><p><?php echo esc_html__('An error occurred.', 'ltl-bookings'); ?></p></div>
+			<?php endif; ?>
+
+			<?php if ( $action === 'add' || $editing ) :
+				$email = $editing ? $customer['email'] : '';
+				$first = $editing ? $customer['first_name'] : '';
+				$last = $editing ? $customer['last_name'] : '';
+				$phone = $editing ? $customer['phone'] : '';
+				$notes = $editing ? $customer['notes'] : '';
+				?>
+				<form method="post">
+					<?php wp_nonce_field( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ); ?>
+					<input type="hidden" name="ltlb_customer_save" value="1" />
+
+					<table class="form-table">
+						<tbody>
+							<tr>
+								<th><label for="email"><?php echo esc_html__('Email', 'ltl-bookings'); ?></label></th>
+								<td><input name="email" id="email" type="email" value="<?php echo esc_attr( $email ); ?>" class="regular-text" required></td>
+							</tr>
+							<tr>
+								<th><label for="first_name"><?php echo esc_html__('First name', 'ltl-bookings'); ?></label></th>
+								<td><input name="first_name" id="first_name" type="text" value="<?php echo esc_attr( $first ); ?>" class="regular-text"></td>
+							</tr>
+							<tr>
+								<th><label for="last_name"><?php echo esc_html__('Last name', 'ltl-bookings'); ?></label></th>
+								<td><input name="last_name" id="last_name" type="text" value="<?php echo esc_attr( $last ); ?>" class="regular-text"></td>
+							</tr>
+							<tr>
+								<th><label for="phone"><?php echo esc_html__('Phone', 'ltl-bookings'); ?></label></th>
+								<td><input name="phone" id="phone" type="text" value="<?php echo esc_attr( $phone ); ?>" class="regular-text"></td>
+							</tr>
+							<tr>
+								<th><label for="notes"><?php echo esc_html__('Notes', 'ltl-bookings'); ?></label></th>
+								<td><textarea name="notes" id="notes" class="large-text" rows="5"><?php echo esc_textarea( $notes ); ?></textarea></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<?php submit_button( $editing ? esc_html__('Update Customer', 'ltl-bookings') : esc_html__('Create Customer', 'ltl-bookings') ); ?>
+				</form>
+			<?php else: ?>
+				<table class="wp-list-table widefat striped">
+					<thead>
+						<tr>
+							<th><?php echo esc_html__('Email', 'ltl-bookings'); ?></th>
+							<th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th>
+							<th><?php echo esc_html__('Phone', 'ltl-bookings'); ?></th>
+							<th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if ( empty( $customers ) ) : ?>
+							<tr><td colspan="4"><?php echo esc_html__('No customers yet', 'ltl-bookings'); ?></td></tr>
+						<?php else: foreach ( $customers as $c ): ?>
+							<tr>
+								<td><?php echo esc_html( $c['email'] ); ?></td>
+								<td><?php echo esc_html( trim( ($c['first_name'] ?? '') . ' ' . ($c['last_name'] ?? '') ) ); ?></td>
+								<td><?php echo esc_html( $c['phone'] ?? '' ); ?></td>
+								<td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id=' . intval($c['id'])) ); ?>"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a></td>
+							</tr>
+						<?php endforeach; endif; ?>
+					</tbody>
+				</table>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+}
+

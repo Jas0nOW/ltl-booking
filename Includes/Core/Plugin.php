@@ -42,6 +42,7 @@ class LTLB_Plugin {
             [ $this, 'render_dashboard_page' ]
         );
 
+        // Services
         add_submenu_page(
             'ltlb_dashboard',
             'Services',
@@ -50,15 +51,89 @@ class LTLB_Plugin {
             'ltlb_services',
             [ $this, 'render_services_page' ]
         );
+
+        // Customers
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Customers',
+            'Customers',
+            'manage_options',
+            'ltlb_customers',
+            [ $this, 'render_customers_page' ]
+        );
+
+        // Appointments
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Appointments',
+            'Appointments',
+            'manage_options',
+            'ltlb_appointments',
+            [ $this, 'render_appointments_page' ]
+        );
+
+        // Settings
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'ltlb_settings',
+            [ $this, 'render_settings_page' ]
+        );
+
+        // Design (placeholder page)
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Design',
+            'Design',
+            'manage_options',
+            'ltlb_design',
+            [ $this, 'render_settings_page' ]
+        );
     }
 
     public function render_dashboard_page(): void {
-        echo '<div class="wrap"><h1>LazyBookings Dashboard</h1></div>';
+        // Simple dashboard output
+        if ( ! class_exists('LTLB_Admin_DashboardPage') ) {
+            echo '<div class="wrap"><h1>LazyBookings Dashboard</h1></div>';
+            return;
+        }
+
+        $page = new LTLB_Admin_DashboardPage();
+        $page->render();
     }
 
     public function render_services_page(): void {
         $page = new LTLB_Admin_ServicesPage();
         $page->render();
+    }
+
+    public function render_customers_page(): void {
+        if ( class_exists('LTLB_Admin_CustomersPage') ) {
+            $page = new LTLB_Admin_CustomersPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Customers</h1></div>';
+    }
+
+    public function render_appointments_page(): void {
+        if ( class_exists('LTLB_Admin_AppointmentsPage') ) {
+            $page = new LTLB_Admin_AppointmentsPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Appointments</h1></div>';
+    }
+
+    public function render_settings_page(): void {
+        if ( class_exists('LTLB_Admin_SettingsPage') ) {
+            $page = new LTLB_Admin_SettingsPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Settings</h1></div>';
     }
 
     public function register_rest_routes(): void {
