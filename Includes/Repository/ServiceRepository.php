@@ -7,7 +7,7 @@ class LTLB_ServiceRepository {
 
     public function __construct() {
         global $wpdb;
-        $this->table_name = $wpdb->prefix . 'ltlb_services';
+        $this->table_name = $wpdb->prefix . 'lazy_services';
     }
 
     /**

@@ -45,7 +45,7 @@ class LTLB_Plugin {
     }
 
     public function render_services_page(): void {
-        $page = new LTLB_ServicesPage();
+        $page = new LTLB_Admin_ServicesPage();
         $page->render();
     }
 
