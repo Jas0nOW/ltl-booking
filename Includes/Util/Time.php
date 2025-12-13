@@ -104,4 +104,40 @@ class LTLB_Time {
 
         return $slots;
     }
+
+
+    /**
+     * Combine a date (Y-m-d) and time (H:i or H:i:s) into DateTimeImmutable.
+     * Used for hotel check-in/check-out calculations.
+     */
+    public static function combine_date_time( string $date_ymd, string $time_hi ): ?DateTimeImmutable {
+        $tz = self::wp_timezone();
+        $combined = $date_ymd . ' ' . $time_hi;
+        // Try formats: HH:MM or HH:MM:SS
+        $formats = [ 'Y-m-d H:i', 'Y-m-d H:i:s' ];
+        foreach ( $formats as $fmt ) {
+            $dt = DateTimeImmutable::createFromFormat( $fmt, $combined, $tz );
+            if ( $dt !== false ) return $dt->setTimezone( $tz );
+        }
+        return null;
+    }
+
+    /**
+     * Calculate number of nights between two dates (date-only, checkout exclusive).
+     * e.g., checkin 2025-12-20, checkout 2025-12-22 → 2 nights
+     */
+    public static function nights_between( string $checkin_date, string $checkout_date ): int {
+        $tz = self::wp_timezone();
+        try {
+            $checkin = DateTimeImmutable::createFromFormat( 'Y-m-d', $checkin_date, $tz );
+            $checkout = DateTimeImmutable::createFromFormat( 'Y-m-d', $checkout_date, $tz );
+            if ( $checkin === false || $checkout === false ) {
+                return 0;
+            }
+            $interval = $checkout->diff( $checkin );
+            return $interval->days;
+        } catch ( Exception $e ) {
+            return 0;
+        }
+    }
 }

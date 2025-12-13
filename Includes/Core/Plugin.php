@@ -235,6 +235,34 @@ class LTLB_Plugin {
             },
             'permission_callback' => function() { return true; }
         ]);
+
+        register_rest_route('ltlb/v1', '/hotel-availability', [
+            'methods' => 'GET',
+            'callback' => function( WP_REST_Request $request ) {
+                $service_id = intval( $request->get_param('service_id') );
+                $checkin = sanitize_text_field( $request->get_param('checkin') );
+                $checkout = sanitize_text_field( $request->get_param('checkout') );
+                $guests = intval( $request->get_param('guests') ?? 1 );
+
+                if ( empty($service_id) || empty($checkin) || empty($checkout) ) {
+                    return new WP_REST_Response( [ 'error' => 'Missing required parameters: service_id, checkin, checkout' ], 400 );
+                }
+
+                $engine = EngineFactory::get_engine();
+                if ( ! ( $engine instanceof HotelEngine ) ) {
+                    return new WP_REST_Response( [ 'error' => 'Hotel availability not available in current mode' ], 400 );
+                }
+
+                $result = $engine->get_hotel_availability( $service_id, $checkin, $checkout, $guests );
+                
+                if ( isset($result['error']) ) {
+                    return new WP_REST_Response( [ 'error' => $result['error'] ], 400 );
+                }
+
+                return new WP_REST_Response( $result, 200 );
+            },
+            'permission_callback' => function() { return true; }
+        ]);
     }
 
     public function print_design_css_frontend(): void {

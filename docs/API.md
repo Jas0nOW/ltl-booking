@@ -72,6 +72,44 @@ Booking is handled via shortcode form submission (not direct REST endpoint for s
 - For regular services, `seats` defaults to 1.
 - Email templates support placeholder `{seats}` for including seat count in notifications.
 
+### Hotel Availability (Phase 4)
+`GET /ltlb/v1/hotel-availability`
+
+Query parameters:
+- `service_id` (required) - Room Type (Service) ID
+- `checkin` (required) - Check-in date in format YYYY-MM-DD
+- `checkout` (required) - Check-out date in format YYYY-MM-DD (exclusive, no overlap if equals next check-in)
+- `guests` (optional, default 1) - Number of guests
+
+Returns on success:
+```json
+{
+  "nights": 2,
+  "free_resources_count": 2,
+  "resource_ids": [1, 2],
+  "total_price_cents": 20000
+}
+```
+
+Returns on error:
+```json
+{
+  "error": "Invalid date range or guest count"
+}
+```
+
+Notes:
+- `nights` = (checkout_date - checkin_date) calculated as days between, with checkout exclusive
+- Example: checkin 2025-12-20, checkout 2025-12-22 = 2 nights
+- `free_resources_count` = number of rooms with sufficient capacity for guest count
+- `resource_ids` = array of room IDs with available capacity
+- `total_price_cents` = (nights × service.price_cents)
+- Validation:
+  - checkout > checkin (checkout exclusive)
+  - nights >= hotel_min_nights and nights <= hotel_max_nights
+  - guests >= 1
+  - Room capacity >= guests (for each room in free_resources_count calculation)
+
 ## Planned Future Endpoints
 - `GET /services` - list services
 - `GET /services/{id}` - get service

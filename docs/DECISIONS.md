@@ -119,7 +119,101 @@ Group Booking Feature decisions (Implementation Phase):
 
 **Validation:** Max seats validation happens on the frontend (HTML max attribute) and should be enforced in the engine for security. No backend hard limit enforced on seats value — this allows for manual admin adjustments if needed, but should be tightened in Phase 2.
 
+Phase 4 decisions (Hotel Mode MVP):
 
+**Commit 1: Hotel Settings**
+- Added four new settings to SettingsPage: `hotel_checkin_time`, `hotel_checkout_time`, `hotel_min_nights`, `hotel_max_nights`.
+- Stored in `lazy_settings` array (same as existing settings).
+- Defaults: check-in 15:00, check-out 11:00, min 1 night, max 30 nights.
+- These are read by HotelEngine for date/time validation and availability calculation.
+
+**Commit 2: Time Helpers for Date Ranges**
+- Added `combine_date_time($date_ymd, $time_hi)` to LTLB_Time: merges Y-m-d string + H:i string into DateTimeImmutable in site timezone.
+- Added `nights_between($checkin_date, $checkout_date)` to LTLB_Time: calculates integer days between two dates with checkout treated as exclusive (e.g., checkin 2025-12-20, checkout 2025-12-22 = 2 nights).
+- These helpers are used by HotelEngine and admin display to calculate night counts and validate date ranges.
+
+**Commit 3-4: HotelEngine Implementation**
+- Created `Includes/Domain/HotelEngine.php` implementing `BookingEngineInterface`.
+- `get_hotel_availability($service_id, $checkin, $checkout, $guests)`:
+  - Validates date range (checkout > checkin), night count (>= min_nights, <= max_nights), guest count (>= 1).
+  - Queries `lazy_service_resources` to find allowed rooms (resources) for room type (service).
+  - Uses `AppointmentResourcesRepository::get_blocked_resources()` (SUM(seats)) to check overlapping bookings.
+  - Availability logic: room is free if `SUM(seats for overlaps) + guests <= room.capacity`.
+  - Returns: `nights`, `free_resources_count`, `resource_ids` array, `total_price_cents` (nights × service.price_cents).
+- `create_hotel_booking($payload)`:
+  - Validates payload (required: service_id, checkin, checkout, email, guests).
+  - Calls `get_hotel_availability()` to check availability.
+  - Creates appointment with `start_at=checkin+hotel_checkin_time`, `end_at=checkout+hotel_checkout_time`, `seats=guests`.
+  - Auto-assigns first available room from `resource_ids` (or uses explicit `resource_id` from payload).
+  - Stores assignment in `lazy_appointment_resources`.
+  - Sends admin and customer emails via LTLB_Mailer (includes `{nights}`, `{guests}`, `{room}` placeholders).
+- `validate_hotel_payload()`: helper for input validation.
+- EngineFactory now returns HotelEngine when `template_mode=hotel`.
+
+**Commit 5: Hotel Frontend Wizard**
+- Modified `Shortcodes.php::render_lazy_book()` to check `template_mode` setting and route to `render_hotel_booking()` if hotel mode is enabled.
+- `render_hotel_booking()`: HTML form with fields:
+  - Room Type (service dropdown, filtered for active only)
+  - Check-in (date input, format YYYY-MM-DD)
+  - Check-out (date input, format YYYY-MM-DD)
+  - Guests (number input, min 1, max 10, default 1)
+  - Customer details: email (required), first name, last name, phone
+- `handle_hotel_submission()`: form handler
+  - Nonce verification (`ltlb_book_nonce`)
+  - Honeypot check (`ltlb_hp`)
+  - IP-based rate limiting (same as service mode: 10 requests / 10 minutes)
+  - Builds payload: service_id, checkin, checkout, email, first_name, last_name, phone, guests
+  - Calls `HotelEngine::create_hotel_booking()`
+  - Returns success message or error with details.
+- Rate limiting and honeypot provide same security as service mode; no new vulnerabilities introduced.
+
+**Commit 6: Admin Hotel Appointments Display**
+- Modified `AppointmentsPage.php::render_content()` to detect `template_mode` setting.
+- When `template_mode=hotel`:
+  - Table headers (9 columns): Room Type | Customer | Check-in | Check-out | Nights | Guests | Room | Status | Actions
+  - Data rows show:
+    - Service name (room type)
+    - Customer full name (first + last)
+    - Check-in date (formatted as YYYY-MM-DD)
+    - Check-out date (formatted as YYYY-MM-DD)
+    - Nights (calculated using LTLB_Time::nights_between())
+    - Guests (appointment.seats value)
+    - Room (resource name from lazy_appointment_resources)
+    - Status (appointment.status)
+    - Actions (Edit, Delete — same as service mode)
+- When `template_mode=service` (default):
+  - Original 7-column table (Service ID, Customer ID, Start, End, Seats, Status, Actions) — unchanged
+- No changes to database or appointment logic; purely UI conditional rendering.
+
+**Commit 7: Hotel REST API Endpoint**
+- Added `GET /ltlb/v1/hotel-availability` route in `Plugin.php::register_rest_routes()`.
+- Query parameters: `service_id` (int), `checkin` (Y-m-d), `checkout` (Y-m-d), `guests` (int, default 1).
+- Validates `template_mode=hotel` and delegates to `HotelEngine::get_hotel_availability()`.
+- Returns JSON:
+  - Success: `{ "nights": 2, "free_resources_count": 2, "resource_ids": [1, 2], "total_price_cents": 20000 }`
+  - Error: `{ "error": "message" }`
+- Public endpoint (no authentication required) but subject to rate limiting via standard WP nonce/form submission flow for hotel bookings.
+
+**Checkout Exclusivity:** Check-out date is exclusive — no overlap occurs if one booking's checkout equals another's check-in.
+- Example: Room 101 booked with checkout 2025-12-22; next booking can start check-in 2025-12-22 (same day, overlaps are detected during daytime, but hotel midnight boundary is clean).
+- Implemented via `nights_between()` using date subtraction (checkout - checkin as days).
+
+**Capacity Model:** Reuses Phase 3 `seats` field and `SUM(seats)` blocking logic.
+- For service mode: seats = number of people in appointment (group size).
+- For hotel mode: seats = number of guests in booking.
+- Blocking: `SUM(seats for overlapping bookings) + new_guests <= room.capacity`.
+
+**Backwards Compatibility:** Service mode remains fully functional when `template_mode=service` (default).
+- All existing service bookings, time slots, and admin pages unaffected.
+- No database schema changes (reuses existing tables).
+- EngineFactory pattern isolates hotel logic from service logic.
+
+**Testing Note:** QA_CHECKLIST.md updated with comprehensive hotel test scenarios including:
+- Setup (1 room type + 2 rooms with different capacities)
+- Booking flow (valid booking, overlapping dates, exclusive checkout boundary test)
+- Capacity constraints (multi-booking blocking)
+- REST API testing
+- Edge cases (invalid dates, min/max nights validation)
 
 
 

@@ -29,8 +29,10 @@ class LTLB_Admin_SettingsPage {
 				$settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' );
 				$settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? '' );
 				$settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? '' );
-
-				update_option( 'lazy_settings', $settings );
+			$settings['hotel_checkin_time'] = LTLB_Sanitizer::text( $_POST['hotel_checkin_time'] ?? '15:00' );
+			$settings['hotel_checkout_time'] = LTLB_Sanitizer::text( $_POST['hotel_checkout_time'] ?? '11:00' );
+			$settings['hotel_min_nights'] = LTLB_Sanitizer::int( $_POST['hotel_min_nights'] ?? 1 );
+			$settings['hotel_max_nights'] = LTLB_Sanitizer::int( $_POST['hotel_max_nights'] ?? 30 );
 
 			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
 			LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
@@ -54,8 +56,10 @@ class LTLB_Admin_SettingsPage {
 			$mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
 			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
 			$mail_admin_subject = $settings['mail_admin_subject'] ?? '';
-			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';
-
+			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';		$hotel_checkin_time = $settings['hotel_checkin_time'] ?? '15:00';
+		$hotel_checkout_time = $settings['hotel_checkout_time'] ?? '11:00';
+		$hotel_min_nights = (int) ( $settings['hotel_min_nights'] ?? 1 );
+		$hotel_max_nights = (int) ( $settings['hotel_max_nights'] ?? 30 );
 		$timezones = timezone_identifiers_list();
 		?>
 		<div class="wrap">
@@ -152,6 +156,25 @@ class LTLB_Admin_SettingsPage {
 								<br>
 								<label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( $mail_customer_enabled ); ?>> <?php echo esc_html__('Send confirmation email to customer after booking', 'ltl-bookings'); ?></label>
 							</td>
+						</tr>
+						<tr>
+							<th colspan="2"><h2><?php echo esc_html__('Hotel Settings (Phase 4)', 'ltl-bookings'); ?></h2></th>
+						</tr>
+						<tr>
+							<th><label for="hotel_checkin_time"><?php echo esc_html__('Check-in Time', 'ltl-bookings'); ?></label></th>
+							<td><input name="hotel_checkin_time" id="hotel_checkin_time" type="time" value="<?php echo esc_attr( $hotel_checkin_time ); ?>"> <span class="description"><?php echo esc_html__('Default: 15:00', 'ltl-bookings'); ?></span></td>
+						</tr>
+						<tr>
+							<th><label for="hotel_checkout_time"><?php echo esc_html__('Check-out Time', 'ltl-bookings'); ?></label></th>
+							<td><input name="hotel_checkout_time" id="hotel_checkout_time" type="time" value="<?php echo esc_attr( $hotel_checkout_time ); ?>"> <span class="description"><?php echo esc_html__('Default: 11:00', 'ltl-bookings'); ?></span></td>
+						</tr>
+						<tr>
+							<th><label for="hotel_min_nights"><?php echo esc_html__('Minimum Nights', 'ltl-bookings'); ?></label></th>
+							<td><input name="hotel_min_nights" id="hotel_min_nights" type="number" min="1" value="<?php echo esc_attr( $hotel_min_nights ); ?>" class="small-text"></td>
+						</tr>
+						<tr>
+							<th><label for="hotel_max_nights"><?php echo esc_html__('Maximum Nights', 'ltl-bookings'); ?></label></th>
+							<td><input name="hotel_max_nights" id="hotel_max_nights" type="number" min="1" value="<?php echo esc_attr( $hotel_max_nights ); ?>" class="small-text"></td>
 						</tr>
 					</tbody>
 				</table>

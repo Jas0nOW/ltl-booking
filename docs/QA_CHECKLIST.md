@@ -14,6 +14,7 @@ This checklist covers manual verification steps after installing or updating the
 - **Appointments**: filter, change status (Confirm/Cancel) — confirm notices shown; verify Resource column shows assigned resource name or "—".
   - **Seats Column**: Verify "Seats" column displays seat count (default 1, or group booking seat count).
 - **Settings**: change template_mode (service/hotel), working hours, email settings — confirm notice shown and settings persist.
+  - **Hotel Settings** (when template_mode=hotel): verify check-in time, check-out time, min/max nights fields are visible and save correctly.
 - **Resources** (if admin page exists): add/edit resources with capacity, verify saves to `lazy_resources`.
 
 ## Frontend Booking (`[lazy_book]` shortcode)
@@ -31,11 +32,29 @@ This checklist covers manual verification steps after installing or updating the
   - **Pending blocks option**: toggle `ltlb_pending_blocks` in settings; verify pending appointments block/don't block slots accordingly.
 - **Hotel Mode**:
   - Switch template_mode to "hotel" in Settings.
-  - Load `[lazy_book]` shortcode — verify placeholder message ("Hotel booking mode coming soon") displays.
+  - Load `[lazy_book]` shortcode — verify hotel booking form appears (Room Type, Check-in, Check-out, Guests, Customer Details).
+  - **Hotel Booking Flow**:
+    - Setup: Create 1 Room Type (Service) and map 2 Rooms (Resources) to it, each with capacity 2.
+    - Booking 1: Select Room Type, checkin 2025-12-20, checkout 2025-12-22 (2 nights), guests 1 — verify appointment created with seats=1, start_at/end_at include check-in/check-out times, resource assigned.
+    - Admin verification: Appointments page shows "Room Type", "Check-in", "Check-out", "Nights" (=2), "Guests" (=1), "Room" (room name).
+    - Booking 2 (same room): checkin 2025-12-22 (checkout-exclusive), checkout 2025-12-24, guests 1 — verify allowed (next check-in is previous check-out).
+    - Booking 3 (overlap, same room): checkin 2025-12-21, checkout 2025-12-23, guests 1 — verify rejected or auto-assigned to Room 2 if available.
+    - Booking 4 (capacity test): checkin 2025-12-25, checkout 2025-12-27, guests 2 on both rooms already → verify rejected.
+  - **Edge Cases**:
+    - Minimum/Maximum nights validation: attempt booking with < min_nights or > max_nights — should reject.
+    - Invalid dates: checkout <= checkin — should reject.
+    - Negative guests — should reject.
+  - Rate limiting: submit form >10 times in 10 minutes — should block after 10 attempts.
 
 ## REST API
 - `GET /wp-json/ltlb/v1/time-slots?service_id=1&date=2025-12-15` — verify returns slots with `free_resources_count`, `resource_ids`, and `spots_left` (for group services).
 - `GET /wp-json/ltlb/v1/slot-resources?service_id=1&start=2025-12-15 09:00:00` — verify returns per-resource availability details.
+- **Hotel Mode** (when template_mode=hotel):
+  - `GET /wp-json/ltlb/v1/hotel-availability?service_id=1&checkin=2025-12-20&checkout=2025-12-22&guests=1` — verify returns `nights` (2), `free_resources_count`, `resource_ids`, `total_price_cents`.
+  - Missing params: attempt without `service_id` or `checkin` — should return error.
+  - Invalid dates: attempt with `checkout <= checkin` — should return error.
+  - Invalid guest count: attempt with `guests=0` or negative — should return error.
+  - Room fully booked: setup booking with 1 room and capacity 1 for checkin 2025-12-20 to 2025-12-22 with 1 guest; request availability for same dates with 1 guest — should return `free_resources_count=0` or omit that room from `resource_ids`.
 
 ## Timezone/DST
 - Set site timezone and plugin timezone (Settings) and verify slot times and stored `start_at`/`end_at` values match expected local times.

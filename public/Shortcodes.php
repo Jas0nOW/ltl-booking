@@ -19,19 +19,14 @@ class LTLB_Shortcodes {
 		return self::handle_submission();
 	}
 
-	// Template mode switch: show placeholder for hotel mode
+	// Template mode switch
 	$settings = get_option('lazy_settings', []);
 	$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
+	
 	if ( $template_mode === 'hotel' ) {
-		ob_start();
-		?>
-		<div class="ltlb-booking">
-			<h3><?php echo esc_html__( 'Hotel booking - coming soon', 'ltl-bookings' ); ?></h3>
-			<p><?php echo esc_html__( 'The hotel booking workflow is not implemented yet. Please switch to Service mode to use the live booking widget.', 'ltl-bookings' ); ?></p>
-		</div>
-		<?php
-		return ob_get_clean();
+		return self::render_hotel_booking();
 	}
+	
 	$service_repo = new LTLB_ServiceRepository();
 	$services = $service_repo->get_all();
 	ob_start();
@@ -178,6 +173,113 @@ class LTLB_Shortcodes {
 	}
 
 	return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
+	}
+
+	private static function render_hotel_booking(): string {
+		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['ltlb_book_submit'] ) ) {
+			return self::handle_hotel_submission();
+		}
+
+		$service_repo = new LTLB_ServiceRepository();
+		$services = $service_repo->get_all();
+		ob_start();
+		?>
+		<style>
+		.ltlb-booking{background:var(--lazy-bg,#fff);color:var(--lazy-text,#111);padding:16px;border-radius:6px}
+		.ltlb-booking .button-primary{background:var(--lazy-primary,#2b7cff);color:var(--lazy-text,#fff);border:none}
+		.ltlb-booking .ltlb-success{color:var(--lazy-primary,#2b7cff)}
+		.ltlb-booking .ltlb-error{color:#c33}
+		</style>
+		<div class="ltlb-booking">
+			<form method="post">
+				<?php wp_nonce_field( 'ltlb_book_action', 'ltlb_book_nonce' ); ?>
+				<div style="display:none;">
+					<label>Leave this empty<input type="text" name="ltlb_hp" value=""></label>
+				</div>
+				<h3><?php echo esc_html__( 'Book a Room', 'ltl-bookings' ); ?></h3>
+
+				<p>
+					<label><?php echo esc_html__('Room Type', 'ltl-bookings'); ?>
+						<select name="service_id" required>
+							<?php foreach ( $services as $s ): ?>
+								<?php if ( ! empty($s['is_active']) ): ?>
+									<option value="<?php echo esc_attr( $s['id'] ); ?>"><?php echo esc_html( $s['name'] ); ?></option>
+								<?php endif; ?>
+							<?php endforeach; ?>
+						</select>
+					</label>
+				</p>
+				<p>
+					<label><?php echo esc_html__('Check-in Date', 'ltl-bookings'); ?> <input type="date" name="checkin" required></label>
+				</p>
+				<p>
+					<label><?php echo esc_html__('Check-out Date', 'ltl-bookings'); ?> <input type="date" name="checkout" required></label>
+				</p>
+				<p>
+					<label><?php echo esc_html__('Number of Guests', 'ltl-bookings'); ?> <input type="number" name="guests" min="1" max="10" value="1" required></label>
+				</p>
+				<h4><?php echo esc_html__('Your details', 'ltl-bookings'); ?></h4>
+				<p><label><?php echo esc_html__('Email', 'ltl-bookings'); ?> <input type="email" name="email" required></label></p>
+				<p><label><?php echo esc_html__('First name', 'ltl-bookings'); ?> <input type="text" name="first_name"></label></p>
+				<p><label><?php echo esc_html__('Last name', 'ltl-bookings'); ?> <input type="text" name="last_name"></label></p>
+				<p><label><?php echo esc_html__('Phone', 'ltl-bookings'); ?> <input type="text" name="phone"></label></p>
+
+				<p><?php submit_button( esc_html__('Book Room', 'ltl-bookings'), 'primary', 'ltlb_book_submit', false ); ?></p>
+			</form>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	private static function handle_hotel_submission(): string {
+		if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
+			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+		}
+
+		if ( ! empty( $_POST['ltlb_hp'] ) ) {
+			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+		}
+
+		// Rate limit
+		$ip = '';
+		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		}
+
+		if ( $ip ) {
+			$key = 'ltlb_rate_' . md5( $ip );
+			$count = (int) get_transient( $key );
+			if ( $count >= 10 ) {
+				return '<div class="ltlb-error">' . esc_html__( 'Too many requests. Please try again later.', 'ltl-bookings' ) . '</div>';
+			}
+			set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
+		}
+
+		// Build hotel payload
+		$payload = [
+			'service_id' => isset($_POST['service_id']) ? intval($_POST['service_id']) : 0,
+			'checkin' => isset($_POST['checkin']) ? sanitize_text_field($_POST['checkin']) : '',
+			'checkout' => isset($_POST['checkout']) ? sanitize_text_field($_POST['checkout']) : '',
+			'guests' => isset($_POST['guests']) ? intval($_POST['guests']) : 0,
+			'email' => LTLB_Sanitizer::email( $_POST['email'] ?? '' ),
+			'first' => LTLB_Sanitizer::text( $_POST['first_name'] ?? '' ),
+			'last' => LTLB_Sanitizer::text( $_POST['last_name'] ?? '' ),
+			'phone' => LTLB_Sanitizer::text( $_POST['phone'] ?? '' ),
+		];
+
+		$engine = EngineFactory::get_engine();
+		if ( ! ( $engine instanceof HotelEngine ) ) {
+			return '<div class="ltlb-error">' . esc_html__( 'Hotel booking not available.', 'ltl-bookings' ) . '</div>';
+		}
+
+		$result = $engine->create_hotel_booking( $payload );
+		if ( is_wp_error($result) ) {
+			return '<div class="ltlb-error">' . esc_html( $result->get_error_message() ) . '</div>';
+		}
+
+		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
 	}
 }
 
