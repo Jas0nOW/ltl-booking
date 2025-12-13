@@ -86,11 +86,34 @@ class LTLB_AppointmentRepository {
 				$insert['end_at'] = sanitize_text_field( $data['end_at'] );
 			}
 		}
+		// Determine which statuses should block a slot. By default only 'confirmed'.
+		$blocking_statuses = [ 'confirmed' ];
+		if ( get_option( 'ltlb_pending_blocks', false ) ) {
+			$blocking_statuses[] = 'pending';
+		}
 
-		$formats = ['%d','%d','%d','%s','%s','%s','%s','%s','%s'];
-		$res = $wpdb->insert( $this->table_name, $insert, $formats );
-		if ( $res === false ) return false;
-		return (int) $wpdb->insert_id;
+		// Basic lock to reduce race conditions: attempt to add an option as a mutex.
+		$lock_key = 'ltlb_lock_' . md5( $insert['service_id'] . '|' . $insert['start_at'] . '|' . $insert['end_at'] );
+		$got_lock = add_option( $lock_key, 1, '', 'no' );
+		if ( $got_lock === false ) {
+			// someone else is inserting for this exact slot
+			return false;
+		}
+
+		try {
+			// final conflict check immediately before insert
+			if ( $this->has_conflict( $insert['start_at'], $insert['end_at'], intval( $insert['service_id'] ), $blocking_statuses ) ) {
+				return false;
+			}
+
+			$formats = ['%d','%d','%d','%s','%s','%s','%s','%s','%s'];
+			$res = $wpdb->insert( $this->table_name, $insert, $formats );
+			if ( $res === false ) return false;
+			return (int) $wpdb->insert_id;
+		} finally {
+			// release lock
+			delete_option( $lock_key );
+		}
 	}
 
 	public function update_status(int $id, string $status): bool {
@@ -103,10 +126,29 @@ class LTLB_AppointmentRepository {
 	 * Simple overlap/conflict check for a given service.
 	 * Returns true if there is a conflict.
 	 */
-	public function has_conflict(string $start_at, string $end_at, int $service_id): bool {
+	/**
+	 * Check for overlapping appointments for a service.
+	 *
+	 * @param string $start_at
+	 * @param string $end_at
+	 * @param int $service_id
+	 * @param array $blocking_statuses list of statuses that should block (e.g. ['confirmed','pending'])
+	 * @return bool
+	 */
+	public function has_conflict(string $start_at, string $end_at, int $service_id, array $blocking_statuses = ['confirmed']): bool {
 		global $wpdb;
-		$sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE service_id = %d AND status != %s AND start_at < %s AND end_at > %s";
-		$count = $wpdb->get_var( $wpdb->prepare( $sql, $service_id, 'canceled', $end_at, $start_at ) );
+
+		if ( empty( $blocking_statuses ) ) {
+			return false;
+		}
+
+		// build placeholders for IN()
+		$placeholders = implode( ',', array_fill( 0, count( $blocking_statuses ), '%s' ) );
+
+		$sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE service_id = %d AND status IN ($placeholders) AND start_at < %s AND end_at > %s";
+
+		$params = array_merge( [ $service_id ], $blocking_statuses, [ $end_at, $start_at ] );
+		$count = $wpdb->get_var( $wpdb->prepare( $sql, ...$params ) );
 		return intval( $count ) > 0;
 	}
 }
