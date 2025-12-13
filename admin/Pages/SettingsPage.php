@@ -43,6 +43,12 @@ class LTLB_Admin_SettingsPage {
 			$tz = $settings['timezone'] ?? '';
 			$default_status = $settings['default_status'] ?? 'pending';
 			$pending_blocks = $settings['pending_blocks'] ?? 0;
+			$mail_from_name = $settings['mail_from_name'] ?? '';
+			$mail_from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+			$mail_admin_template = $settings['mail_admin_template'] ?? '';
+			$mail_customer_template = $settings['mail_customer_template'] ?? '';
+			$mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
+			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
 
 		$timezones = timezone_identifiers_list();
 		?>
@@ -98,11 +104,11 @@ class LTLB_Admin_SettingsPage {
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_from_name"><?php echo esc_html__('From name', 'ltl-bookings'); ?></label></th>
-							<td><input name="ltlb_email_from_name" id="ltlb_email_from_name" type="text" value="<?php echo esc_attr( get_option('ltlb_email_from_name', '') ); ?>" class="regular-text"></td>
+							<td><input name="ltlb_email_from_name" id="ltlb_email_from_name" type="text" value="<?php echo esc_attr( $mail_from_name ); ?>" class="regular-text"></td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_from_address"><?php echo esc_html__('From email', 'ltl-bookings'); ?></label></th>
-							<td><input name="ltlb_email_from_address" id="ltlb_email_from_address" type="email" value="<?php echo esc_attr( get_option('ltlb_email_from_address', get_option('admin_email')) ); ?>" class="regular-text"></td>
+							<td><input name="ltlb_email_from_address" id="ltlb_email_from_address" type="email" value="<?php echo esc_attr( $mail_from_email ); ?>" class="regular-text"></td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_admin_subject"><?php echo esc_html__('Admin email subject', 'ltl-bookings'); ?></label></th>
@@ -110,23 +116,27 @@ class LTLB_Admin_SettingsPage {
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_admin_body"><?php echo esc_html__('Admin email body', 'ltl-bookings'); ?></label></th>
-							<td><textarea name="ltlb_email_admin_body" id="ltlb_email_admin_body" class="large-text" rows="6"><?php echo esc_textarea( get_option('ltlb_email_admin_body', '') ); ?></textarea>
+							<td><textarea name="ltlb_email_admin_body" id="ltlb_email_admin_body" class="large-text" rows="6"><?php echo esc_textarea( $mail_admin_template ); ?></textarea>
 								<p class="description"><?php echo esc_html__('Placeholders: {service}, {start}, {end}, {name}, {email}, {phone}, {status}, {appointment_id}', 'ltl-bookings'); ?></p>
 							</td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_customer_subject"><?php echo esc_html__('Customer email subject', 'ltl-bookings'); ?></label></th>
-							<td><input name="ltlb_email_customer_subject" id="ltlb_email_customer_subject" type="text" value="<?php echo esc_attr( get_option('ltlb_email_customer_subject', '') ); ?>" class="regular-text"></td>
+							<td><!-- subject kept for backwards compat; not used by new mailer --></td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_customer_body"><?php echo esc_html__('Customer email body', 'ltl-bookings'); ?></label></th>
-							<td><textarea name="ltlb_email_customer_body" id="ltlb_email_customer_body" class="large-text" rows="6"><?php echo esc_textarea( get_option('ltlb_email_customer_body', '') ); ?></textarea>
+							<td><textarea name="ltlb_email_customer_body" id="ltlb_email_customer_body" class="large-text" rows="6"><?php echo esc_textarea( $mail_customer_template ); ?></textarea>
 								<p class="description"><?php echo esc_html__('Placeholders: {service}, {start}, {end}, {name}, {email}, {phone}, {status}, {appointment_id}', 'ltl-bookings'); ?></p>
 							</td>
 						</tr>
 						<tr>
 							<th><?php echo esc_html__('Send customer email', 'ltl-bookings'); ?></th>
-							<td><label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( get_option('ltlb_email_send_customer', 1) ); ?>> <?php echo esc_html__('Send confirmation email to customer after booking', 'ltl-bookings'); ?></label></td>
+							<td>
+								<label><input name="ltlb_email_send_admin" type="checkbox" value="1" <?php checked( $mail_admin_enabled ); ?>> <?php echo esc_html__('Send notification email to admin on booking', 'ltl-bookings'); ?></label>
+								<br>
+								<label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( $mail_customer_enabled ); ?>> <?php echo esc_html__('Send confirmation email to customer after booking', 'ltl-bookings'); ?></label>
+							</td>
 						</tr>
 					</tbody>
 				</table>
