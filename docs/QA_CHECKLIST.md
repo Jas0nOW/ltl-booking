@@ -95,16 +95,29 @@ This minimal test verifies core functionality is working after plugin update/act
    - [ ] Open Appointments page
    - [ ] Change appointment status to "Confirmed"
    - [ ] Verify status updated
-   - [ ] Test CSV Export button - downloads appointments.csv
+   - [ ] Test CSV Export button - downloads appointments.csv with extended fields (resource, seats/nights, mode-aware)
    - [ ] Test customer search filter (search by email)
 
-5. **Settings & Email**
+5. **WP-CLI Commands** (if WP-CLI available)
+   - [ ] Run `wp ltlb doctor` - verify output shows system info, table status, lock support
+   - [ ] Run `wp ltlb migrate` - verify migrations run without errors
+   - [ ] Enable dev tools (Settings → `enable_dev_tools=1` or set `WP_DEBUG=true`)
+   - [ ] Run `wp ltlb seed --mode=service` - verify demo data created (services, resources, staff)
+   - [ ] Run `wp ltlb seed --mode=hotel` - verify hotel demo data created and template mode switched
+
+6. **Diagnostics Admin UI**
+   - [ ] Visit LazyBookings → Diagnostics
+   - [ ] Click "Run Doctor" button
+   - [ ] Verify diagnostics output displayed (version check, lock support, email config, logging status)
+   - [ ] Click "Run Migrations" button - verify migrations execute without errors
+
+7. **Settings & Email**
    - [ ] Settings → Email section
    - [ ] Enter test email in "Send test email to" field
    - [ ] Click "Send Test Email"
    - [ ] Check email received with correct From/Reply-To headers
 
-6. **Diagnostics & Health**
+8. **Diagnostics & Health** (legacy check)
    - [ ] Visit Diagnostics page
    - [ ] Verify system info displays (WP version, PHP version, template mode)
    - [ ] Verify database statistics show correct counts

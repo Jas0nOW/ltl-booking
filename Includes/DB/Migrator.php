@@ -44,6 +44,9 @@ class LTLB_DB_Migrator {
         } else {
             update_option('ltlb_db_version', '0.0.0');
         }
+        
+        // Track last migration time
+        update_option('ltlb_last_migration_time', current_time('mysql'));
     }
 
     /**

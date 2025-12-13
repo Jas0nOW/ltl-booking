@@ -81,6 +81,43 @@ Notes:
   - guests >= 1
   - Room capacity >= guests (for each room in free_resources_count calculation)
 
+## WP-CLI Commands (0.4.0)
+
+### Doctor Command
+`wp ltlb doctor`
+
+Runs system diagnostics and outputs:
+- Plugin/DB version check
+- Template mode
+- Database table status with row counts
+- MySQL Named Lock support test
+- Email configuration
+- Logging status
+- Dev tools gate status
+- Last migration timestamp
+
+### Migrate Command
+`wp ltlb migrate`
+
+Runs database migrations manually. Safe to call multiple times (uses `dbDelta`).
+
+### Seed Command
+`wp ltlb seed [--mode=<service|hotel>]`
+
+Creates demo data for development/testing. Only available when `WP_DEBUG` is true or `enable_dev_tools=1` setting is enabled.
+
+**Service mode** (default):
+- 1 service (Demo Yoga Class)
+- 2 resources (Studio A, Studio B)
+- 2 staff users with working hours
+- 1 demo customer
+
+**Hotel mode**:
+- 1 room type (Demo Double Room)
+- 2 rooms (Room 101, Room 102)
+- Sets template mode to hotel
+- 1 demo customer
+
 ## Planned Future Endpoints
 - `GET /services` — list services
 - `GET /services/{id}` — get service

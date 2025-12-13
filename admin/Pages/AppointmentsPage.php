@@ -212,6 +212,9 @@ class LTLB_Admin_AppointmentsPage {
 		$appt_res_repo = new LTLB_AppointmentResourcesRepository();
 		$res_repo = new LTLB_ResourceRepository();
 
+		$settings = get_option( 'lazy_settings', [] );
+		$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
+
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename=appointments_' . date('Y-m-d') . '.csv');
 		header('Pragma: no-cache');
@@ -219,8 +222,12 @@ class LTLB_Admin_AppointmentsPage {
 
 		$output = fopen('php://output', 'w');
 		
-		// CSV headers
-		fputcsv($output, ['ID', 'Service', 'Customer Email', 'Customer Name', 'Resource', 'Start', 'End', 'Status', 'Created']);
+		// CSV headers (extended)
+		if ( $template_mode === 'hotel' ) {
+			fputcsv($output, ['ID', 'Room Type', 'Customer Email', 'Customer Name', 'Room', 'Check-in', 'Check-out', 'Nights', 'Guests', 'Status', 'Created']);
+		} else {
+			fputcsv($output, ['ID', 'Service', 'Customer Email', 'Customer Name', 'Resource', 'Start', 'End', 'Seats', 'Status', 'Created']);
+		}
 
 		foreach ( $rows as $r ) {
 			$service = $service_repo->get_by_id( intval($r['service_id']) );
@@ -237,17 +244,39 @@ class LTLB_Admin_AppointmentsPage {
 				$customer_name = trim( ($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '') );
 			}
 
-			fputcsv($output, [
-				$r['id'],
-				$service ? $service['name'] : 'N/A',
-				$customer ? $customer['email'] : 'N/A',
-				$customer_name,
-				$resName,
-				$r['start_at'],
-				$r['end_at'],
-				$r['status'],
-				$r['created_at']
-			]);
+			if ( $template_mode === 'hotel' ) {
+				$nights = LTLB_Time::nights_between( $r['start_at'], $r['end_at'] );
+				$guests = $r['seats'] ?? 1;
+				
+				fputcsv($output, [
+					$r['id'],
+					$service ? $service['name'] : 'N/A',
+					$customer ? $customer['email'] : 'N/A',
+					$customer_name,
+					$resName,
+					substr($r['start_at'], 0, 10), // check-in date
+					substr($r['end_at'], 0, 10),   // check-out date
+					$nights,
+					$guests,
+					$r['status'],
+					$r['created_at']
+				]);
+			} else {
+				$seats = $r['seats'] ?? 1;
+				
+				fputcsv($output, [
+					$r['id'],
+					$service ? $service['name'] : 'N/A',
+					$customer ? $customer['email'] : 'N/A',
+					$customer_name,
+					$resName,
+					$r['start_at'],
+					$r['end_at'],
+					$seats,
+					$r['status'],
+					$r['created_at']
+				]);
+			}
 		}
 
 		fclose($output);

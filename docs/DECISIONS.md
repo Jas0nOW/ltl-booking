@@ -85,6 +85,24 @@ Notes:
 - If an admin explicitly enables `delete_data_on_uninstall = 1`, uninstall will drop all custom tables and delete plugin options (`lazy_settings`, `lazy_design`, `ltlb_db_version`).
 - Rationale: safer default to avoid accidental data loss; explicit opt-in required for destructive actions.
 
+## Go-Live Tools (WP-CLI + Admin)
+
+**Dev Tools Gating:**
+- Seed command (`wp ltlb seed`) is only available when `WP_DEBUG` is true OR `enable_dev_tools=1` setting is explicitly enabled.
+- Default: dev tools disabled in production. Rationale: prevent accidental demo data seeding on live sites.
+
+**WP-CLI Commands:**
+- `wp ltlb doctor`: Runs system diagnostics (version check, table status, lock support, email config, logging status). Read-only, safe to run anytime.
+- `wp ltlb migrate`: Manually triggers database migrations. Safe to call multiple times (uses `dbDelta`).
+- `wp ltlb seed`: Creates demo data for service or hotel mode. Gated by dev tools flag.
+
+**Admin UI Enhancements:**
+- Diagnostics page: "Run Doctor" button shows inline diagnostics output (read-only).
+- CSV Export: Extended with resource name, seats (service mode) or nights/guests (hotel mode), mode-aware column headers.
+
+**Migration Tracking:**
+- `ltlb_last_migration_time` option stores timestamp of last migration run for diagnostics/auditing.
+
 Commit 10 decisions (Resource Model):
 
 - An appointment in Phase 2c is associated with exactly one resource (e.g., a specific room or a piece of equipment). The `lazy_appointment_resources` table therefore only contains `appointment_id` and `resource_id`.

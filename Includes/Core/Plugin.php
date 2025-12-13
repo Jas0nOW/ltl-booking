@@ -54,11 +54,25 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Admin/StaffProfile.php';
         // Public: Shortcodes
         require_once LTLB_PATH . 'public/Shortcodes.php';
+        
+        // WP-CLI commands
+        if ( defined('WP_CLI') && WP_CLI ) {
+            require_once LTLB_PATH . 'Includes/CLI/DoctorCommand.php';
+            require_once LTLB_PATH . 'Includes/CLI/MigrateCommand.php';
+            require_once LTLB_PATH . 'Includes/CLI/SeedCommand.php';
+        }
     }
 
     public function on_init(): void {
         // Initialize Shortcodes
         LTLB_Shortcodes::init();
+        
+        // Register WP-CLI commands
+        if ( defined('WP_CLI') && WP_CLI ) {
+            WP_CLI::add_command( 'ltlb doctor', 'LTLB_CLI_DoctorCommand' );
+            WP_CLI::add_command( 'ltlb migrate', 'LTLB_CLI_MigrateCommand' );
+            WP_CLI::add_command( 'ltlb seed', 'LTLB_CLI_SeedCommand' );
+        }
         
         // instantiate profile handler
         if ( is_admin() ) {

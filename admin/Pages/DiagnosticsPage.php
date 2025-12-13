@@ -91,6 +91,23 @@ class LTLB_DiagnosticsPage {
                     <span class="description">Re-runs database migrations. Safe to execute multiple times (uses dbDelta).</span>
                 </p>
             </form>
+            
+            <form method="post" style="margin-top: 10px;">
+                <?php wp_nonce_field('ltlb_run_doctor', 'ltlb_doctor_nonce'); ?>
+                <p>
+                    <button type="submit" name="ltlb_run_doctor" class="button button-secondary">
+                        Run Doctor
+                    </button>
+                    <span class="description">Run system diagnostics (read-only).</span>
+                </p>
+            </form>
+            
+            <?php
+            // Handle doctor action
+            if (isset($_POST['ltlb_run_doctor']) && check_admin_referer('ltlb_run_doctor', 'ltlb_doctor_nonce')) {
+                $this->render_doctor_output();
+            }
+            ?>
 
             <h2>Table Status</h2>
             <?php
@@ -124,5 +141,65 @@ class LTLB_DiagnosticsPage {
             ?>
         </div>
         <?php
+    }
+    
+    private function render_doctor_output(): void {
+        global $wpdb;
+        $settings = get_option('lazy_settings', []);
+        
+        echo '<div class="notice notice-info" style="margin-top: 20px; padding: 15px; background: #f0f0f1; border-left: 4px solid #72aee6;">';
+        echo '<h3 style="margin-top: 0;">System Diagnostics Results</h3>';
+        
+        // Version info
+        $plugin_version = defined('LTLB_VERSION') ? LTLB_VERSION : 'unknown';
+        $db_version = get_option('ltlb_db_version', 'not set');
+        echo '<p><strong>Plugin Version:</strong> ' . esc_html($plugin_version) . '</p>';
+        echo '<p><strong>DB Version:</strong> ' . esc_html($db_version) . '</p>';
+        
+        if (version_compare($plugin_version, $db_version, '>')) {
+            echo '<p style="color: #d63638;"><strong>⚠ DB version is behind plugin version.</strong> Consider running migrations.</p>';
+        } elseif (version_compare($plugin_version, $db_version, '=')) {
+            echo '<p style="color: #00a32a;"><strong>✓ DB version matches plugin version</strong></p>';
+        }
+        
+        // Template mode
+        $template_mode = $settings['template_mode'] ?? 'service';
+        echo '<p><strong>Template Mode:</strong> ' . esc_html($template_mode) . '</p>';
+        
+        // Lock support
+        $lock_test = $wpdb->get_var("SELECT GET_LOCK('ltlb_test_lock', 0)");
+        $lock_supported = ($lock_test === '1');
+        if ($lock_supported) {
+            $wpdb->query("SELECT RELEASE_LOCK('ltlb_test_lock')");
+            echo '<p style="color: #00a32a;"><strong>MySQL Named Locks:</strong> Supported ✓</p>';
+        } else {
+            echo '<p style="color: #d63638;"><strong>MySQL Named Locks:</strong> Not supported (race condition protection disabled)</p>';
+        }
+        
+        // Mail configuration
+        $from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+        $from_name = $settings['mail_from_name'] ?? get_bloginfo('name');
+        $reply_to = $settings['mail_reply_to'] ?? '';
+        echo '<p><strong>Email From:</strong> ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
+        if (!empty($reply_to)) {
+            echo '<p><strong>Reply-To:</strong> ' . esc_html($reply_to) . '</p>';
+        }
+        
+        // Logging
+        $logging_enabled = !empty($settings['logging_enabled']);
+        $log_level = $settings['log_level'] ?? 'error';
+        $log_status = $logging_enabled ? "Enabled ({$log_level})" : 'Disabled';
+        echo '<p><strong>Logging:</strong> ' . esc_html($log_status) . '</p>';
+        
+        // Dev tools
+        $dev_tools_enabled = (defined('WP_DEBUG') && WP_DEBUG) || !empty($settings['enable_dev_tools']);
+        $dev_status = $dev_tools_enabled ? 'Enabled' : 'Disabled';
+        echo '<p><strong>Dev Tools:</strong> ' . esc_html($dev_status) . '</p>';
+        
+        // Last migration
+        $last_migration = get_option('ltlb_last_migration_time', 'never');
+        echo '<p><strong>Last Migration:</strong> ' . esc_html($last_migration) . '</p>';
+        
+        echo '</div>';
     }
 }
