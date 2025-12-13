@@ -35,7 +35,32 @@ class LTLB_DB_Migrator {
         if ($sql_appointment_resources) dbDelta($sql_appointment_resources);
         if ($sql_service_resources) dbDelta($sql_service_resources);
 
-        // Version merken für spätere Migrationen
-        update_option('ltlb_db_version', '0.3.0');
+        // Version merken für spätere Migrationen (use plugin constant)
+        if ( defined('LTLB_VERSION') ) {
+            update_option('ltlb_db_version', LTLB_VERSION);
+        } else {
+            update_option('ltlb_db_version', '0.0.0');
+        }
+    }
+
+    /**
+     * Run migrations if stored DB version differs from plugin version.
+     * Safe to call on every request (lightweight compare).
+     */
+    public static function maybe_migrate(): void {
+        // if migrations already ran for this plugin version, skip
+        $current = get_option('ltlb_db_version', '0.0.0');
+        $target = defined('LTLB_VERSION') ? LTLB_VERSION : '0.0.0';
+        if ( version_compare( $current, $target, '>=' ) ) {
+            return;
+        }
+
+        // run migrations (this will update the stored version)
+        try {
+            self::migrate();
+        } catch ( Throwable $e ) {
+            // swallow to avoid fatal errors during normal page loads; admin can see notices
+            error_log( 'LTLB migration failed: ' . $e->getMessage() );
+        }
     }
 }

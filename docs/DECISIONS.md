@@ -88,6 +88,12 @@ Commit 11 decisions (Service ↔ Resource mapping):
 
 - Services can be mapped to a set of allowed resources via the `lazy_service_resources` table. If a service has no mappings, it is considered compatible with any resource. When computing availability for a service, only resources allowed for that service are considered for blocking.
 
+Migration decisions (Commit 2c.1 - auto-migrate):
+
+- The plugin runs lightweight migration checks on `plugins_loaded` via `LTLB_DB_Migrator::maybe_migrate()`. This compares stored `ltlb_db_version` against `LTLB_VERSION` and runs `migrate()` if the stored version is older.
+- `LTLB_Activator::activate()` continues to run a full `migrate()` during activation to ensure fresh installs create tables immediately.
+- `maybe_migrate()` is designed to be safe on frontend requests: it only compares versions and runs migrations when needed; migration failures are logged to PHP error log and do not fatal-error the page.
+
 
 
 

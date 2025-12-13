@@ -5,6 +5,8 @@ class LTLB_Plugin {
 
     public function run(): void {
         add_action('init', [ $this, 'on_init' ]);
+        // Ensure DB migrations run automatically when plugin version changes
+        add_action('plugins_loaded', [ 'LTLB_DB_Migrator', 'maybe_migrate' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
         add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
         add_action('wp_head', [ $this, 'print_design_css_frontend' ]);

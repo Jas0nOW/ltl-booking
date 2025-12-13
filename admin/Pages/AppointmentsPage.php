@@ -69,6 +69,7 @@ class LTLB_Admin_AppointmentsPage {
 					<tr>
 						<th><?php echo esc_html__('Service ID', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Customer ID', 'ltl-bookings'); ?></th>
+						<th><?php echo esc_html__('Resource', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Start', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('End', 'ltl-bookings'); ?></th>
 						<th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
@@ -77,11 +78,23 @@ class LTLB_Admin_AppointmentsPage {
 				</thead>
 				<tbody>
 					<?php if ( empty($rows) ): ?>
-						<tr><td colspan="6"><?php echo esc_html__('No appointments', 'ltl-bookings'); ?></td></tr>
+						<tr><td colspan="7"><?php echo esc_html__('No appointments', 'ltl-bookings'); ?></td></tr>
 					<?php else: foreach($rows as $r): ?>
 						<tr>
 							<td><?php echo esc_html($r['service_id']); ?></td>
 							<td><?php echo esc_html($r['customer_id']); ?></td>
+							<?php
+								// get resource name for appointment
+								$apptResRepo = new LTLB_AppointmentResourcesRepository();
+								$resRepo = new LTLB_ResourceRepository();
+								$resId = $apptResRepo->get_resource_for_appointment( intval($r['id']) );
+								$resName = '—';
+								if ( $resId ) {
+									$res = $resRepo->get_by_id( intval($resId) );
+									if ( $res ) $resName = sanitize_text_field( $res['name'] );
+								}
+							?>
+							<td><?php echo esc_html( $resName ); ?></td>
 							<td><?php echo esc_html($r['start_at']); ?></td>
 							<td><?php echo esc_html($r['end_at']); ?></td>
 							<td><?php echo esc_html($r['status']); ?></td>

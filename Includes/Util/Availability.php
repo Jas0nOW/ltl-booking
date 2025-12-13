@@ -183,6 +183,11 @@ class Availability {
         if ( ! $service ) return [];
         $duration_min = intval( $service['duration_min'] ?? 60 );
 
+        $service_resources_repo = new LTLB_ServiceResourcesRepository();
+        $resource_repo = new LTLB_ResourceRepository();
+        $appt_resource_repo = new LTLB_AppointmentResourcesRepository();
+        $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+
         $slots_by_user = [];
         foreach ( $avail as $user_id => $intervals ) {
             $slots_by_user[$user_id] = [];
@@ -194,11 +199,39 @@ class Availability {
 
                 // iterate by step_min and add slots where full duration fits
                 while ( true ) {
-                    $slot_end = clone $cursor;
-                    $slot_end->add( new DateInterval('PT' . $duration_min . 'M') );
-                    if ( $slot_end > $interval_end ) break;
-                    $slots_by_user[$user_id][] = [ 'start' => $cursor->format('Y-m-d H:i:s'), 'end' => $slot_end->format('Y-m-d H:i:s') ];
-                    $cursor->add( new DateInterval('PT' . $step_min . 'M') );
+                        $slot_end = clone $cursor;
+                        $slot_end->add( new DateInterval('PT' . $duration_min . 'M') );
+                        if ( $slot_end > $interval_end ) break;
+
+                        // determine allowed resources for this service
+                        $allowed_resources = $service_resources_repo->get_resources_for_service( $service_id );
+                        if ( empty( $allowed_resources ) ) {
+                            $all = $resource_repo->get_all();
+                            $allowed_resources = array_map(function($r){ return intval($r['id']); }, $all );
+                        }
+
+                        // compute blocked counts for this specific slot interval
+                        $blocked_counts = $appt_resource_repo->get_blocked_resources( $cursor->format('Y-m-d H:i:s'), $slot_end->format('Y-m-d H:i:s'), $include_pending );
+
+                        $available_ids = [];
+                        foreach ( $allowed_resources as $rid ) {
+                            $res = $resource_repo->get_by_id( intval($rid) );
+                            if ( ! $res ) continue;
+                            $capacity = intval( $res['capacity'] ?? 1 );
+                            $used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
+                            if ( $used < $capacity ) {
+                                $available_ids[] = intval($rid);
+                            }
+                        }
+
+                        $slots_by_user[$user_id][] = [
+                            'start' => $cursor->format('Y-m-d H:i:s'),
+                            'end' => $slot_end->format('Y-m-d H:i:s'),
+                            'free_resources_count' => count($available_ids),
+                            'resource_ids' => $available_ids,
+                        ];
+
+                        $cursor->add( new DateInterval('PT' . $step_min . 'M') );
                 }
             }
         }

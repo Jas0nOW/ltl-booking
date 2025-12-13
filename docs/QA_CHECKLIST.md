@@ -31,3 +31,30 @@ This checklist covers manual verification steps after installing or updating the
   - Verify graceful failures: booking should still create if emails fail (errors logged but user sees success).
 
 If any step fails, collect screenshots, DB rows, and wp-debug.log entries and report.
+
+## Resource-specific tests (Phase 2c)
+
+- Service with single resource:
+  - Create a `Resource` and map it to a `Service` (Services → edit → Resources).
+  - Book the only available slot for that service twice (two different customers). Second booking should be rejected when capacity is exhausted.
+
+- Service with two resources:
+  - Create two `Resources` and map both to the same `Service`.
+  - Book the same slot twice (two customers) — both bookings should succeed if each maps to a different resource.
+  - Book the same slot a third time — should be rejected once both resources are occupied.
+
+- Slot blocking behavior:
+  - Create appointments with `confirmed` status and verify they block resource availability immediately.
+  - Toggle the `ltlb_pending_blocks` option and verify `pending` appointments also block when enabled.
+
+- Wizard UI checks:
+  - When multiple resources are free for a slot, the frontend should show a `Resource` dropdown.
+  - Selecting a resource should persist the chosen resource to the appointment (check `lazy_appointment_resources`).
+  - If the user doesn't choose a resource, verify the system auto-selects the first available resource.
+
+- Edge cases & race checks (manual):
+  - Rapidly submit the same slot from two browser windows to observe possible race conditions; verify at most capacity bookings are accepted.
+  - Check admin Appointments list shows the `Resource` column and the correct resource name or `—` when none.
+
+- Optional status page (admin):
+  - Visit the resource status admin page (if installed) and verify counts for resources, mappings, and active bookings per resource.

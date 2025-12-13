@@ -17,6 +17,12 @@ class LTLB_Shortcodes {
 			'callback' => [ __CLASS__, 'get_time_slots' ],
 			'permission_callback' => '__return_true',
 		] );
+
+		register_rest_route( 'ltlb/v1', '/slot-resources', [
+			'methods' => 'GET',
+			'callback' => [ __CLASS__, 'get_slot_resources' ],
+			'permission_callback' => '__return_true',
+		] );
 	}
 
 	public static function get_time_slots( WP_REST_Request $request ): WP_REST_Response {
@@ -31,6 +37,51 @@ class LTLB_Shortcodes {
 		$slots = $availability->compute_time_slots( $service_id, $date );
 
 		return new WP_REST_Response( $slots, 200 );
+	}
+
+	public static function get_slot_resources( WP_REST_Request $request ): WP_REST_Response {
+		$service_id = intval( $request->get_param( 'service_id' ) );
+		$start = sanitize_text_field( $request->get_param( 'start' ) ); // YYYY-MM-DD HH:MM:SS
+		if ( ! $service_id || ! $start ) {
+			return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+		}
+
+		$service_repo = new LTLB_ServiceRepository();
+		$service = $service_repo->get_by_id( $service_id );
+		if ( ! $service ) return new WP_REST_Response( [ 'error' => 'Invalid service' ], 400 );
+
+		$duration = intval( $service['duration_min'] ?? 60 );
+		$start_dt = DateTime::createFromFormat('Y-m-d H:i:s', $start);
+		if ( ! $start_dt ) return new WP_REST_Response( [ 'error' => 'Invalid start' ], 400 );
+		$end_dt = clone $start_dt;
+		$end_dt->modify('+' . $duration . ' minutes');
+
+		$service_resources_repo = new LTLB_ServiceResourcesRepository();
+		$resource_repo = new LTLB_ResourceRepository();
+		$appt_res_repo = new LTLB_AppointmentResourcesRepository();
+
+		$allowed = $service_resources_repo->get_resources_for_service( $service_id );
+		if ( empty( $allowed ) ) {
+			$all = $resource_repo->get_all();
+			$allowed = array_map(function($r){ return intval($r['id']); }, $all );
+		}
+
+		$include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+		$blocked = $appt_res_repo->get_blocked_resources( $start_dt->format('Y-m-d H:i:s'), $end_dt->format('Y-m-d H:i:s'), $include_pending );
+
+		$resources = [];
+		$free_count = 0;
+		foreach ( $allowed as $rid ) {
+			$r = $resource_repo->get_by_id( intval($rid) );
+			if ( ! $r ) continue;
+			$capacity = intval( $r['capacity'] ?? 1 );
+			$used = isset( $blocked[$rid] ) ? intval( $blocked[$rid] ) : 0;
+			$available = max(0, $capacity - $used);
+			if ( $available > 0 ) $free_count += 1;
+			$resources[] = [ 'id' => intval($r['id']), 'name' => $r['name'], 'capacity' => $capacity, 'used' => $used, 'available' => $available ];
+		}
+
+		return new WP_REST_Response( [ 'free_resources_count' => $free_count, 'resources' => $resources ], 200 );
 	}
 
 	public static function maybe_enqueue_assets(): void {
@@ -81,6 +132,13 @@ class LTLB_Shortcodes {
 					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
 						<select name="time_slot" required>
 							<!-- Time slots will be loaded dynamically via JavaScript -->
+						</select>
+					</label>
+				</p>
+				<p>
+					<label><?php echo esc_html__('Resource (optional)', 'ltl-bookings'); ?>
+						<select name="resource_id" id="ltlb_resource_select" style="display:none; min-width:200px;">
+							<!-- filled via JS when multiple resources are available -->
 						</select>
 					</label>
 				</p>
@@ -160,7 +218,9 @@ class LTLB_Shortcodes {
 			return new WP_Error( 'missing_fields', __( 'Please fill the required fields.', 'ltl-bookings' ) );
 		}
 
-		return compact( 'service_id', 'date', 'time', 'email', 'first', 'last', 'phone' );
+		$resource_id = isset( $_POST['resource_id'] ) ? intval( $_POST['resource_id'] ) : 0;
+
+		return compact( 'service_id', 'date', 'time', 'email', 'first', 'last', 'phone', 'resource_id' );
 	}
 
 	private static function _create_appointment_from_submission( array $data ): int|WP_Error {
@@ -217,7 +277,7 @@ class LTLB_Shortcodes {
 			return $appt_id;
 		}
 
-		// Assign a resource deterministically: pick first allowed resource with available capacity
+		// If user selected a resource, try to persist it (validate capacity and mapping), otherwise select automatically
 		$service_resources_repo = new LTLB_ServiceResourcesRepository();
 		$resource_repo = new LTLB_ResourceRepository();
 		$appt_resource_repo = new LTLB_AppointmentResourcesRepository();
@@ -231,14 +291,27 @@ class LTLB_Shortcodes {
 		$include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
 		$blocked_counts = $appt_resource_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
 
-		foreach ( $allowed_resources as $rid ) {
-			$res = $resource_repo->get_by_id( intval($rid) );
-			if ( ! $res ) continue;
-			$capacity = intval( $res['capacity'] ?? 1 );
-			$used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
-			if ( $used < $capacity ) {
-				$appt_resource_repo->set_resource_for_appointment( intval($appt_id), intval($rid) );
-				break;
+		$chosen = isset($data['resource_id']) ? intval($data['resource_id']) : 0;
+		if ( $chosen > 0 && in_array($chosen, $allowed_resources, true) ) {
+			// validate capacity
+			$res = $resource_repo->get_by_id( $chosen );
+			if ( $res ) {
+				$cap = intval($res['capacity'] ?? 1);
+				$used = isset($blocked_counts[$chosen]) ? intval($blocked_counts[$chosen]) : 0;
+				if ( $used < $cap ) {
+					$appt_resource_repo->set_resource_for_appointment( intval($appt_id), $chosen );
+				}
+			}
+		} else {
+			foreach ( $allowed_resources as $rid ) {
+				$res = $resource_repo->get_by_id( intval($rid) );
+				if ( ! $res ) continue;
+				$capacity = intval( $res['capacity'] ?? 1 );
+				$used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
+				if ( $used < $capacity ) {
+					$appt_resource_repo->set_resource_for_appointment( intval($appt_id), intval($rid) );
+					break;
+				}
 			}
 		}
 
