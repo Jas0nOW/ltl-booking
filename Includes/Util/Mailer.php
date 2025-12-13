@@ -16,16 +16,19 @@ class LTLB_Mailer {
     public static function send_booking_notifications( int $appointment_id, array $service, array $customer, string $start_at, string $end_at, string $status ): array {
         $results = [];
 
-        $from_name = get_option( 'ltlb_email_from_name', '' );
-        $from_addr = get_option( 'ltlb_email_from_address', get_option('admin_email') );
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) $ls = [];
+
+        $from_name = $ls['mail_from_name'] ?? '';
+        $from_addr = $ls['mail_from_email'] ?? get_option('admin_email');
 
         $admin_to = get_option('admin_email');
-        $admin_subject = get_option( 'ltlb_email_admin_subject', '' );
-        $admin_body = get_option( 'ltlb_email_admin_body', '' );
+        $admin_subject = $ls['mail_admin_subject'] ?? ($ls['mail_admin_template_subject'] ?? '');
+        $admin_body = $ls['mail_admin_template'] ?? '';
 
-        $customer_send = get_option( 'ltlb_email_send_customer', 1 );
-        $customer_subject = get_option( 'ltlb_email_customer_subject', '' );
-        $customer_body = get_option( 'ltlb_email_customer_body', '' );
+        $customer_send = ! empty( $ls['mail_customer_enabled'] ) ? 1 : 0;
+        $customer_subject = $ls['mail_customer_subject'] ?? ($ls['mail_customer_template_subject'] ?? '');
+        $customer_body = $ls['mail_customer_template'] ?? '';
 
         $placeholders = [
             'service' => $service['name'] ?? '',

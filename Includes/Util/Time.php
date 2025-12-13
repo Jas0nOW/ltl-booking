@@ -5,7 +5,9 @@ class LTLB_Time {
 
     public static function wp_timezone(): DateTimeZone {
         // Allow plugin setting to override site timezone for plugin operations
-        $plugin_tz = get_option( 'ltlb_timezone', '' );
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) $ls = [];
+        $plugin_tz = $ls['timezone'] ?? '';
         if ( ! empty( $plugin_tz ) ) {
             try {
                 return new DateTimeZone( $plugin_tz );

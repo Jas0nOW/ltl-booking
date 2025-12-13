@@ -88,7 +88,9 @@ class LTLB_AppointmentRepository {
 		}
 		// Determine which statuses should block a slot. By default only 'confirmed'.
 		$blocking_statuses = [ 'confirmed' ];
-		if ( get_option( 'ltlb_pending_blocks', false ) ) {
+		$ls = get_option( 'lazy_settings', [] );
+		if ( ! is_array( $ls ) ) $ls = [];
+		if ( ! empty( $ls['pending_blocks'] ) ) {
 			$blocking_statuses[] = 'pending';
 		}
 
