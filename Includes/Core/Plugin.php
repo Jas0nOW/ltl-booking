@@ -313,8 +313,35 @@ class LTLB_Plugin {
         $primary = $design['primary'] ?? '#2b7cff';
         $text = $design['text'] ?? '#222222';
         $accent = $design['accent'] ?? '#ffcc00';
+        $border_color = $design['border_color'] ?? '#cccccc';
+        $border_width = $design['border_width'] ?? 1;
+        $border_radius = $design['border_radius'] ?? 4;
+        $box_shadow_blur = $design['box_shadow_blur'] ?? 4;
+        $box_shadow_spread = $design['box_shadow_spread'] ?? 0;
+        $transition_duration = $design['transition_duration'] ?? 200;
+        $use_gradient = $design['use_gradient'] ?? 0;
+        $use_box_shadow = $design['use_box_shadow'] ?? 0;
+        $custom_css = $design['custom_css'] ?? '';
 
-        echo "<style id=\"ltlb-design-vars\">:root{--lazy-bg:{$bg};--lazy-primary:{$primary};--lazy-text:{$text};--lazy-accent:{$accent};}</style>";
+        $bg_final = $use_gradient ? "linear-gradient(135deg, {$primary}, {$accent})" : $bg;
+        $shadow = $use_box_shadow ? "0 {$box_shadow_blur}px {$box_shadow_spread}px rgba(0,0,0,0.1)" : 'none';
+
+        $css = ":root{
+            --lazy-bg:{$bg_final};
+            --lazy-primary:{$primary};
+            --lazy-text:{$text};
+            --lazy-accent:{$accent};
+            --lazy-border-color:{$border_color};
+            --lazy-border-width:{$border_width}px;
+            --lazy-border-radius:{$border_radius}px;
+            --lazy-box-shadow:{$shadow};
+            --lazy-transition-duration:{$transition_duration}ms;
+        }";
+
+        echo "<style id=\"ltlb-design-vars\">{$css}</style>";
+        if ( ! empty( $custom_css ) ) {
+            echo "<style id=\"ltlb-custom-css\">" . wp_kses_post( $custom_css ) . "</style>";
+        }
     }
 
     public function print_design_css_admin(): void {
@@ -329,7 +356,34 @@ class LTLB_Plugin {
         $primary = $design['primary'] ?? '#2b7cff';
         $text = $design['text'] ?? '#222222';
         $accent = $design['accent'] ?? '#ffcc00';
+        $border_color = $design['border_color'] ?? '#cccccc';
+        $border_width = $design['border_width'] ?? 1;
+        $border_radius = $design['border_radius'] ?? 4;
+        $box_shadow_blur = $design['box_shadow_blur'] ?? 4;
+        $box_shadow_spread = $design['box_shadow_spread'] ?? 0;
+        $transition_duration = $design['transition_duration'] ?? 200;
+        $use_gradient = $design['use_gradient'] ?? 0;
+        $use_box_shadow = $design['use_box_shadow'] ?? 0;
+        $custom_css = $design['custom_css'] ?? '';
 
-        echo "<style id=\"ltlb-design-vars-admin\">:root{--lazy-bg:{$bg};--lazy-primary:{$primary};--lazy-text:{$text};--lazy-accent:{$accent};}</style>";
+        $bg_final = $use_gradient ? "linear-gradient(135deg, {$primary}, {$accent})" : $bg;
+        $shadow = $use_box_shadow ? "0 {$box_shadow_blur}px {$box_shadow_spread}px rgba(0,0,0,0.1)" : 'none';
+
+        $css = ":root{
+            --lazy-bg:{$bg_final};
+            --lazy-primary:{$primary};
+            --lazy-text:{$text};
+            --lazy-accent:{$accent};
+            --lazy-border-color:{$border_color};
+            --lazy-border-width:{$border_width}px;
+            --lazy-border-radius:{$border_radius}px;
+            --lazy-box-shadow:{$shadow};
+            --lazy-transition-duration:{$transition_duration}ms;
+        }";
+
+        echo "<style id=\"ltlb-design-vars-admin\">{$css}</style>";
+        if ( ! empty( $custom_css ) ) {
+            echo "<style id=\"ltlb-custom-css-admin\">" . wp_kses_post( $custom_css ) . "</style>";
+        }
     }
 }

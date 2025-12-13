@@ -198,7 +198,55 @@ Migration decisions (Commit 2c.1 - auto-migrate):
 
 ---
 
-## Phase 4.2: Final UX Polish (Commits 1-5)
+## Extended Design System (Post-UX-Polish)
+
+**Design Page Enhancements:**
+- **Color Controls**: Background, Primary, Text, Accent, Border Color (all hex input with color picker)
+- **Spacing & Shape Controls**: Border Radius (0-50px), Border Width (0-10px)
+- **Shadow & Effects**: Enable/Disable Box Shadow, Shadow Blur (0-20px), Shadow Spread (0-10px)
+- **Gradient Background**: Checkbox to enable linear gradient from Primary to Accent color (135deg)
+- **Animation Duration**: Global transition duration (0-1000ms, default 200ms) for all hover effects
+- **Custom CSS Block**: Textarea to paste arbitrary CSS rules targeting `.ltlb-booking`, `.service-card`, `.button-primary`, etc.
+
+**CSS Variables Available to Frontend:**
+```css
+--lazy-bg                   /* background or gradient */
+--lazy-primary              /* button/link color */
+--lazy-text                 /* text color */
+--lazy-accent               /* hover effects */
+--lazy-border-color         /* input & card borders */
+--lazy-border-width         /* border thickness in px */
+--lazy-border-radius        /* roundness in px */
+--lazy-box-shadow           /* shadow string (or none) */
+--lazy-transition-duration  /* animation speed in ms */
+```
+
+**Frontend Styling (public.css):**
+- All `.ltlb-booking` elements respect design variables
+- Service cards (`.service-card`) have hover effects with shadow/border color change
+- Buttons (`.button-primary`, `.button-secondary`) use primary/accent with smooth transitions
+- Input fields inherit border-radius, border-color, and transition-duration
+- Wizard steps (`.ltlb-step`) show active/completed states using accent color
+- Price preview box (`.ltlb-price-preview`) styled with accent background
+- All focus states use 2px solid primary color outline
+- Hover effects include `translateY(-2px)` on buttons with updated shadow
+
+**Shortcodes.php Updates:**
+- Removed inline style block, now relies entirely on CSS variables in `<style>` tags from `Plugin.php`
+- Used semantic HTML `<fieldset>` and `<legend>` elements instead of `<h4>` for better accessibility and styling hooks
+- Added unique IDs to all form elements for consistent styling (ltlb-checkin, ltlb-checkout, ltlb-guests, ltlb-date, ltlb-time-slot, ltlb-resource-select)
+- Service select now has class `ltlb-service-select` for specific styling if needed
+- Honeypot field updated: removed `tabindex="-1"` and added to parent `<div>` instead
+
+**Rationale:**
+- Users want pixel-perfect control over wizard appearance without coding
+- Custom CSS allows advanced users to add gradients, shadows, or brand-specific styles
+- CSS variables eliminate need for code changes when colors change
+- Gradient support adds visual depth without complexity
+- Animation duration control lets users match their site's interaction style
+- All variables have fallback values for graceful degradation if not set
+
+---
 
 **Goal**: User-facing polish for mobile-first wizard, admin tables, hotel mode, and accessibility — no new features.
 
