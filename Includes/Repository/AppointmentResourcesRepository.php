@@ -38,8 +38,7 @@ class LTLB_AppointmentResourcesRepository {
         global $wpdb;
         // remove any existing mapping for this appointment
         $wpdb->delete( $this->table_name, [ 'appointment_id' => $appointment_id ], [ '%d' ] );
-        $now = current_time('mysql');
-        $res = $wpdb->insert( $this->table_name, [ 'appointment_id' => $appointment_id, 'resource_id' => $resource_id, 'created_at' => $now, 'updated_at' => $now ], [ '%d','%d','%s','%s' ] );
+		$res = $wpdb->insert( $this->table_name, [ 'appointment_id' => $appointment_id, 'resource_id' => $resource_id ], [ '%d','%d' ] );
         return $res !== false;
     }
 

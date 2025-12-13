@@ -13,16 +13,25 @@ class LTLB_DB_Schema {
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(190) NOT NULL,
                 description LONGTEXT NULL,
+                staff_user_id BIGINT UNSIGNED NULL,
                 duration_min SMALLINT UNSIGNED NOT NULL DEFAULT 60,
                 buffer_before_min SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 buffer_after_min SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 price_cents INT UNSIGNED NOT NULL DEFAULT 0,
                 currency CHAR(3) NOT NULL DEFAULT 'EUR',
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
+                is_group TINYINT(1) NOT NULL DEFAULT 0,
+                max_seats_per_booking SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+                availability_mode VARCHAR(20) NOT NULL DEFAULT 'window',
+                available_weekdays VARCHAR(20) NULL,
+                available_start_time TIME NULL,
+                available_end_time TIME NULL,
+                fixed_weekly_slots LONGTEXT NULL,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
                 PRIMARY KEY  (id),
-                KEY is_active (is_active)
+                KEY is_active (is_active),
+                KEY staff_user_id (staff_user_id)
             ) {$charset_collate};";
         }
 
@@ -51,6 +60,7 @@ class LTLB_DB_Schema {
                 end_at DATETIME NOT NULL,
                 status VARCHAR(20) NOT NULL DEFAULT 'pending',
                 timezone VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin',
+                seats SMALLINT UNSIGNED NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
                 PRIMARY KEY  (id),

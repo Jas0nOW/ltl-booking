@@ -1,23 +1,48 @@
-(Phase 1) Tables and minimal schema
+# LazyBookings DB Schema (v0.4.4)
 
-All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
+Alle Custom Tables nutzen Prefix: `$wpdb->prefix . 'lazy_' . <name>`.
+Schema wird per `dbDelta()` gepflegt und bei Versionswechsel automatisch migriert.
 
-`lazy_services`:
+Hinweis: WordPress entfernt via `dbDelta()` keine alten Spalten automatisch. Neue Spalten werden hinzugefügt.
+
+---
+
+## `lazy_services`
+
+Service/Kurs bzw. (semantisch) Room Type.
+
 - `id` BIGINT UNSIGNED PK AI
 - `name` VARCHAR(190) NOT NULL
 - `description` LONGTEXT NULL
+- `staff_user_id` BIGINT UNSIGNED NULL
 - `duration_min` SMALLINT UNSIGNED NOT NULL DEFAULT 60
 - `buffer_before_min` SMALLINT UNSIGNED NOT NULL DEFAULT 0
 - `buffer_after_min` SMALLINT UNSIGNED NOT NULL DEFAULT 0
 - `price_cents` INT UNSIGNED NOT NULL DEFAULT 0
 - `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
-- `is_group` TINYINT(1) NOT NULL DEFAULT 0 (Group Booking Feature)
-- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
+- `is_group` TINYINT(1) NOT NULL DEFAULT 0
+- `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1
+
+Service Availability:
+- `availability_mode` VARCHAR(20) NOT NULL DEFAULT 'window'  (`window` | `fixed`)
+- `available_weekdays` VARCHAR(20) NULL  (CSV: `0..6`, 0=Sun)
+- `available_start_time` TIME NULL
+- `available_end_time` TIME NULL
+- `fixed_weekly_slots` LONGTEXT NULL (JSON array, z.B. `[{"weekday":5,"time":"18:00"}]`)
+
+Timestamps:
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_customers`:
+Indexes:
+- `KEY is_active (is_active)`
+- `KEY staff_user_id (staff_user_id)`
+
+---
+
+## `lazy_customers`
+
 - `id` BIGINT UNSIGNED PK AI
 - `email` VARCHAR(190) NOT NULL UNIQUE
 - `first_name` VARCHAR(100) NULL
@@ -27,7 +52,12 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_appointments`:
+---
+
+## `lazy_appointments`
+
+Ein Appointment ist eine Buchung mit Zeitspanne.
+
 - `id` BIGINT UNSIGNED PK AI
 - `service_id` BIGINT UNSIGNED NOT NULL
 - `customer_id` BIGINT UNSIGNED NOT NULL
@@ -36,60 +66,81 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
-- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1 (Group Booking Feature)
+- `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_resources`:
+Indexes:
+- `KEY service_id (service_id)`
+- `KEY customer_id (customer_id)`
+- `KEY start_at (start_at)`
+- `KEY end_at (end_at)`
+- `KEY status (status)`
+- `KEY status_start (status, start_at)`
+- `KEY time_range (start_at, end_at)`
+
+---
+
+## `lazy_resources`
+
+Resource = Raum/Studio/Equipment/Hotelzimmer.
+
 - `id` BIGINT UNSIGNED PK AI
 - `name` VARCHAR(190) NOT NULL
-- `capacity` SMALLINT UNSIGNED NOT NULL DEFAULT 1
+- `description` LONGTEXT NULL
+- `capacity` INT UNSIGNED NOT NULL DEFAULT 1
 - `is_active` TINYINT(1) NOT NULL DEFAULT 1
 - `created_at` DATETIME NOT NULL
 - `updated_at` DATETIME NOT NULL
 
-`lazy_service_resources` (mapping table):
+Indexes:
+- `KEY is_active (is_active)`
+
+---
+
+## Junction Tables
+
+### `lazy_service_resources`
 - `service_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- PRIMARY KEY (service_id, resource_id)
-- KEY resource_id (resource_id)
+- PRIMARY KEY (`service_id`,`resource_id`)
+- KEY `resource_id` (`resource_id`)
 
-`lazy_appointment_resources` (mapping table):
+### `lazy_appointment_resources`
 - `appointment_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- PRIMARY KEY (appointment_id, resource_id)
-- KEY resource_id (resource_id)
+- PRIMARY KEY (`appointment_id`,`resource_id`)
+- KEY `resource_id` (`resource_id`)
 
-## Phase 4 (Hotel Mode) Schema Notes
+---
 
-**No new tables required.** Hotel mode reuses existing schema with different semantics:
+## Staff Tables
 
-- **lazy_services**: Room Types (e.g., "Double Room", "Suite")
-  - `is_group` and `max_seats_per_booking` remain unused in hotel mode
-  - `price_cents` = nightly rate (e.g., 10000 = 100.00 EUR/night)
+### `lazy_staff_hours`
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `weekday` TINYINT NOT NULL (0=Sun..6=Sat)
+- `start_time` TIME NOT NULL
+- `end_time` TIME NOT NULL
+- `is_active` TINYINT(1) NOT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-- **lazy_resources**: Rooms (e.g., "Room 101", "Room 102")
-  - `capacity` = max guests per room (e.g., 2 for double room, 4 for family room)
-  - Hotel mode validates available rooms by: `SUM(seats for overlapping bookings) + new_guests <= capacity`
+Indexes:
+- `KEY user_id (user_id)`
+- `KEY user_weekday (user_id, weekday)`
 
-- **lazy_appointments**: Hotel bookings reuse appointment table
-  - `start_at` = check-in date at hotel_checkin_time (e.g., 2025-12-20 15:00)
-  - `end_at` = check-out date at hotel_checkout_time (e.g., 2025-12-22 11:00)
-  - `seats` = number of guests for this booking (e.g., 2)
-  - Check-out is exclusive: if Room 101 booked with checkout 2025-12-22, next booking can start 2025-12-22 (no overlap)
+### `lazy_staff_exceptions`
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `date` DATE NOT NULL
+- `is_off_day` TINYINT(1) NOT NULL
+- `start_time` TIME NULL
+- `end_time` TIME NULL
+- `note` TEXT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-- **lazy_service_resources**: Room Type → Rooms mapping (unchanged)
-  - Service (Room Type) can map to multiple Resources (Rooms)
-  - Example: Service "Double Room" maps to Resource "Room 101" and "Room 102"
-
-- **lazy_appointment_resources**: Booking → Assigned Room (unchanged)
-  - Tracks which room is assigned to a booking
-  - Example: Appointment 42 assigned to Resource 5 (Room 102)
-
-## Phase 4 Hotel Mode Settings
-
-Settings stored in wp_options (lazy_settings):
-- `hotel_checkin_time` (string, format HH:mm, e.g., "15:00")
-- `hotel_checkout_time` (string, format HH:mm, e.g., "11:00")
-- `hotel_min_nights` (int, minimum booking length, e.g., 1)
-- `hotel_max_nights` (int, maximum booking length, e.g., 30)
+Indexes:
+- `KEY user_id (user_id)`
+- `KEY user_date (user_id, date)`

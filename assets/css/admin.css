@@ -1,0 +1,580 @@
+/**
+ * LazyBookings Admin Styles
+ */
+
+/* Shared Admin Header */
+.ltlb-admin .ltlb-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    margin: 0 0 16px 0;
+    background: var(--lazy-panel-bg, #fff);
+    border: 1px solid var(--lazy-border-color, #ccd0d4);
+    border-radius: var(--lazy-border-radius, 6px);
+    box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
+}
+
+.ltlb-admin .ltlb-admin-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.ltlb-admin .ltlb-admin-header__icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--lazy-primary, #2271b1);
+}
+
+.ltlb-admin .ltlb-admin-header__titles { line-height: 1.2; }
+
+.ltlb-admin .ltlb-admin-header__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--lazy-text, #1d2327);
+}
+
+.ltlb-admin .ltlb-admin-header__subtitle {
+    font-size: 12px;
+    color: #646970;
+}
+
+.ltlb-admin .ltlb-admin-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.ltlb-admin .ltlb-admin-header__actions {
+    display: flex;
+    align-items: center;
+}
+
+/* Design page: Frontend/Backend sub-tabs */
+.ltlb-admin .ltlb-design-subnav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ltlb-admin .ltlb-admin-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ltlb-admin .ltlb-admin-lang select {
+    height: 32px;
+}
+
+.ltlb-admin .ltlb-admin-tab {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--lazy-text, #1d2327);
+    transition: background var(--lazy-transition-duration, 200ms) ease,
+                border-color var(--lazy-transition-duration, 200ms) ease,
+                color var(--lazy-transition-duration, 200ms) ease;
+}
+
+.ltlb-admin .ltlb-admin-tab:hover {
+    background: rgba(0,0,0,0.03);
+    border-color: var(--lazy-border-color, #ccd0d4);
+}
+
+.ltlb-admin .ltlb-admin-tab.is-active {
+    background: var(--lazy-primary, #2271b1);
+    color: var(--lazy-button-text, #fff);
+}
+
+@media (max-width: 1024px) {
+    .ltlb-admin .ltlb-admin-header { flex-direction: column; align-items: flex-start; }
+    .ltlb-admin .ltlb-admin-header__nav { width: 100%; justify-content: flex-start; }
+}
+
+.ltlb-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+/* Premium admin look (exclude dashboard) */
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card {
+    background: var(--lazy-panel-bg, #fff);
+    border: 1px solid var(--lazy-border-color, #ccd0d4);
+    border-radius: var(--lazy-border-radius, 6px);
+    box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card > h2,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card > h3 {
+    margin-top: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .submit {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ltlb-card .description {
+    display: block;
+    margin-top: 6px;
+    color: #646970;
+}
+
+/* Calendar layout (calendar + details side panel) */
+.ltlb-admin .ltlb-calendar-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 16px;
+    align-items: start;
+}
+
+/* Calendar container should read like a panel/card */
+.ltlb-admin #ltlb-admin-calendar {
+    background: var(--lazy-panel-bg, #fff);
+    border: 1px solid var(--lazy-border-color, #ccd0d4);
+    border-radius: var(--lazy-border-radius, 8px);
+    box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
+    padding: 10px;
+}
+
+@media (max-width: 1200px) {
+    .ltlb-admin .ltlb-calendar-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ltlb-admin .ltlb-calendar-layout__side {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+}
+
+.ltlb-admin .ltlb-calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 10px 0;
+}
+
+.ltlb-admin .ltlb-calendar-legend__item {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.ltlb-admin .ltlb-calendar-details-empty {
+    padding: 12px 12px;
+    border: 1px dashed rgba(0,0,0,0.12);
+    border-radius: 6px;
+    background: rgba(0,0,0,0.02);
+}
+
+/* Calendar details panel */
+.ltlb-admin .ltlb-calendar-details {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.ltlb-admin .ltlb-calendar-details__header {
+    margin-bottom: 10px;
+}
+
+.ltlb-admin .ltlb-calendar-details__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ltlb-admin .ltlb-calendar-details__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ltlb-admin .ltlb-muted {
+    color: #646970;
+    font-size: 12px;
+}
+
+/* FullCalendar event status colors */
+.ltlb-admin .fc .ltlb-fc-status-confirmed {
+    background-color: #d1fae5;
+    border-color: #d1fae5;
+    color: #065f46;
+}
+
+.ltlb-admin .fc .ltlb-fc-status-pending {
+    background-color: #fef3c7;
+    border-color: #fef3c7;
+    color: #92400e;
+}
+
+.ltlb-admin .fc .ltlb-fc-status-cancelled,
+.ltlb-admin .fc .ltlb-fc-status-canceled {
+    background-color: #fee2e2;
+    border-color: #fee2e2;
+    color: #991b1b;
+}
+
+.ltlb-admin .fc .ltlb-fc-status-confirmed .fc-event-main,
+.ltlb-admin .fc .ltlb-fc-status-pending .fc-event-main,
+.ltlb-admin .fc .ltlb-fc-status-cancelled .fc-event-main,
+.ltlb-admin .fc .ltlb-fc-status-canceled .fc-event-main {
+    color: inherit;
+}
+
+/* FullCalendar polish */
+.ltlb-admin .fc {
+    --fc-border-color: rgba(0,0,0,0.10);
+}
+
+.ltlb-admin .fc-theme-standard td,
+.ltlb-admin .fc-theme-standard th {
+    border-style: solid;
+    border-color: var(--fc-border-color);
+}
+
+.ltlb-admin .fc .fc-scrollgrid,
+.ltlb-admin .fc .fc-scrollgrid table {
+    border-color: var(--fc-border-color);
+}
+
+/* TimeGrid: remove “dotted stitches” by forcing solid lane separators */
+.ltlb-admin .fc .fc-timegrid-slot,
+.ltlb-admin .fc .fc-timegrid-slot-lane,
+.ltlb-admin .fc .fc-timegrid-divider {
+    border-style: solid;
+    border-color: rgba(0,0,0,0.08);
+}
+
+.ltlb-admin .fc .fc-timegrid-slot {
+    border-bottom-width: 1px;
+    height: 2.2em;
+}
+
+.ltlb-admin .fc .fc-timegrid-slot-label {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.ltlb-admin .fc .fc-timegrid-col-frame {
+    background: #fff;
+}
+
+.ltlb-admin .fc .fc-timegrid-now-indicator-line {
+    border-width: 2px;
+}
+
+.ltlb-admin .fc .fc-toolbar-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ltlb-admin .fc .fc-button {
+    border-radius: 6px;
+}
+
+.ltlb-admin .fc .fc-timegrid-col.fc-day-today,
+.ltlb-admin .fc .fc-timegrid-col.fc-day-today .fc-timegrid-col-frame,
+.ltlb-admin .fc .fc-col-header-cell.fc-day-today,
+.ltlb-admin .fc .fc-daygrid-day.fc-day-today {
+    background: rgba(34, 113, 177, 0.04);
+}
+
+@supports (background: color-mix(in srgb, #000 10%, transparent)) {
+    .ltlb-admin .fc .fc-timegrid-col.fc-day-today,
+    .ltlb-admin .fc .fc-timegrid-col.fc-day-today .fc-timegrid-col-frame,
+    .ltlb-admin .fc .fc-col-header-cell.fc-day-today,
+    .ltlb-admin .fc .fc-daygrid-day.fc-day-today {
+        background: color-mix(in srgb, var(--wp-admin-theme-color, #2271b1) 6%, transparent);
+    }
+}
+
+.ltlb-admin .fc .fc-timegrid-event,
+.ltlb-admin .fc .fc-daygrid-event {
+    border-radius: 6px;
+    padding: 2px 4px;
+}
+
+.ltlb-admin .fc .ltlb-fc-event {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+.ltlb-admin .fc .ltlb-fc-time {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.ltlb-admin .fc .ltlb-fc-lines {
+    min-width: 0;
+}
+
+.ltlb-admin .fc .ltlb-fc-service {
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.ltlb-admin .fc .ltlb-fc-customer {
+    font-size: 11px;
+    opacity: 0.9;
+    line-height: 1.15;
+}
+
+.ltlb-admin .fc .ltlb-fc-selected {
+    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+    outline-offset: 1px;
+}
+
+.ltlb-admin .ltlb-calendar-details__section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.ltlb-admin .ltlb-calendar-details__section-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.ltlb-admin .ltlb-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ltlb-admin .ltlb-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.ltlb-admin .ltlb-form-grid input,
+.ltlb-admin .ltlb-form-grid textarea,
+.ltlb-admin .ltlb-inline select {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Ensure headings inside cards look good */
+.ltlb-card h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.ltlb-card h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    font-size: 1.1em;
+}
+
+/* Form table adjustments inside cards */
+.ltlb-card .form-table th {
+    padding: 15px 10px 15px 0;
+}
+
+.ltlb-card .form-table td {
+    padding: 15px 10px;
+}
+
+/* Design Page Styles */
+.ltlb-design-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: flex-start;
+}
+.ltlb-design-settings {
+    flex: 1;
+    min-width: 300px;
+    max-width: 800px;
+}
+.ltlb-design-preview-sidebar {
+    flex: 0 0 350px;
+    position: sticky;
+    top: 50px;
+    align-self: flex-start;
+}
+.ltlb-preview-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-preview-card {
+    background: var(--lazy-panel-bg, #fff);
+    border: 1px solid var(--lazy-border-color, #ccd0d4);
+    border-radius: var(--lazy-border-radius, 6px);
+    box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-preview-card > h3 {
+    margin-top: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-preview-card > h4 {
+    margin-top: 0;
+}
+.ltlb-color-input {
+    width: 60px;
+    height: 40px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    padding: 2px;
+    border-radius: 4px;
+}
+.ltlb-design-settings .form-table th { padding: 15px 10px 15px 0; width: 200px; }
+.ltlb-design-settings .form-table td { padding: 15px 10px; }
+
+.ltlb-design-settings .form-table {
+    table-layout: fixed;
+}
+
+.ltlb-design-settings .form-table th {
+    width: 220px;
+}
+
+.ltlb-design-settings .form-table td input[type="number"] {
+    max-width: 120px;
+}
+
+@media (max-width: 1100px) {
+    .ltlb-design-container { flex-direction: column-reverse; }
+    .ltlb-design-preview-sidebar { position: static; width: 100%; flex: none; }
+    .ltlb-design-settings { width: 100%; max-width: 100%; }
+}
+
+/* Status Badges */
+.ltlb-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.status-active, .status-confirmed { background: #d1fae5; color: #065f46; }
+.status-inactive { background: #f3f4f6; color: #374151; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-canceled { background: #fee2e2; color: #991b1b; }
+
+/* Dashboard Stats */
+.ltlb-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.ltlb-stat-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ltlb-stat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    margin-right: 15px;
+    color: #2271b1;
+}
+.ltlb-stat-content {
+    display: flex;
+    flex-direction: column;
+}
+.ltlb-stat-label {
+    color: #646970;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.ltlb-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1d2327;
+    line-height: 1.2;
+}
+
+/* Filters */
+.ltlb-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.ltlb-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.ltlb-filter-group label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #646970;
+}
+.ltlb-filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    align-items: flex-end;
+    flex-grow: 1;
+}

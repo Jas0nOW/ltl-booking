@@ -66,7 +66,9 @@ class HotelEngine implements BookingEngineInterface {
         }
 
         // Get blocked/occupied resources for the date range
-        $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) $ls = [];
+        $include_pending = ! empty( $ls['pending_blocks'] );
         $blocked = $appt_res_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
 
         // Check which rooms are available
@@ -144,6 +146,16 @@ class HotelEngine implements BookingEngineInterface {
             return new WP_Error('unavailable', $avail['error']);
         }
 
+		$free_ids = isset( $avail['resource_ids'] ) && is_array( $avail['resource_ids'] ) ? array_values( $avail['resource_ids'] ) : [];
+		if ( empty( $free_ids ) ) {
+			return new WP_Error( 'unavailable', __( 'No rooms available for the selected dates.', 'ltl-bookings' ) );
+		}
+
+        $chosen = isset( $payload['resource_id'] ) ? intval( $payload['resource_id'] ) : 0;
+        if ( $chosen > 0 && ! in_array( $chosen, $free_ids, true ) ) {
+            return new WP_Error( 'unavailable', __( 'Selected room is no longer available.', 'ltl-bookings' ) );
+        }
+
         // Get times from settings
         $ls = get_option( 'lazy_settings', [] );
         if ( ! is_array( $ls ) ) $ls = [];
@@ -186,6 +198,7 @@ class HotelEngine implements BookingEngineInterface {
             'status'      => $default_status,
             'timezone'    => LTLB_Time::get_site_timezone_string(),
             'seats'       => $guests,
+			'skip_conflict_check' => true,
         ] );
 
         if ( is_wp_error( $appt_id ) ) {
@@ -193,35 +206,13 @@ class HotelEngine implements BookingEngineInterface {
         }
 
         // Assign resource (room)
-        $svc_res_repo = new LTLB_ServiceResourcesRepository();
-        $res_repo = new LTLB_ResourceRepository();
         $appt_res_repo = new LTLB_AppointmentResourcesRepository();
-
-        $allowed = $svc_res_repo->get_resources_for_service( $service_id );
-        if ( empty( $allowed ) ) {
-            $all = $res_repo->get_all();
-            $allowed = array_map(function($r){ return intval($r['id']); }, $all );
-        }
-
-        // Try explicit resource choice first
-        $chosen = isset($payload['resource_id']) ? intval($payload['resource_id']) : 0;
-        if ( $chosen > 0 && in_array($chosen, $allowed, true) ) {
+        if ( $chosen > 0 ) {
             $appt_res_repo->set_resource_for_appointment( intval($appt_id), $chosen );
         } else {
-            // Auto-assign first available room
-            $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
-            $blocked = $appt_res_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
-
-            foreach ( $allowed as $rid ) {
-                $r = $res_repo->get_by_id( intval($rid) );
-                if ( ! $r ) continue;
-                $cap = intval( $r['capacity'] ?? 1 );
-                $used = isset( $blocked[ $rid ] ) ? intval( $blocked[ $rid ] ) : 0;
-                if ( ($used + $guests) <= $cap ) {
-                    $appt_res_repo->set_resource_for_appointment( intval($appt_id), intval($rid) );
-                    break;
-                }
-            }
+            // Auto-assign first available room computed during availability check
+            $rid = intval( $free_ids[0] );
+            $appt_res_repo->set_resource_for_appointment( intval($appt_id), $rid );
         }
 
         // Send notifications
