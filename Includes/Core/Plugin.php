@@ -20,19 +20,24 @@ class LTLB_Plugin {
     private function load_classes(): void {
 
         // Utilities
-        require_once LTLB_PATH . 'includes/Util/Sanitizer.php';
-        require_once LTLB_PATH . 'includes/Util/Time.php';
-        require_once LTLB_PATH . 'includes/Util/Notices.php';
+        require_once LTLB_PATH . 'Includes/Util/Sanitizer.php';
+        require_once LTLB_PATH . 'Includes/Util/Time.php';
+        require_once LTLB_PATH . 'Includes/Util/Notices.php';
+        require_once LTLB_PATH . 'Includes/Util/LockManager.php';
+        require_once LTLB_PATH . 'Includes/Util/Logger.php';
+        require_once LTLB_PATH . 'Includes/Util/Mailer.php';
+        require_once LTLB_PATH . 'Includes/Util/Validator.php';
+        require_once LTLB_PATH . 'Includes/Util/Availability.php';
 
         // Repositories
-        require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/ResourceRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/AppointmentResourcesRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/ServiceResourcesRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/StaffHoursRepository.php';
-        require_once LTLB_PATH . 'includes/Repository/StaffExceptionsRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ServiceRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/CustomerRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/AppointmentRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ResourceRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/AppointmentResourcesRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/StaffHoursRepository.php';
+        require_once LTLB_PATH . 'Includes/Repository/StaffExceptionsRepository.php';
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
@@ -43,12 +48,18 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
         require_once LTLB_PATH . 'admin/Pages/StaffPage.php';
         require_once LTLB_PATH . 'admin/Pages/ResourcesPage.php';
+        require_once LTLB_PATH . 'admin/Pages/DiagnosticsPage.php';
+        require_once LTLB_PATH . 'admin/Pages/PrivacyPage.php';
         // Admin: profile helpers
-        require_once LTLB_PATH . 'includes/Admin/StaffProfile.php';
+        require_once LTLB_PATH . 'Includes/Admin/StaffProfile.php';
+        // Public: Shortcodes
+        require_once LTLB_PATH . 'public/Shortcodes.php';
     }
 
     public function on_init(): void {
-        // Phase 1: Shortcodes/CPT/Assets registrieren
+        // Initialize Shortcodes
+        LTLB_Shortcodes::init();
+        
         // instantiate profile handler
         if ( is_admin() ) {
             if ( class_exists('LTLB_Admin_StaffProfile') ) {
@@ -135,6 +146,26 @@ class LTLB_Plugin {
             'ltlb_design',
             [ $this, 'render_design_page' ]
         );
+
+        // Diagnostics
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Diagnostics',
+            'Diagnostics',
+            'manage_options',
+            'ltlb_diagnostics',
+            [ $this, 'render_diagnostics_page' ]
+        );
+
+        // Privacy
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Privacy & GDPR',
+            'Privacy',
+            'manage_options',
+            'ltlb_privacy',
+            [ $this, 'render_privacy_page' ]
+        );
     }
 
     public function render_dashboard_page(): void {
@@ -207,6 +238,24 @@ class LTLB_Plugin {
         echo '<div class="wrap"><h1>Resources</h1></div>';
     }
 
+    public function render_diagnostics_page(): void {
+        if ( class_exists('LTLB_DiagnosticsPage') ) {
+            $page = new LTLB_DiagnosticsPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Diagnostics</h1></div>';
+    }
+
+    public function render_privacy_page(): void {
+        if ( class_exists('LTLB_PrivacyPage') ) {
+            $page = new LTLB_PrivacyPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Privacy</h1></div>';
+    }
+
     public function register_rest_routes(): void {
         register_rest_route('ltlb/v1', '/availability', [
             'methods' => 'GET',
@@ -223,9 +272,6 @@ class LTLB_Plugin {
         }
 
         // instantiate availability and compute
-        if ( ! class_exists('Availability') ) {
-            require_once LTLB_PATH . 'includes/Util/Availability.php';
-        }
         $avail = new Availability();
 
         $want_slots = $request->get_param('slots');
@@ -254,7 +300,7 @@ class LTLB_Plugin {
         $text = $design['text'] ?? '#222222';
         $accent = $design['accent'] ?? '#ffcc00';
 
-        echo "<style id=\"ltlb-design-vars\">:root{--lazy-bg:${bg};--lazy-primary:${primary};--lazy-text:${text};--lazy-accent:${accent};}</style>";
+        echo "<style id=\"ltlb-design-vars\">:root{--lazy-bg:{$bg};--lazy-primary:{$primary};--lazy-text:{$text};--lazy-accent:{$accent};}</style>";
     }
 
     public function print_design_css_admin(): void {
@@ -270,6 +316,6 @@ class LTLB_Plugin {
         $text = $design['text'] ?? '#222222';
         $accent = $design['accent'] ?? '#ffcc00';
 
-        echo "<style id=\"ltlb-design-vars-admin\">:root{--lazy-bg:${bg};--lazy-primary:${primary};--lazy-text:${text};--lazy-accent:${accent};}</style>";
+        echo "<style id=\"ltlb-design-vars-admin\">:root{--lazy-bg:{$bg};--lazy-primary:{$primary};--lazy-text:{$text};--lazy-accent:{$accent};}</style>";
     }
 }

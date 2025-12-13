@@ -320,8 +320,25 @@ Seiten:
 - Stripe/PayPal modular
 - Invoices Table + PDF Export (später)
 
-### Phase 4 – Dual Template Engine (Hotel)
-- Check-in/out Logik, Nights, Room inventory
+### Phase 4 – Hotel Mode MVP (Dual Template Engine)
+- Template mode: service (time-slot booking) vs hotel (date-range booking)
+- Hotel bookings: check-in/check-out dates, nights calculation, room assignment
+- Room types (services) and rooms (resources) with capacity management
+- Implemented in 9 commits (see DECISIONS.md Phase 4)
+
+### Phase 4.1 – Production Readiness (9 Commits)
+**Goal**: Harden plugin for production deployment
+- **Commit 1**: Health/Diagnostics page (system info, DB stats, manual migrations)
+- **Commit 2**: Named Lock Protection (MySQL GET_LOCK to prevent race conditions)
+- **Commit 3**: Indexes & Query Performance (composite indexes for staff queries)
+- **Commit 4**: Admin UX Upgrade (filters by service/customer, CSV export)
+- **Commit 5**: Email Deliverability (Reply-To field, test email button, validation)
+- **Commit 6**: GDPR Basics (retention settings, manual customer anonymization)
+- **Commit 7**: Logging System (privacy-safe logging with levels, PII hashing)
+- **Commit 8**: QA Automation (smoke test checklist, upgrade test procedures)
+- **Commit 9**: Documentation Sweep (updated DECISIONS, SPEC, QA_CHECKLIST)
+
+**Current Version**: 0.4.0 (DB version: 0.4.0)
 
 ### Phase 5 – React SPA (Optional, wenn MVP stabil)
 - Admin & Wizard als React ersetzen (REST bleibt)

@@ -58,3 +58,136 @@ If any step fails, collect screenshots, DB rows, and wp-debug.log entries and re
 
 - Optional status page (admin):
   - Visit the resource status admin page (if installed) and verify counts for resources, mappings, and active bookings per resource.
+## Production Readiness Tests (Phase 4.1)
+
+### Smoke Test for Release
+
+This minimal test verifies core functionality is working after plugin update/activation:
+
+**Prerequisites:**
+- Fresh WordPress installation OR existing site with LazyBookings installed
+- Admin access
+- Test email account accessible
+
+**Test Steps:**
+
+1. **Plugin Activation**
+   - [ ] Activate/Update plugin without fatal errors
+   - [ ] Visit LazyBookings → Diagnostics
+   - [ ] Verify DB version matches plugin version (0.4.0)
+   - [ ] Verify all 8 tables show "✓ Exists" status
+
+2. **Create Test Data**
+   - [ ] Create 1 Service (e.g., "Test Service", 60min, 10€)
+   - [ ] Create 1 Resource (e.g., "Test Room", capacity 2)
+   - [ ] Map Resource to Service (Services → Edit → Resources)
+   - [ ] Verify saves without errors
+
+3. **Frontend Booking Flow**
+   - [ ] Create test page with `[lazy_book]` shortcode
+   - [ ] Select service, date, time slot
+   - [ ] Fill customer details with test email
+   - [ ] Submit booking
+   - [ ] Verify success message displayed
+   - [ ] Check Appointments admin page shows new booking
+
+4. **Admin Functions**
+   - [ ] Open Appointments page
+   - [ ] Change appointment status to "Confirmed"
+   - [ ] Verify status updated
+   - [ ] Test CSV Export button - downloads appointments.csv
+   - [ ] Test customer search filter (search by email)
+
+5. **Settings & Email**
+   - [ ] Settings → Email section
+   - [ ] Enter test email in "Send test email to" field
+   - [ ] Click "Send Test Email"
+   - [ ] Check email received with correct From/Reply-To headers
+
+6. **Diagnostics & Health**
+   - [ ] Visit Diagnostics page
+   - [ ] Verify system info displays (WP version, PHP version, template mode)
+   - [ ] Verify database statistics show correct counts
+   - [ ] Click "Run Migrations" button - no errors
+
+**Expected Result:** All steps pass without fatal errors, bookings create successfully, emails send correctly.
+
+### Upgrade Test from Previous DB Version
+
+This test verifies smooth upgrade path from previous plugin versions.
+
+**Prerequisites:**
+- Site running previous LazyBookings version (e.g., 0.3.0)
+- Existing appointments/customers/services in database
+- Backup database before test
+
+**Test Steps:**
+
+1. **Pre-Upgrade Verification**
+   - [ ] Note current plugin version (wp-admin → Plugins)
+   - [ ] Record current `ltlb_db_version` option value
+   - [ ] Export appointments via CSV (keep as reference)
+   - [ ] Count records: services, customers, appointments, resources
+   - [ ] Take screenshot of Diagnostics page (table status)
+
+2. **Perform Upgrade**
+   - [ ] Update plugin via WordPress admin OR upload new version
+   - [ ] Activate updated plugin
+   - [ ] Check for activation errors in debug.log
+
+3. **Post-Upgrade Verification**
+   - [ ] Visit Diagnostics page
+   - [ ] Verify `ltlb_db_version` updated to 0.4.0
+   - [ ] Verify all tables still show "✓ Exists"
+   - [ ] Verify record counts match pre-upgrade counts
+   - [ ] Check for new tables/columns (if applicable):
+     - Verify indexes added (check schema changes)
+
+4. **Data Integrity**
+   - [ ] Open Appointments page - all appointments display correctly
+   - [ ] Open Customers page - all customers present
+   - [ ] Open Services page - all services intact
+   - [ ] Open Resources page - all resources present
+   - [ ] Test appointment status change - verify updates work
+
+5. **Feature Regression**
+   - [ ] Test frontend booking (create new appointment)
+   - [ ] Test email sending (Settings → Send Test Email)
+   - [ ] Test CSV export (Appointments → Export CSV)
+   - [ ] Test filters (filter appointments by status, service, customer)
+
+6. **New Features (Phase 4.1)**
+   - [ ] Verify Diagnostics menu item exists
+   - [ ] Verify Privacy menu item exists (new in 0.4.0)
+   - [ ] Test customer anonymization (Privacy → Manual Anonymization)
+   - [ ] Verify logging settings present (Settings → Logging Settings)
+   - [ ] Enable logging, create booking, check debug.log for LTLB-INFO entries
+
+**Expected Result:** 
+- All pre-existing data preserved
+- No data loss or corruption
+- All features from previous version still work
+- New Phase 4.1 features accessible and functional
+- `ltlb_db_version` updated correctly
+
+**Rollback Plan:** 
+If upgrade fails critically, restore database backup and reinstall previous plugin version.
+
+### Performance & Load Testing (Optional)
+
+**Concurrent Booking Test:**
+- Use browser dev tools or automated script
+- Simulate 5+ simultaneous booking requests to same slot
+- Expected: Only 1 booking succeeds (or up to capacity), others rejected with lock timeout or conflict error
+- Verify no duplicate bookings in database
+
+**Lock Manager Validation:**
+- Enable logging (Settings → Logging → Debug level)
+- Create 3 concurrent bookings to same slot
+- Check debug.log for "lock timeout" warnings
+- Verify GET_LOCK/RELEASE_LOCK behavior (MySQL logs if available)
+
+**Email Deliverability:**
+- Create 10 bookings in quick succession
+- Verify all confirmation emails sent (check mail queue/logs)
+- Verify no email failures block booking creation (graceful failure)

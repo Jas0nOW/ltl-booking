@@ -1,9 +1,6 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
-use WP_REST_Request;
-use WP_REST_Response;
-
 class LTLB_Shortcodes {
 	public static function init(): void {
 		add_shortcode( 'lazy_book', [ __CLASS__, 'render_lazy_book' ] );
@@ -240,42 +237,61 @@ class LTLB_Shortcodes {
 		$end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
 
 		$appointment_repo = new LTLB_AppointmentRepository();
-
-		// conflict check
-		if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $data['service_id'], null ) ) {
-			return new WP_Error( 'conflict', __( 'Selected slot is already booked.', 'ltl-bookings' ) );
-		}
-
-		// upsert customer
 		$customer_repo = new LTLB_CustomerRepository();
-		$customer_id = $customer_repo->upsert_by_email( [
-			'email'      => $data['email'],
-			'first_name' => $data['first'],
-			'last_name'  => $data['last'],
-			'phone'      => $data['phone'],
-		] );
 
-		if ( ! $customer_id ) {
-			return new WP_Error( 'customer_error', __( 'Unable to save customer.', 'ltl-bookings' ) );
-		}
+		// Build lock key for this booking slot
+		$lock_key = LTLB_LockManager::build_service_lock_key( $data['service_id'], $start_at_sql, $data['resource_id'] ?: null );
 
-		$ls = get_option( 'lazy_settings', [] );
-		if ( ! is_array( $ls ) ) {
-			$ls = [];
-		}
-		$default_status = $ls['default_status'] ?? 'pending';
-		$appt_id = $appointment_repo->create( [
-			'service_id'  => $data['service_id'],
-			'customer_id' => $customer_id,
-			'start_at'    => $start_dt,
-			'end_at'      => $end_dt,
-			'status'      => $default_status,
-			'timezone'    => LTLB_Time::get_site_timezone_string(),
-		] );
+		// Execute booking within lock protection
+		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $appointment_repo, $customer_repo, $data, $start_at_sql, $end_at_sql, $start_dt, $end_dt ) {
+			// conflict check
+			if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $data['service_id'], null ) ) {
+				return new WP_Error( 'conflict', __( 'Selected slot is already booked.', 'ltl-bookings' ) );
+			}
 
-		if ( is_wp_error( $appt_id ) ) {
+			// upsert customer
+			$customer_id = $customer_repo->upsert_by_email( [
+				'email'      => $data['email'],
+				'first_name' => $data['first'],
+				'last_name'  => $data['last'],
+				'phone'      => $data['phone'],
+			] );
+
+			if ( ! $customer_id ) {
+				return new WP_Error( 'customer_error', __( 'Unable to save customer.', 'ltl-bookings' ) );
+			}
+
+			$ls = get_option( 'lazy_settings', [] );
+			if ( ! is_array( $ls ) ) {
+				$ls = [];
+			}
+			$default_status = $ls['default_status'] ?? 'pending';
+			$appt_id = $appointment_repo->create( [
+				'service_id'  => $data['service_id'],
+				'customer_id' => $customer_id,
+				'start_at'    => $start_dt,
+				'end_at'      => $end_dt,
+				'status'      => $default_status,
+				'timezone'    => LTLB_Time::get_site_timezone_string(),
+			] );
+
 			return $appt_id;
+		});
+
+		// Check if lock acquisition failed
+		if ( $result === false ) {
+			LTLB_Logger::warn( 'Booking lock timeout', [ 'service_id' => $data['service_id'], 'start' => $start_at_sql ] );
+			return new WP_Error( 'lock_timeout', __( 'Another booking is in progress. Please try again.', 'ltl-bookings' ) );
 		}
+
+		// Check if appointment creation returned error
+		if ( is_wp_error( $result ) ) {
+			LTLB_Logger::error( 'Booking creation failed: ' . $result->get_error_message(), [ 'service_id' => $data['service_id'], 'email' => $data['email'] ] );
+			return $result;
+		}
+
+		$appt_id = $result;
+		LTLB_Logger::info( 'Booking created successfully', [ 'appointment_id' => $appt_id, 'service_id' => $data['service_id'], 'email' => $data['email'] ] );
 
 		// If user selected a resource, try to persist it (validate capacity and mapping), otherwise select automatically
 		$service_resources_repo = new LTLB_ServiceResourcesRepository();

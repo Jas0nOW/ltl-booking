@@ -1,8 +1,6 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
-use WP_Error;
-
 class LTLB_AppointmentRepository {
 
 	private $table_name;
@@ -13,7 +11,7 @@ class LTLB_AppointmentRepository {
 	}
 
 	/**
-	 * Get all appointments with optional filters: from, to, status, service_id
+	 * Get all appointments with optional filters: from, to, status, service_id, customer_search
 	 * Returns ARRAY_A
 	 *
 	 * @param array $filters
@@ -22,23 +20,36 @@ class LTLB_AppointmentRepository {
 	public function get_all(array $filters = []): array {
 		global $wpdb;
 
+		$customers_table = $wpdb->prefix . 'lazy_customers';
+
 		$where = [];
 		$params = [];
+		$join = '';
+
+		// Customer search (email or name)
+		if ( ! empty( $filters['customer_search'] ) ) {
+			$join = " LEFT JOIN {$customers_table} c ON {$this->table_name}.customer_id = c.id";
+			$search = '%' . $wpdb->esc_like( $filters['customer_search'] ) . '%';
+			$where[] = "(c.email LIKE %s OR c.first_name LIKE %s OR c.last_name LIKE %s)";
+			$params[] = $search;
+			$params[] = $search;
+			$params[] = $search;
+		}
 
 		if ( ! empty( $filters['from'] ) ) {
-			$where[] = "start_at >= %s";
+			$where[] = "{$this->table_name}.start_at >= %s";
 			$params[] = $filters['from'];
 		}
 		if ( ! empty( $filters['to'] ) ) {
-			$where[] = "end_at <= %s";
+			$where[] = "{$this->table_name}.end_at <= %s";
 			$params[] = $filters['to'];
 		}
 		if ( ! empty( $filters['status'] ) ) {
-			$where[] = "status = %s";
+			$where[] = "{$this->table_name}.status = %s";
 			$params[] = $filters['status'];
 		}
 		if ( ! empty( $filters['service_id'] ) ) {
-			$where[] = "service_id = %d";
+			$where[] = "{$this->table_name}.service_id = %d";
 			$params[] = intval( $filters['service_id'] );
 		}
 
@@ -47,7 +58,7 @@ class LTLB_AppointmentRepository {
 			$where_sql = ' AND ' . implode(' AND ', $where);
 		}
 
-		$sql = "SELECT * FROM {$this->table_name} WHERE 1=1 {$where_sql} ORDER BY start_at DESC";
+		$sql = "SELECT {$this->table_name}.* FROM {$this->table_name} {$join} WHERE 1=1 {$where_sql} ORDER BY {$this->table_name}.start_at DESC";
 
 		if ( empty( $params ) ) {
 			$rows = $wpdb->get_results( $sql, ARRAY_A );

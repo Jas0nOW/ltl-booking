@@ -94,7 +94,100 @@ Migration decisions (Commit 2c.1 - auto-migrate):
 - `LTLB_Activator::activate()` continues to run a full `migrate()` during activation to ensure fresh installs create tables immediately.
 - `maybe_migrate()` is designed to be safe on frontend requests: it only compares versions and runs migrations when needed; migration failures are logged to PHP error log and do not fatal-error the page.
 
+## Phase 4.1 - Production Readiness (Commits 1-9)
 
+**Commit 1: Health/Diagnostics (DiagnosticsPage.php)**
+- New admin page showing system info: WP/PHP versions, database prefix, template mode, DB version, plugin version
+- Database statistics: counts for services, customers, appointments, resources
+- Table status check: verifies all 6 core tables exist and shows row counts
+- Manual "Run Migrations" button for admin troubleshooting (calls LTLB_DB_Migrator::migrate() with nonce protection)
+- Helps diagnose activation issues and provides visibility into database state
 
+**Commit 2: Named Lock Protection (LockManager.php)**
+- Implemented MySQL `GET_LOCK()` / `RELEASE_LOCK()` based locking to prevent race conditions during booking creation
+- Lock timeout set to 3 seconds (configurable via `LOCK_TIMEOUT` constant)
+- Lock keys use MD5 hash of service_id + start_at + resource_id (max 64 chars for MySQL compatibility)
+- Graceful fallback: if lock acquisition fails (timeout or MySQL doesn't support locks), returns error to user ("Another booking is in progress")
+- Applied to `Shortcodes::_create_appointment_from_submission()` via `LockManager::with_lock()` wrapper
+- Limitations documented: named locks are connection-based and won't work across separate DB connections; not all MySQL configurations support named locks
+- Significantly reduces double-booking risk compared to previous option-based mutex, but still not 100% guaranteed without true transactions
+
+**Commit 3: Indexes & Query Performance (Schema.php)**
+- Added composite indexes to `lazy_staff_hours`: `user_id`, `user_weekday (user_id, weekday)`
+- Added composite indexes to `lazy_staff_exceptions`: `user_id`, `user_date (user_id, date)`
+- These indexes optimize frequent queries: fetching staff hours by user, filtering by weekday, checking exceptions by date
+- Existing indexes on `lazy_appointments` (service_id, customer_id, start_at, status) already cover most query patterns
+- Future optimization: consider composite index on `lazy_appointments(service_id, start_at, status)` if filtering queries become bottleneck
+
+**Commit 4: Admin UX Upgrade (AppointmentsPage.php, AppointmentRepository.php)**
+- **Filters added**: Service dropdown filter, customer search (email/name via LEFT JOIN on customers table)
+- **CSV Export**: "Export CSV" button generates appointments CSV with headers: ID, Service, Customer Email, Customer Name, Resource, Start, End, Status, Created
+- **Repository enhancement**: `AppointmentRepository::get_all()` now supports `service_id` and `customer_search` filters
+- Customer search uses `LIKE` query on email, first_name, last_name with proper `esc_like()` escaping
+- Export respects current filters (can export filtered subset)
+- Improves admin workflow for large datasets and reporting needs
+
+**Commit 5: Email Deliverability (SettingsPage.php, Mailer.php)**
+- **Reply-To field**: Added optional `mail_reply_to` setting; if set, emails include `Reply-To:` header
+- **From email validation**: Uses `is_email()` validation before sending
+- **Test Email button**: Sends test email using current From/Reply-To settings to verify deliverability
+- Test email shows From name/email and Reply-To in message body for debugging
+- Mailer updated to include Reply-To header when configured
+- Helps diagnose email delivery issues before customers report problems
+
+**Commit 6: GDPR Basics (PrivacyPage.php)**
+- **Retention settings**: `retention_delete_canceled_days` (auto-delete canceled appointments after X days), `retention_anonymize_after_days` (auto-anonymize customer data after X days)
+- Settings default to 0 (disabled); must be explicitly configured
+- **Manual anonymization**: Admin can anonymize customer by email via nonce-protected form
+- Anonymization replaces email with `anonymized_{hash}@deleted.local`, name with "Anonymized User", clears phone/notes
+- **Future automation**: Retention cleanup via WP Cron (not yet implemented; documented as "Run Cleanup Now" placeholder)
+- Supports GDPR right to erasure and data minimization principles
+- Note: Full GDPR compliance requires additional measures (privacy policy, consent tracking, data export) - this is baseline implementation
+
+**Commit 7: Logging System (Logger.php)**
+- **Log levels**: error, warn, info, debug (hierarchical: debug includes all, error only critical)
+- **Privacy-safe**: Automatically hashes/truncates PII fields (email, phone, first_name, last_name, name)
+- Email logging format: `abc***@***.12345678` (first 3 chars + MD5 hash)
+- Other PII: `ab***1234` (first 2 chars + hash)
+- **Settings toggles**: `logging_enabled` (on/off), `log_level` (dropdown in Settings)
+- Logs written to WordPress debug.log via `error_log()` with `[LTLB-{LEVEL}]` prefix
+- Applied to Shortcodes booking flow: logs lock timeouts (warn), booking failures (error), successful bookings (info)
+- Requires `WP_DEBUG_LOG` enabled in wp-config.php
+- Helps troubleshoot production issues without exposing customer data in logs
+
+**Commit 8: QA Automation (QA_CHECKLIST.md)**
+- **Smoke Test for Release**: 6-step minimal test covering plugin activation, data creation, frontend booking, admin functions, email sending, diagnostics
+- **Upgrade Test from Previous DB Version**: 6-step test covering pre-upgrade data snapshot, upgrade execution, post-upgrade verification, data integrity checks, feature regression, new feature validation
+- **Performance & Load Testing**: Optional concurrent booking test, lock manager validation, email deliverability test
+- Provides checklist for manual QA before production deployment
+- Ensures no regressions during version upgrades (data loss, feature breakage)
+- Smoke test can be executed in < 10 minutes for rapid validation
+
+**Commit 9: Documentation Sweep**
+- Updated DECISIONS.md with all Phase 4.1 architectural decisions and rationale
+- Updated QA_CHECKLIST.md with comprehensive test scenarios
+- Verified consistency across SPEC.md, DB_SCHEMA.md, API.md
+- Plugin version: 0.4.0
+- DB version: 0.4.0 (tracked via `ltlb_db_version` option)
+
+**Overall Phase 4.1 Goal**: Harden plugin for production use with diagnostics, concurrency protection, admin productivity features, email reliability, GDPR basics, privacy-safe logging, and comprehensive QA procedures.
+
+---
+
+## Phase 4.1.1: Bug Fixes (Post-Review)
+
+**Junction Table Migration Fix (Migrator.php, Schema.php)**
+- **Problem**: dbDelta caused "Multiple primary key defined" errors on junction tables during plugin reactivation
+- **Root Cause**: dbDelta struggles with composite PRIMARY KEYs on existing tables, especially when trying to ALTER existing keys
+- **Additional Issue**: Some junction tables had AUTO_INCREMENT fields (incorrect for junction tables), preventing PRIMARY KEY drops
+- **Solution**: Implemented `ensure_junction_table()` helper method with 3-tier approach:
+  1. **New tables**: Creates using dbDelta
+  2. **Missing PRIMARY KEY**: Adds composite key manually
+  3. **Incorrect PRIMARY KEY**: Backs up data → drops table → recreates with correct structure → restores data
+- **Why recreate instead of ALTER**: MySQL doesn't allow `DROP PRIMARY KEY` on tables with AUTO_INCREMENT columns
+- **Data Safety**: Automatic backup/restore ensures no data loss during structure correction
+- **Schema Change**: Removed spaces in composite key syntax: `PRIMARY KEY (id1,id2)` instead of `PRIMARY KEY (id1, id2)` for better dbDelta compatibility
+- **Affected Tables**: `lazy_appointment_resources`, `lazy_service_resources`
+- **Impact**: Plugin now activates/deactivates cleanly without database errors, automatically repairs corrupted junction table structures from previous migrations while preserving all existing relationships
 
 

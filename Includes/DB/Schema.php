@@ -57,7 +57,10 @@ class LTLB_DB_Schema {
                 KEY service_id (service_id),
                 KEY customer_id (customer_id),
                 KEY start_at (start_at),
-                KEY status (status)
+                KEY status (status),
+                KEY status_start (status, start_at),
+                KEY end_at (end_at),
+                KEY time_range (start_at, end_at)
             ) {$charset_collate};";
         }
 
@@ -71,7 +74,9 @@ class LTLB_DB_Schema {
                 is_active TINYINT(1) NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id)
+                PRIMARY KEY (id),
+                KEY user_id (user_id),
+                KEY user_weekday (user_id, weekday)
             ) {$charset_collate};";
         }
 
@@ -86,7 +91,9 @@ class LTLB_DB_Schema {
                 note TEXT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id)
+                PRIMARY KEY (id),
+                KEY user_id (user_id),
+                KEY user_date (user_id, date)
             ) {$charset_collate};";
         }
 
@@ -108,7 +115,7 @@ class LTLB_DB_Schema {
             return "CREATE TABLE {$table_name} (
                 appointment_id BIGINT UNSIGNED NOT NULL,
                 resource_id BIGINT UNSIGNED NOT NULL,
-                PRIMARY KEY  (appointment_id, resource_id),
+                PRIMARY KEY (appointment_id,resource_id),
                 KEY resource_id (resource_id)
             ) {$charset_collate};";
         }
@@ -117,7 +124,7 @@ class LTLB_DB_Schema {
             return "CREATE TABLE {$table_name} (
                 service_id BIGINT UNSIGNED NOT NULL,
                 resource_id BIGINT UNSIGNED NOT NULL,
-                PRIMARY KEY  (service_id, resource_id),
+                PRIMARY KEY (service_id,resource_id),
                 KEY resource_id (resource_id)
             ) {$charset_collate};";
         }
