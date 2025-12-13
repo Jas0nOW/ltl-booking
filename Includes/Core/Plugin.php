@@ -31,6 +31,7 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/CustomersPage.php';
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
+        require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
     }
 
     public function on_init(): void {
@@ -86,14 +87,14 @@ class LTLB_Plugin {
             [ $this, 'render_settings_page' ]
         );
 
-        // Design (placeholder page)
+        // Design
         add_submenu_page(
             'ltlb_dashboard',
             'Design',
             'Design',
             'manage_options',
             'ltlb_design',
-            [ $this, 'render_settings_page' ]
+            [ $this, 'render_design_page' ]
         );
     }
 
@@ -138,6 +139,15 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>Settings</h1></div>';
+    }
+
+    public function render_design_page(): void {
+        if ( class_exists('LTLB_Admin_DesignPage') ) {
+            $page = new LTLB_Admin_DesignPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>Design</h1></div>';
     }
 
     public function register_rest_routes(): void {
