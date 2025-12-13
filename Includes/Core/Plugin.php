@@ -13,8 +13,20 @@ class LTLB_Plugin {
     }
 
     private function load_classes(): void {
+        // Utilities
+        require_once LTLB_PATH . 'includes/Util/Sanitizer.php';
+
+        // Repositories
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
+        require_once LTLB_PATH . 'includes/Repository/AppointmentRepository.php';
+
+        // Admin pages
+        require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
         require_once LTLB_PATH . 'admin/Pages/ServicesPage.php';
+        require_once LTLB_PATH . 'admin/Pages/CustomersPage.php';
+        require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
+        require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
     }
 
     public function on_init(): void {
