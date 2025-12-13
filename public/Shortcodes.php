@@ -217,6 +217,31 @@ class LTLB_Shortcodes {
 			return $appt_id;
 		}
 
+		// Assign a resource deterministically: pick first allowed resource with available capacity
+		$service_resources_repo = new LTLB_ServiceResourcesRepository();
+		$resource_repo = new LTLB_ResourceRepository();
+		$appt_resource_repo = new LTLB_AppointmentResourcesRepository();
+
+		$allowed_resources = $service_resources_repo->get_resources_for_service( intval( $data['service_id'] ) );
+		if ( empty( $allowed_resources ) ) {
+			$all = $resource_repo->get_all();
+			$allowed_resources = array_map(function($r){ return intval($r['id']); }, $all );
+		}
+
+		$include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+		$blocked_counts = $appt_resource_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
+
+		foreach ( $allowed_resources as $rid ) {
+			$res = $resource_repo->get_by_id( intval($rid) );
+			if ( ! $res ) continue;
+			$capacity = intval( $res['capacity'] ?? 1 );
+			$used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
+			if ( $used < $capacity ) {
+				$appt_resource_repo->set_resource_for_appointment( intval($appt_id), intval($rid) );
+				break;
+			}
+		}
+
 		// fetch fresh service and customer data and send notifications
 		$service = $service_repo->get_by_id( $data['service_id'] );
 		$customer = $customer_repo->get_by_id( $customer_id );
