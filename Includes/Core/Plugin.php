@@ -13,8 +13,10 @@ class LTLB_Plugin {
     }
 
     private function load_classes(): void {
+
         // Utilities
         require_once LTLB_PATH . 'includes/Util/Sanitizer.php';
+        require_once LTLB_PATH . 'includes/Util/Time.php';
 
         // Repositories
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';

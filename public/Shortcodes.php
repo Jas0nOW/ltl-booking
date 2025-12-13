@@ -25,6 +25,10 @@ class LTLB_Shortcodes {
 	<div class="ltlb-booking">
 			<form method="post">
 				<?php wp_nonce_field( 'ltlb_book_action', 'ltlb_book_nonce' ); ?>
+				<!-- honeypot field: bots will fill this -->
+				<div style="display:none;">
+					<label>Leave this empty<input type="text" name="ltlb_hp" value=""></label>
+				</div>
 				<h3><?php echo esc_html__( 'Book a service', 'ltl-bookings' ); ?></h3>
 
 				<p>
@@ -43,9 +47,12 @@ class LTLB_Shortcodes {
 					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
 						<select name="time_slot" required>
 							<?php
-							// basic slots 09:00 - 17:00 hourly
-							for ( $h = 9; $h <= 16; $h++ ) {
-								$label = sprintf('%02d:00', $h);
+							// generate slots for today using site timezone and LTLB_Time helper
+							$tz = LTLB_Time::wp_timezone();
+							$today = new DateTimeImmutable( 'now', $tz );
+							$slots = LTLB_Time::generate_slots_for_day( $today, 9, 17, 60 );
+							foreach ( $slots as $slot ) {
+								$label = $slot->format('H:i');
 								echo '<option value="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</option>';
 							}
 							?>
@@ -65,9 +72,31 @@ class LTLB_Shortcodes {
 	return ob_get_clean();
 	}
 	private static function handle_submission(): string {
-	if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Security check failed.', 'ltl-bookings' ) . '</div>';
-	}
+		if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
+			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+		}
+
+		// Honeypot: if filled, silently fail
+		if ( ! empty( $_POST['ltlb_hp'] ) ) {
+			return '<div class="ltlb-error">' . esc_html__( 'Unable to process request.', 'ltl-bookings' ) . '</div>';
+		}
+
+		// Simple rate limit per IP: 10 submits per 10 minutes
+		$ip = '';
+		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		}
+
+		if ( $ip ) {
+			$key = 'ltlb_rate_' . md5( $ip );
+			$count = (int) get_transient( $key );
+			if ( $count >= 10 ) {
+				return '<div class="ltlb-error">' . esc_html__( 'Too many requests. Please try again later.', 'ltl-bookings' ) . '</div>';
+			}
+			set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
+		}
 	$service_id = isset( $_POST['service_id'] ) ? intval( $_POST['service_id'] ) : 0;
 	$date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : '';
 	$time = isset( $_POST['time_slot'] ) ? sanitize_text_field( $_POST['time_slot'] ) : '';
@@ -86,19 +115,13 @@ class LTLB_Shortcodes {
 	$service = $service_repo->get_by_id( $service_id );
 	$duration = $service && isset( $service['duration_min'] ) ? intval( $service['duration_min'] ) : 60;
 
-	$start_at = $date . ' ' . $time . ':00';
-	$start_dt = DateTime::createFromFormat('Y-m-d H:i:s', $start_at);
-	if ( ! $start_dt ) {
-			// try Y-m-d H:i
-			$start_dt = DateTime::createFromFormat('Y-m-d H:i', $date . ' ' . $time);
-	}
-	if ( ! $start_dt ) return '<div class="ltlb-error">' . esc_html__( 'Invalid date/time.', 'ltl-bookings' ) . '</div>';
+	    $start_dt = LTLB_Time::parse_date_and_time( $date, $time );
+	    if ( ! $start_dt ) return '<div class="ltlb-error">' . esc_html__( 'Invalid date/time.', 'ltl-bookings' ) . '</div>';
 
-	$end_dt = clone $start_dt;
-	$end_dt->modify( '+' . $duration . ' minutes' );
+	    $end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
 
-	$start_at_sql = $start_dt->format('Y-m-d H:i:s');
-	$end_at_sql = $end_dt->format('Y-m-d H:i:s');
+	    $start_at_sql = LTLB_Time::format_wp_datetime( $start_dt );
+	    $end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
 
 	$appointment_repo = new LTLB_AppointmentRepository();
 
@@ -126,7 +149,7 @@ class LTLB_Shortcodes {
 			'start_at' => $start_at_sql,
 			'end_at' => $end_at_sql,
 			'status' => 'pending',
-			'timezone' => date_default_timezone_get() ?: 'UTC',
+			'timezone' => LTLB_Time::get_site_timezone_string(),
 	] );
 
 	if ( ! $appt_id ) {

@@ -64,13 +64,28 @@ class LTLB_AppointmentRepository {
 			'service_id' => isset($data['service_id']) ? intval($data['service_id']) : 0,
 			'customer_id' => isset($data['customer_id']) ? intval($data['customer_id']) : 0,
 			'staff_user_id' => isset($data['staff_user_id']) ? intval($data['staff_user_id']) : null,
-			'start_at' => isset($data['start_at']) ? sanitize_text_field($data['start_at']) : '',
-			'end_at' => isset($data['end_at']) ? sanitize_text_field($data['end_at']) : '',
+			'start_at' => '',
+			'end_at' => '',
 			'status' => isset($data['status']) ? sanitize_text_field($data['status']) : 'pending',
-			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : 'UTC',
+			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : LTLB_Time::get_site_timezone_string(),
 			'created_at' => $now,
 			'updated_at' => $now,
 		];
+		// start_at / end_at may be DateTimeInterface or strings
+		if ( isset( $data['start_at'] ) ) {
+			if ( $data['start_at'] instanceof DateTimeInterface ) {
+				$insert['start_at'] = LTLB_Time::format_wp_datetime( $data['start_at'] );
+			} else {
+				$insert['start_at'] = sanitize_text_field( $data['start_at'] );
+			}
+		}
+		if ( isset( $data['end_at'] ) ) {
+			if ( $data['end_at'] instanceof DateTimeInterface ) {
+				$insert['end_at'] = LTLB_Time::format_wp_datetime( $data['end_at'] );
+			} else {
+				$insert['end_at'] = sanitize_text_field( $data['end_at'] );
+			}
+		}
 
 		$formats = ['%d','%d','%d','%s','%s','%s','%s','%s','%s'];
 		$res = $wpdb->insert( $this->table_name, $insert, $formats );
