@@ -63,6 +63,22 @@ Commit 8 decisions:
 
 - Availability engine upgraded to consider staff hours and exceptions.
 
+Commit 9 decisions (Availability slots & API):
+
+- REST API: added `GET /wp-json/ltlb/v1/availability` which accepts `service_id` and `date=YYYY-MM-DD`.
+- The endpoint supports returning either raw free intervals per staff or discrete time slots when the `slots` parameter is provided. Use `slot_step` to control the step in minutes (default 15).
+- Slot generation: for each staff member, free intervals (respecting weekly hours, exceptions, existing appointments and buffers) are split into candidate start times by `slot_step`. A slot is valid if the full service duration fits within the free interval.
+- Returned slot format: `['start' => 'YYYY-MM-DD HH:MM:SS', 'end' => 'YYYY-MM-DD HH:MM:SS']` grouped by staff user ID.
+- Permissions: the availability endpoint is public (no auth) for now to allow frontend widgets to fetch available times. If needed, we will add nonce or auth protections later.
+- Defaults & assumptions:
+	- Default `slot_step` is 15 minutes.
+	- Service duration and buffers are taken from `lazy_services` table (`duration_min`, `buffer_before_min`, `buffer_after_min`).
+	- Times in DB are stored and compared using the site timezone.
+
+Notes:
+- This implementation prioritizes clarity and a workable Phase 2 delivery. Future improvements may include caching computed availability per-day, improving concurrency controls, and returning aggregated availability across staff (e.g., next N slots across all staff sorted by time).
+- Tests and QA checks for the availability engine are pending (see TODO list).
+
 
 
 
