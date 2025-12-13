@@ -4,6 +4,31 @@ REST namespace: `/wp-json/ltlb/v1/`
 
 ## Implemented Endpoints
 
+### Availability
+`GET /ltlb/v1/availability`
+
+Query parameters:
+- `service_id` (required) - Service ID
+- `date` (required) - Date in format YYYY-MM-DD
+- `slots` (optional, boolean) - If true, returns structured time slots
+- `slot_step` (optional) - Slot step in minutes (default 15)
+
+Returns:
+```json
+[
+  {
+    "time": "09:00",
+    "start": "2025-12-13 09:00:00",
+    "end": "2025-12-13 10:00:00",
+    "free_resources_count": 2
+  }
+]
+```
+
+Notes:
+- When `slots=true`, step is controlled by `slot_step`.
+- Capacity is derived from mapped resources and existing appointments.
+
 ### Time Slots
 `GET /ltlb/v1/time-slots`
 

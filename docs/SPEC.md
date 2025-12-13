@@ -1,4 +1,4 @@
-# LazyBookings – Master-Spezifikation & Agent-Prompt (v0.1)
+# LazyBookings – Master-Spezifikation & Agent-Prompt (v0.4.0)
 
 Diese Datei ist die **Source of Truth** für das WordPress-Plugin **LazyBookings** (Amelia-Alternative).
 Nutze sie 1:1 als Prompt/Briefing für Copilot Agent, Gemini (Continue/Aider) oder andere Coding-Agents.
@@ -26,7 +26,11 @@ Es soll **für service-basierte Unternehmen** (z.B. Yoga, Beratung) funktioniere
 
 - **Name:** LazyBookings (Amelia Clone)
 - **Slug / Text Domain:** `ltl-bookings`
-- **Version:** `0.2.0` (Start)
+- **Doc Stand:** `SPEC v0.4.0`
+- **Current Plugin Version:** `0.4.0`
+- **Current DB Version:** `0.4.0`
+  
+Hinweis: Frühere Phasen/Bezeichnungen wurden harmonisiert; diese SPEC spiegelt den aktuellen Stand wider.
 - **WP min:** 6.0
 - **PHP min:** 7.4 (empfohlen 8.0+)
 
@@ -56,7 +60,7 @@ Auch wenn langfristig eine React-SPA geplant ist, wird **Phase 1** als **PHP-fir
 ### 4.2 Modularer Aufbau (damit später React/Payments/Hotel reinpasst)
 - Domain/Entities (Service, Customer, Appointment, Resource, Invoice)
 - Repositories (DB-Zugriff pro Tabelle)
-- REST Controller Layer (`/wp-json/lazy/v1/...`)
+- REST Controller Layer (`/wp-json/ltlb/v1/...`)
 - UI Layer (Admin Pages, Shortcodes, Assets)
 
 ---
@@ -209,37 +213,29 @@ INDEX: `service_id`, `customer_id`, `start_at`, `status`
 
 - `register_activation_hook`: Tabellen anlegen + Default-Options (`lazy_settings`, `lazy_design`)
 - `admin_menu`: Top-Level Menü **LazyBookings**
-- `rest_api_init`: REST Routen unter `/wp-json/lazy/v1/`
+- `rest_api_init`: REST Routen unter `/wp-json/ltlb/v1/`
 - `init`: Shortcodes registrieren
 - `wp_enqueue_scripts`: Assets nur laden, wenn Shortcode auf Seite vorkommt
 - `admin_enqueue_scripts`: Assets nur auf LazyBookings Admin-Seiten laden
 
 ---
 
-## 8) REST API (Phase 1)
+## 8) REST API
 
 Namespace: `/ltlb/v1`
 
-### Endpoints
-- `GET /services` (list)
-- `POST /services` (create)
-- `GET /services/{id}`
-- `PUT /services/{id}`
-- `DELETE /services/{id}` (soft delete via `is_active=0`)
+### Implemented (current)
+- `GET /availability` — service_id, date; optional slots, slot_step
+- `GET /time-slots` — service_id, date; optional slot_step
+- `GET /slot-resources` — service_id, start (YYYY-MM-DD HH:MM:SS)
+- `GET /hotel-availability` — service_id, checkin, checkout, guests
 
-- `GET /customers`
-- `POST /customers`
-- `GET /customers/{id}`
-- `PUT /customers/{id}`
+Booking creation: via Shortcode form (no public REST create in current phase)
 
-- `GET /appointments?from=YYYY-MM-DD&to=YYYY-MM-DD&service_id=...`
-- `POST /appointments` (create booking)
-- `PUT /appointments/{id}` (status change)
-
-- `GET /availability?service_id=ID&date=YYYY-MM-DD`
-  - returns raw free intervals per staff, respecting working hours, exceptions, and existing appointments.
-- `GET /time-slots?service_id=ID&date=YYYY-MM-DD`
-  - returns time slots (z.B. 09:00, 10:00 …) basierend auf Default Working Hours (Phase 1)
+### Planned (future phases)
+- `GET /services`, `GET /services/{id}`, `POST /services`, `PUT /services/{id}`, `DELETE /services/{id}` (soft delete)
+- `GET /customers`, `GET /customers/{id}`, `POST /customers`, `PUT /customers/{id}`
+- `GET /appointments`, `PUT /appointments/{id}` (status change)
 
 ### Auth & Rechte
 - Admin endpoints: `current_user_can('manage_options')`
@@ -263,7 +259,9 @@ Namespace: `/ltlb/v1`
 
 ## 10) Admin UI (Phase 1)
 
-Top-Level Menü: **LazyBookings** (Slug: `ltl_bookings`)
+Top-Level Menü: **LazyBookings**
+
+Finaler Admin-Menü-Slug: `ltlb_dashboard` (entspricht der Code-Implementierung in Plugin.php)
 
 Seiten:
 - Dashboard (KPIs später)
