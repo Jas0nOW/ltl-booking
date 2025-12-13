@@ -4,9 +4,13 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_ServicesPage {
 
     private $service_repository;
+    private $resource_repository;
+    private $service_resources_repository;
 
     public function __construct() {
         $this->service_repository = new LTLB_ServiceRepository();
+        $this->resource_repository = new LTLB_ResourceRepository();
+        $this->service_resources_repository = new LTLB_ServiceResourcesRepository();
     }
 
     public function render(): void {
@@ -34,8 +38,17 @@ class LTLB_Admin_ServicesPage {
 
             if ( $id > 0 ) {
                 $ok = $this->service_repository->update( $id, $data );
+                $saved_id = $id;
             } else {
-                $ok = $this->service_repository->create( $data );
+                $created = $this->service_repository->create( $data );
+                $ok = $created !== false;
+                $saved_id = $created ?: 0;
+            }
+
+            // save service -> resource mappings
+            $resource_ids = isset( $_POST['resource_ids'] ) ? array_map( 'intval', (array) $_POST['resource_ids'] ) : [];
+            if ( $saved_id > 0 ) {
+                $this->service_resources_repository->set_resources_for_service( $saved_id, $resource_ids );
             }
 
             $redirect = admin_url( 'admin.php?page=ltlb_services' );

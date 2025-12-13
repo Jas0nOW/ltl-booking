@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Lazy Bookings
- * Description: Booking plugin (Amelia replacement MVP).
+ * Description: Booking plugin (LazyBookings) for yoga studios and more.
  * Version: 0.1.0
  * Author: LazyTechLab
  * Text Domain: ltl-bookings
@@ -9,7 +9,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'LTLB_VERSION', '0.1.0' );
+define( 'LTLB_VERSION', '0.2.0' );
 define( 'LTLB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LTLB_URL', plugin_dir_url( __FILE__ ) );
 

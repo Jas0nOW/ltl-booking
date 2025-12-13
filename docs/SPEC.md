@@ -25,12 +25,12 @@ Es soll **für service-basierte Unternehmen** (z.B. Yoga, Beratung) funktioniere
 ## 2) Plugin-Identität & Kompatibilität
 
 - **Name:** LazyBookings (Amelia Clone)
-- **Slug / Text Domain:** `lazy-bookings`
-- **Version:** `0.1.0` (Start)
+- **Slug / Text Domain:** `ltl-bookings`
+- **Version:** `0.2.0` (Start)
 - **WP min:** 6.0
 - **PHP min:** 7.4 (empfohlen 8.0+)
 
-Repo-Name darf abweichen (z.B. `ltl-booking`), aber Plugin-Slug bleibt **lazy-bookings**.
+Repo-Name darf abweichen (z.B. `ltl-bookings`), aber Plugin-Slug bleibt **ltl-bookings**.
 
 ---
 
@@ -64,8 +64,8 @@ Auch wenn langfristig eine React-SPA geplant ist, wird **Phase 1** als **PHP-fir
 ## 5) Ordnerstruktur (Soll)
 
 ```
-lazy-bookings/
-  lazy-bookings.php
+ltl-bookings/
+  ltl-bookings.php
   uninstall.php
   readme.txt
   .gitignore
@@ -75,6 +75,8 @@ lazy-bookings/
       Activator.php
       Deactivator.php
       Capabilities.php
+    /Admin
+      StaffProfile.php
     /DB
       Schema.php
       Migrator.php
@@ -88,6 +90,8 @@ lazy-bookings/
       CustomerRepository.php
       AppointmentRepository.php
       ResourceRepository.php
+      StaffHoursRepository.php
+      StaffExceptionsRepository.php
     /Rest
       Routes.php
       ServicesController.php
@@ -98,6 +102,7 @@ lazy-bookings/
       Sanitizer.php
       Validator.php
       Time.php
+      Availability.php
   /admin
     AdminMenu.php
     Pages/
@@ -106,6 +111,7 @@ lazy-bookings/
       AppointmentsPage.php
       CustomersPage.php
       SettingsPage.php
+      StaffPage.php
   /public
     Shortcodes.php
     Templates/
@@ -131,9 +137,11 @@ lazy-bookings/
 - `{$prefix}lazy_services`
 - `{$prefix}lazy_customers`
 - `{$prefix}lazy_appointments`
+- `{$prefix}lazy_staff_hours`
+- `{$prefix}lazy_staff_exceptions`
 - `{$prefix}lazy_resources` (optional in Phase 1, sonst Phase 2)
 
-### 6.2 Minimal-Schema (Phase 1)
+### 6.2 Minimal-Schema (Phase 1 & 2)
 
 #### lazy_services
 - `id` BIGINT UNSIGNED PK AI
@@ -175,6 +183,27 @@ INDEX: `is_active`
 - `updated_at` DATETIME NOT NULL
 INDEX: `service_id`, `customer_id`, `start_at`, `status`
 
+#### lazy_staff_hours
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `weekday` TINYINT NOT NULL
+- `start_time` TIME NOT NULL
+- `end_time` TIME NOT NULL
+- `is_active` TINYINT(1) NOT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+#### lazy_staff_exceptions
+- `id` BIGINT UNSIGNED PK AI
+- `user_id` BIGINT UNSIGNED NOT NULL
+- `date` DATE NOT NULL
+- `is_off_day` TINYINT(1) NOT NULL
+- `start_time` TIME NULL
+- `end_time` TIME NULL
+- `note` TEXT NULL
+- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+```
 **Wichtig:** SQL immer per `dbDelta` + `wpdb->prepare`.
 
 ---
@@ -192,7 +221,7 @@ INDEX: `service_id`, `customer_id`, `start_at`, `status`
 
 ## 8) REST API (Phase 1)
 
-Namespace: `/lazy/v1`
+Namespace: `/ltlb/v1`
 
 ### Endpoints
 - `GET /services` (list)
@@ -211,6 +240,8 @@ Namespace: `/lazy/v1`
 - `PUT /appointments/{id}` (status change)
 
 - `GET /availability?service_id=ID&date=YYYY-MM-DD`
+  - returns raw free intervals per staff, respecting working hours, exceptions, and existing appointments.
+- `GET /time-slots?service_id=ID&date=YYYY-MM-DD`
   - returns time slots (z.B. 09:00, 10:00 …) basierend auf Default Working Hours (Phase 1)
 
 ### Auth & Rechte
@@ -235,7 +266,7 @@ Namespace: `/lazy/v1`
 
 ## 10) Admin UI (Phase 1)
 
-Top-Level Menü: **LazyBookings** (Slug: `lazy_bookings`)
+Top-Level Menü: **LazyBookings** (Slug: `ltl_bookings`)
 
 Seiten:
 - Dashboard (KPIs später)
@@ -280,9 +311,12 @@ Seiten:
 - Ich kann im Frontend buchen und Appointment erscheint im Admin
 
 ### Phase 2 – Ressourcen/Staff/Verfügbarkeit “richtig”
-- Working Hours pro Staff
+- Working Hours pro Staff (erledigt)
+- Staff Exceptions (erledigt)
+- Availability Engine (erledigt)
+- E-Mail-Benachrichtigungen (erledigt)
+- Doppelte Buchungen verhindern (erledigt)
 - Ressourcen-Blocking (Räume)
-- Doppelte Buchungen verhindern
 - Email-Templates + tatsächliche Mails
 
 ### Phase 3 – Payments + Invoices
@@ -331,4 +365,3 @@ Seiten:
 
 - KI-Features (Gemini): erst ab Phase 3/4, wenn die Datenmodelle stabil sind.
 - DSGVO: Datenminimierung + Löschkonzept (uninstall/retention) später.
-
