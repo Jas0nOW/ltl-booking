@@ -51,6 +51,12 @@ Commit 5 decisions (Email basics):
 - Simple mailer `LTLB_Mailer` implemented in `Includes/Util/Mailer.php` which replaces placeholders `{service},{start},{end},{name},{email},{phone},{status},{appointment_id}` and sends admin and customer emails via `wp_mail()`.
 - Emails are sent after appointment creation in the frontend flow. Failures in sending do not block appointment creation.
 
+Commit 6 decisions (Design & CSS variables):
+
+- `lazy_design` option stores four hex colors: `background`, `primary`, `text`, `accent`.
+- The plugin emits CSS variables `--lazy-bg`, `--lazy-primary`, `--lazy-text`, `--lazy-accent` on the frontend (only when the `[lazy_book]` shortcode is present) and in admin pages under the `ltlb_` menu via `wp_head`/`admin_head` hooks.
+- Frontend widgets (wizard/shortcode) use those variables for background, button and text styling; themes can override or extend these variables. This keeps color logic centralized and non-invasive.
+
 
 
 

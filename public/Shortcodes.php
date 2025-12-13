@@ -22,7 +22,14 @@ class LTLB_Shortcodes {
 	$services = $service_repo->get_all();
 	ob_start();
 	?>
-	<div class="ltlb-booking">
+		<style>
+		/* LazyBookings inline styles using design CSS variables */
+		.ltlb-booking{background:var(--lazy-bg,#fff);color:var(--lazy-text,#111);padding:16px;border-radius:6px}
+		.ltlb-booking .button-primary{background:var(--lazy-primary,#2b7cff);color:var(--lazy-text,#fff);border:none}
+		.ltlb-booking .ltlb-success{color:var(--lazy-primary,#2b7cff)}
+		.ltlb-booking .ltlb-error{color:#c33}
+		</style>
+		<div class="ltlb-booking">
 			<form method="post">
 				<?php wp_nonce_field( 'ltlb_book_action', 'ltlb_book_nonce' ); ?>
 				<!-- honeypot field: bots will fill this -->
@@ -47,12 +54,14 @@ class LTLB_Shortcodes {
 					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
 						<select name="time_slot" required>
 							<?php
-							// generate slots for today using site/plugin settings and LTLB_Time helper
+							// generate slots for today using lazy_settings and LTLB_Time helper
 							$tz = LTLB_Time::wp_timezone();
 							$today = new DateTimeImmutable( 'now', $tz );
-							$start_hour = (int) get_option( 'ltlb_working_hours_start', 9 );
-							$end_hour = (int) get_option( 'ltlb_working_hours_end', 17 );
-							$slot_minutes = (int) get_option( 'ltlb_slot_minutes', 60 );
+							$ls = get_option( 'lazy_settings', [] );
+							if ( ! is_array( $ls ) ) $ls = [];
+							$start_hour = (int) ( $ls['working_hours_start'] ?? 9 );
+							$end_hour = (int) ( $ls['working_hours_end'] ?? 17 );
+							$slot_minutes = (int) ( $ls['slot_size_minutes'] ?? 60 );
 							$slots = LTLB_Time::generate_slots_for_day( $today, $start_hour, $end_hour, $slot_minutes );
 							foreach ( $slots as $slot ) {
 								$label = $slot->format('H:i');
@@ -146,7 +155,9 @@ class LTLB_Shortcodes {
 			return '<div class="ltlb-error">' . esc_html__( 'Unable to save customer.', 'ltl-bookings' ) . '</div>';
 	}
 
-		$default_status = get_option( 'ltlb_default_status', 'pending' );
+    		$ls = get_option( 'lazy_settings', [] );
+    		if ( ! is_array( $ls ) ) $ls = [];
+    		$default_status = $ls['default_status'] ?? 'pending';
 		$appt_id = $appointment_repo->create( [
 			'service_id' => $service_id,
 			'customer_id' => $customer_id,

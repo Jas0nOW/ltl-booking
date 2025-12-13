@@ -7,6 +7,8 @@ class LTLB_Plugin {
         add_action('init', [ $this, 'on_init' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
         add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
+        add_action('wp_head', [ $this, 'print_design_css_frontend' ]);
+        add_action('admin_head', [ $this, 'print_design_css_admin' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
         
         // Load required classes
@@ -152,5 +154,38 @@ class LTLB_Plugin {
 
     public function register_rest_routes(): void {
         // Phase 1: REST-Routen registrieren
+    }
+
+    public function print_design_css_frontend(): void {
+        if ( ! function_exists('has_shortcode') ) return;
+        global $post;
+        if ( empty( $post ) ) return;
+        if ( ! has_shortcode( $post->post_content, 'lazy_book' ) ) return;
+
+        $design = get_option( 'lazy_design', [] );
+        if ( ! is_array( $design ) ) $design = [];
+
+        $bg = $design['background'] ?? '#ffffff';
+        $primary = $design['primary'] ?? '#2b7cff';
+        $text = $design['text'] ?? '#222222';
+        $accent = $design['accent'] ?? '#ffcc00';
+
+        echo "<style id=\"ltlb-design-vars\">:root{--lazy-bg:${bg};--lazy-primary:${primary};--lazy-text:${text};--lazy-accent:${accent};}</style>";
+    }
+
+    public function print_design_css_admin(): void {
+        if ( ! is_admin() ) return;
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+
+        $design = get_option( 'lazy_design', [] );
+        if ( ! is_array( $design ) ) $design = [];
+
+        $bg = $design['background'] ?? '#ffffff';
+        $primary = $design['primary'] ?? '#2b7cff';
+        $text = $design['text'] ?? '#222222';
+        $accent = $design['accent'] ?? '#ffcc00';
+
+        echo "<style id=\"ltlb-design-vars-admin\">:root{--lazy-bg:${bg};--lazy-primary:${primary};--lazy-text:${text};--lazy-accent:${accent};}</style>";
     }
 }
