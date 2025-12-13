@@ -59,11 +59,13 @@ class LTLB_ServiceRepository {
             'price_cents' => isset($data['price_cents']) ? intval($data['price_cents']) : 0,
             'currency' => isset($data['currency']) ? sanitize_text_field($data['currency']) : 'EUR',
             'is_active' => isset($data['is_active']) ? intval($data['is_active']) : 1,
+            'is_group' => isset($data['is_group']) ? intval($data['is_group']) : 0,
+            'max_seats_per_booking' => isset($data['max_seats_per_booking']) ? intval($data['max_seats_per_booking']) : 1,
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
-        $formats = ['%s','%s','%d','%d','%d','%d','%s','%d','%s','%s'];
+        $formats = ['%s','%s','%d','%d','%d','%d','%s','%d','%d','%d','%s','%s'];
         $res = $wpdb->insert( $this->table_name, $insert, $formats );
         if ( $res === false ) return false;
         return (int) $wpdb->insert_id;
@@ -82,10 +84,10 @@ class LTLB_ServiceRepository {
         $update = [];
         $formats = [];
 
-        $allowed = ['name','description','duration_min','buffer_before_min','buffer_after_min','price_cents','currency','is_active'];
+        $allowed = ['name','description','duration_min','buffer_before_min','buffer_after_min','price_cents','currency','is_active','is_group','max_seats_per_booking'];
         foreach ( $allowed as $col ) {
             if ( isset( $data[ $col ] ) ) {
-                if ( in_array( $col, ['duration_min','buffer_before_min','buffer_after_min','price_cents','is_active'], true ) ) {
+                if ( in_array( $col, ['duration_min','buffer_before_min','buffer_after_min','price_cents','is_active','is_group','max_seats_per_booking'], true ) ) {
                     $update[ $col ] = intval( $data[ $col ] );
                     $formats[] = '%d';
                 } else {

@@ -33,6 +33,8 @@ class LTLB_Admin_ServicesPage {
             $data['price_cents'] = LTLB_Sanitizer::money_cents( $_POST['price_eur'] ?? '' );
             $data['currency'] = LTLB_Sanitizer::text( $_POST['currency'] ?? 'EUR' );
             $data['is_active'] = isset( $_POST['is_active'] ) ? 1 : 0;
+            $data['is_group'] = isset( $_POST['is_group'] ) ? 1 : 0;
+            $data['max_seats_per_booking'] = LTLB_Sanitizer::int( $_POST['max_seats_per_booking'] ?? 1 );
 
             if ( $id > 0 ) {
                 $ok = $this->service_repository->update( $id, $data );
@@ -87,8 +89,8 @@ class LTLB_Admin_ServicesPage {
                 $price = $editing && isset( $service['price_cents'] ) ? number_format( $service['price_cents'] / 100, 2, '.', '' ) : '';
                 $currency = $editing ? ( $service['currency'] ?? 'EUR' ) : 'EUR';
                 $is_active = $editing ? ( ! empty( $service['is_active'] ) ) : true;
-                $available_resources = $this->resource_repository->get_all();
-                $selected_resources = $editing ? $this->service_resources_repository->get_resources_for_service( intval( $service['id'] ) ) : [];
+                $is_group = $editing ? ( ! empty( $service['is_group'] ) ) : false;
+                $max_seats = $editing ? intval($service['max_seats_per_booking'] ?? 1) : 1;
                 ?>
                 <form method="post">
                     <?php wp_nonce_field( 'ltlb_service_save_action', 'ltlb_service_nonce' ); ?>
@@ -126,15 +128,12 @@ class LTLB_Admin_ServicesPage {
                                 <td><label><input name="is_active" type="checkbox" value="1" <?php checked( $is_active ); ?>> <?php echo esc_html__('Yes', 'ltl-bookings'); ?></label></td>
                             </tr>
                             <tr>
-                                <th><label for="resource_ids"><?php echo esc_html__('Resources', 'ltl-bookings'); ?></label></th>
-                                <td>
-                                    <select name="resource_ids[]" id="resource_ids" multiple style="min-width:300px;">
-                                        <?php foreach ( $available_resources as $r ) : ?>
-                                            <option value="<?php echo intval($r['id']); ?>" <?php echo in_array(intval($r['id']), $selected_resources, true) ? 'selected' : ''; ?>><?php echo esc_html($r['name']); ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <p class="description"><?php echo esc_html__('Select resources that can be used for this service. Leave empty to allow any resource.', 'ltl-bookings'); ?></p>
-                                </td>
+                                <th><?php echo esc_html__('Group Booking', 'ltl-bookings'); ?></th>
+                                <td><label><input name="is_group" type="checkbox" value="1" <?php checked( $is_group ); ?>> <?php echo esc_html__('Enable group bookings', 'ltl-bookings'); ?></label></td>
+                            </tr>
+                            <tr>
+                                <th><label for="max_seats_per_booking"><?php echo esc_html__('Max Seats per Booking', 'ltl-bookings'); ?></label></th>
+                                <td><input name="max_seats_per_booking" id="max_seats_per_booking" type="number" min="1" value="<?php echo esc_attr( $max_seats ); ?>" class="small-text"></td>
                             </tr>
                         </tbody>
                     </table>

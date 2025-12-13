@@ -1,0 +1,67 @@
+/**
+ * LazyBookings Public Styles
+ * Using CSS variables defined by the plugin
+ */
+
+.ltlb-booking {
+    background: var(--lazy-bg, #fff);
+    color: var(--lazy-text, #111);
+    padding: 16px;
+    border-radius: 6px;
+    max-width: 600px;
+}
+
+.ltlb-booking h3,
+.ltlb-booking h4 {
+    margin-top: 0;
+}
+
+.ltlb-booking label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.ltlb-booking input[type="text"],
+.ltlb-booking input[type="email"],
+.ltlb-booking input[type="date"],
+.ltlb-booking select,
+.ltlb-booking textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.ltlb-booking .button-primary {
+    background: var(--lazy-primary, #2b7cff);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.ltlb-booking .button-primary:hover {
+    background: var(--lazy-accent, #ffcc00);
+}
+
+.ltlb-booking .ltlb-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 16px 0;
+}
+
+.ltlb-booking .ltlb-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 16px 0;
+}

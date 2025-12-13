@@ -13,7 +13,7 @@ class LTLB_Mailer {
         return str_replace( $search, $replace, $template );
     }
 
-    public static function send_booking_notifications( int $appointment_id, array $service, array $customer, string $start_at, string $end_at, string $status ): array {
+    public static function send_booking_notifications( int $appointment_id, array $service, array $customer, string $start_at, string $end_at, string $status, int $seats = 1 ): array {
         $results = [];
 
         $ls = get_option( 'lazy_settings', [] );
@@ -40,6 +40,7 @@ class LTLB_Mailer {
             'phone' => $customer['phone'] ?? '',
             'status' => $status,
             'appointment_id' => (string) $appointment_id,
+            'seats' => (string) $seats,
         ];
 
         // admin email
