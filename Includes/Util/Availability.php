@@ -16,6 +16,9 @@ class Availability {
         $hours_repo = new StaffHoursRepository();
         $exceptions_repo = new StaffExceptionsRepository();
         $appt_repo = new LTLB_AppointmentRepository();
+        $service_resources_repo = new LTLB_ServiceResourcesRepository();
+        $resource_repo = new LTLB_ResourceRepository();
+        $appt_resource_repo = new LTLB_AppointmentResourcesRepository();
 
         $service = $service_repo->get_by_id( $service_id );
         if ( ! $service ) return [];
@@ -109,15 +112,51 @@ class Availability {
             if ( $cursor < $work_end ) {
                 $free[] = [ 'start' => $cursor, 'end' => $work_end ];
             }
-
             // filter free intervals shorter than service duration
             $valid = [];
+            // determine allowed resources for this service
+            $allowed_resources = $service_resources_repo->get_resources_for_service( $service_id );
+            if ( empty( $allowed_resources ) ) {
+                // allow any active resource
+                $all = $resource_repo->get_all();
+                $allowed_resources = array_map(function($r){ return intval($r['id']); }, $all );
+            }
+
+            // should pending appointments block? (option)
+            $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+
             foreach ( $free as $f ) {
                 $s_dt = DateTime::createFromFormat('H:i:s', $f['start']);
                 $e_dt = DateTime::createFromFormat('H:i:s', $f['end']);
                 if ( ! $s_dt || ! $e_dt ) continue;
                 $diff = ( $e_dt->getTimestamp() - $s_dt->getTimestamp() ) / 60;
-                if ( $diff >= $duration_min ) {
+                if ( $diff < $duration_min ) continue;
+
+                // Check resource occupancy conservatively over the whole interval: any appointment overlapping any part
+                // will be counted as occupying that resource. If at least one allowed resource has available capacity
+                // (capacity > overlapping_count) we keep the interval.
+                $interval_start_dt = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' ' . $f['start']);
+                $interval_end_dt = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' ' . $f['end']);
+                if ( ! $interval_start_dt || ! $interval_end_dt ) {
+                    $valid[] = $f; // can't analyze, keep it
+                    continue;
+                }
+
+                $blocked_counts = $appt_resource_repo->get_blocked_resources( $interval_start_dt->format('Y-m-d H:i:s'), $interval_end_dt->format('Y-m-d H:i:s'), $include_pending );
+
+                $has_available = false;
+                foreach ( $allowed_resources as $rid ) {
+                    $res = $resource_repo->get_by_id( intval($rid) );
+                    if ( ! $res ) continue;
+                    $capacity = intval( $res['capacity'] ?? 1 );
+                    $used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
+                    if ( $used < $capacity ) {
+                        $has_available = true;
+                        break;
+                    }
+                }
+
+                if ( $has_available ) {
                     $valid[] = $f;
                 }
             }

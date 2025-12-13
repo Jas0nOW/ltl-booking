@@ -23,17 +23,35 @@ class LTLB_AppointmentResourcesRepository {
         return $res !== false;
     }
 
-    public function get_blocked_resources(string $start, string $end): array {
+    /**
+     * Return an associative array resource_id => overlapping_appointment_count
+     * for appointments that overlap the given interval. By default considers only 'confirmed' status,
+     * set $include_pending=true to include 'pending' as blocking as well.
+     *
+     * @param string $start DATETIME string
+     * @param string $end DATETIME string
+     * @param bool $include_pending
+     * @return array<int,int>
+     */
+    public function get_blocked_resources(string $start, string $end, bool $include_pending = false): array {
         global $wpdb;
         $appointments_table = $wpdb->prefix . 'lazy_appointments';
 
-        $sql = "SELECT ar.resource_id
+        $status_clause = $include_pending ? "a.status IN ('confirmed','pending')" : "a.status = 'confirmed'";
+
+        $sql = "SELECT ar.resource_id, COUNT(*) as cnt
                 FROM {$this->table_name} ar
                 JOIN {$appointments_table} a ON ar.appointment_id = a.id
-                WHERE a.start_at < %s AND a.end_at > %s AND a.status IN ('confirmed', 'pending')";
+                WHERE a.start_at < %s AND a.end_at > %s AND {$status_clause}
+                GROUP BY ar.resource_id";
 
-        $results = $wpdb->get_col( $wpdb->prepare( $sql, $end, $start ) );
-
-        return array_map( 'intval', $results );
+        $rows = $wpdb->get_results( $wpdb->prepare( $sql, $end, $start ), ARRAY_A );
+        $out = [];
+        if ( $rows ) {
+            foreach ( $rows as $r ) {
+                $out[ intval($r['resource_id']) ] = intval($r['cnt']);
+            }
+        }
+        return $out;
     }
 }
