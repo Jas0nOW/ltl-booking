@@ -47,10 +47,13 @@ class LTLB_Shortcodes {
 					<label><?php echo esc_html__('Time', 'ltl-bookings'); ?>
 						<select name="time_slot" required>
 							<?php
-							// generate slots for today using site timezone and LTLB_Time helper
+							// generate slots for today using site/plugin settings and LTLB_Time helper
 							$tz = LTLB_Time::wp_timezone();
 							$today = new DateTimeImmutable( 'now', $tz );
-							$slots = LTLB_Time::generate_slots_for_day( $today, 9, 17, 60 );
+							$start_hour = (int) get_option( 'ltlb_working_hours_start', 9 );
+							$end_hour = (int) get_option( 'ltlb_working_hours_end', 17 );
+							$slot_minutes = (int) get_option( 'ltlb_slot_minutes', 60 );
+							$slots = LTLB_Time::generate_slots_for_day( $today, $start_hour, $end_hour, $slot_minutes );
 							foreach ( $slots as $slot ) {
 								$label = $slot->format('H:i');
 								echo '<option value="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</option>';
@@ -143,14 +146,15 @@ class LTLB_Shortcodes {
 			return '<div class="ltlb-error">' . esc_html__( 'Unable to save customer.', 'ltl-bookings' ) . '</div>';
 	}
 
-	$appt_id = $appointment_repo->create( [
+		$default_status = get_option( 'ltlb_default_status', 'pending' );
+		$appt_id = $appointment_repo->create( [
 			'service_id' => $service_id,
 			'customer_id' => $customer_id,
-			'start_at' => $start_at_sql,
-			'end_at' => $end_at_sql,
-			'status' => 'pending',
+			'start_at' => $start_dt,
+			'end_at' => $end_dt,
+			'status' => $default_status,
 			'timezone' => LTLB_Time::get_site_timezone_string(),
-	] );
+		] );
 
 	if ( ! $appt_id ) {
 			return '<div class="ltlb-error">' . esc_html__( 'Unable to create appointment.', 'ltl-bookings' ) . '</div>';

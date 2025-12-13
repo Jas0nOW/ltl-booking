@@ -4,18 +4,23 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Time {
 
     public static function wp_timezone(): DateTimeZone {
+        // Allow plugin setting to override site timezone for plugin operations
+        $plugin_tz = get_option( 'ltlb_timezone', '' );
+        if ( ! empty( $plugin_tz ) ) {
+            try {
+                return new DateTimeZone( $plugin_tz );
+            } catch ( Exception $e ) {
+                // fallback to WP timezone
+            }
+        }
+
         if ( function_exists('wp_timezone') ) {
             return wp_timezone();
         }
 
         $tz = get_option('timezone_string');
         if ( ! $tz ) {
-            $gmt_offset = get_option('gmt_offset', 0);
-            if ( $gmt_offset == 0 ) {
-                $tz = 'UTC';
-            } else {
-                $tz = 'UTC';
-            }
+            return new DateTimeZone( 'UTC' );
         }
         return new DateTimeZone( $tz );
     }
