@@ -22,6 +22,9 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'includes/Util/Time.php';
         require_once LTLB_PATH . 'includes/Util/Notices.php';
 
+        // Engines
+        require_once LTLB_PATH . 'includes/Engine/EngineFactory.php';
+
         // Repositories
         require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
         require_once LTLB_PATH . 'includes/Repository/CustomerRepository.php';
@@ -153,7 +156,74 @@ class LTLB_Plugin {
     }
 
     public function register_rest_routes(): void {
-        // Phase 1: REST-Routen registrieren
+        register_rest_route('ltlb/v1', '/time-slots', [
+            'methods' => 'GET',
+            'callback' => function( WP_REST_Request $request ) {
+                $service_id = intval( $request->get_param('service_id') );
+                $date = sanitize_text_field( $request->get_param('date') );
+                $step = intval( $request->get_param('slot_step') );
+                if ( empty($service_id) || empty($date) ) {
+                    return new WP_REST_Response( [ 'error' => 'service_id and date required' ], 400 );
+                }
+                $engine = EngineFactory::get_engine();
+                $data = $engine->get_time_slots( $service_id, $date, [ 'step' => $step ] );
+                return new WP_REST_Response( $data, 200 );
+            },
+            'permission_callback' => function() { return true; }
+        ]);
+
+        register_rest_route('ltlb/v1', '/slot-resources', [
+            'methods' => 'GET',
+            'callback' => function( WP_REST_Request $request ) {
+                $service_id = intval( $request->get_param('service_id') );
+                $start = sanitize_text_field( $request->get_param('start') );
+                if ( empty($service_id) || empty($start) ) {
+                    return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+                }
+                // Only ServiceEngine supports slot-level resources currently
+                $engine = EngineFactory::get_engine();
+                if ( $engine instanceof ServiceEngine ) {
+                    // reuse existing logic from previous implementation
+                    $service_repo = new LTLB_ServiceRepository();
+                    $service = $service_repo->get_by_id( $service_id );
+                    if ( ! $service ) return new WP_REST_Response( [ 'error' => 'Invalid service' ], 400 );
+                    $duration = intval( $service['duration_min'] ?? 60 );
+                    $start_dt = DateTime::createFromFormat('Y-m-d H:i:s', $start);
+                    if ( ! $start_dt ) return new WP_REST_Response( [ 'error' => 'Invalid start' ], 400 );
+                    $end_dt = clone $start_dt;
+                    $end_dt->modify('+' . $duration . ' minutes');
+
+                    $service_resources_repo = new LTLB_ServiceResourcesRepository();
+                    $resource_repo = new LTLB_ResourceRepository();
+                    $appt_res_repo = new LTLB_AppointmentResourcesRepository();
+
+                    $allowed = $service_resources_repo->get_resources_for_service( $service_id );
+                    if ( empty( $allowed ) ) {
+                        $all = $resource_repo->get_all();
+                        $allowed = array_map(function($r){ return intval($r['id']); }, $all );
+                    }
+
+                    $include_pending = get_option('ltlb_pending_blocks', 0) ? true : false;
+                    $blocked = $appt_res_repo->get_blocked_resources( $start_dt->format('Y-m-d H:i:s'), $end_dt->format('Y-m-d H:i:s'), $include_pending );
+
+                    $resources = [];
+                    $free_count = 0;
+                    foreach ( $allowed as $rid ) {
+                        $r = $resource_repo->get_by_id( intval($rid) );
+                        if ( ! $r ) continue;
+                        $capacity = intval( $r['capacity'] ?? 1 );
+                        $used = isset( $blocked[$rid] ) ? intval( $blocked[$rid] ) : 0;
+                        $available = max(0, $capacity - $used);
+                        if ( $available > 0 ) $free_count += 1;
+                        $resources[] = [ 'id' => intval($r['id']), 'name' => $r['name'], 'capacity' => $capacity, 'used' => $used, 'available' => $available ];
+                    }
+
+                    return new WP_REST_Response( [ 'free_resources_count' => $free_count, 'resources' => $resources ], 200 );
+                }
+                return new WP_REST_Response( [ 'error' => 'Slot resources not supported for current template mode' ], 400 );
+            },
+            'permission_callback' => function() { return true; }
+        ]);
     }
 
     public function print_design_css_frontend(): void {

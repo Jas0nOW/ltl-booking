@@ -57,6 +57,12 @@ Commit 6 decisions (Design & CSS variables):
 - The plugin emits CSS variables `--lazy-bg`, `--lazy-primary`, `--lazy-text`, `--lazy-accent` on the frontend (only when the `[lazy_book]` shortcode is present) and in admin pages under the `ltlb_` menu via `wp_head`/`admin_head` hooks.
 - Frontend widgets (wizard/shortcode) use those variables for background, button and text styling; themes can override or extend these variables. This keeps color logic centralized and non-invasive.
 
+Commit X decisions (Template modes & Engine refactor):
+
+- Introduce `template_mode` stored in `lazy_settings` with possible values `service` (default) and `hotel` (stub). This allows switching booking UX and backend engines.
+- Implement an `EngineFactory` returning an engine implementing `BookingEngineInterface`. Existing service logic is moved into `ServiceEngine`; `HotelEngine` is a safe stub returning friendly errors or placeholders until implemented.
+- All frontend shortcode booking and REST time-slot endpoints now call the engine via `EngineFactory` to keep behavior pluggable per template mode.
+
 
 
 

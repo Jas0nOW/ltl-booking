@@ -16,7 +16,21 @@ class LTLB_Shortcodes {
 	}
 	public static function render_lazy_book( $atts ): string {
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['ltlb_book_submit'] ) ) {
-			return self::handle_submission();
+		return self::handle_submission();
+	}
+
+	// Template mode switch: show placeholder for hotel mode
+	$settings = get_option('lazy_settings', []);
+	$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
+	if ( $template_mode === 'hotel' ) {
+		ob_start();
+		?>
+		<div class="ltlb-booking">
+			<h3><?php echo esc_html__( 'Hotel booking - coming soon', 'ltl-bookings' ); ?></h3>
+			<p><?php echo esc_html__( 'The hotel booking workflow is not implemented yet. Please switch to Service mode to use the live booking widget.', 'ltl-bookings' ); ?></p>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 	$service_repo = new LTLB_ServiceRepository();
 	$services = $service_repo->get_all();
@@ -109,77 +123,30 @@ class LTLB_Shortcodes {
 			}
 			set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
 		}
-	$service_id = isset( $_POST['service_id'] ) ? intval( $_POST['service_id'] ) : 0;
-	$date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : '';
-	$time = isset( $_POST['time_slot'] ) ? sanitize_text_field( $_POST['time_slot'] ) : '';
+	// Build payload and delegate to active engine
+	$payload = [
+		'service_id' => isset($_POST['service_id']) ? intval($_POST['service_id']) : 0,
+		'date' => isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '',
+		'time' => isset($_POST['time_slot']) ? sanitize_text_field($_POST['time_slot']) : '',
+		'email' => LTLB_Sanitizer::email( $_POST['email'] ?? '' ),
+		'first' => LTLB_Sanitizer::text( $_POST['first_name'] ?? '' ),
+		'last' => LTLB_Sanitizer::text( $_POST['last_name'] ?? '' ),
+		'phone' => LTLB_Sanitizer::text( $_POST['phone'] ?? '' ),
+		'resource_id' => isset($_POST['resource_id']) ? intval($_POST['resource_id']) : 0,
+	];
 
-	$email = LTLB_Sanitizer::email( $_POST['email'] ?? '' );
-	$first = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
-	$last = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
-	$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
-
-	if ( empty( $service_id ) || empty( $date ) || empty( $time ) || empty( $email ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Please fill the required fields.', 'ltl-bookings' ) . '</div>';
+	$engine = EngineFactory::get_engine();
+	$valid = $engine->validate_payload($payload);
+	if ( is_wp_error($valid) ) {
+		return '<div class="ltlb-error">' . esc_html( $valid->get_error_message() ) . '</div>';
 	}
 
-	// compute start_at and end_at based on service duration
-	$service_repo = new LTLB_ServiceRepository();
-	$service = $service_repo->get_by_id( $service_id );
-	$duration = $service && isset( $service['duration_min'] ) ? intval( $service['duration_min'] ) : 60;
-
-	    $start_dt = LTLB_Time::parse_date_and_time( $date, $time );
-	    if ( ! $start_dt ) return '<div class="ltlb-error">' . esc_html__( 'Invalid date/time.', 'ltl-bookings' ) . '</div>';
-
-	    $end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
-
-	    $start_at_sql = LTLB_Time::format_wp_datetime( $start_dt );
-	    $end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
-
-	$appointment_repo = new LTLB_AppointmentRepository();
-
-	// conflict check
-	if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $service_id ) ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Selected slot is already booked.', 'ltl-bookings' ) . '</div>';
+	$result = $engine->create_booking($payload);
+	if ( is_wp_error($result) ) {
+		return '<div class="ltlb-error">' . esc_html( $result->get_error_message() ) . '</div>';
 	}
 
-	// upsert customer
-	$customer_repo = new LTLB_CustomerRepository();
-	$customer_id = $customer_repo->upsert_by_email( [
-			'email' => $email,
-			'first_name' => $first,
-			'last_name' => $last,
-			'phone' => $phone,
-	] );
-
-	if ( ! $customer_id ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to save customer.', 'ltl-bookings' ) . '</div>';
-	}
-
-    		$ls = get_option( 'lazy_settings', [] );
-    		if ( ! is_array( $ls ) ) $ls = [];
-    		$default_status = $ls['default_status'] ?? 'pending';
-		$appt_id = $appointment_repo->create( [
-			'service_id' => $service_id,
-			'customer_id' => $customer_id,
-			'start_at' => $start_dt,
-			'end_at' => $end_dt,
-			'status' => $default_status,
-			'timezone' => LTLB_Time::get_site_timezone_string(),
-		] );
-
-		if ( ! $appt_id ) {
-			return '<div class="ltlb-error">' . esc_html__( 'Unable to create appointment.', 'ltl-bookings' ) . '</div>';
-		}
-
-		// fetch fresh service and customer data and send notifications
-		$service = $service_repo->get_by_id( $service_id );
-		$customer = $customer_repo->get_by_id( $customer_id );
-
-		if ( class_exists( 'LTLB_Mailer' ) ) {
-			LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
-		}
-
-		return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
+	return '<div class="ltlb-success">' . esc_html__( 'Booking created (pending). We have sent confirmation emails where configured.', 'ltl-bookings' ) . '</div>';
 	}
 }
 

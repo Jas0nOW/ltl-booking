@@ -20,6 +20,7 @@ class LTLB_Admin_SettingsPage {
 				$settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? '' );
 				$settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? 'pending' );
 				$settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
+				$settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? 'service' );
 				$settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
 				$settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
 				$settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? '' );
@@ -43,6 +44,7 @@ class LTLB_Admin_SettingsPage {
 			$end = (int) ( $settings['working_hours_end'] ?? 17 );
 			$slot = (int) ( $settings['slot_size_minutes'] ?? 60 );
 			$tz = $settings['timezone'] ?? '';
+			$template_mode = $settings['template_mode'] ?? 'service';
 			$default_status = $settings['default_status'] ?? 'pending';
 			$pending_blocks = $settings['pending_blocks'] ?? 0;
 			$mail_from_name = $settings['mail_from_name'] ?? '';
@@ -105,6 +107,15 @@ class LTLB_Admin_SettingsPage {
 						</tr>
 						<tr>
 							<th colspan="2"><h2><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2></th>
+						</tr>
+						<tr>
+							<th><?php echo esc_html__('Template Mode', 'ltl-bookings'); ?></th>
+							<td>
+								<label><input type="radio" name="template_mode" value="service" <?php checked( $template_mode, 'service' ); ?>> <?php echo esc_html__('Service / Courses', 'ltl-bookings'); ?></label>
+								<br>
+								<label><input type="radio" name="template_mode" value="hotel" <?php checked( $template_mode, 'hotel' ); ?>> <?php echo esc_html__('Hotel (coming soon)', 'ltl-bookings'); ?></label>
+								<p class="description"><?php echo esc_html__('Choose the booking template mode. Default: Service.', 'ltl-bookings'); ?></p>
+							</td>
 						</tr>
 						<tr>
 							<th><label for="ltlb_email_from_name"><?php echo esc_html__('From name', 'ltl-bookings'); ?></label></th>
