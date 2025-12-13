@@ -112,6 +112,26 @@ This minimal test verifies core functionality is working after plugin update/act
 
 **Expected Result:** All steps pass without fatal errors, bookings create successfully, emails send correctly.
 
+### Hotel Mode Flow (Phase 4)
+
+This test validates the real hotel booking flow with check-in/out and room assignment.
+
+**Prerequisites:**
+- Services configured as Room Types (e.g., Double Room)
+- Resources configured as Rooms (e.g., Room 101, Room 102) with capacity
+- Hotel times set in Settings (check-in/check-out)
+
+**Test Steps:**
+1. Create a page with `[lazy_book]` and switch template mode to hotel.
+2. Choose a Room Type service and select check-in and check-out dates.
+3. Verify available rooms list reflects capacity and existing bookings.
+4. Complete booking; confirm `lazy_appointments` has correct start/end (check-in/out times).
+5. Confirm `lazy_appointment_resources` contains assigned room for the booking.
+6. Create overlapping booking with same room; verify conflict is prevented unless capacity allows.
+7. Verify check-out exclusivity: next booking can start on the check-out date.
+
+**Expected Result:** Hotel bookings store correct date ranges, room assignment persists, capacity and overlap rules enforced.
+
 ### Upgrade Test from Previous DB Version
 
 This test verifies smooth upgrade path from previous plugin versions.
