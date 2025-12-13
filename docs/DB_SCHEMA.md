@@ -49,19 +49,16 @@ All tables use prefix: `$wpdb->prefix . 'lazy_' . name`
 - `updated_at` DATETIME NOT NULL
 
 `lazy_service_resources` (mapping table):
-- `id` BIGINT UNSIGNED PK AI
 - `service_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- `created_at` DATETIME NOT NULL
-- KEY service_id, resource_id
+- PRIMARY KEY (service_id, resource_id)
+- KEY resource_id (resource_id)
 
 `lazy_appointment_resources` (mapping table):
-- `id` BIGINT UNSIGNED PK AI
 - `appointment_id` BIGINT UNSIGNED NOT NULL
 - `resource_id` BIGINT UNSIGNED NOT NULL
-- `created_at` DATETIME NOT NULL
-- `updated_at` DATETIME NOT NULL
-- KEY appointment_id, resource_id
+- PRIMARY KEY (appointment_id, resource_id)
+- KEY resource_id (resource_id)
 
 ## Phase 4 (Hotel Mode) Schema Notes
 
