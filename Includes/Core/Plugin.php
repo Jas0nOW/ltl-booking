@@ -7,6 +7,14 @@ class LTLB_Plugin {
         add_action('init', [ $this, 'on_init' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
+        
+        // Load required classes
+        $this->load_classes();
+    }
+
+    private function load_classes(): void {
+        require_once LTLB_PATH . 'includes/Repository/ServiceRepository.php';
+        require_once LTLB_PATH . 'admin/Pages/ServicesPage.php';
     }
 
     public function on_init(): void {
@@ -14,7 +22,31 @@ class LTLB_Plugin {
     }
 
     public function register_admin_menu(): void {
-        // Phase 1: Admin-Menü + Seiten
+        add_menu_page(
+            'LazyBookings',
+            'LazyBookings',
+            'manage_options',
+            'ltlb_dashboard',
+            [ $this, 'render_dashboard_page' ]
+        );
+
+        add_submenu_page(
+            'ltlb_dashboard',
+            'Services',
+            'Services',
+            'manage_options',
+            'ltlb_services',
+            [ $this, 'render_services_page' ]
+        );
+    }
+
+    public function render_dashboard_page(): void {
+        echo '<div class="wrap"><h1>LazyBookings Dashboard</h1></div>';
+    }
+
+    public function render_services_page(): void {
+        $page = new LTLB_ServicesPage();
+        $page->render();
     }
 
     public function register_rest_routes(): void {
