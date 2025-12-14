@@ -60,7 +60,6 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Util/Logger.php';
         require_once LTLB_PATH . 'Includes/Util/Mailer.php';
         require_once LTLB_PATH . 'Includes/Util/BookingService.php';
-        require_once LTLB_PATH . 'Includes/Util/Availability.php';
 		require_once LTLB_PATH . 'Includes/Util/I18n.php';
         require_once LTLB_PATH . 'Includes/Util/Retention.php';
         require_once LTLB_PATH . 'Includes/Util/Analytics.php';
@@ -84,6 +83,9 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
         require_once LTLB_PATH . 'Includes/Repository/StaffHoursRepository.php';
         require_once LTLB_PATH . 'Includes/Repository/StaffExceptionsRepository.php';
+
+		// Availability depends on repositories.
+		require_once LTLB_PATH . 'Includes/Util/Availability.php';
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Components/AdminHeader.php';

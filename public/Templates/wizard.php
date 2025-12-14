@@ -67,7 +67,7 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
         <div class="ltlb-stepper" data-ltlb-stepper>
             <!-- Step 1: Service/Room Selection -->
             <fieldset class="ltlb-step ltlb-step-panel" aria-labelledby="ltlb-step-service" data-ltlb-step="service">
-                <legend id="ltlb-step-service"><?php echo $is_hotel_mode ? esc_html__( 'Room type', 'ltl-bookings' ) : esc_html__( 'Service', 'ltl-bookings' ); ?><span class="ltlb-required" aria-label="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</span></legend>
+                <legend id="ltlb-step-service"><?php echo $is_hotel_mode ? esc_html__( 'Room type', 'ltl-bookings' ) : esc_html__( 'Service', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr></legend>
                 
                 <div class="ltlb-form-group">
                     <select name="service_id" class="ltlb-service-select ltlb-input" required aria-required="true" data-price-cents="">
@@ -100,20 +100,20 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                     <div class="ltlb-form-row">
                         <div class="ltlb-form-group">
                             <label for="ltlb-checkin">
-                                <?php echo esc_html__( 'Check-in', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                                <?php echo esc_html__( 'Check-in', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                             </label>
                             <input type="date" id="ltlb-checkin" name="checkin" required aria-required="true" class="ltlb-input">
                         </div>
                         <div class="ltlb-form-group">
                             <label for="ltlb-checkout">
-                                <?php echo esc_html__( 'Check-out', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                                <?php echo esc_html__( 'Check-out', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                             </label>
                             <input type="date" id="ltlb-checkout" name="checkout" required aria-required="true" class="ltlb-input">
                         </div>
                     </div>
                     <div class="ltlb-form-group">
                         <label for="ltlb-guests">
-                            <?php echo esc_html__( 'Guests', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                            <?php echo esc_html__( 'Guests', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                         </label>
                         <input type="number" id="ltlb-guests" name="guests" min="1" value="1" required aria-required="true" class="ltlb-input">
                     </div>
@@ -128,13 +128,13 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                     <legend id="ltlb-step-datetime"><?php echo esc_html__( 'Date & Time', 'ltl-bookings' ); ?></legend>
                     <div class="ltlb-form-group">
                         <label for="ltlb-date">
-                            <?php echo esc_html__( 'Date', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                            <?php echo esc_html__( 'Date', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                         </label>
                         <input type="date" id="ltlb-date" name="date" required aria-required="true" class="ltlb-input">
                     </div>
                     <div class="ltlb-form-group">
                         <label for="ltlb-time-slot">
-                            <?php echo esc_html__( 'Time', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                            <?php echo esc_html__( 'Time', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                         </label>
                         <select id="ltlb-time-slot" name="time_slot" required aria-required="true" class="ltlb-input">
                             <option value=""><?php echo esc_html__( 'Select a date first', 'ltl-bookings' ); ?></option>
@@ -172,28 +172,28 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                 <legend id="ltlb-step-details"><?php echo esc_html__( 'Your details', 'ltl-bookings' ); ?></legend>
                 <div class="ltlb-form-group">
                     <label for="ltlb-email">
-                        <?php echo esc_html__( 'Email', 'ltl-bookings' ); ?><span class="ltlb-required">*</span>
+                        <?php echo esc_html__( 'Email', 'ltl-bookings' ); ?><abbr class="ltlb-required" title="<?php echo esc_attr__( 'required', 'ltl-bookings' ); ?>">*</abbr>
                     </label>
-                    <input type="email" id="ltlb-email" name="email" required aria-required="true" placeholder="you@example.com" autocomplete="email" class="ltlb-input">
+					<input type="email" id="ltlb-email" name="email" required aria-required="true" autocomplete="email" class="ltlb-input">
                 </div>
                 <div class="ltlb-form-row">
                     <div class="ltlb-form-group">
                         <label for="ltlb-first-name"><?php echo esc_html__( 'First name', 'ltl-bookings' ); ?></label>
-                        <input type="text" id="ltlb-first-name" name="first_name" autocomplete="given-name" placeholder="Jane" class="ltlb-input">
+						<input type="text" id="ltlb-first-name" name="first_name" autocomplete="given-name" class="ltlb-input">
                     </div>
                     <div class="ltlb-form-group">
                         <label for="ltlb-last-name"><?php echo esc_html__( 'Last name', 'ltl-bookings' ); ?></label>
-                        <input type="text" id="ltlb-last-name" name="last_name" autocomplete="family-name" placeholder="Doe" class="ltlb-input">
+						<input type="text" id="ltlb-last-name" name="last_name" autocomplete="family-name" class="ltlb-input">
                     </div>
                 </div>
                 <div class="ltlb-form-group">
                     <label for="ltlb-phone"><?php echo esc_html__( 'Phone', 'ltl-bookings' ); ?></label>
-                    <input type="tel" id="ltlb-phone" name="phone" placeholder="+1 555 123 4567" autocomplete="tel" class="ltlb-input">
+					<input type="tel" id="ltlb-phone" name="phone" autocomplete="tel" class="ltlb-input">
                 </div>
 
                 <div class="ltlb-step-nav">
                     <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                    <?php submit_button( esc_html__( 'Complete booking', 'ltl-bookings' ), 'primary', 'ltlb_book_submit', false, [ 'aria-label' => esc_attr__( 'Submit booking form', 'ltl-bookings' ) ] ); ?>
+                    <?php submit_button( esc_html__( 'Confirm booking', 'ltl-bookings' ), 'primary', 'ltlb_book_submit', false, [ 'aria-label' => esc_attr__( 'Submit booking form', 'ltl-bookings' ) ] ); ?>
                 </div>
             </fieldset>
         </div>

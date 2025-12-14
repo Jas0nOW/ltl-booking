@@ -116,6 +116,13 @@
     opacity: 0.75;
 }
 
+.ltlb-booking .ltlb-field-hint::before {
+    content: "ℹ";
+    display: inline-block;
+    margin-right: 0.35rem;
+    opacity: 0.85;
+}
+
 .ltlb-booking .ltlb-price-preview {
     border: var(--lazy-border-width, 1px) solid var(--lazy-border-color, #e5e7eb);
     border-radius: var(--lazy-border-radius, 12px);
@@ -153,7 +160,6 @@
 .ltlb-booking.ltlb-js .ltlb-stepper {
     overflow: hidden;
     height: auto;
-    transition: height var(--lazy-transition-duration, 200ms) ease;
     align-items: start;
 }
 
@@ -206,7 +212,7 @@
     min-width: 10rem;
 }
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
     .ltlb-booking .ltlb-step-nav {
         flex-direction: column;
         align-items: stretch;
@@ -1094,7 +1100,7 @@
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--lazy-space-6, 6px);
     white-space: nowrap;
 }
 

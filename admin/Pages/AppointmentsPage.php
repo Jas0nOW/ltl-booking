@@ -3,7 +3,7 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_AppointmentsPage {
 	public function render(): void {
-		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 
 		$appointment_repo = new LTLB_AppointmentRepository();
 		$service_repo = new LTLB_ServiceRepository();
@@ -62,7 +62,7 @@ class LTLB_Admin_AppointmentsPage {
                 <?php LTLB_Admin_Component::card_start(''); ?>
                     <div class="ltlb-table-toolbar">
                         <div class="ltlb-table-toolbar__bulk-actions" role="group" aria-label="<?php esc_attr_e( 'Bulk actions toolbar', 'ltl-bookings' ); ?>">
-                            <label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select bulk action', 'ltl-bookings' ); ?></label>
+							<label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Choose action to apply to selected appointments', 'ltl-bookings' ); ?></label>
                             <select name="action" id="bulk-action-selector-top" aria-describedby="bulk-action-help">
                                 <option value="-1"><?php esc_html_e( 'Bulk Actions', 'ltl-bookings' ); ?></option>
                                 <option value="set_status_confirmed"><?php esc_html_e( 'Change status to confirmed', 'ltl-bookings' ); ?></option>
@@ -73,9 +73,9 @@ class LTLB_Admin_AppointmentsPage {
                             <span id="bulk-action-help" class="screen-reader-text"><?php esc_html_e( 'Select appointments using checkboxes, choose an action, then click Apply', 'ltl-bookings' ); ?></span>
                         </div>
                         <div class="ltlb-table-toolbar__export">
-                            <button type="button" class="button ltlb-column-toggle-btn" id="ltlb-column-toggle-btn" aria-label="<?php esc_attr_e('Toggle columns', 'ltl-bookings'); ?>">
+							<button type="button" class="button ltlb-column-toggle-btn" id="ltlb-column-toggle-btn" aria-label="<?php esc_attr_e( 'Show/hide columns', 'ltl-bookings' ); ?>">
                                 <span class="dashicons dashicons-visibility"></span>
-                                <?php esc_html_e('Columns', 'ltl-bookings'); ?>
+								<?php esc_html_e( 'Manage columns', 'ltl-bookings' ); ?>
                             </button>
                             <a href="<?php echo esc_url( LTLB_ICS_Export::get_feed_url() ); ?>" class="button" target="_blank">
                                 <span class="dashicons dashicons-calendar-alt"></span>
@@ -92,8 +92,14 @@ class LTLB_Admin_AppointmentsPage {
                                 <option value="confirmed" <?php selected($status, 'confirmed'); ?>><?php echo esc_html__( 'Confirmed', 'ltl-bookings' ); ?></option>
                                 <option value="cancelled" <?php selected($status, 'cancelled'); ?>><?php echo esc_html__( 'Cancelled', 'ltl-bookings' ); ?></option>
                             </select>
-                            <button type="submit" class="button"><?php echo esc_html__( 'Filter', 'ltl-bookings' ); ?></button>
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments')); ?>" class="button"><?php echo esc_html__('Reset', 'ltl-bookings'); ?></a>
+                            <button type="submit" class="button">
+                                <span class="dashicons dashicons-filter" aria-hidden="true"></span>
+                                <?php echo esc_html__( 'Filter', 'ltl-bookings' ); ?>
+                            </button>
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments' ) ); ?>" class="button">
+                                <span class="dashicons dashicons-undo" aria-hidden="true"></span>
+                                <?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?>
+                            </a>
                         </form>
                     </div>
 

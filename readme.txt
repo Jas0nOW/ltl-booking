@@ -33,6 +33,12 @@ The REST namespace is `ltlb/v1`.
 4. Booking wizard.
 
 == Changelog ==
+= 1.0.1 =
+- Copy/UX: clearer labels and notices across admin + booking wizard.
+- A11y: improved focus styles and required field indicators.
+- Frontend: smoother wizard step transitions on mobile.
+- Admin: improved dark-mode styling consistency.
+
 = 0.4.4 =
 - Admin calendar management (drag & drop rescheduling).
 - Admin REST endpoints for calendar + appointment/customer edits.
@@ -45,4 +51,4 @@ The REST namespace is `ltlb/v1`.
 - Docs and API behavior aligned to current implementation.
 
 == Upgrade Notice ==
-Version 0.4.4: Database migrations run automatically on activation and when plugin version changes.
+Version 1.0.1: Database migrations run automatically on activation and when plugin version changes.

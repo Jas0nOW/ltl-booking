@@ -1,5 +1,12 @@
 # LazyBookings Changelog
 
+## 1.0.1
+- Release: version bump to 1.0.1
+- Copy/UX: clearer labels, notices, and required indicators
+- A11y: improved focus styles and aria labels
+- Frontend: improved stepper performance (avoid height transitions)
+- Admin: improved dark-mode robustness for dashboard components
+
 ## 0.4.4
 - Admin: shared header navigation across LazyBookings pages
 - Admin: Calendar page (FullCalendar) with drag & drop / resize

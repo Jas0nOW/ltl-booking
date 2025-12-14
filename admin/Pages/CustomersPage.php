@@ -10,7 +10,9 @@ class LTLB_Admin_CustomersPage {
 	}
 
 	public function render(): void {
-        if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        }
         $settings = get_option( 'lazy_settings', [] );
         $template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
         $is_hotel_mode = $template_mode === 'hotel';
@@ -36,7 +38,7 @@ class LTLB_Admin_CustomersPage {
 			if ( $res ) {
                 LTLB_Notices::add( $is_hotel_mode ? __( 'Guest saved.', 'ltl-bookings' ) : __( 'Customer saved.', 'ltl-bookings' ), 'success' );
 			} else {
-                LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( $is_hotel_mode ? __( 'Could not save guest. Please try again.', 'ltl-bookings' ) : __( 'Could not save customer. Please try again.', 'ltl-bookings' ), 'error' );
 			}
 			wp_safe_redirect( $redirect );
 			exit;
@@ -72,7 +74,7 @@ class LTLB_Admin_CustomersPage {
             <?php endif; ?>
             <hr class="wp-header-end">
 			
-			<p class="description" style="margin-bottom:20px;"><?php echo esc_html( $is_hotel_mode ? __( 'Manage guest information. Guests are created automatically from bookings.', 'ltl-bookings' ) : __( 'Manage customer information. Customers are created automatically from bookings.', 'ltl-bookings' ) ); ?></p>
+            <p class="description" style="margin-bottom:20px;"><?php echo esc_html( $is_hotel_mode ? __( 'Guests are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) : __( 'Customers are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) ); ?></p>
 
 			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -104,11 +106,11 @@ class LTLB_Admin_CustomersPage {
                                     <td><input name="email" id="email" type="email" value="<?php echo esc_attr( $email ); ?>" class="regular-text" required></td>
                                 </tr>
                                 <tr>
-							<th><label for="first_name"><?php echo esc_html__('First Name', 'ltl-bookings'); ?></label></th>
+						<th><label for="first_name"><?php echo esc_html__( 'First name', 'ltl-bookings' ); ?></label></th>
                                     <td><input name="first_name" id="first_name" type="text" value="<?php echo esc_attr( $first ); ?>" class="regular-text"></td>
                                 </tr>
                                 <tr>
-							<th><label for="last_name"><?php echo esc_html__('Last Name', 'ltl-bookings'); ?></label></th>
+						<th><label for="last_name"><?php echo esc_html__( 'Last name', 'ltl-bookings' ); ?></label></th>
                                     <td><input name="last_name" id="last_name" type="text" value="<?php echo esc_attr( $last ); ?>" class="regular-text"></td>
                                 </tr>
                                 <tr>
@@ -150,6 +152,17 @@ class LTLB_Admin_CustomersPage {
 							admin_url('admin.php?page=ltlb_customers&action=add'),
 							'dashicons-groups'
 						);
+
+                        $create_page_url = admin_url( 'post-new.php?post_type=page' );
+                        echo '<p class="description" style="margin-top:12px;">' . wp_kses(
+                            sprintf(
+                                /* translators: 1: link to create new page in WP admin, 2: shortcode */
+                                __( 'Tip: %1$s (shortcode: %2$s) and place a test booking to see it working end-to-end.', 'ltl-bookings' ),
+                                '<a href="' . esc_url( $create_page_url ) . '">' . esc_html__( 'Create a booking page', 'ltl-bookings' ) . '</a>',
+                                '<code>[lazy_book]</code>'
+                            ),
+                            [ 'a' => [ 'href' => true ], 'code' => [] ]
+                        ) . '</p>';
 						?>
                     <?php else : ?>
                         <table class="widefat striped">

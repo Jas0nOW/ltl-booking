@@ -116,9 +116,9 @@ class LTLB_Admin_ServicesPage {
 
             $redirect = admin_url( 'admin.php?page=ltlb_services' );
             if ( $ok ) {
-                LTLB_Notices::add( __( 'Saved.', 'ltl-bookings' ), 'success' );
+                LTLB_Notices::add( __( 'Service saved successfully.', 'ltl-bookings' ), 'success' );
             } else {
-                LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'Could not save service. Please try again.', 'ltl-bookings' ), 'error' );
             }
             wp_safe_redirect( $redirect );
             exit;
@@ -773,7 +773,13 @@ class LTLB_Admin_ServicesPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
-            <h1><?php echo $is_edit ? esc_html__('Edit ', 'ltl-bookings') . esc_html($service_label_singular) : esc_html__('Add New ', 'ltl-bookings') . esc_html($service_label_singular); ?></h1>
+            <h1>
+                <?php
+                echo $is_edit
+                    ? ( esc_html__( 'Edit', 'ltl-bookings' ) . ' ' . esc_html( $service_label_singular ) )
+                    : ( esc_html__( 'Add New', 'ltl-bookings' ) . ' ' . esc_html( $service_label_singular ) );
+                ?>
+            </h1>
 
             <?php LTLB_Admin_Component::card_start('', ['class' => 'ltlb-wizard-form']); ?>
                 <form method="post">

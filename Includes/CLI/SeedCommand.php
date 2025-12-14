@@ -111,7 +111,7 @@ class LTLB_CLI_SeedCommand {
             $user1->set_role( 'ltlb_staff' );
             
             // Add working hours (Mon-Fri 9-17)
-            $staff_hours_repo = new LTLB_StaffHoursRepository();
+            $staff_hours_repo = new StaffHoursRepository();
             for ( $day = 1; $day <= 5; $day++ ) {
                 $staff_hours_repo->create([
                     'user_id' => $staff_user1,
@@ -130,7 +130,7 @@ class LTLB_CLI_SeedCommand {
             $user2->set_role( 'ltlb_staff' );
             
             // Add working hours (Tue-Sat 10-18)
-            $staff_hours_repo = new LTLB_StaffHoursRepository();
+            $staff_hours_repo = new StaffHoursRepository();
             for ( $day = 2; $day <= 6; $day++ ) {
                 $staff_hours_repo->create([
                     'user_id' => $staff_user2,

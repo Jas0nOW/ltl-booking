@@ -9,31 +9,12 @@ class LTLB_Admin_HotelDashboardPage {
             $can_view_reports = LTLB_Role_Manager::user_can( 'view_ai_reports' );
         }
         if ( ! $can_view_reports ) {
-            wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
 
         // Handle AI insights generation.
-        if ( isset( $_POST['ltlb_generate_ai_insights'] ) ) {
-            if ( ! check_admin_referer( 'ltlb_generate_ai_insights_action', 'ltlb_generate_ai_insights_nonce' ) ) {
-                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
-            }
-            if ( ! $can_manage ) {
-                wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
-            }
-            if ( class_exists( 'LTLB_Automations' ) ) {
-                $res = LTLB_Automations::generate_ai_insights_now();
-                if ( ! empty( $res['success'] ) ) {
-                    $msg = $res['message'] ?? __( 'Report generated.', 'ltl-bookings' );
-                    if ( isset( $res['id'] ) ) {
-                        $msg .= ' ' . sprintf( __( 'Outbox draft #%d created.', 'ltl-bookings' ), intval( $res['id'] ) );
-                    }
-                    LTLB_Notices::add( $msg, 'success' );
-                } else {
-                    LTLB_Notices::add( $res['message'] ?? __( 'Could not generate report.', 'ltl-bookings' ), 'error' );
-                }
-            }
-            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_dashboard' ) );
-            exit;
+        if ( class_exists( 'LTLB_Automations' ) ) {
+            LTLB_Automations::maybe_handle_generate_ai_insights_post( admin_url( 'admin.php?page=ltlb_dashboard' ) );
         }
 
 		$appt_repo = new LTLB_AppointmentRepository();

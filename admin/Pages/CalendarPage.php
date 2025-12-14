@@ -33,7 +33,7 @@ class LTLB_Admin_CalendarPage {
 					<?php endif; ?>
 					<div class="ltlb-calendar-layout__main">
 					<div class="ltlb-calendar-legend-wrapper">
-						<button type="button" class="ltlb-calendar-legend-toggle" aria-expanded="true" aria-controls="ltlb-calendar-legend-items">
+						<button type="button" class="ltlb-calendar-legend-toggle" aria-expanded="true" aria-controls="ltlb-calendar-legend-items" aria-label="<?php echo esc_attr__( 'Show or hide status legend', 'ltl-bookings' ); ?>">
 							<span class="dashicons dashicons-info" aria-hidden="true"></span>
 							<?php echo esc_html__( 'Legend', 'ltl-bookings' ); ?>
 							<span class="dashicons dashicons-arrow-down-alt2 ltlb-legend-toggle-icon" aria-hidden="true"></span>
@@ -55,7 +55,7 @@ class LTLB_Admin_CalendarPage {
 						</div>
 				<div id="ltlb-admin-calendar-loading" class="ltlb-calendar-loading" role="status" aria-live="polite">
 					<span class="spinner is-active"></span>
-					<span class="screen-reader-text"><?php echo esc_html__( 'Loading calendar...', 'ltl-bookings' ); ?></span>
+					<span class="screen-reader-text"><?php echo esc_html__( 'Loading calendar… This may take a few seconds.', 'ltl-bookings' ); ?></span>
 				</div>
 				<div id="ltlb-admin-calendar" style="min-height: <?php echo $is_hotel_mode ? '0' : '700'; ?>px;" hidden></div>
 				<?php if ( $is_hotel_mode ): ?>
