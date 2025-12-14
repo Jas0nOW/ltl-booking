@@ -62,14 +62,14 @@ class LTLB_Admin_AppointmentsPage {
                 <?php LTLB_Admin_Component::card_start(''); ?>
                     <div class="ltlb-table-toolbar">
                         <div class="ltlb-table-toolbar__bulk-actions">
-                            <label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select bulk action' ); ?></label>
+                            <label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select bulk action', 'ltl-bookings' ); ?></label>
                             <select name="action" id="bulk-action-selector-top">
-                                <option value="-1"><?php esc_html_e( 'Bulk Actions' ); ?></option>
-                                <option value="set_status_confirmed"><?php esc_html_e( 'Change status to confirmed' ); ?></option>
-                                <option value="set_status_pending"><?php esc_html_e( 'Change status to pending' ); ?></option>
-                                <option value="set_status_cancelled"><?php esc_html_e( 'Change status to cancelled' ); ?></option>
+                                <option value="-1"><?php esc_html_e( 'Bulk Actions', 'ltl-bookings' ); ?></option>
+                                <option value="set_status_confirmed"><?php esc_html_e( 'Change status to confirmed', 'ltl-bookings' ); ?></option>
+                                <option value="set_status_pending"><?php esc_html_e( 'Change status to pending', 'ltl-bookings' ); ?></option>
+                                <option value="set_status_cancelled"><?php esc_html_e( 'Change status to cancelled', 'ltl-bookings' ); ?></option>
                             </select>
-                            <?php submit_button( esc_html__( 'Apply' ), 'action', '', false ); ?>
+                            <?php submit_button( esc_html__( 'Apply', 'ltl-bookings' ), 'action', '', false ); ?>
                         </div>
                         <form method="get">
                             <input type="hidden" name="page" value="ltlb_appointments">
@@ -90,7 +90,7 @@ class LTLB_Admin_AppointmentsPage {
                         <thead>
                             <tr>
                                 <td id="cb" class="manage-column column-cb check-column">
-                                    <label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All' ); ?></label>
+                                    <label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All', 'ltl-bookings' ); ?></label>
                                     <input id="cb-select-all-1" type="checkbox">
                                 </td>
                                 <th scope="col" class="manage-column"><?php echo esc_html__( 'Customer', 'ltl-bookings' ); ?></th>

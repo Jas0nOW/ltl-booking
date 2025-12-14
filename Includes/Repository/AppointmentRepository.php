@@ -153,7 +153,11 @@ class LTLB_AppointmentRepository {
 		
 		$sql = "SELECT COUNT({$this->table_name}.id) FROM {$this->table_name} {$join} {$where_sql}";
 		
-		$count = $wpdb->get_var($wpdb->prepare($sql, ...$params));
+		if ( empty( $params ) ) {
+			$count = $wpdb->get_var( $sql );
+		} else {
+			$count = $wpdb->get_var( $wpdb->prepare( $sql, ...$params ) );
+		}
 		return (int) $count;
 	}
 

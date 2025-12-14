@@ -165,8 +165,6 @@ Komponenten (wiederverwendbar):
 
 ## 5) Projekt-Status & Nächste Phasen
 ⚠️ **Aktuell bekannte Blocker (müssen vor “Release‑Ready” gefixt werden):**
-- `Plugin.php:load_classes()` lädt die Component‑Library / Dashboard‑Subpages nicht vollständig (führt zu Class‑Not‑Found / Fallback‑Text).
-- Hotel‑Modus: `Customers/Guests` sollte verfügbar sein (Gäste‑Management).
 - Hotel‑Room‑Types benötigen zusätzliche Felder (Beds, Amenities, Max‑Occupancy) inkl. Save/Load.
 
 
@@ -184,7 +182,7 @@ Komponenten (wiederverwendbar):
     - `wizard_steps/wizard_step_start/step_end()` – Multi-Step Form Navigation
     - `pagination()` – WordPress-integrierte Pagination
   - ✅ Mode-spezifische Dashboards: 
-    - `DashboardPage` (appointments) mit Schnellstarts
+    - `AppointmentsDashboardPage` (appointments) mit Schnellstarts
     - `HotelDashboardPage` (hotel) mit KPI-Karten
   - ✅ Admin CSS mit 8pt Grid, 10-14px Radius, subtilen Schatten
 
@@ -276,23 +274,31 @@ Komponenten (wiederverwendbar):
 Der Agent soll daraus zu Beginn eine **pinnbare Task‑Liste im Copilot‑Chat** erzeugen und beim Abarbeiten abhaken.
 
 ### P0 (Blocker/Kritisch)
-- [ ] Fehlender Require für Component Library — `Plugin.php:load_classes()`
+- [x] Fehlender Require für Component Library — `Plugin.php:load_classes()`
   - Fix: `require_once LTLB_PATH . 'admin/Components/Component.php';` hinzufügen.
   - Check: `LTLB_Admin_Component` wird in `ServicesPage.php` ohne Fehler geladen.
-- [ ] Dashboard Sub‑Pages nicht geladen — `Plugin.php:load_classes()`
+- [x] Dashboard Sub‑Pages nicht geladen — `Plugin.php:load_classes()`
   - Fix: `require_once` für `AppointmentsDashboardPage.php` und `HotelDashboardPage.php` hinzufügen.
   - Check: Dashboard instanziiert je nach Modus die korrekte Klasse (kein Fallback‑Text).
-- [ ] Frontend/Backend Sprache & i18n konsistent machen — `public/Templates/wizard.php` (+ Admin Pages)
+- [x] Frontend/Backend Sprache & i18n konsistent machen — `public/Templates/wizard.php` (+ Admin Pages)
   - Fix: Alle user‑facing Strings via `__()`/`esc_html__()` mit Textdomain `ltl-bookings`; Basissprache im Code Englisch; DE via Übersetzung.
   - Check: Keine hardcoded DE/EN‑Mischung mehr; Wizard rendert korrekt in DE/EN.
 
-- [ ] Textdomain‑Wrap Bug (Admin) — `admin/Pages/AppointmentsPage.php:75,80-82`
+- [x] Textdomain‑Wrap Bug (Admin) — `admin/Pages/AppointmentsPage.php:75,80-82`
   - Fix: falsche `esc_html__()` Nutzung korrigieren / Strings korrekt wrappen (Textdomain).
   - Check: Alle Bulk/Screenreader Strings sind übersetzbar.
 
+- [x] Stale Require entfernen (fatal) — `Includes/Core/Plugin.php:load_classes()`
+  - Fix: `require_once ... admin/Pages/DashboardPage.php` entfernen (Datei existiert nicht; Dashboards sind `AppointmentsDashboardPage.php` + `HotelDashboardPage.php`).
+  - Check: Plugin lädt ohne Fatal Error.
+
+- [x] `wpdb::prepare()` Notice fixen (fehlender Placeholder) — `Includes/Repository/AppointmentRepository.php:get_count()`
+  - Fix: Nur `prepare()` aufrufen, wenn `$params` nicht leer sind; sonst direkt `$wpdb->get_var($sql)`.
+  - Check: Kein “query argument must have a placeholder” Notice mehr.
+
 ### P1 (Hoch)
-- [ ] Customers/Guests im Hotel‑Modus aktivieren — `Plugin.php:register_admin_menu`
-  - Fix: `ltlb_customers` Menüpunkt im Hotel‑Modus freigeben (Label ggf. “Guests”).
+- [x] Customers/Guests im Hotel‑Modus aktivieren — `Plugin.php:register_admin_menu`
+  - Fix: `ltlb_customers` Menüpunkt im Hotel‑Modus freigeben (Label “Guests”).
   - Check: Menüpunkt erscheint im Hotel‑Modus.
 - [ ] Room Types: Hotel‑Felder ergänzen — `admin/Pages/ServicesPage.php`
   - Fix: Beds‑Type, Amenities, Max‑Occupancy (Adults/Children) hinzufügen, wenn `is_hotel` aktiv ist.
@@ -370,9 +376,6 @@ Der Agent soll daraus zu Beginn eine **pinnbare Task‑Liste im Copilot‑Chat**
   - Check: selbsterklärend.
 
 ### P3 (Low/Polish)
-- [ ] Dead Code prüfen: `admin/Pages/DashboardPage.php`
-  - Fix: Nur Router behalten oder bereinigen.
-  - Check: Datei enthält nur notwendige Logik.
 - [ ] Keyboard‑Shortcuts — `AppointmentsPage.php`
   - Fix: optional `Ctrl+F` Filter, `Ctrl+N` New.
   - Check: Power‑User schneller.

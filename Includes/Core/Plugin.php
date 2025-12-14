@@ -65,7 +65,9 @@ class LTLB_Plugin {
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Components/AdminHeader.php';
-        require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
+        require_once LTLB_PATH . 'admin/Components/Component.php';
+        require_once LTLB_PATH . 'admin/Pages/AppointmentsDashboardPage.php';
+        require_once LTLB_PATH . 'admin/Pages/HotelDashboardPage.php';
         require_once LTLB_PATH . 'admin/Pages/ServicesPage.php';
         require_once LTLB_PATH . 'admin/Pages/CustomersPage.php';
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
@@ -176,17 +178,16 @@ class LTLB_Plugin {
             [ $this, 'render_calendar_page' ]
         );
 
-		if ($admin_mode === 'appointments') {
-			// Customers
-			add_submenu_page(
-				'ltlb_dashboard',
-				__( 'Customers', 'ltl-bookings' ),
-				__( 'Customers', 'ltl-bookings' ),
-				'manage_options',
-				'ltlb_customers',
-				[ $this, 'render_customers_page' ]
-			);
-		}
+        // Customers / Guests
+        $customers_label = $admin_mode === 'hotel' ? __( 'Guests', 'ltl-bookings' ) : __( 'Customers', 'ltl-bookings' );
+        add_submenu_page(
+            'ltlb_dashboard',
+            $customers_label,
+            $customers_label,
+            'manage_options',
+            'ltlb_customers',
+            [ $this, 'render_customers_page' ]
+        );
 
 
         // Services (context-aware label)

@@ -11,6 +11,12 @@ class LTLB_Admin_CustomersPage {
 
 	public function render(): void {
         if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        $settings = get_option( 'lazy_settings', [] );
+        $admin_mode = is_array( $settings ) && isset( $settings['admin_mode'] ) ? $settings['admin_mode'] : 'appointments';
+        $is_hotel_mode = $admin_mode === 'hotel';
+        $page_title = $is_hotel_mode ? __( 'Guests', 'ltl-bookings' ) : __( 'Customers', 'ltl-bookings' );
+        $item_singular = $is_hotel_mode ? __( 'Guest', 'ltl-bookings' ) : __( 'Customer', 'ltl-bookings' );
+        $item_plural = $page_title;
 		// Handle save
 		if ( isset( $_POST['ltlb_customer_save'] ) ) {
 			if ( ! check_admin_referer( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ) ) {
@@ -28,7 +34,7 @@ class LTLB_Admin_CustomersPage {
 
 			$redirect = admin_url( 'admin.php?page=ltlb_customers' );
 			if ( $res ) {
-                LTLB_Notices::add( __( 'Customer saved.', 'ltl-bookings' ), 'success' );
+                LTLB_Notices::add( $is_hotel_mode ? __( 'Guest saved.', 'ltl-bookings' ) : __( 'Customer saved.', 'ltl-bookings' ), 'success' );
 			} else {
                 LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
 			}
@@ -48,13 +54,13 @@ class LTLB_Admin_CustomersPage {
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_customers'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Customers', 'ltl-bookings'); ?></h1>
+			<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <?php endif; ?>
             <hr class="wp-header-end">
 			
-            <p class="description" style="margin-bottom:20px;"><?php echo esc_html__('Manage customer information. Customers are created automatically from bookings.', 'ltl-bookings'); ?></p>
+			<p class="description" style="margin-bottom:20px;"><?php echo esc_html( $is_hotel_mode ? __( 'Manage guest information. Guests are created automatically from bookings.', 'ltl-bookings' ) : __( 'Manage customer information. Customers are created automatically from bookings.', 'ltl-bookings' ) ); ?></p>
 
 			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -66,7 +72,15 @@ class LTLB_Admin_CustomersPage {
 				$notes = $editing ? $customer['notes'] : '';
 				?>
                 <div class="ltlb-card" style="max-width:800px;">
-					<h2><?php echo $editing ? esc_html__('Edit Customer', 'ltl-bookings') : esc_html__('Add New Customer', 'ltl-bookings'); ?></h2>
+                    <h2>
+                        <?php
+                        echo esc_html(
+                            $editing
+                                ? ( $is_hotel_mode ? __( 'Edit Guest', 'ltl-bookings' ) : __( 'Edit Customer', 'ltl-bookings' ) )
+                                : ( $is_hotel_mode ? __( 'Add New Guest', 'ltl-bookings' ) : __( 'Add New Customer', 'ltl-bookings' ) )
+                        );
+                        ?>
+                    </h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ); ?>
                         <input type="hidden" name="ltlb_customer_save" value="1" />
@@ -97,7 +111,16 @@ class LTLB_Admin_CustomersPage {
                         </table>
 
                         <p class="submit">
-						<?php submit_button( $editing ? esc_html__('Update Customer', 'ltl-bookings') : esc_html__('Create Customer', 'ltl-bookings'), 'primary', 'submit', false ); ?>
+                        <?php
+                        submit_button(
+                            $editing
+                                ? ( $is_hotel_mode ? __( 'Update Guest', 'ltl-bookings' ) : __( 'Update Customer', 'ltl-bookings' ) )
+                                : ( $is_hotel_mode ? __( 'Create Guest', 'ltl-bookings' ) : __( 'Create Customer', 'ltl-bookings' ) ),
+                            'primary',
+                            'submit',
+                            false
+                        );
+                        ?>
 						<a href="<?php echo admin_url('admin.php?page=ltlb_customers'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>
@@ -105,8 +128,8 @@ class LTLB_Admin_CustomersPage {
 			<?php else: ?>
                 <div class="ltlb-card">
                     <?php if ( empty($customers) ) : ?>
-						<p><?php echo esc_html__('No customers found.', 'ltl-bookings'); ?></p>
-						<p><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="button button-primary"><?php echo esc_html__('Add New Customer', 'ltl-bookings'); ?></a></p>
+						<p><?php echo esc_html( $is_hotel_mode ? __( 'No guests found.', 'ltl-bookings' ) : __( 'No customers found.', 'ltl-bookings' ) ); ?></p>
+						<p><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="button button-primary"><?php echo esc_html( $is_hotel_mode ? __( 'Add New Guest', 'ltl-bookings' ) : __( 'Add New Customer', 'ltl-bookings' ) ); ?></a></p>
                     <?php else : ?>
                         <table class="widefat striped">
                             <thead>
