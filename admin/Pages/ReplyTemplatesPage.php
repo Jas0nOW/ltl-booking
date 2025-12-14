@@ -4,7 +4,7 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_ReplyTemplatesPage {
 	public function render(): void {
 		if ( ! current_user_can( 'manage_ai_settings' ) ) {
-			wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 		}
 
 		$this->handle_post();
@@ -36,7 +36,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 				<form method="post" style="margin:12px 0;">
 					<?php wp_nonce_field( 'ltlb_templates_action', 'ltlb_templates_nonce' ); ?>
 					<input type="hidden" name="ltlb_templates_do" value="add_default">
-					<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Add Default Templates', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Load default templates', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<table class="widefat striped">
@@ -49,7 +49,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 					</thead>
 					<tbody>
 						<?php if ( empty( $templates ) ): ?>
-							<tr><td colspan="3"><?php echo esc_html__( 'No templates yet.', 'ltl-bookings' ); ?></td></tr>
+							<tr><td colspan="3"><?php echo esc_html__( 'No templates yet. Click "Add New" to create your first template.', 'ltl-bookings' ); ?></td></tr>
 						<?php else: ?>
 							<?php foreach ( $templates as $tpl ): ?>
 								<?php

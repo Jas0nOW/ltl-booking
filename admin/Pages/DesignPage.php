@@ -36,13 +36,13 @@ class LTLB_Admin_DesignPage {
     }
 
     public function render(): void {
-        if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 
         $scope = $this->get_scope();
 
         if ( isset( $_POST['ltlb_design_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_design_save_action', 'ltlb_design_nonce' ) ) {
-                wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__( 'Security check failed. Please reload the page and try again.', 'ltl-bookings' ) );
             }
 
             $design = get_option( 'lazy_design', [] );

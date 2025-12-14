@@ -47,3 +47,7 @@ class StaffExceptionsRepository {
         return (bool) $wpdb->delete($table, ['id' => $id], ['%d']);
     }
 }
+
+if ( ! class_exists( 'LTLB_StaffExceptionsRepository' ) ) {
+    class LTLB_StaffExceptionsRepository extends StaffExceptionsRepository {}
+}

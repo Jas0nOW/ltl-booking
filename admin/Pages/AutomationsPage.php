@@ -4,7 +4,7 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_AutomationsPage {
 	public function render(): void {
 		if ( ! current_user_can( 'manage_ai_settings' ) ) {
-			wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 		}
 
 		$this->handle_post();

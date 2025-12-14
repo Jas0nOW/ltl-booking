@@ -4,7 +4,7 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_SettingsPage {
 
 	public function render(): void {
-        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 
 		// Handle test email
 		if ( isset( $_POST['ltlb_send_test_email'] ) ) {
@@ -240,12 +240,12 @@ class LTLB_Admin_SettingsPage {
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label for="working_hours_start"><?php echo esc_html__( 'Working Hours', 'ltl-bookings' ); ?></label></th>
+                                <th><label for="working_hours_start"><?php echo esc_html__( 'Business hours', 'ltl-bookings' ); ?></label></th>
                                 <td>
                                     <label><?php echo esc_html__( 'Start:', 'ltl-bookings' ); ?> <input name="working_hours_start" id="working_hours_start" type="number" value="<?php echo esc_attr( $start ); ?>" class="small-text" min="0" max="23"></label>
                                     &nbsp;&nbsp;
                                     <label><?php echo esc_html__( 'End:', 'ltl-bookings' ); ?> <input name="working_hours_end" id="working_hours_end" type="number" value="<?php echo esc_attr( $end ); ?>" class="small-text" min="0" max="23"></label>
-                                    <p class="description"><?php echo esc_html__( 'Global working hours (0-23). Individual staff hours can override this.', 'ltl-bookings' ); ?></p>
+                                    <p class="description"><?php echo esc_html__( 'Global business hours (0-23). Individual staff hours can override this.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>

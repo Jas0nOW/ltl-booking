@@ -115,22 +115,8 @@
             var h = $active.outerHeight(true);
             if (!h || h <= 0) return;
 
-            // Animate height changes by setting explicit height.
-            var current = $stepper.height();
-            if (!current || current <= 0) {
-                $stepper.css('height', h + 'px');
-                return;
-            }
-            if (Math.abs(current - h) < 2) {
-                $stepper.css('height', h + 'px');
-                return;
-            }
-
-            // Set current height first, then transition to new height.
-            $stepper.css('height', current + 'px');
-            window.requestAnimationFrame(function() {
-                $stepper.css('height', h + 'px');
-            });
+            // Keep layout stable without animating container height (better on mobile).
+            $stepper.css('height', h + 'px');
         }
 
         function setActiveStep(stepName) {

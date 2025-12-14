@@ -210,6 +210,32 @@ class LTLB_Automations {
 		return [ 'success' => false, 'message' => __( 'Unknown rule type.', 'ltl-bookings' ) ];
 	}
 
+	public static function maybe_handle_generate_ai_insights_post( string $redirect_url ): void {
+		if ( ! isset( $_POST['ltlb_generate_ai_insights'] ) ) {
+			return;
+		}
+		if ( ! check_admin_referer( 'ltlb_generate_ai_insights_action', 'ltlb_generate_ai_insights_nonce' ) ) {
+			wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
+		}
+
+		$res = self::generate_ai_insights_now();
+		if ( ! empty( $res['success'] ) ) {
+			$msg = $res['message'] ?? __( 'Report generated.', 'ltl-bookings' );
+			if ( isset( $res['id'] ) ) {
+				$msg .= ' ' . sprintf( __( 'Outbox draft #%d created.', 'ltl-bookings' ), intval( $res['id'] ) );
+			}
+			LTLB_Notices::add( $msg, 'success' );
+		} else {
+			LTLB_Notices::add( $res['message'] ?? __( 'Could not generate report.', 'ltl-bookings' ), 'error' );
+		}
+
+		wp_safe_redirect( $redirect_url );
+		exit;
+	}
+
 	public static function generate_ai_insights_now(): array {
 		$report = self::build_insights_bundle_report();
 		if ( $report === '' ) {

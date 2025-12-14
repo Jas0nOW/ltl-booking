@@ -1,15 +1,6 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
-require_once LTLB_PATH . 'Includes/Repository/ServiceRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/AppointmentRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/ResourceRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/AppointmentResourcesRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/StaffHoursRepository.php';
-require_once LTLB_PATH . 'Includes/Repository/StaffExceptionsRepository.php';
-require_once LTLB_PATH . 'Includes/Util/Time.php';
-
 class Availability {
     /**
      * Compute availability for a given service and date.
@@ -306,4 +297,8 @@ class Availability {
 
         return $slots;
     }
+}
+
+if ( ! class_exists( 'LTLB_Availability' ) ) {
+    class LTLB_Availability extends Availability {}
 }

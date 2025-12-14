@@ -48,3 +48,7 @@ class StaffHoursRepository {
         return true;
     }
 }
+
+if ( ! class_exists( 'LTLB_StaffHoursRepository' ) ) {
+    class LTLB_StaffHoursRepository extends StaffHoursRepository {}
+}

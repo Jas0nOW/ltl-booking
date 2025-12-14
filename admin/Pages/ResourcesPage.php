@@ -43,9 +43,9 @@ class LTLB_Admin_ResourcesPage {
 
             $redirect = admin_url( 'admin.php?page=ltlb_resources' );
             if ( $ok ) {
-                LTLB_Notices::add( __( 'Saved.', 'ltl-bookings' ), 'success' );
+                LTLB_Notices::add( sprintf( __( '%s saved successfully.', 'ltl-bookings' ), $label_singular ), 'success' );
             } else {
-                LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( sprintf( __( 'Could not save %s. Please try again.', 'ltl-bookings' ), $label_singular ), 'error' );
             }
             wp_safe_redirect( $redirect );
             exit;
