@@ -31,6 +31,9 @@ class LTLB_Admin_ResourcesPage {
             $data['description'] = isset( $_POST['description'] ) ? wp_kses_post( $_POST['description'] ) : null;
             $data['capacity'] = LTLB_Sanitizer::int( $_POST['capacity'] ?? 1 );
             $data['is_active'] = isset( $_POST['is_active'] ) ? 1 : 0;
+            if ( $is_hotel ) {
+                $data['cost_per_night_cents'] = max( 0, LTLB_Sanitizer::money_cents( $_POST['cost_per_night'] ?? 0 ) );
+            }
 
             if ( $id > 0 ) {
                 $ok = $this->resource_repository->update( $id, $data );
@@ -77,6 +80,8 @@ class LTLB_Admin_ResourcesPage {
                 $description = $editing ? $resource['description'] : '';
                 $capacity = $editing ? $resource['capacity'] : 1;
                 $is_active = $editing ? ( ! empty( $resource['is_active'] ) ) : true;
+                $cost_per_night_cents = $editing ? intval( $resource['cost_per_night_cents'] ?? 0 ) : 0;
+                $cost_per_night = number_format( $cost_per_night_cents / 100, 2, '.', '' );
                 ?>
                 <div class="ltlb-card" style="max-width:800px;">
                     <h2><?php echo $editing ? sprintf(esc_html__('Edit %s', 'ltl-bookings'), $label_singular) : sprintf(esc_html__('Add New %s', 'ltl-bookings'), $label_singular); ?></h2>
@@ -102,6 +107,15 @@ class LTLB_Admin_ResourcesPage {
                                         <p class="description" id="capacity-desc"><?php echo esc_html__('Maximum number of simultaneous bookings this resource can handle (e.g., 1 for exclusive use, 10 for a meeting room).', 'ltl-bookings'); ?></p>
                                     </td>
                                 </tr>
+                                <?php if ( $is_hotel ) : ?>
+                                <tr>
+                                    <th><label for="cost_per_night"><?php echo esc_html__( 'Cost per Night', 'ltl-bookings' ); ?></label></th>
+                                    <td>
+                                        <input name="cost_per_night" id="cost_per_night" type="text" value="<?php echo esc_attr( (string) $cost_per_night ); ?>" class="regular-text" aria-describedby="cost-per-night-desc">
+                                        <p class="description" id="cost-per-night-desc"><?php echo esc_html__( 'Internal cost per occupied night for gross profit calculations. Stored in cents.', 'ltl-bookings' ); ?></p>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                                 <tr>
                                     <th><?php echo esc_html__('Active', 'ltl-bookings'); ?></th>
                                     <td><label><input name="is_active" type="checkbox" value="1" <?php checked( $is_active ); ?>> <?php echo esc_html__('Yes', 'ltl-bookings'); ?></label></td>
@@ -141,6 +155,9 @@ class LTLB_Admin_ResourcesPage {
                                 <tr>
                                     <th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th>
                                     <th><?php echo esc_html__('Capacity', 'ltl-bookings'); ?></th>
+                                    <?php if ( $is_hotel ) : ?>
+                                        <th><?php echo esc_html__( 'Cost / Night', 'ltl-bookings' ); ?></th>
+                                    <?php endif; ?>
                                     <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
                                     <th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
                                 </tr>
@@ -157,6 +174,9 @@ class LTLB_Admin_ResourcesPage {
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo intval( $r['capacity'] ); ?></td>
+                                        <?php if ( $is_hotel ) : ?>
+                                            <td>€<?php echo esc_html( number_format( (float) ( intval( $r['cost_per_night_cents'] ?? 0 ) ) / 100, 2 ) ); ?></td>
+                                        <?php endif; ?>
                                         <td>
                                             <?php if ( ! empty($r['is_active']) ) : ?>
                                                 <span class="ltlb-status-badge status-active"><?php echo esc_html__('Active', 'ltl-bookings'); ?></span>

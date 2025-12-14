@@ -11,12 +11,12 @@ class LTLB_Admin_Header {
 		}
 
 		$settings = get_option('lazy_settings', []);
-		$is_hotel_frontend = is_array($settings) && isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
-        $admin_mode = is_array($settings) && isset($settings['admin_mode']) ? $settings['admin_mode'] : 'appointments';
+		$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
+		$is_hotel_mode = $template_mode === 'hotel';
 
 		$tabs = [];
 
-        if ($admin_mode === 'appointments') {
+        if ($template_mode === 'service') {
             $tabs = [
                 'ltlb_dashboard' => [
                     'label' => __( 'Dashboard', 'ltl-bookings' ),
@@ -109,10 +109,10 @@ class LTLB_Admin_Header {
 			</div>
 			<div class="ltlb-admin-header__main">
 				<div class="ltlb-mode-switcher">
-					<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_admin_mode' => 'appointments'])); ?>" class="ltlb-mode-switcher__button <?php echo $admin_mode === 'appointments' ? 'is-active' : ''; ?>">
-						<?php echo esc_html__('Appointments', 'ltl-bookings'); ?>
-					</a>
-					<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_admin_mode' => 'hotel'])); ?>" class="ltlb-mode-switcher__button <?php echo $admin_mode === 'hotel' ? 'is-active' : ''; ?>">
+				<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_template_mode' => 'service'])); ?>" class="ltlb-mode-switcher__button <?php echo $template_mode === 'service' ? 'is-active' : ''; ?>">
+					<?php echo esc_html__('Appointments', 'ltl-bookings'); ?>
+				</a>
+				<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_template_mode' => 'hotel'])); ?>" class="ltlb-mode-switcher__button <?php echo $template_mode === 'hotel' ? 'is-active' : ''; ?>">
 						<?php echo esc_html__('Hotel', 'ltl-bookings'); ?>
 					</a>
 				</div>

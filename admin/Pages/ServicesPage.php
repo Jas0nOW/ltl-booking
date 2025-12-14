@@ -573,8 +573,8 @@ class LTLB_Admin_ServicesPage {
         $services = $repo->get_all_with_staff_and_resources($per_page, $offset);
 
         $settings = get_option( 'lazy_settings', [] );
-        $admin_mode = is_array( $settings ) && isset( $settings['admin_mode'] ) ? $settings['admin_mode'] : 'appointments';
-        $is_hotel = $admin_mode === 'hotel';
+        $template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
+        $is_hotel = $template_mode === 'hotel';
         $service_label_plural = $is_hotel ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
         $service_label_singular = $is_hotel ? __( 'Room Type', 'ltl-bookings' ) : __( 'Service', 'ltl-bookings' );
 
@@ -596,17 +596,33 @@ class LTLB_Admin_ServicesPage {
         }
 
         ?>
-        <div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html($service_label_plural); ?></h1>
             <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <hr class="wp-header-end">
 
-            <?php LTLB_Admin_Component::card_start('', ['style' => 'margin-top:20px;']); ?>
-                <table class="wp-list-table widefat fixed striped">
+            <div class="ltlb-table-actions" style="margin-top: 20px;">
+                <button type="button" class="button ltlb-column-toggle-btn" id="ltlb-services-column-toggle">
+                    <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                    <?php echo esc_html__('Columns', 'ltl-bookings'); ?>
+                </button>
+                <div class="ltlb-column-toggle-menu" id="ltlb-services-column-menu" hidden>
+                    <?php foreach($columns as $key => $label): ?>
+                        <label class="ltlb-column-toggle-item">
+                            <input type="checkbox" class="ltlb-column-checkbox" data-column="<?php echo esc_attr($key); ?>" checked>
+                            <span><?php echo esc_html($label); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <?php LTLB_Admin_Component::card_start('', ['style' => 'margin-top:12px;']); ?>
+                <table class="wp-list-table widefat fixed striped ltlb-table-with-toggles" id="ltlb-services-table">
                     <thead>
                         <tr>
                             <?php foreach($columns as $key => $label): ?>
-                                <th scope="col" class="manage-column"><?php echo esc_html($label); ?></th>
+                                <th scope="col" class="manage-column ltlb-col-<?php echo esc_attr($key); ?>" data-column="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
@@ -628,7 +644,7 @@ class LTLB_Admin_ServicesPage {
                         <?php else: ?>
                             <?php foreach ($services as $service): ?>
                                 <tr>
-                                    <td>
+                                    <td class="ltlb-col-name" data-column="name">
                                         <strong><a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=edit&id=' . $service['id'])); ?>"><?php echo esc_html($service['name']); ?></a></strong>
                                         <div class="row-actions">
                                             <span class="edit"><a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=edit&id=' . $service['id'])); ?>"><?php echo esc_html__( 'Edit', 'ltl-bookings' ); ?></a> | </span>
@@ -636,13 +652,13 @@ class LTLB_Admin_ServicesPage {
                                         </div>
                                     </td>
                                     <?php if(!$is_hotel): ?>
-                                        <td><?php echo esc_html($service['duration_min']); ?> min</td>
+                                        <td class="ltlb-col-duration" data-column="duration"><?php echo esc_html($service['duration_min']); ?> min</td>
                                     <?php endif; ?>
-                                    <td><?php echo esc_html(number_format($service['price_cents'] / 100, 2) . ' ' . $service['currency']); ?></td>
+                                    <td class="ltlb-col-price" data-column="price"><?php echo esc_html(number_format($service['price_cents'] / 100, 2) . ' ' . $service['currency']); ?></td>
                                     <?php if(!$is_hotel): ?>
-                                        <td><?php echo esc_html($service['staff_name'] ?? __( 'Any', 'ltl-bookings' )); ?></td>
+                                        <td class="ltlb-col-staff" data-column="staff"><?php echo esc_html($service['staff_name'] ?? __( 'Any', 'ltl-bookings' )); ?></td>
                                     <?php endif; ?>
-                                    <td><?php echo esc_html($service['resources'] ? implode(', ', $service['resources']) : ($is_hotel ? __('No rooms assigned', 'ltl-bookings') : __( 'All', 'ltl-bookings' ))); ?></td>
+                                    <td class="ltlb-col-resources" data-column="resources"><?php echo esc_html($service['resources'] ? implode(', ', $service['resources']) : ($is_hotel ? __('No rooms assigned', 'ltl-bookings') : __( 'All', 'ltl-bookings' ))); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -656,7 +672,7 @@ class LTLB_Admin_ServicesPage {
             function qs(sel, root){ return (root || document).querySelector(sel); }
             function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
-            var modeSelect = qs('select[name="admin_mode"]');
+            var modeSelect = qs('select[name="template_mode"]');
             var serviceRows = qsa('.wp-list-table tbody tr');
             var currentMode = modeSelect ? modeSelect.value : 'appointments';
 
@@ -682,6 +698,46 @@ class LTLB_Admin_ServicesPage {
                 modeSelect.addEventListener('change', function() {
                     currentMode = this.value;
                     toggleColumns(currentMode);
+                });
+            }
+
+            // Column visibility toggles
+            var toggleBtn = qs('#ltlb-services-column-toggle');
+            var toggleMenu = qs('#ltlb-services-column-menu');
+            if (toggleBtn && toggleMenu) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleMenu.hidden = !toggleMenu.hidden;
+                });
+                
+                document.addEventListener('click', function() {
+                    toggleMenu.hidden = true;
+                });
+                
+                toggleMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                var checkboxes = qsa('.ltlb-column-checkbox', toggleMenu);
+                checkboxes.forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        var col = this.dataset.column;
+                        var isVisible = this.checked;
+                        var cells = qsa('.ltlb-col-' + col);
+                        cells.forEach(function(cell) {
+                            cell.style.display = isVisible ? '' : 'none';
+                        });
+                        // Save preference
+                        localStorage.setItem('ltlb_columns_services_' + col, isVisible ? '1' : '0');
+                    });
+                    
+                    // Restore preference
+                    var col = cb.dataset.column;
+                    var saved = localStorage.getItem('ltlb_columns_services_' + col);
+                    if (saved !== null) {
+                        cb.checked = saved === '1';
+                        cb.dispatchEvent(new Event('change'));
+                    }
                 });
             }
         })();
@@ -715,7 +771,8 @@ class LTLB_Admin_ServicesPage {
         $repo = new LTLB_ServiceRepository();
         $selected_resources = $is_edit ? $repo->get_assigned_resource_ids($service['id']) : [];
         ?>
-        <div class="wrap">
+        <div class="wrap ltlb-admin">
+            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
             <h1><?php echo $is_edit ? esc_html__('Edit ', 'ltl-bookings') . esc_html($service_label_singular) : esc_html__('Add New ', 'ltl-bookings') . esc_html($service_label_singular); ?></h1>
 
             <?php LTLB_Admin_Component::card_start('', ['class' => 'ltlb-wizard-form']); ?>

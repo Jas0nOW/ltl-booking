@@ -157,8 +157,8 @@ class LTLB_DiagnosticsPage {
         global $wpdb;
         $settings = get_option('lazy_settings', []);
         
-        echo '<div class="notice notice-info" style="margin-top: 20px; padding: 15px; background: #f0f0f1; border-left: 4px solid #72aee6;">';
-        echo '<h3 style="margin-top: 0;">' . esc_html__( 'System Check Results', 'ltl-bookings' ) . '</h3>';
+        echo '<div class="notice notice-info ltlb-diagnostics-notice">';
+        echo '<h3 class="ltlb-diagnostics-notice__title">' . esc_html__( 'System Check Results', 'ltl-bookings' ) . '</h3>';
         
         // Version info
         $plugin_version = defined('LTLB_VERSION') ? LTLB_VERSION : __( 'unknown', 'ltl-bookings' );
@@ -167,9 +167,9 @@ class LTLB_DiagnosticsPage {
         echo '<p><strong>' . esc_html__( 'DB Version:', 'ltl-bookings' ) . '</strong> ' . esc_html($db_version) . '</p>';
         
         if (version_compare($plugin_version, $db_version, '>')) {
-            echo '<p style="color: #d63638;"><strong>' . esc_html__( '⚠ DB version is behind plugin version.', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Please run migrations.', 'ltl-bookings' ) . '</p>';
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--warn"><strong>' . esc_html__( '⚠ DB version is behind plugin version.', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Please run migrations.', 'ltl-bookings' ) . '</p>';
         } elseif (version_compare($plugin_version, $db_version, '=')) {
-            echo '<p style="color: #00a32a;"><strong>' . esc_html__( '✓ DB version matches plugin version.', 'ltl-bookings' ) . '</strong></p>';
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--ok"><strong>' . esc_html__( '✓ DB version matches plugin version.', 'ltl-bookings' ) . '</strong></p>';
         }
         
         // Template mode
@@ -181,9 +181,9 @@ class LTLB_DiagnosticsPage {
         $lock_supported = ($lock_test === '1');
         if ($lock_supported) {
             $wpdb->query("SELECT RELEASE_LOCK('ltlb_test_lock')");
-            echo '<p style="color: #00a32a;"><strong>' . esc_html__( 'MySQL Named Locks:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Supported ✓', 'ltl-bookings' ) . '</p>';
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--ok"><strong>' . esc_html__( 'MySQL Named Locks:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Supported ✓', 'ltl-bookings' ) . '</p>';
         } else {
-            echo '<p style="color: #d63638;"><strong>' . esc_html__( 'MySQL Named Locks:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Not supported (race condition protection disabled)', 'ltl-bookings' ) . '</p>';
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--warn"><strong>' . esc_html__( 'MySQL Named Locks:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Not supported (race condition protection disabled)', 'ltl-bookings' ) . '</p>';
         }
         
         // Mail configuration

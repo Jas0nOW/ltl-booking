@@ -75,6 +75,8 @@ class LTLB_I18n {
 			'Room' => 'Zimmer',
 			'Resources' => 'Ressourcen',
 			'Rooms' => 'Zimmer',
+			'Unassigned' => 'Nicht zugewiesen',
+			'Other' => 'Sonstiges',
 			'Staff' => 'Mitarbeiter',
 			'Settings' => 'Einstellungen',
 			'Design' => 'Design',
@@ -222,6 +224,16 @@ class LTLB_I18n {
 			'Appointment updated.' => 'Termin aktualisiert.',
 			'Appointment details loaded.' => 'Termindetails geladen.',
 			'Loading appointment details…' => 'Termindetails werden geladen…',
+
+			// Calendar legend: editable colors
+			'Change color' => 'Farbe ändern',
+			'Change color for Confirmed' => 'Farbe für Bestätigt ändern',
+			'Change color for Pending' => 'Farbe für Ausstehend ändern',
+			'Change color for Cancelled' => 'Farbe für Storniert ändern',
+			'Color saved.' => 'Farbe gespeichert.',
+			'Could not save color.' => 'Farbe konnte nicht gespeichert werden.',
+			'No rooms found.' => 'Keine Zimmer gefunden.',
+			'Could not load rooms.' => 'Zimmer konnten nicht geladen werden.',
 
 			// CSV export headings
 			'Customer Name' => 'Kundenname',
@@ -549,6 +561,22 @@ class LTLB_I18n {
 			'Appointment #%d' => 'Termin #%d',
 
 			'ID' => 'ID',
+
+			// Frontend/Public booking wizard
+			'Step %s of %s' => 'Schritt %s von %s',
+			'night' => 'Nacht',
+			'nights' => 'Nächte',
+			'Any' => 'Beliebig',
+			'Room #' => 'Zimmer #',
+			'Resource #' => 'Ressource #',
+			'Optional: select a room.' => 'Optional: Wähle ein Zimmer aus.',
+			'Optional: select a resource.' => 'Optional: Wähle eine Ressource aus.',
+			'Availability could not be loaded. Please try again.' => 'Verfügbarkeit konnte nicht geladen werden. Bitte versuche es erneut.',
+			'Resources could not be loaded. Please try again.' => 'Ressourcen konnten nicht geladen werden. Bitte versuche es erneut.',
+
+			// Design & AI placeholders
+			'.ltlb-booking .service-card { /* your styles */ }' => '.ltlb-booking .service-card { /* Deine Styles */ }',
+			'mail@example.com, +1-555-0000' => 'mail@beispiel.de, +49-123-456789',
 		];
 
 		return $dict;

@@ -96,7 +96,9 @@
             var total = $visible.length || 1;
             var title = getPanelTitle($active);
 
-            $stepCount.text('Schritt ' + current + ' von ' + total);
+            var stepText = window.ltlbI18n && window.ltlbI18n.step_of ? window.ltlbI18n.step_of : 'Step %s of %s';
+            stepText = stepText.replace('%s', current).replace('%s', total);
+            $stepCount.text(stepText);
             $stepTitle.text(title ? '— ' + title : '');
         }
 
@@ -263,7 +265,9 @@
                     var totalCents = priceCents * nights;
                     var pricePerNight = (priceCents / 100).toFixed(2);
                     var total = (totalCents / 100).toFixed(2);
-                    var nightLabel = (nights === 1) ? 'Nacht' : 'Nächte';
+                    var nightLabel = (nights === 1) ? 
+                        (window.ltlbI18n && window.ltlbI18n.night ? window.ltlbI18n.night : 'night') : 
+                        (window.ltlbI18n && window.ltlbI18n.nights ? window.ltlbI18n.nights : 'nights');
 
                     $priceAmount.text('€' + total);
                     $priceBreakdown.text(nights + ' ' + nightLabel + ' × €' + pricePerNight);
@@ -325,6 +329,26 @@
 
         var startMode = String($root.data('ltlb-start-mode') || 'wizard');
         var prefillServiceId = parseInt($root.data('ltlb-prefill-service') || 0, 10);
+
+        // Optional prefill (from query params via PHP data attributes)
+        var prefillDate = String($root.data('ltlb-prefill-date') || '');
+        var prefillTime = String($root.data('ltlb-prefill-time') || '');
+        var prefillCheckin = String($root.data('ltlb-prefill-checkin') || '');
+        var prefillCheckout = String($root.data('ltlb-prefill-checkout') || '');
+        var prefillGuests = parseInt($root.data('ltlb-prefill-guests') || 0, 10);
+
+        if ($dateInput.length && prefillDate && !$dateInput.val()) {
+            $dateInput.val(prefillDate);
+        }
+        if ($checkinInput.length && prefillCheckin && !$checkinInput.val()) {
+            $checkinInput.val(prefillCheckin);
+        }
+        if ($checkoutInput.length && prefillCheckout && !$checkoutInput.val()) {
+            $checkoutInput.val(prefillCheckout);
+        }
+        if (prefillGuests && $root.find('#ltlb-guests').length) {
+            $root.find('#ltlb-guests').val(String(prefillGuests));
+        }
 
         function getInlineMessageEl($anchor, kind) {
             // kind: 'info' | 'error'
@@ -403,7 +427,7 @@
                 var serviceId = parseInt($serviceSelect.val() || 0, 10);
                 if (!serviceId) {
                     $serviceSelect.attr('aria-invalid', 'true');
-                    showInlineError($serviceSelect, 'Bitte wähle eine Leistung.');
+                    showInlineError($serviceSelect, 'Please select a service.');
                     firstInvalid = $serviceSelect;
                 }
             }
@@ -418,15 +442,15 @@
 
                 if (!d) {
                     $dateInput.attr('aria-invalid', 'true');
-                    showInlineError($dateInput, 'Bitte wähle ein Datum.');
+                    showInlineError($dateInput, 'Please select a date.');
                     firstInvalid = $dateInput;
                 } else if ($timeSelect.prop('disabled')) {
                     // Slots still loading or unavailable
-                    showInlineInfo($timeSelect, 'Verfügbare Zeiten werden noch geladen…', true);
+                    showInlineInfo($timeSelect, 'Available times are still loading…', true);
                     firstInvalid = $timeSelect;
                 } else if (!t) {
                     $timeSelect.attr('aria-invalid', 'true');
-                    showInlineError($timeSelect, 'Bitte wähle eine Uhrzeit.');
+                    showInlineError($timeSelect, 'Please select a time.');
                     firstInvalid = $timeSelect;
                 }
             }
@@ -441,22 +465,22 @@
 
                 if (!ci) {
                     $checkinInput.attr('aria-invalid', 'true');
-                    showInlineError($checkinInput, 'Bitte wähle ein Anreise-Datum.');
+                    showInlineError($checkinInput, 'Please select a check-in date.');
                     firstInvalid = $checkinInput;
                 } else if (!co) {
                     $checkoutInput.attr('aria-invalid', 'true');
-                    showInlineError($checkoutInput, 'Bitte wähle ein Abreise-Datum.');
+                    showInlineError($checkoutInput, 'Please select a check-out date.');
                     firstInvalid = $checkoutInput;
                 } else {
                     var ciD = parseIsoDateLocal(ci);
                     var coD = parseIsoDateLocal(co);
                     if (ciD && ciD < startOfTodayLocal()) {
                         $checkinInput.attr('aria-invalid', 'true');
-                        showInlineError($checkinInput, 'Das Datum darf nicht in der Vergangenheit liegen.');
+                        showInlineError($checkinInput, 'The date cannot be in the past.');
                         firstInvalid = $checkinInput;
                     } else if (ciD && coD && coD <= ciD) {
                         $checkoutInput.attr('aria-invalid', 'true');
-                        showInlineError($checkoutInput, 'Die Abreise muss nach der Anreise liegen.');
+                        showInlineError($checkoutInput, 'Check-out must be after check-in.');
                         firstInvalid = $checkoutInput;
                     }
                 }
@@ -471,11 +495,11 @@
 
                     if (!emailVal) {
                         $email.attr('aria-invalid', 'true');
-                        showInlineError($email, 'Bitte gib deine E-Mail-Adresse ein.');
+                        showInlineError($email, 'Please enter your email address.');
                         firstInvalid = $email;
                     } else if (el && typeof el.checkValidity === 'function' && !el.checkValidity()) {
                         $email.attr('aria-invalid', 'true');
-                        showInlineError($email, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+                        showInlineError($email, 'Please enter a valid email address.');
                         firstInvalid = $email;
                     }
                 }
@@ -497,7 +521,7 @@
 
         function resetResourceStep() {
             if (!$resourceStep.length) return;
-            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
+            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any' }));
             $resourceStep.hide();
             syncStepIndicator();
         }
@@ -521,7 +545,7 @@
             }
 
             $resourceSelect.prop('disabled', true);
-            showInlineInfo($resourceSelect, 'Verfügbarkeit wird geladen…', true);
+            showInlineInfo($resourceSelect, 'Loading availability…', true);
 
             $.getJSON(restRoot + '/hotel/availability', { service_id: serviceId, checkin: checkin, checkout: checkout, guests: guests })
                 .done(function(resp) {
@@ -549,15 +573,18 @@
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
+                    var anyText = window.ltlbI18n && window.ltlbI18n.any ? window.ltlbI18n.any : 'Any';
+                    var roomPrefix = window.ltlbI18n && window.ltlbI18n.room_number ? window.ltlbI18n.room_number : 'Room #';
+                    var selectRoomText = window.ltlbI18n && window.ltlbI18n.select_room_optional ? window.ltlbI18n.select_room_optional : 'Optional: select a room.';
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: anyText }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Zimmer #' + r.id))
+                            text: String(r.name || (roomPrefix + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Optional: Zimmer auswählen.');
+                        $resourceHint.text(selectRoomText);
                     }
                     $resourceSelect.prop('disabled', false);
                     $resourceStep.show();
@@ -567,7 +594,8 @@
                 })
                 .fail(function() {
                     $resourceSelect.prop('disabled', true);
-                    showInlineError($resourceSelect, 'Verfügbarkeit konnte nicht geladen werden. Bitte erneut versuchen.');
+                    var errorText = window.ltlbI18n && window.ltlbI18n.availability_error ? window.ltlbI18n.availability_error : 'Availability could not be loaded. Please try again.';
+                    showInlineError($resourceSelect, errorText);
                     setTimeout(setStepperHeight, 0);
                 });
         }
@@ -588,21 +616,21 @@
             clearInlineMessages($timeSelect);
 
             if (!serviceId || !date) {
-                resetTimeSelect('Zuerst Datum wählen');
+                resetTimeSelect('Select a date first');
                 syncNextButtons();
                 return;
             }
 
             if (!restRoot) {
-                resetTimeSelect('Zeiten konnten nicht geladen werden');
-                showInlineError($timeSelect, 'Zeiten konnten nicht geladen werden. Bitte Seite neu laden.');
+                resetTimeSelect('Times could not be loaded');
+                showInlineError($timeSelect, 'Times could not be loaded. Please reload the page.');
                 syncNextButtons();
                 return;
             }
 
             // Loading state: disable select and show spinner/status (avoid "Loading..." as an option)
             resetTimeSelect('—');
-            showInlineInfo($timeSelect, 'Verfügbare Zeiten werden geladen…', true);
+            showInlineInfo($timeSelect, 'Loading available times…', true);
 
             $.getJSON(restRoot + '/time-slots', { service_id: serviceId, date: date })
                 .done(function(slots) {
@@ -610,14 +638,14 @@
                     $timeSelect.empty();
 
                     if (!Array.isArray(slots) || slots.length === 0) {
-                        $timeSelect.append($('<option/>', { value: '', text: 'Keine Zeiten verfügbar' }));
+                        $timeSelect.append($('<option/>', { value: '', text: 'No times available' }));
                         $timeSelect.prop('disabled', true);
-                        showInlineInfo($timeSelect, 'Für dieses Datum sind keine Zeiten verfügbar.', false);
+                        showInlineInfo($timeSelect, 'No times are available for this date.', false);
                         syncNextButtons();
                         return;
                     }
 
-                    $timeSelect.append($('<option/>', { value: '', text: 'Uhrzeit auswählen' }));
+                    $timeSelect.append($('<option/>', { value: '', text: 'Select a time' }));
                     for (var i = 0; i < slots.length; i++) {
                         var slot = slots[i] || {};
                         var label = String(slot.time || '');
@@ -632,12 +660,23 @@
                     }
 
                     $timeSelect.prop('disabled', false);
+
+                    // Apply optional prefilled time once slots exist
+                    if (prefillTime && !$timeSelect.val()) {
+                        var has = $timeSelect.find('option[value="' + String(prefillTime).replace(/"/g, '\\"') + '"]').length;
+                        if (has) {
+                            $timeSelect.val(String(prefillTime));
+                            prefillTime = '';
+                            onTimeChanged();
+                        }
+                    }
+
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
                 })
                 .fail(function() {
                     resetTimeSelect('—');
-                    showInlineError($timeSelect, 'Zeiten konnten nicht geladen werden. Bitte erneut versuchen.');
+                    showInlineError($timeSelect, 'Times could not be loaded. Please try again.');
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
                 });
@@ -657,7 +696,7 @@
             }
 
             $resourceSelect.prop('disabled', true);
-            showInlineInfo($resourceSelect, 'Ressourcen werden geladen…', true);
+            showInlineInfo($resourceSelect, 'Loading resources…', true);
 
             $.getJSON(restRoot + '/slot-resources', { service_id: serviceId, start: start })
                 .done(function(resp) {
@@ -683,15 +722,18 @@
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
+                    var anyText = window.ltlbI18n && window.ltlbI18n.any ? window.ltlbI18n.any : 'Any';
+                    var resourcePrefix = window.ltlbI18n && window.ltlbI18n.resource_number ? window.ltlbI18n.resource_number : 'Resource #';
+                    var selectResourceText = window.ltlbI18n && window.ltlbI18n.select_resource_optional ? window.ltlbI18n.select_resource_optional : 'Optional: select a resource.';
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: anyText }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Ressource #' + r.id))
+                            text: String(r.name || (resourcePrefix + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Optional: Ressource auswählen.');
+                        $resourceHint.text(selectResourceText);
                     }
                     $resourceStep.show();
                     syncStepIndicator();
@@ -705,7 +747,8 @@
                 })
                 .fail(function() {
                     $resourceSelect.prop('disabled', true);
-                    showInlineError($resourceSelect, 'Ressourcen konnten nicht geladen werden. Bitte erneut versuchen.');
+                    var errorText = window.ltlbI18n && window.ltlbI18n.resources_error ? window.ltlbI18n.resources_error : 'Resources could not be loaded. Please try again.';
+                    showInlineError($resourceSelect, errorText);
                     setTimeout(setStepperHeight, 0);
                 });
         }

@@ -2,8 +2,9 @@
  * LazyBookings Admin Styles
  */
 
-/* Spacing tokens (scoped to plugin admin UI) */
+/* Design tokens (scoped to plugin admin UI) */
 .ltlb-admin {
+    /* Spacing */
     --lazy-space-2: 2px;
     --lazy-space-4: 4px;
     --lazy-space-5: 5px;
@@ -15,6 +16,185 @@
     --lazy-space-15: 15px;
     --lazy-space-16: 16px;
     --lazy-space-20: 20px;
+    --lazy-space-24: 24px;
+    --lazy-space-40: 40px;
+
+    /* Light Mode Colors */
+    --lazy-bg-primary: #ffffff;
+    --lazy-bg-secondary: #f9f9f9;
+    --lazy-bg-tertiary: #f4f4f4;
+    --lazy-panel-bg: var(--lazy-bg-secondary);
+    --lazy-text-primary: #1d2327;
+    --lazy-text-secondary: #646970;
+    --lazy-text-muted: #999;
+    --lazy-border-light: rgba(0,0,0,0.06);
+    --lazy-border-medium: rgba(0,0,0,0.1);
+    --lazy-border-strong: #ccd0d4;
+    --lazy-accent: #2271b1;
+    --lazy-accent-hover: #135e96;
+    --lazy-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --lazy-shadow-md: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Occupancy donut (uses existing theme tokens) */
+.ltlb-donut {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: conic-gradient(var(--lazy-accent) calc(var(--ltlb-donut-pct, 0) * 1%), var(--lazy-border-medium) 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--lazy-shadow-sm);
+}
+
+.ltlb-donut__inner {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--lazy-bg-primary);
+    border: 1px solid var(--lazy-border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.ltlb-donut__value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--lazy-text-primary);
+    line-height: 1.1;
+}
+
+.ltlb-donut__label {
+    font-size: 11px;
+    color: var(--lazy-text-secondary);
+    margin-top: 2px;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .ltlb-admin {
+        --lazy-bg-primary: #1e1e1e;
+        --lazy-bg-secondary: #2a2a2a;
+        --lazy-bg-tertiary: #333333;
+        --lazy-text-primary: #e4e4e4;
+        --lazy-text-secondary: #b4b4b4;
+        --lazy-text-muted: #888;
+        --lazy-border-light: rgba(255,255,255,0.08);
+        --lazy-border-medium: rgba(255,255,255,0.15);
+        --lazy-border-strong: rgba(255,255,255,0.2);
+        --lazy-accent: #4a9eff;
+        --lazy-accent-hover: #6bb0ff;
+        --lazy-shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+        --lazy-shadow-md: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Cards & Panels */
+    .ltlb-admin .ltlb-card,
+    .ltlb-admin .ltlb-admin-header,
+    .ltlb-admin .ltlb-kpi-card {
+        background: var(--lazy-bg-secondary);
+        border-color: var(--lazy-border-medium);
+        color: var(--lazy-text-primary);
+    }
+
+    /* Tables */
+    .ltlb-admin table.widefat {
+        background: var(--lazy-bg-secondary);
+        color: var(--lazy-text-primary);
+        border-color: var(--lazy-border-medium);
+    }
+
+    .ltlb-admin table.widefat thead th,
+    .ltlb-admin table.widefat tfoot th {
+        background: var(--lazy-bg-tertiary);
+        color: var(--lazy-text-primary);
+        border-color: var(--lazy-border-medium);
+    }
+
+    .ltlb-admin table.widefat tbody tr:nth-child(odd) {
+        background: var(--lazy-bg-secondary);
+    }
+
+    .ltlb-admin table.widefat tbody tr:nth-child(even) {
+        background: var(--lazy-bg-primary);
+    }
+
+    .ltlb-admin table.widefat tbody tr:hover {
+        background: var(--lazy-bg-tertiary);
+    }
+
+    /* Forms */
+    .ltlb-admin input[type="text"],
+    .ltlb-admin input[type="email"],
+    .ltlb-admin input[type="number"],
+    .ltlb-admin input[type="date"],
+    .ltlb-admin input[type="time"],
+    .ltlb-admin select,
+    .ltlb-admin textarea {
+        background: var(--lazy-bg-tertiary);
+        border-color: var(--lazy-border-medium);
+        color: var(--lazy-text-primary);
+    }
+
+    .ltlb-admin input:focus,
+    .ltlb-admin select:focus,
+    .ltlb-admin textarea:focus {
+        border-color: var(--lazy-accent);
+        box-shadow: 0 0 0 1px var(--lazy-accent);
+    }
+
+    /* Buttons */
+    .ltlb-admin .button-primary {
+        background: var(--lazy-accent);
+        border-color: var(--lazy-accent);
+    }
+
+    .ltlb-admin .button-primary:hover {
+        background: var(--lazy-accent-hover);
+        border-color: var(--lazy-accent-hover);
+    }
+
+    .ltlb-admin .button-secondary {
+        background: var(--lazy-bg-tertiary);
+        border-color: var(--lazy-border-medium);
+        color: var(--lazy-text-primary);
+    }
+
+    .ltlb-admin .button-secondary:hover {
+        background: var(--lazy-bg-secondary);
+        border-color: var(--lazy-border-strong);
+    }
+
+    /* Status badges */
+    .ltlb-admin .ltlb-status-badge {
+        border: 1px solid var(--lazy-border-medium);
+    }
+
+    /* Calendar */
+    .ltlb-admin .fc {
+        --fc-border-color: var(--lazy-border-medium);
+        --fc-bg-event-opacity: 0.8;
+    }
+
+    .ltlb-admin .fc .fc-button-primary {
+        background: var(--lazy-accent);
+        border-color: var(--lazy-accent);
+    }
+
+    .ltlb-admin .fc .fc-button-primary:hover {
+        background: var(--lazy-accent-hover);
+        border-color: var(--lazy-accent-hover);
+    }
+
+    /* Shadows in dark mode - softer */
+    .ltlb-admin .ltlb-card,
+    .ltlb-admin .ltlb-kpi-card {
+        box-shadow: var(--lazy-shadow-sm);
+    }
 }
 
 /* Shared Admin Header */
@@ -42,7 +222,7 @@
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: var(--lazy-primary, #2271b1);
+    color: var(--lazy-accent, #2271b1);
 }
 
 .ltlb-admin .ltlb-admin-header__titles { line-height: 1.2; }
@@ -50,12 +230,12 @@
 .ltlb-admin .ltlb-admin-header__title {
     font-size: 14px;
     font-weight: 700;
-    color: var(--lazy-text, #1d2327);
+    color: var(--lazy-text-primary, #1d2327);
 }
 
 .ltlb-admin .ltlb-admin-header__subtitle {
     font-size: 12px;
-    color: #646970;
+    color: var(--lazy-text-secondary, #646970);
 }
 
 .ltlb-admin .ltlb-admin-header__nav {
@@ -80,7 +260,7 @@
 /* Mode Switcher */
 .ltlb-mode-switcher {
 	display: flex;
-	background-color: #e0e0e0;
+    background-color: var(--lazy-bg-tertiary, #f4f4f4);
 	border-radius: 8px;
 	padding: 4px;
 	margin-bottom: 10px;
@@ -89,15 +269,15 @@
 .ltlb-mode-switcher__button {
 	padding: 6px 12px;
 	text-decoration: none;
-	color: #555;
+    color: var(--lazy-text-secondary, #646970);
 	border-radius: 6px;
 	font-weight: 500;
 	transition: all 0.2s ease-in-out;
 }
 
 .ltlb-mode-switcher__button.is-active {
-	background-color: #fff;
-	color: #0073aa;
+    background-color: var(--lazy-bg-primary, #ffffff);
+    color: var(--lazy-accent, var(--lazy-primary, #2271b1));
 	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
@@ -252,18 +432,238 @@
     align-items: start;
 }
 
+/* Calendar surfaces (shared between Termin + Hotel rack) */
+.ltlb-admin {
+    --ltlb-calendar-surface: var(--lazy-panel-bg, #fff);
+    --ltlb-calendar-header-surface: var(--lazy-bg-secondary, #f6f7f7);
+    --ltlb-today-bg: rgba(34, 113, 177, 0.04);
+    --ltlb-today-border: rgba(34, 113, 177, 0.14);
+}
+
 /* Calendar container should read like a panel/card */
 .ltlb-admin #ltlb-admin-calendar {
-    background: var(--lazy-panel-bg, #fff);
+    background: var(--ltlb-calendar-surface, var(--lazy-panel-bg, #fff));
     border: 1px solid var(--lazy-border-color, #ccd0d4);
     border-radius: var(--lazy-border-radius, 8px);
     box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
     padding: var(--lazy-space-10, 10px);
 }
 
+/* Hotel mode: calendar surface must follow the configured panel color */
+.ltlb-admin.ltlb-admin--hotel #ltlb-admin-calendar {
+    /* Hotel uses the same surface: panel background */
+    background: var(--ltlb-calendar-surface, var(--lazy-panel-bg, #fff));
+}
+
+/* Date header row: dynamic surface derived from calendar surface (keeps it readable on any panel bg) */
+@supports (background: color-mix(in srgb, #000 10%, #fff)) {
+    .ltlb-admin {
+        --ltlb-calendar-header-surface: color-mix(
+            in srgb,
+            var(--ltlb-calendar-surface) 92%,
+            #000
+        );
+        --ltlb-today-bg: color-mix(
+            in srgb,
+            var(--lazy-accent, var(--wp-admin-theme-color, #2271b1)) 8%,
+            var(--ltlb-calendar-surface)
+        );
+    }
+    @media (prefers-color-scheme: dark) {
+        .ltlb-admin {
+            --ltlb-calendar-header-surface: color-mix(
+                in srgb,
+                var(--ltlb-calendar-surface) 88%,
+                #fff
+            );
+        }
+    }
+}
+
 @media (max-width: 1200px) {
     .ltlb-admin .ltlb-calendar-layout {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Hotel mode: rooms are rendered inside the calendar rack */
+.ltlb-admin.ltlb-admin--hotel .ltlb-calendar-layout__rooms {
+    display: none;
+}
+
+/* Keep FullCalendar navigation, hide its grid in hotel mode */
+.ltlb-admin.ltlb-admin--hotel #ltlb-admin-calendar .fc-view-harness {
+    display: none;
+}
+
+/* Hotel room-rack (per-room rows connected to calendar range) */
+.ltlb-admin .ltlb-hotel-rack {
+    margin-top: var(--lazy-space-10, 10px);
+    border: 0;
+    border-radius: 0;
+    background: var(--ltlb-calendar-surface, var(--lazy-panel-bg, #fff));
+    overflow: auto;
+    position: relative;
+}
+
+/* Hotel rack: paint a full-height "Today" column stripe (also below the last row) */
+.ltlb-admin .ltlb-hotel-rack.ltlb-hotel-rack--has-today {
+    --ltlb-rack-left-col: 220px;
+    background-image: linear-gradient(
+        to right,
+        transparent 0,
+        transparent calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * var(--ltlb-rack-today-idx) / var(--ltlb-rack-cols))
+        ),
+        var(--ltlb-today-border) calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * var(--ltlb-rack-today-idx) / var(--ltlb-rack-cols))
+        ),
+        var(--ltlb-today-bg) calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * var(--ltlb-rack-today-idx) / var(--ltlb-rack-cols))
+        ),
+        var(--ltlb-today-bg) calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * (var(--ltlb-rack-today-idx) + 1) / var(--ltlb-rack-cols))
+        ),
+        var(--ltlb-today-border) calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * (var(--ltlb-rack-today-idx) + 1) / var(--ltlb-rack-cols))
+        ),
+        transparent calc(
+            var(--ltlb-rack-left-col) + ((100% - var(--ltlb-rack-left-col)) * (var(--ltlb-rack-today-idx) + 1) / var(--ltlb-rack-cols))
+        )
+    );
+    background-repeat: no-repeat;
+}
+
+.ltlb-admin .ltlb-hotel-rack__row {
+    display: grid;
+    gap: 0;
+    min-width: 900px;
+}
+
+.ltlb-admin .ltlb-hotel-rack__row + .ltlb-hotel-rack__row {
+    border-top: 1px solid var(--fc-border-color, var(--lazy-border-medium, rgba(0,0,0,0.1)));
+}
+
+.ltlb-admin .ltlb-hotel-rack__cell {
+    padding: 6px 8px;
+    border-right: 1px solid var(--fc-border-color, var(--lazy-border-medium, rgba(0,0,0,0.1)));
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--lazy-text-primary, #1d2327);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.ltlb-admin .ltlb-hotel-rack__row .ltlb-hotel-rack__cell:last-child {
+    border-right: 0;
+}
+
+.ltlb-admin .ltlb-hotel-rack__row--header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--ltlb-calendar-header-surface, var(--lazy-bg-secondary, #f6f7f7));
+}
+
+/* FullCalendar date header row surface (Termin-Vorlage) */
+.ltlb-admin .fc .fc-scrollgrid-section-header td,
+.ltlb-admin .fc .fc-scrollgrid-section-header th,
+.ltlb-admin .fc .fc-col-header-cell,
+.ltlb-admin .fc .fc-timegrid-axis,
+.ltlb-admin .fc .fc-timegrid-axis-frame {
+    background: var(--ltlb-calendar-header-surface, var(--lazy-bg-secondary, #f6f7f7));
+}
+
+/* Hotel rack: highlight "Today" column like the normal calendar */
+.ltlb-admin .ltlb-hotel-rack__cell--today {
+    background: var(--ltlb-today-bg);
+}
+
+@supports (color: color-mix(in srgb, #000 10%, #fff)) {
+    .ltlb-admin .ltlb-hotel-rack__row--header .ltlb-hotel-rack__cell--today {
+        color: color-mix(
+            in srgb,
+            var(--lazy-accent, var(--wp-admin-theme-color, #2271b1)) 65%,
+            currentColor
+        );
+        font-weight: 800;
+        box-shadow: inset 0 -2px 0 color-mix(
+            in srgb,
+            var(--lazy-accent, var(--wp-admin-theme-color, #2271b1)) 35%,
+            transparent
+        );
+    }
+}
+
+.ltlb-admin .ltlb-hotel-rack__room-label {
+    font-weight: 600;
+}
+
+.ltlb-admin .ltlb-hotel-rack__group-toggle {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--lazy-text-primary, #1d2327);
+}
+
+.ltlb-admin .ltlb-hotel-rack__group-sub {
+    font-weight: normal;
+    color: var(--lazy-text-secondary, #646970);
+}
+
+.ltlb-admin .ltlb-hotel-rack__booking {
+    margin: 3px 2px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--lazy-border-light, rgba(0,0,0,0.06));
+    grid-row: 1;
+    z-index: 2;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.ltlb-admin .ltlb-hotel-rack__occ {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--lazy-text-secondary, #646970);
+}
+
+.ltlb-admin .ltlb-hotel-rack__booking--selected {
+    outline: 2px solid var(--lazy-accent, #2271b1);
+    outline-offset: 1px;
+}
+
+.ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-confirmed {
+    border-left: 4px solid var(--ltlb-status-confirmed, var(--lazy-accent, #2271b1));
+}
+
+.ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-pending {
+    border-left: 4px solid var(--ltlb-status-pending, #2271b1);
+}
+
+.ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-cancelled {
+    border-left: 4px solid var(--ltlb-status-cancelled, #ccd0d4);
+}
+
+@supports (background: color-mix(in srgb, #fff, #000)) {
+    .ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-confirmed {
+        background: color-mix(in srgb, var(--ltlb-status-confirmed, var(--lazy-accent, #2271b1)) 18%, transparent);
+    }
+    .ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-pending {
+        background: color-mix(in srgb, var(--ltlb-status-pending, #2271b1) 18%, transparent);
+    }
+    .ltlb-admin .ltlb-hotel-rack__booking.ltlb-fc-status-cancelled {
+        background: color-mix(in srgb, var(--ltlb-status-cancelled, #ccd0d4) 22%, transparent);
     }
 }
 
@@ -273,30 +673,130 @@
     align-self: start;
 }
 
+.ltlb-admin .ltlb-calendar-legend-wrapper {
+    margin: 0 0 var(--lazy-space-10, 10px) 0;
+}
+
+.ltlb-admin .ltlb-calendar-legend-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lazy-space-6, 6px);
+    padding: var(--lazy-space-8, 8px) var(--lazy-space-12, 12px);
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d2327;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ltlb-admin .ltlb-calendar-legend-toggle:hover {
+    background: rgba(0,0,0,0.04);
+    border-color: rgba(0,0,0,0.2);
+}
+
+.ltlb-admin .ltlb-calendar-legend-toggle .ltlb-legend-toggle-icon {
+    transition: transform 0.2s ease;
+}
+
+.ltlb-admin .ltlb-calendar-legend-toggle[aria-expanded="false"] .ltlb-legend-toggle-icon {
+    transform: rotate(-90deg);
+}
+
 .ltlb-admin .ltlb-calendar-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--lazy-space-8, 8px);
+    gap: var(--lazy-space-12, 12px);
     align-items: center;
-    margin: 0 0 var(--lazy-space-10, 10px) 0;
+    margin-top: var(--lazy-space-10, 10px);
+    padding: var(--lazy-space-12, 12px);
+    background: var(--lazy-bg-secondary, #f9f9f9);
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.1));
+    border-radius: 4px;
+    transition: opacity 0.2s ease, max-height 0.3s ease;
+}
+
+.ltlb-admin .ltlb-calendar-legend[aria-hidden="true"] {
+    display: none;
 }
 
 .ltlb-admin .ltlb-calendar-legend__item {
     display: inline-flex;
     align-items: center;
-    height: 24px;
-    padding: 0 var(--lazy-space-10, 10px);
-    border-radius: 999px;
-    font-size: 12px;
+    gap: var(--lazy-space-8, 8px);
+    height: 32px;
+    padding: 0 var(--lazy-space-12, 12px);
+    border-radius: 4px;
+    font-size: 13px;
     font-weight: 600;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.12));
+}
+
+.ltlb-admin .ltlb-legend-color-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.15));
+    background: currentColor;
+}
+
+.ltlb-admin .ltlb-calendar-legend__color {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.15));
+    border-radius: 3px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.ltlb-admin .ltlb-calendar-legend__color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.ltlb-admin .ltlb-calendar-legend__color::-webkit-color-swatch {
+    border: 0;
+    border-radius: 2px;
+}
+
+.ltlb-admin .ltlb-calendar-legend__color::-moz-color-swatch {
+    border: 0;
+    border-radius: 2px;
+}
+
+.ltlb-admin .ltlb-calendar-legend__color:focus-visible {
+    outline: 2px solid var(--lazy-accent, #2271b1);
+    outline-offset: 2px;
+}
+
+/* Status color swatches in legend */
+.ltlb-admin .ltlb-fc-status-confirmed .ltlb-legend-color-swatch {
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1));
+}
+
+.ltlb-admin .ltlb-fc-status-pending .ltlb-legend-color-swatch {
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1)));
+}
+
+.ltlb-admin .ltlb-fc-status-cancelled .ltlb-legend-color-swatch,
+.ltlb-admin .ltlb-fc-status-canceled .ltlb-legend-color-swatch {
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-cancelled, var(--lazy-border-strong, #ccd0d4));
 }
 
 .ltlb-admin .ltlb-calendar-details-empty {
     padding: var(--lazy-space-12, 12px) var(--lazy-space-12, 12px);
-    border: 1px dashed rgba(0,0,0,0.12);
+    border: 1px dashed var(--lazy-border-medium, rgba(0,0,0,0.12));
     border-radius: 6px;
-    background: rgba(0,0,0,0.02);
+    background: var(--lazy-bg-secondary, #f9f9f9);
 }
 
 /* Calendar details panel */
@@ -323,30 +823,98 @@
     flex-wrap: wrap;
 }
 
+.ltlb-admin .ltlb-occupancy-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    min-width: 30px;
+    padding: 0 6px;
+    margin-left: 6px;
+    border-radius: 999px;
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.12));
+    background: var(--lazy-bg-secondary, #f9f9f9);
+    color: var(--lazy-text-primary, #1d2327);
+    font-size: 11px;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.ltlb-admin .ltlb-room-assistant__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--lazy-space-12, 12px);
+}
+
 .ltlb-admin .ltlb-muted {
-    color: #646970;
+    color: var(--lazy-text-secondary, #646970);
     font-size: 12px;
 }
 
 /* FullCalendar event status colors */
 .ltlb-admin .fc .ltlb-fc-status-confirmed {
-    background-color: #d1fae5;
-    border-color: #d1fae5;
-    color: #065f46;
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1));
+    border-left-width: 4px;
+    border-left-color: var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1));
+    color: var(--lazy-text-primary, #1d2327);
 }
 
 .ltlb-admin .fc .ltlb-fc-status-pending {
-    background-color: #fef3c7;
-    border-color: #fef3c7;
-    color: #92400e;
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1)));
+    border-left-width: 4px;
+    border-left-color: var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1)));
+    color: var(--lazy-text-primary, #1d2327);
 }
 
 .ltlb-admin .fc .ltlb-fc-status-cancelled,
 .ltlb-admin .fc .ltlb-fc-status-canceled {
-    background-color: #fee2e2;
-    border-color: #fee2e2;
-    color: #991b1b;
+    background-color: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--ltlb-status-cancelled, var(--lazy-border-strong, #ccd0d4));
+    border-left-width: 4px;
+    border-left-color: var(--ltlb-status-cancelled, var(--lazy-border-strong, #ccd0d4));
+    color: var(--lazy-text-primary, #1d2327);
 }
+
+@supports (color: color-mix(in srgb, #000 10%, #fff)) {
+    .ltlb-admin .ltlb-fc-status-confirmed .ltlb-legend-color-swatch {
+        background-color: color-mix(in srgb, var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1)) 16%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1)) 42%, var(--lazy-bg-primary, #ffffff));
+    }
+
+    .ltlb-admin .ltlb-fc-status-pending .ltlb-legend-color-swatch {
+        background-color: color-mix(in srgb, var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1))) 16%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1))) 42%, var(--lazy-bg-primary, #ffffff));
+    }
+
+    .ltlb-admin .ltlb-fc-status-cancelled .ltlb-legend-color-swatch,
+    .ltlb-admin .ltlb-fc-status-canceled .ltlb-legend-color-swatch {
+        background-color: color-mix(in srgb, var(--ltlb-status-cancelled, var(--lazy-text-primary, #1d2327)) 7%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-cancelled, var(--lazy-text-primary, #1d2327)) 18%, var(--lazy-bg-primary, #ffffff));
+    }
+
+    .ltlb-admin .fc .ltlb-fc-status-confirmed {
+        background-color: color-mix(in srgb, var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1)) 12%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1)) 35%, var(--lazy-bg-primary, #ffffff));
+        border-left-color: var(--ltlb-status-confirmed, var(--lazy-primary, #2271b1));
+    }
+
+    .ltlb-admin .fc .ltlb-fc-status-pending {
+        background-color: color-mix(in srgb, var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1))) 12%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1))) 35%, var(--lazy-bg-primary, #ffffff));
+        border-left-color: var(--ltlb-status-pending, var(--lazy-accent, var(--lazy-primary, #2271b1)));
+    }
+
+    .ltlb-admin .fc .ltlb-fc-status-cancelled,
+    .ltlb-admin .fc .ltlb-fc-status-canceled {
+        background-color: color-mix(in srgb, var(--ltlb-status-cancelled, var(--lazy-text-primary, #1d2327)) 6%, var(--lazy-bg-primary, #ffffff));
+        border-color: color-mix(in srgb, var(--ltlb-status-cancelled, var(--lazy-text-primary, #1d2327)) 18%, var(--lazy-bg-primary, #ffffff));
+        border-left-color: var(--ltlb-status-cancelled, var(--lazy-text-primary, #1d2327));
+    }
+}
+
 
 .ltlb-admin .fc .ltlb-fc-status-confirmed .fc-event-main,
 .ltlb-admin .fc .ltlb-fc-status-pending .fc-event-main,
@@ -357,7 +925,7 @@
 
 /* FullCalendar polish */
 .ltlb-admin .fc {
-    --fc-border-color: rgba(0,0,0,0.10);
+    --fc-border-color: var(--lazy-border-medium, rgba(0,0,0,0.10));
 }
 
 .ltlb-admin .fc-theme-standard td,
@@ -389,8 +957,17 @@
     padding-bottom: 2px;
 }
 
+.ltlb-admin .fc,
+.ltlb-admin .fc .fc-view-harness,
+.ltlb-admin .fc .fc-scrollgrid,
+.ltlb-admin .fc .fc-scroller,
+.ltlb-admin .fc .fc-scroller-harness,
+.ltlb-admin .fc .fc-scroller-harness-liquid {
+    background: var(--ltlb-calendar-surface, var(--lazy-panel-bg, #fff));
+}
+
 .ltlb-admin .fc .fc-timegrid-col-frame {
-    background: var(--lazy-panel-bg, #fff);
+    background: var(--ltlb-calendar-surface, var(--lazy-panel-bg, #fff));
 }
 
 .ltlb-admin .fc .fc-timegrid-now-indicator-line {
@@ -410,15 +987,28 @@
 .ltlb-admin .fc .fc-timegrid-col.fc-day-today .fc-timegrid-col-frame,
 .ltlb-admin .fc .fc-col-header-cell.fc-day-today,
 .ltlb-admin .fc .fc-daygrid-day.fc-day-today {
-    background: rgba(34, 113, 177, 0.04);
+    background: var(--ltlb-today-bg);
+    box-shadow: inset 1px 0 0 var(--ltlb-today-border), inset -1px 0 0 var(--ltlb-today-border);
 }
 
-@supports (background: color-mix(in srgb, #000 10%, transparent)) {
-    .ltlb-admin .fc .fc-timegrid-col.fc-day-today,
-    .ltlb-admin .fc .fc-timegrid-col.fc-day-today .fc-timegrid-col-frame,
-    .ltlb-admin .fc .fc-col-header-cell.fc-day-today,
-    .ltlb-admin .fc .fc-daygrid-day.fc-day-today {
-        background: color-mix(in srgb, var(--wp-admin-theme-color, #2271b1) 6%, transparent);
+/* Today: subtle header/date emphasis for fast scanning */
+@supports (color: color-mix(in srgb, #000 10%, #fff)) {
+    .ltlb-admin .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion,
+    .ltlb-admin .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+        color: color-mix(
+            in srgb,
+            var(--lazy-accent, var(--wp-admin-theme-color, #2271b1)) 65%,
+            currentColor
+        );
+        font-weight: 800;
+    }
+
+    .ltlb-admin .fc .fc-col-header-cell.fc-day-today {
+        box-shadow: inset 0 -2px 0 color-mix(
+            in srgb,
+            var(--lazy-accent, var(--wp-admin-theme-color, #2271b1)) 35%,
+            transparent
+        );
     }
 }
 
@@ -595,11 +1185,15 @@
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    background: var(--lazy-bg-secondary, #f9f9f9);
+    color: var(--lazy-text-primary, #1d2327);
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.1));
+    border-left-width: 4px;
 }
-.status-active, .status-confirmed { background: #d1fae5; color: #065f46; }
-.status-inactive { background: #f3f4f6; color: #374151; }
-.status-pending { background: #fef3c7; color: #92400e; outline: 1px solid rgba(0,0,0,0.12); outline-offset: -1px; }
-.status-canceled { background: #fee2e2; color: #991b1b; }
+.status-active, .status-confirmed { border-left-color: var(--lazy-primary, #2271b1); }
+.status-inactive { border-left-color: var(--lazy-border-strong, #ccd0d4); opacity: 0.9; }
+.status-pending { border-left-color: var(--lazy-accent, var(--lazy-primary, #2271b1)); }
+.status-canceled { border-left-color: var(--lazy-accent, var(--lazy-primary, #2271b1)); }
 
 /* Dashboard Stats */
 .ltlb-dashboard-stats {
@@ -610,7 +1204,7 @@
 }
 .ltlb-stat-card {
     background: var(--lazy-panel-bg, #fff);
-    border: 1px solid #ccd0d4;
+    border: 1px solid var(--lazy-border-strong, #ccd0d4);
     border-radius: 4px;
     padding: var(--lazy-space-20, 20px);
     display: flex;
@@ -622,14 +1216,14 @@
     width: 32px;
     height: 32px;
     margin-right: var(--lazy-space-15, 15px);
-    color: #2271b1;
+    color: var(--lazy-accent, var(--lazy-primary, #2271b1));
 }
 .ltlb-stat-content {
     display: flex;
     flex-direction: column;
 }
 .ltlb-stat-label {
-    color: #646970;
+    color: var(--lazy-text-secondary, #646970);
     font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
@@ -637,7 +1231,7 @@
 .ltlb-stat-value {
     font-size: 24px;
     font-weight: bold;
-    color: #1d2327;
+    color: var(--lazy-text-primary, #1d2327);
     line-height: 1.2;
 }
 
@@ -658,7 +1252,7 @@
 .ltlb-filter-group label {
     font-weight: 600;
     font-size: 12px;
-    color: #646970;
+    color: var(--lazy-text-secondary, #646970);
 }
 .ltlb-filter-actions {
     display: flex;
@@ -666,6 +1260,35 @@
     margin-left: auto;
     align-items: flex-end;
     flex-grow: 1;
+}
+
+/* Small utility colors (no inline styles) */
+.ltlb-admin .ltlb-icon-success {
+    color: var(--lazy-accent, var(--lazy-primary, #46b450));
+}
+
+.ltlb-admin .ltlb-diagnostics-notice {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--lazy-bg-secondary, #f0f0f1);
+    border-left: 4px solid var(--lazy-accent, var(--lazy-primary, #72aee6));
+}
+
+.ltlb-admin .ltlb-diagnostics-notice__title {
+    margin-top: 0;
+    color: var(--lazy-text-primary, #1d2327);
+}
+
+.ltlb-admin .ltlb-diagnostics-status {
+    color: var(--lazy-text-primary, #1d2327);
+}
+
+.ltlb-admin .ltlb-diagnostics-status--ok {
+    color: var(--lazy-accent, var(--lazy-primary, #00a32a));
+}
+
+.ltlb-admin .ltlb-diagnostics-status--warn {
+    color: var(--lazy-accent, var(--lazy-primary, #d63638));
 }
 
 /* ==========================================================================
@@ -680,13 +1303,13 @@
 .ltlb-choice-tile {
     display: block;
     position: relative;
-    background-color: #fdfdfd;
-    border: 1px solid #ddd;
+    background-color: var(--lazy-bg-primary, #fdfdfd);
+    border: 1px solid var(--lazy-border-medium, #ddd);
     border-radius: 8px;
-    padding: 16px;
+    padding: var(--lazy-space-16, 16px);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: var(--lazy-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
 }
 
 .ltlb-choice-tile:hover {
@@ -788,6 +1411,90 @@
     color: #2c3338;
 }
 
+/* Dashboard Grid Layout */
+.ltlb-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.ltlb-dashboard-grid__main {
+    min-width: 0;
+}
+
+.ltlb-dashboard-grid__sidebar {
+    min-width: 0;
+}
+
+@media (max-width: 1200px) {
+    .ltlb-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Recently Viewed Widget */
+.ltlb-recent-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ltlb-recent-item {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.ltlb-recent-item:last-child {
+    border-bottom: none;
+}
+
+.ltlb-recent-item__link {
+    display: block;
+    padding: 12px 0;
+    text-decoration: none;
+    color: #1d2327;
+    transition: background-color 0.15s ease;
+}
+
+.ltlb-recent-item__link:hover {
+    background-color: rgba(0,0,0,0.02);
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-radius: 4px;
+}
+
+.ltlb-recent-item__link:focus {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+.ltlb-recent-item__title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.ltlb-recent-item__meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #787c82;
+}
+
+.ltlb-recent-item__meta .dashicons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+}
+
+.ltlb-card--sidebar {
+    position: sticky;
+    top: 32px;
+}
+
 @media print {
     /* Hide interactive UI and navigation */
     .ltlb-admin .ltlb-admin-header,
@@ -851,6 +1558,56 @@
     display: flex;
     gap: 8px;
     align-items: center;
+}
+
+/* Column Visibility Toggle */
+.ltlb-table-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.ltlb-column-toggle-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ltlb-column-toggle-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 8px;
+    min-width: 200px;
+    z-index: 100;
+}
+
+.ltlb-column-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.15s ease;
+}
+
+.ltlb-column-toggle-item:hover {
+    background-color: rgba(0,0,0,0.04);
+}
+
+.ltlb-column-toggle-item input[type="checkbox"] {
+    margin: 0;
+}
+
+.ltlb-column-toggle-item span {
+    font-size: 13px;
 }
 
 
@@ -1203,4 +1960,307 @@
     font-size: 14px;
     width: 14px;
     height: 14px;
+}
+/* Analytics Styles */
+.ltlb-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--lazy-space-12, 12px);
+    margin-bottom: var(--lazy-space-16, 16px);
+}
+
+.ltlb-analytics-stat {
+    text-align: center;
+    padding: var(--lazy-space-12, 12px);
+    background: rgba(34, 113, 177, 0.05);
+    border-radius: 4px;
+}
+
+.ltlb-analytics-stat__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--lazy-primary, #2271b1);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ltlb-analytics-stat__label {
+    font-size: 12px;
+    color: #646970;
+    font-weight: 500;
+}
+
+.ltlb-analytics-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--lazy-space-12, 12px) 0;
+}
+
+.ltlb-analytics-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 13px;
+}
+
+.ltlb-analytics-list li:last-child {
+    border-bottom: none;
+}
+
+.ltlb-analytics-badge {
+    background: #f0f0f0;
+    color: #555;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.ltlb-analytics-actions {
+    text-align: right;
+}
+
+.ltlb-analytics-actions .button {
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+/* Payment Styles */
+.ltlb-payment-form-wrapper {
+    margin: var(--lazy-space-16, 16px) 0;
+    padding: var(--lazy-space-12, 12px);
+    background: rgba(34, 113, 177, 0.04);
+    border: 1px solid rgba(34, 113, 177, 0.1);
+    border-radius: 4px;
+}
+
+.ltlb-payment-form-wrapper h3 {
+    margin: 0 0 var(--lazy-space-12, 12px) 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ltlb-payment-field {
+    margin-bottom: var(--lazy-space-12, 12px);
+}
+
+.ltlb-payment-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+#stripe-card-element {
+    background: var(--lazy-bg-primary, #ffffff);
+    padding: 10px 12px;
+    border: 1px solid var(--lazy-border-medium, rgba(0,0,0,0.15));
+    border-radius: 4px;
+}
+
+#paypal-button-container {
+    margin: var(--lazy-space-12, 12px) 0;
+}
+
+/* Calendar Export Button */
+.ltlb-table-toolbar__export {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.ltlb-table-toolbar__export .button .dashicons {
+    line-height: 28px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Column Toggle Menu */
+.ltlb-column-toggle-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--lazy-bg-primary, #fff);
+    border: 1px solid var(--lazy-border-medium, #ddd);
+    border-radius: 4px;
+    box-shadow: var(--lazy-shadow-md, 0 4px 8px rgba(0,0,0,0.1));
+    padding: var(--lazy-space-8, 8px);
+    min-width: 160px;
+    z-index: 1000;
+}
+
+.ltlb-column-toggle-item {
+    display: flex;
+    align-items: center;
+    padding: var(--lazy-space-6, 6px) var(--lazy-space-8, 8px);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.15s;
+    font-size: 13px;
+}
+
+.ltlb-column-toggle-item:hover {
+    background: var(--lazy-bg-secondary, #f0f0f0);
+}
+
+.ltlb-column-toggle-item input[type="checkbox"] {
+    margin: 0 8px 0 0;
+    cursor: pointer;
+}
+
+/* Print Styles */
+@media print {
+    /* Hide non-essential elements */
+    .ltlb-admin-header,
+    .ltlb-table-toolbar,
+    .ltlb-quick-actions,
+    .ltlb-dashboard-header .button,
+    .ltlb-column-toggle-menu,
+    .wp-heading-inline ~ .page-title-action,
+    #wpadminbar,
+    #adminmenumain,
+    .notice,
+    .update-nag,
+    .ltlb-step-nav,
+    button,
+    input[type="submit"],
+    input[type="button"],
+    .check-column,
+    .column-cb {
+        display: none !important;
+    }
+    
+    /* Optimize layout for print */
+    .wrap {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .ltlb-admin {
+        background: white;
+        color: black;
+    }
+    
+    /* Cards */
+    .ltlb-card {
+        border: 1px solid #000;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .ltlb-card__header {
+        border-bottom: 1px solid #000;
+        padding: 10px;
+    }
+    
+    .ltlb-card__body {
+        padding: 10px;
+    }
+    
+    /* Tables */
+    .wp-list-table {
+        border: 1px solid #000;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .wp-list-table th,
+    .wp-list-table td {
+        border: 1px solid #000;
+        padding: 6px;
+        font-size: 10pt;
+    }
+    
+    .wp-list-table thead {
+        background: #f0f0f0;
+    }
+    
+    .wp-list-table tr {
+        page-break-inside: avoid;
+    }
+    
+    /* KPI Cards */
+    .ltlb-kpi-card {
+        border: 1px solid #000;
+        page-break-inside: avoid;
+        margin-bottom: 10px;
+    }
+    
+    .ltlb-kpi-card__value {
+        font-size: 18pt;
+        font-weight: bold;
+    }
+    
+    .ltlb-kpi-card__label {
+        font-size: 10pt;
+    }
+    
+    /* Dashboard Grid */
+    .ltlb-dashboard-grid {
+        display: block;
+    }
+    
+    .ltlb-dashboard-grid__main,
+    .ltlb-dashboard-grid__sidebar {
+        width: 100%;
+        margin: 0;
+        page-break-inside: avoid;
+    }
+    
+    /* Status badges */
+    .ltlb-status-badge {
+        border: 1px solid #000;
+        padding: 2px 6px;
+        font-weight: bold;
+    }
+    
+    /* Analytics */
+    .ltlb-analytics-grid {
+        display: block;
+    }
+    
+    .ltlb-analytics-stat {
+        border: 1px solid #000;
+        margin-bottom: 10px;
+        page-break-inside: avoid;
+    }
+    
+    /* Headers */
+    h1, h2, h3 {
+        page-break-after: avoid;
+        margin-top: 0;
+    }
+    
+    /* Links */
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+    
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 8pt;
+        color: #666;
+    }
+    
+    /* Prevent orphans/widows */
+    p, li, tr {
+        orphans: 3;
+        widows: 3;
+    }
+    
+    /* Page breaks */
+    .ltlb-card,
+    .ltlb-kpi-card,
+    table {
+        page-break-inside: avoid;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
 }

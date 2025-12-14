@@ -47,47 +47,94 @@ class LTLB_Admin_SettingsPage {
 		}
 
 		// Handle save
-			if ( isset( $_POST['ltlb_settings_save'] ) ) {
+            if ( isset( $_POST['ltlb_settings_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
                 wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
 			}
-				// Collect and sanitize into a single lazy_settings option
+                $current_tab_save = sanitize_key( (string) ( $_POST['ltlb_settings_tab'] ?? 'general' ) );
+                if ( ! in_array( $current_tab_save, [ 'general', 'email', 'ai', 'security' ], true ) ) {
+                    $current_tab_save = 'general';
+                }
+
+                // Collect and sanitize into a single lazy_settings option
 				$settings = get_option( 'lazy_settings', [] );
 				if ( ! is_array( $settings ) ) $settings = [];
-				$settings['working_hours_start'] = LTLB_Sanitizer::int( $_POST['working_hours_start'] ?? 9 );
-				$settings['working_hours_end'] = LTLB_Sanitizer::int( $_POST['working_hours_end'] ?? 17 );
-				$settings['slot_size_minutes'] = LTLB_Sanitizer::int( $_POST['slot_size_minutes'] ?? 60 );
-				$settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? '' );
-				$settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? 'pending' );
-				$settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
-				$settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
-				$settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
-				$settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? '' );
-				$settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? '' );
-				$settings['mail_reply_to'] = LTLB_Sanitizer::email( $_POST['ltlb_email_reply_to'] ?? '' );
-				$settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? '' );
-				$settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? '' );
-				$settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? '' );
-				$settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? '' );
-				
-				// Logging settings
-				$settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
-				$settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? 'error' );
-				
-				// Template Mode
-				$settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? 'service' );
 
-				// Admin Mode
-				$settings['admin_mode'] = LTLB_Sanitizer::text( $_POST['admin_mode'] ?? 'appointments' );
+                if ( $current_tab_save === 'general' ) {
+                    $settings['working_hours_start'] = LTLB_Sanitizer::int( $_POST['working_hours_start'] ?? ( $settings['working_hours_start'] ?? 9 ) );
+                    $settings['working_hours_end'] = LTLB_Sanitizer::int( $_POST['working_hours_end'] ?? ( $settings['working_hours_end'] ?? 17 ) );
+                    $settings['slot_size_minutes'] = LTLB_Sanitizer::int( $_POST['slot_size_minutes'] ?? ( $settings['slot_size_minutes'] ?? 60 ) );
+                    $settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? ( $settings['timezone'] ?? '' ) );
+                    $settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? ( $settings['default_status'] ?? 'pending' ) );
+                    $settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
 
-				update_option( 'lazy_settings', $settings );
+                    // Logging settings
+                    $settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
+                    $settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? ( $settings['log_level'] ?? 'error' ) );
+
+                    // Template Mode
+                    $settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? ( $settings['template_mode'] ?? 'service' ) );
+
+                    // Profit model (simple margin)
+                    $profit_margin = LTLB_Sanitizer::int( $_POST['profit_margin_percent'] ?? ( $settings['profit_margin_percent'] ?? 100 ) );
+                    $settings['profit_margin_percent'] = max( 0, min( 100, (int) $profit_margin ) );
+
+                    // Hotel fees (used for gross profit)
+                    $hotel_fee_percent = LTLB_Sanitizer::int( $_POST['hotel_fee_percent'] ?? ( $settings['hotel_fee_percent'] ?? 0 ) );
+                    $settings['hotel_fee_percent'] = max( 0, min( 100, (int) $hotel_fee_percent ) );
+                    $settings['hotel_fee_fixed_cents'] = max( 0, LTLB_Sanitizer::money_cents( $_POST['hotel_fee_fixed'] ?? ( $settings['hotel_fee_fixed_cents'] ?? 0 ) ) );
+                }
+
+                if ( $current_tab_save === 'email' ) {
+                    $settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
+                    $settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
+                    $settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? ( $settings['mail_from_name'] ?? '' ) );
+                    $settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? ( $settings['mail_from_email'] ?? '' ) );
+                    $settings['mail_reply_to'] = LTLB_Sanitizer::email( $_POST['ltlb_email_reply_to'] ?? ( $settings['mail_reply_to'] ?? '' ) );
+                    $settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? ( $settings['mail_admin_template'] ?? '' ) );
+                    $settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? ( $settings['mail_customer_template'] ?? '' ) );
+                    $settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? ( $settings['mail_admin_subject'] ?? '' ) );
+                    $settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? ( $settings['mail_customer_subject'] ?? '' ) );
+                }
+
+                if ( $current_tab_save === 'security' ) {
+                    $settings['enable_payments'] = isset( $_POST['enable_payments'] ) ? 1 : 0;
+                    $processor = sanitize_key( (string) ( $_POST['payment_processor'] ?? ( $settings['payment_processor'] ?? 'stripe' ) ) );
+                    $settings['payment_processor'] = in_array( $processor, [ 'stripe', 'paypal' ], true ) ? $processor : 'stripe';
+
+                    // Store payment keys separately (autoload=no). Empty inputs keep existing keys.
+                    $payment_keys = get_option( 'lazy_payment_keys', [] );
+                    if ( ! is_array( $payment_keys ) ) {
+                        $payment_keys = [];
+                    }
+                    $stripe_public = sanitize_text_field( (string) ( $_POST['stripe_public_key'] ?? '' ) );
+                    $stripe_secret = sanitize_text_field( (string) ( $_POST['stripe_secret_key'] ?? '' ) );
+                    $paypal_client_id = sanitize_text_field( (string) ( $_POST['paypal_client_id'] ?? '' ) );
+                    $paypal_secret = sanitize_text_field( (string) ( $_POST['paypal_secret'] ?? '' ) );
+
+                    if ( $stripe_public !== '' ) {
+                        $payment_keys['stripe_public_key'] = $stripe_public;
+                    }
+                    if ( $stripe_secret !== '' ) {
+                        $payment_keys['stripe_secret_key'] = $stripe_secret;
+                    }
+                    if ( $paypal_client_id !== '' ) {
+                        $payment_keys['paypal_client_id'] = $paypal_client_id;
+                    }
+                    if ( $paypal_secret !== '' ) {
+                        $payment_keys['paypal_secret'] = $paypal_secret;
+                    }
+
+                    update_option( 'lazy_payment_keys', $payment_keys, false );
+                }
+
+                update_option( 'lazy_settings', $settings );
 
 			$redirect = admin_url( 'admin.php?page=ltlb_settings&settings_updated=1' );
 			wp_safe_redirect( $redirect );
 			exit;
 		}
-
-			$settings = get_option( 'lazy_settings', [] );
+            $settings = get_option( 'lazy_settings', [] );
 			if ( ! is_array( $settings ) ) $settings = [];
 			$start = (int) ( $settings['working_hours_start'] ?? 9 );
 			$end = (int) ( $settings['working_hours_end'] ?? 17 );
@@ -108,9 +155,42 @@ class LTLB_Admin_SettingsPage {
 			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
 			$log_level = $settings['log_level'] ?? 'error';
 			$template_mode = $settings['template_mode'] ?? 'service';
-			$admin_mode = $settings['admin_mode'] ?? 'appointments';
+            $profit_margin_percent = isset( $settings['profit_margin_percent'] ) ? max( 0, min( 100, (int) $settings['profit_margin_percent'] ) ) : 100;
+            $hotel_fee_percent = isset( $settings['hotel_fee_percent'] ) ? max( 0, min( 100, (int) $settings['hotel_fee_percent'] ) ) : 0;
+            $hotel_fee_fixed_cents = isset( $settings['hotel_fee_fixed_cents'] ) ? max( 0, (int) $settings['hotel_fee_fixed_cents'] ) : 0;
+            $hotel_fee_fixed = number_format( $hotel_fee_fixed_cents / 100, 2, '.', '' );
 
 		$timezones = timezone_identifiers_list();
+
+		// Get AI config and business context
+		$ai_config = get_option( 'lazy_ai_config', [] );
+		if ( ! is_array( $ai_config ) ) $ai_config = [];
+		$ai_enabled = $ai_config['enabled'] ?? 0;
+		$ai_provider = $ai_config['provider'] ?? 'gemini';
+		$ai_model = $ai_config['model'] ?? 'gemini-2.5-flash';
+		$ai_mode = $ai_config['operating_mode'] ?? 'human-in-the-loop';
+
+        $api_keys = get_option( 'lazy_api_keys', [] );
+        if ( ! is_array( $api_keys ) ) $api_keys = [];
+        $gemini_key = $api_keys['gemini'] ?? '';
+
+        $payment_keys = get_option( 'lazy_payment_keys', [] );
+        if ( ! is_array( $payment_keys ) ) {
+            $payment_keys = [];
+        }
+        $has_stripe_public = ! empty( $payment_keys['stripe_public_key'] ?? ( $settings['stripe_public_key'] ?? '' ) );
+        $has_stripe_secret = ! empty( $payment_keys['stripe_secret_key'] ?? ( $settings['stripe_secret_key'] ?? '' ) );
+        $has_paypal_client = ! empty( $payment_keys['paypal_client_id'] ?? ( $settings['paypal_client_id'] ?? '' ) );
+        $has_paypal_secret = ! empty( $payment_keys['paypal_secret'] ?? ( $settings['paypal_secret'] ?? '' ) );
+
+		$business_context = get_option( 'lazy_business_context', [] );
+		if ( ! is_array( $business_context ) ) $business_context = [];
+
+		// Determine current tab
+		$current_tab = sanitize_text_field( $_GET['tab'] ?? 'general' );
+		if ( ! in_array( $current_tab, [ 'general', 'email', 'ai', 'security' ], true ) ) {
+			$current_tab = 'general';
+		}
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_settings'); } ?>
@@ -119,19 +199,42 @@ class LTLB_Admin_SettingsPage {
             
             <?php if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === '1' ): ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><span class="dashicons dashicons-yes-alt" style="color:#46b450;"></span> <?php echo esc_html__( 'Settings saved successfully.', 'ltl-bookings' ); ?></p>
+                    <p><span class="dashicons dashicons-yes-alt ltlb-icon-success" aria-hidden="true"></span> <?php echo esc_html__( 'Settings saved successfully.', 'ltl-bookings' ); ?></p>
                 </div>
             <?php endif; ?>
 
-			<form method="post">
+            <!-- Settings Tabs -->
+            <div class="ltlb-design-subnav" style="margin: 10px 0 15px 0;">
+                <?php
+                $tabs = [
+                    'general' => __('General', 'ltl-bookings'),
+                    'email' => __('Email', 'ltl-bookings'),
+                ];
+                if ( LTLB_Role_Manager::user_can('manage_ai_settings') ) {
+                    $tabs['ai'] = __('AI', 'ltl-bookings');
+                }
+                if ( LTLB_Role_Manager::user_can('manage_options') ) {
+                    $tabs['security'] = __('Security', 'ltl-bookings');
+                }
+                foreach ( $tabs as $tab_key => $tab_label ) : ?>
+                    <a class="ltlb-admin-tab <?php echo $current_tab === $tab_key ? 'is-active' : ''; ?>" 
+                       href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_settings&tab=' . $tab_key ) ); ?>">
+                        <?php echo esc_html( $tab_label ); ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <form method="post">
 				<?php wp_nonce_field( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ); ?>
 				<input type="hidden" name="ltlb_settings_save" value="1" />
+				<input type="hidden" name="ltlb_settings_tab" value="<?php echo esc_attr( $current_tab ); ?>" />
 
 				<!-- Save Button at Top -->
 				<p class="submit" style="margin-top:10px; padding-top:0;">
                     <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save_top', false ); ?>
 				</p>
 
+                <?php if ( $current_tab === 'general' ) : ?>
                 <!-- GENERAL SETTINGS -->
                 <?php LTLB_Admin_Component::card_start(__( 'General Settings', 'ltl-bookings' )); ?>
                     <table class="form-table">
@@ -189,20 +292,60 @@ class LTLB_Admin_SettingsPage {
                                     </select>
                                     <p class="description" id="ltlb-template-mode-desc"><?php echo esc_html__( 'Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings' ); ?></p>
                                 </td>
+                            </tr>
                             <tr>
-                                <th><label for="admin_mode"><?php echo esc_html__( 'Admin View Mode', 'ltl-bookings' ); ?></label></th>
+                                <th><label for="profit_margin_percent"><?php echo esc_html__( 'Profit Margin (%)', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <select name="admin_mode" id="admin_mode" aria-describedby="ltlb-admin-mode-desc" title="<?php echo esc_attr__( 'Controls the admin user interface layout and menus.', 'ltl-bookings' ); ?>">
-                                        <option value="appointments" <?php selected( $admin_mode, 'appointments' ); ?>><?php echo esc_html__( 'Appointments Mode', 'ltl-bookings' ); ?></option>
-                                        <option value="hotel" <?php selected( $admin_mode, 'hotel' ); ?>><?php echo esc_html__( 'Hotel Mode', 'ltl-bookings' ); ?></option>
+                                    <input name="profit_margin_percent" id="profit_margin_percent" type="number" class="small-text" min="0" max="100" value="<?php echo esc_attr( (string) $profit_margin_percent ); ?>" />
+                                    <p class="description"><?php echo esc_html__( 'Used for estimated profit calculations in dashboards and AI reports.', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                        <tr>
+                            <th><label for="hotel_fee_percent"><?php echo esc_html__( 'Hotel Fees (%)', 'ltl-bookings' ); ?></label></th>
+                            <td>
+                                <input name="hotel_fee_percent" id="hotel_fee_percent" type="number" class="small-text" min="0" max="100" value="<?php echo esc_attr( (string) $hotel_fee_percent ); ?>" />
+                                <p class="description"><?php echo esc_html__( 'Used for hotel gross profit: fee percent applied to booking amount.', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="hotel_fee_fixed"><?php echo esc_html__( 'Hotel Fee (Fixed)', 'ltl-bookings' ); ?></label></th>
+                            <td>
+                                <input name="hotel_fee_fixed" id="hotel_fee_fixed" type="text" class="regular-text" value="<?php echo esc_attr( (string) $hotel_fee_fixed ); ?>" />
+                                <p class="description"><?php echo esc_html__( 'Fixed fee per booking (e.g., payment processor fixed fee). Stored in cents.', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                <?php LTLB_Admin_Component::card_end(); ?>
+                <!-- LOGGING SETTINGS -->
+                <?php LTLB_Admin_Component::card_start(__( 'Logging', 'ltl-bookings' )); ?>
+                    <table class="form-table">
+                        <tbody>
+                            <tr>
+                                <th><label for="logging_enabled"><?php echo esc_html__( 'Enable Logging', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?> aria-describedby="ltlb-logging-enabled-desc" title="<?php echo esc_attr__( 'Writes events/errors to a log file for diagnostics.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Log errors and events to file', 'ltl-bookings' ); ?></label>
+                                    <p class="description" id="ltlb-logging-enabled-desc"><?php echo esc_html__( 'Enable this only when needed (e.g., for debugging).', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><label for="log_level"><?php echo esc_html__( 'Log Level', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <select name="log_level" id="log_level" aria-describedby="ltlb-log-level-desc" title="<?php echo esc_attr__( 'Controls how verbose logging is.', 'ltl-bookings' ); ?>">
+                                        <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__( 'Error', 'ltl-bookings' ); ?></option>
+                                        <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__( 'Warning', 'ltl-bookings' ); ?></option>
+                                        <option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info', 'ltl-bookings'); ?></option>
+                                        <option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug', 'ltl-bookings'); ?></option>
                                     </select>
-                                    <p class="description" id="ltlb-admin-mode-desc"><?php echo esc_html__( 'Switch the admin interface between managing appointments or hotel bookings.', 'ltl-bookings' ); ?></p>
+                                    <p class="description" id="ltlb-log-level-desc"><?php echo esc_html__( 'For normal use, "Error" is usually enough. Use "Debug" only temporarily.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
+                <?php endif; ?>
 
+                <?php if ( $current_tab === 'email' ) : ?>
                 <!-- EMAIL SETTINGS -->
                 <?php LTLB_Admin_Component::card_start(__( 'Email Settings', 'ltl-bookings' )); ?>
                     <table class="form-table">
@@ -242,40 +385,89 @@ class LTLB_Admin_SettingsPage {
                         </tbody>
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
+                <?php endif; ?>
 
-                <!-- LOGGING SETTINGS -->
-                <?php LTLB_Admin_Component::card_start(__( 'Logging', 'ltl-bookings' )); ?>
+                <?php if ( $current_tab === 'ai' ) : ?>
+                <?php LTLB_Admin_Component::card_start( __( 'AI Settings', 'ltl-bookings' ) ); ?>
+                    <p class="description"><?php echo esc_html__( 'AI settings (provider, model, business context, and operating mode) are managed under “AI & Automations”.', 'ltl-bookings' ); ?></p>
+                    <p>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_ai' ) ); ?>"><?php echo esc_html__( 'Open AI Settings', 'ltl-bookings' ); ?></a>
+                    </p>
+                <?php LTLB_Admin_Component::card_end(); ?>
+                <?php endif; ?>
+
+                <?php if ( $current_tab === 'security' ) : ?>
+                <?php LTLB_Admin_Component::card_start(__( 'Payment Methods', 'ltl-bookings' )); ?>
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label for="logging_enabled"><?php echo esc_html__( 'Enable Logging', 'ltl-bookings' ); ?></label></th>
+                                <th scope="row"><label for="enable_payments"><?php echo esc_html__( 'Enable Payments', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?> aria-describedby="ltlb-logging-enabled-desc" title="<?php echo esc_attr__( 'Writes events/errors to a log file for diagnostics.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Log errors and events to file', 'ltl-bookings' ); ?></label>
-                                    <p class="description" id="ltlb-logging-enabled-desc"><?php echo esc_html__( 'Enable this only when needed (e.g., for debugging).', 'ltl-bookings' ); ?></p>
+                                    <input type="checkbox" name="enable_payments" id="enable_payments" value="1" <?php checked( ! empty( $settings['enable_payments'] ) ); ?>>
+                                    <p class="description"><?php echo esc_html__( 'Allow customers to pay online via Stripe or PayPal.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="log_level"><?php echo esc_html__( 'Log Level', 'ltl-bookings' ); ?></label></th>
+                                <th scope="row"><label for="payment_processor"><?php echo esc_html__( 'Payment Processor', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <select name="log_level" id="log_level" aria-describedby="ltlb-log-level-desc" title="<?php echo esc_attr__( 'Controls how verbose logging is.', 'ltl-bookings' ); ?>">
-                                        <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__( 'Error', 'ltl-bookings' ); ?></option>
-                                        <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__( 'Warning', 'ltl-bookings' ); ?></option>
-                                        <option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info', 'ltl-bookings'); ?></option>
-                                        <option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug', 'ltl-bookings'); ?></option>
+                                    <select name="payment_processor" id="payment_processor">
+                                        <option value="stripe" <?php selected( ( $settings['payment_processor'] ?? 'stripe' ), 'stripe' ); ?>>Stripe</option>
+                                        <option value="paypal" <?php selected( ( $settings['payment_processor'] ?? 'stripe' ), 'paypal' ); ?>>PayPal</option>
                                     </select>
-                                    <p class="description" id="ltlb-log-level-desc"><?php echo esc_html__( 'For normal use, "Error" is usually enough. Use "Debug" only temporarily.', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="stripe_public_key"><?php echo esc_html__( 'Stripe Public Key', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="password" name="stripe_public_key" id="stripe_public_key" class="regular-text" value="" autocomplete="new-password">
+                                    <p class="description">
+                                        <?php if ( $has_stripe_public ) : ?><?php echo esc_html__( 'A key is stored. Leave blank to keep the existing key.', 'ltl-bookings' ); ?><br><?php endif; ?>
+                                        <?php echo esc_html__( 'Your Stripe publishable key (pk_live_... or pk_test_...).', 'ltl-bookings' ); ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="stripe_secret_key"><?php echo esc_html__( 'Stripe Secret Key', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="password" name="stripe_secret_key" id="stripe_secret_key" class="regular-text" value="" autocomplete="new-password">
+                                    <p class="description">
+                                        <?php if ( $has_stripe_secret ) : ?><?php echo esc_html__( 'A key is stored. Leave blank to keep the existing key.', 'ltl-bookings' ); ?><br><?php endif; ?>
+                                        <?php echo esc_html__( 'Your Stripe secret key (sk_live_... or sk_test_...).', 'ltl-bookings' ); ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="paypal_client_id"><?php echo esc_html__( 'PayPal Client ID', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="password" name="paypal_client_id" id="paypal_client_id" class="regular-text" value="" autocomplete="new-password">
+                                    <p class="description">
+                                        <?php if ( $has_paypal_client ) : ?><?php echo esc_html__( 'A key is stored. Leave blank to keep the existing key.', 'ltl-bookings' ); ?><br><?php endif; ?>
+                                        <?php echo esc_html__( 'Your PayPal Client ID.', 'ltl-bookings' ); ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="paypal_secret"><?php echo esc_html__( 'PayPal Secret', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="password" name="paypal_secret" id="paypal_secret" class="regular-text" value="" autocomplete="new-password">
+                                    <p class="description">
+                                        <?php if ( $has_paypal_secret ) : ?><?php echo esc_html__( 'A key is stored. Leave blank to keep the existing key.', 'ltl-bookings' ); ?><br><?php endif; ?>
+                                        <?php echo esc_html__( 'Your PayPal Secret.', 'ltl-bookings' ); ?>
+                                    </p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
+                <?php endif; ?>
 
-				<p class="submit" style="margin-top:20px;">
+                <p class="submit" style="margin-top:20px;">
                     <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
                 </p>
-			</form>
+            </form>
 
             <!-- TEST EMAIL -->
+            <?php if ( $current_tab === 'email' ) : ?>
             <?php LTLB_Admin_Component::card_start(__( 'Test Email Configuration', 'ltl-bookings' )); ?>
                 <form method="post" style="display:flex; gap:10px; align-items:flex-end;">
                     <?php wp_nonce_field( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ); ?>
@@ -287,10 +479,7 @@ class LTLB_Admin_SettingsPage {
                     <?php submit_button( esc_html__( 'Send Test Email', 'ltl-bookings' ), 'secondary', 'submit', false ); ?>
                 </form>
             <?php LTLB_Admin_Component::card_end(); ?>
-            
-            <p class="submit" style="margin-top:20px;">
-                <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
-            </p>
+			<?php endif; ?>
 		</div>
 
 		<?php

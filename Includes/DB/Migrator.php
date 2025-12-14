@@ -16,6 +16,7 @@ class LTLB_DB_Migrator {
         $resources_table = $wpdb->prefix . 'lazy_resources';
         $appointment_resources_table = $wpdb->prefix . 'lazy_appointment_resources';
         $service_resources_table = $wpdb->prefix . 'lazy_service_resources';
+        $ai_actions_table = $wpdb->prefix . 'lazy_ai_actions';
 
         $sql_services     = LTLB_DB_Schema::get_create_table_sql($services_table, 'services');
         $sql_customers    = LTLB_DB_Schema::get_create_table_sql($customers_table, 'customers');
@@ -25,6 +26,7 @@ class LTLB_DB_Migrator {
         $sql_resources = LTLB_DB_Schema::get_create_table_sql($resources_table, 'resources');
         $sql_appointment_resources = LTLB_DB_Schema::get_create_table_sql($appointment_resources_table, 'appointment_resources');
         $sql_service_resources = LTLB_DB_Schema::get_create_table_sql($service_resources_table, 'service_resources');
+        $sql_ai_actions = LTLB_DB_Schema::get_create_table_sql($ai_actions_table, 'ai_actions');
 
         if ($sql_services)     dbDelta($sql_services);
         if ($sql_customers)    dbDelta($sql_customers);
@@ -32,6 +34,7 @@ class LTLB_DB_Migrator {
         if ($sql_staff_hours) dbDelta($sql_staff_hours);
         if ($sql_staff_exceptions) dbDelta($sql_staff_exceptions);
         if ($sql_resources) dbDelta($sql_resources);
+		if ($sql_ai_actions) dbDelta($sql_ai_actions);
         
         // Junction tables: dbDelta has issues with composite PRIMARY KEYs on existing tables
         // Check if table exists and has correct structure, otherwise recreate

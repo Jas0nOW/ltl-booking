@@ -12,8 +12,8 @@ class LTLB_Admin_CustomersPage {
 	public function render(): void {
         if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
         $settings = get_option( 'lazy_settings', [] );
-        $admin_mode = is_array( $settings ) && isset( $settings['admin_mode'] ) ? $settings['admin_mode'] : 'appointments';
-        $is_hotel_mode = $admin_mode === 'hotel';
+        $template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
+        $is_hotel_mode = $template_mode === 'hotel';
         $page_title = $is_hotel_mode ? __( 'Guests', 'ltl-bookings' ) : __( 'Customers', 'ltl-bookings' );
         $item_singular = $is_hotel_mode ? __( 'Guest', 'ltl-bookings' ) : __( 'Customer', 'ltl-bookings' );
         $item_plural = $page_title;

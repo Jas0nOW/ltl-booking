@@ -137,8 +137,12 @@ class LTLB_Admin_Component {
      *
      * @param bool $is_first Whether this is the first step.
      * @param bool $is_last Whether this is the last step.
+     * @param string $save_label The label for the save button (should be pre-translated).
      */
-    public static function wizard_step_end(bool $is_first = false, bool $is_last = false, string $save_label = 'Save'): void {
+    public static function wizard_step_end(bool $is_first = false, bool $is_last = false, string $save_label = ''): void {
+        if ( empty( $save_label ) ) {
+            $save_label = __( 'Save', 'ltl-bookings' );
+        }
         echo '<div class="ltlb-wizard-nav-buttons">';
         if (!$is_first) {
             echo '<button type="button" class="button ltlb-wizard-prev">' . esc_html__('Back', 'ltl-bookings') . '</button>';

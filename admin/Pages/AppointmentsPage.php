@@ -72,6 +72,16 @@ class LTLB_Admin_AppointmentsPage {
                             <?php submit_button( esc_html__( 'Apply', 'ltl-bookings' ), 'action', '', false, [ 'aria-label' => esc_attr__( 'Apply bulk action to selected appointments', 'ltl-bookings' ) ] ); ?>
                             <span id="bulk-action-help" class="screen-reader-text"><?php esc_html_e( 'Select appointments using checkboxes, choose an action, then click Apply', 'ltl-bookings' ); ?></span>
                         </div>
+                        <div class="ltlb-table-toolbar__export">
+                            <button type="button" class="button ltlb-column-toggle-btn" id="ltlb-column-toggle-btn" aria-label="<?php esc_attr_e('Toggle columns', 'ltl-bookings'); ?>">
+                                <span class="dashicons dashicons-visibility"></span>
+                                <?php esc_html_e('Columns', 'ltl-bookings'); ?>
+                            </button>
+                            <a href="<?php echo esc_url( LTLB_ICS_Export::get_feed_url() ); ?>" class="button" target="_blank">
+                                <span class="dashicons dashicons-calendar-alt"></span>
+                                <?php esc_html_e('Calendar Feed (iCal)', 'ltl-bookings'); ?>
+                            </a>
+                        </div>
                         <form method="get">
                             <input type="hidden" name="page" value="ltlb_appointments">
                             <input type="date" name="date_from" value="<?php echo esc_attr($date_from); ?>">
@@ -94,11 +104,11 @@ class LTLB_Admin_AppointmentsPage {
                                     <label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All', 'ltl-bookings' ); ?></label>
                                     <input id="cb-select-all-1" type="checkbox">
                                 </td>
-                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Customer', 'ltl-bookings' ); ?></th>
-                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Service', 'ltl-bookings' ); ?></th>
-                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Start', 'ltl-bookings' ); ?></th>
-                                <th scope="col" class="manage-column"><?php echo esc_html__( 'End', 'ltl-bookings' ); ?></th>
-                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Status', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column" data-column="customer"><?php echo esc_html__( 'Customer', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column" data-column="service"><?php echo esc_html__( 'Service', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column" data-column="start"><?php echo esc_html__( 'Start', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column" data-column="end"><?php echo esc_html__( 'End', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column" data-column="status"><?php echo esc_html__( 'Status', 'ltl-bookings' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,11 +135,11 @@ class LTLB_Admin_AppointmentsPage {
                                         <th scope="row" class="check-column">
                                             <input type="checkbox" name="appointment_ids[]" value="<?php echo esc_attr( $appointment['id'] ); ?>">
                                         </th>
-                                        <td><?php echo esc_html($customer['first_name'] . ' ' . $customer['last_name']); ?></td>
-                                        <td><?php echo esc_html($service['name']); ?></td>
-                                        <td><?php echo esc_html($appointment['start_at']); ?></td>
-                                        <td><?php echo esc_html($appointment['end_at']); ?></td>
-                                        <td><span class="ltlb-status-badge status-<?php echo esc_attr($appointment['status']); ?>"><?php echo esc_html(ucfirst($appointment['status'])); ?></span></td>
+                                        <td data-column="customer"><?php echo esc_html($customer['first_name'] . ' ' . $customer['last_name']); ?></td>
+                                        <td data-column="service"><?php echo esc_html($service['name']); ?></td>
+                                        <td data-column="start"><?php echo esc_html($appointment['start_at']); ?></td>
+                                        <td data-column="end"><?php echo esc_html($appointment['end_at']); ?></td>
+                                        <td data-column="status"><span class="ltlb-status-badge status-<?php echo esc_attr($appointment['status']); ?>"><?php echo esc_html(ucfirst($appointment['status'])); ?></span></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -147,6 +157,97 @@ class LTLB_Admin_AppointmentsPage {
                 if (selectAll) {
                     selectAll.addEventListener('change', function(e) {
                         checkboxes.forEach(cb => cb.checked = e.target.checked);
+                    });
+                }
+
+                // Column toggle functionality
+                const columnToggleBtn = document.getElementById('ltlb-column-toggle-btn');
+                if (columnToggleBtn) {
+                    const columns = ['customer', 'service', 'start', 'end', 'status'];
+                    const storageKey = 'ltlb_appointments_visible_columns';
+                    
+                    // Load saved preferences
+                    let visibleColumns = localStorage.getItem(storageKey);
+                    if (visibleColumns) {
+                        visibleColumns = JSON.parse(visibleColumns);
+                    } else {
+                        visibleColumns = columns; // All visible by default
+                    }
+                    
+                    // Apply saved state
+                    applyColumnVisibility(visibleColumns);
+                    
+                    // Create toggle menu
+                    columnToggleBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        let menu = document.getElementById('ltlb-column-toggle-menu');
+                        
+                        if (menu) {
+                            menu.remove();
+                            return;
+                        }
+                        
+                        menu = document.createElement('div');
+                        menu.id = 'ltlb-column-toggle-menu';
+                        menu.className = 'ltlb-column-toggle-menu';
+                        menu.setAttribute('role', 'menu');
+                        
+                        columns.forEach(col => {
+                            const label = document.createElement('label');
+                            label.className = 'ltlb-column-toggle-item';
+                            
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = col;
+                            checkbox.checked = visibleColumns.includes(col);
+                            
+                            const colName = col.charAt(0).toUpperCase() + col.slice(1);
+                            const text = document.createTextNode(colName);
+                            
+                            checkbox.addEventListener('change', function() {
+                                if (this.checked) {
+                                    if (!visibleColumns.includes(col)) {
+                                        visibleColumns.push(col);
+                                    }
+                                } else {
+                                    visibleColumns = visibleColumns.filter(c => c !== col);
+                                }
+                                localStorage.setItem(storageKey, JSON.stringify(visibleColumns));
+                                applyColumnVisibility(visibleColumns);
+                            });
+                            
+                            label.appendChild(checkbox);
+                            label.appendChild(text);
+                            menu.appendChild(label);
+                        });
+                        
+                        columnToggleBtn.parentElement.style.position = 'relative';
+                        columnToggleBtn.parentElement.appendChild(menu);
+                        
+                        // Close menu when clicking outside
+                        setTimeout(() => {
+                            document.addEventListener('click', function closeMenu(e) {
+                                if (!menu.contains(e.target) && e.target !== columnToggleBtn) {
+                                    menu.remove();
+                                    document.removeEventListener('click', closeMenu);
+                                }
+                            });
+                        }, 0);
+                    });
+                }
+                
+                function applyColumnVisibility(visibleColumns) {
+                    const table = document.querySelector('.wp-list-table');
+                    if (!table) return;
+                    
+                    const allColumns = ['customer', 'service', 'start', 'end', 'status'];
+                    allColumns.forEach(col => {
+                        const isVisible = visibleColumns.includes(col);
+                        const headers = table.querySelectorAll(`th[data-column="${col}"]`);
+                        const cells = table.querySelectorAll(`td[data-column="${col}"]`);
+                        
+                        headers.forEach(h => h.style.display = isVisible ? '' : 'none');
+                        cells.forEach(c => c.style.display = isVisible ? '' : 'none');
                     });
                 }
             });

@@ -118,6 +118,40 @@ class LTLB_AppointmentRepository {
 		return (int) $count;
 	}
 
+	public function get_count_occupied_rooms_on_date( string $date_yyyy_mm_dd, bool $include_pending = false ): int {
+		global $wpdb;
+		$date_yyyy_mm_dd = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_yyyy_mm_dd ) ? $date_yyyy_mm_dd : date( 'Y-m-d' );
+		$status_sql = $include_pending ? "AND a.status IN ('confirmed','pending')" : "AND a.status = 'confirmed'";
+		$sql = "SELECT COUNT(DISTINCT resource_id)
+			FROM {$wpdb->prefix}lazy_appointment_resources ar
+			JOIN {$this->table_name} a ON ar.appointment_id = a.id
+			WHERE %s >= DATE(a.start_at)
+			AND %s < DATE(a.end_at)
+			{$status_sql}";
+		$count = $wpdb->get_var( $wpdb->prepare( $sql, $date_yyyy_mm_dd, $date_yyyy_mm_dd ) );
+		return (int) $count;
+	}
+
+	/**
+	 * Count requested rooms for bookings that overlap the given date but have no room assigned.
+	 * Uses appointment.seats as the requested room count in hotel mode.
+	 */
+	public function get_count_unassigned_room_bookings_on_date( string $date_yyyy_mm_dd, bool $include_pending = false ): int {
+		global $wpdb;
+		$date_yyyy_mm_dd = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_yyyy_mm_dd ) ? $date_yyyy_mm_dd : date( 'Y-m-d' );
+		$status_sql = $include_pending ? "a.status IN ('confirmed','pending')" : "a.status = 'confirmed'";
+		$ar_table = $wpdb->prefix . 'lazy_appointment_resources';
+		$sql = "SELECT COALESCE(SUM(a.seats), 0)
+			FROM {$this->table_name} a
+			LEFT JOIN {$ar_table} ar ON ar.appointment_id = a.id
+			WHERE %s >= DATE(a.start_at)
+			AND %s < DATE(a.end_at)
+			AND {$status_sql}
+			AND ar.appointment_id IS NULL";
+		$count = $wpdb->get_var( $wpdb->prepare( $sql, $date_yyyy_mm_dd, $date_yyyy_mm_dd ) );
+		return (int) $count;
+	}
+
 	public function get_count(array $filters = []): int {
 		global $wpdb;
 		// This logic needs to mirror get_all() to count correctly with filters.
@@ -206,6 +240,28 @@ class LTLB_AppointmentRepository {
 
 		$skip_conflict_check = ! empty( $data['skip_conflict_check'] );
 
+		$service_repo = new LTLB_ServiceRepository();
+		$service = $service_id ? $service_repo->get_by_id( $service_id ) : null;
+		$seats = isset($data['seats']) ? max( 1, intval($data['seats']) ) : 1;
+
+		// Allow deterministic overrides (e.g., hotel: price_per_night * nights).
+		$amount_cents = null;
+		if ( array_key_exists( 'amount_cents', $data ) ) {
+			$amount_cents = max( 0, intval( $data['amount_cents'] ) );
+		}
+		if ( $amount_cents === null ) {
+			$unit = $service && isset( $service['price_cents'] ) ? intval( $service['price_cents'] ) : 0;
+			$amount_cents = max( 0, $unit * $seats );
+		}
+
+		$currency = 'EUR';
+		if ( array_key_exists( 'currency', $data ) && is_string( $data['currency'] ) && $data['currency'] !== '' ) {
+			$currency = sanitize_text_field( (string) $data['currency'] );
+		} elseif ( $service && ! empty( $service['currency'] ) ) {
+			$currency = sanitize_text_field( (string) $service['currency'] );
+		}
+		$payment_status = $amount_cents > 0 ? 'unpaid' : 'free';
+
 		$insert = [
 			'service_id' => $service_id,
 			'customer_id' => $customer_id,
@@ -213,8 +269,11 @@ class LTLB_AppointmentRepository {
 			'start_at' => '',
 			'end_at' => '',
 			'status' => isset($data['status']) ? sanitize_text_field($data['status']) : 'pending',
+			'amount_cents' => $amount_cents,
+			'currency' => $currency,
+			'payment_status' => $payment_status,
 			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : LTLB_Time::get_site_timezone_string(),
-			'seats' => isset($data['seats']) ? intval($data['seats']) : 1,
+			'seats' => $seats,
 			'created_at' => $now,
 			'updated_at' => $now,
 		];
@@ -257,7 +316,7 @@ class LTLB_AppointmentRepository {
 			if ( array_key_exists( 'staff_user_id', $insert ) ) {
 				$formats[] = '%d';
 			}
-			$formats = array_merge( $formats, [ '%s', '%s', '%s', '%s', '%d', '%s', '%s' ] );
+			$formats = array_merge( $formats, [ '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s' ] );
 
 			$res = $wpdb->insert( $this->table_name, $insert, $formats );
 			if ( $res === false ) {
@@ -384,6 +443,55 @@ class LTLB_AppointmentRepository {
 		$customer = $customer_repo->get_by_id( $customer_id );
 
 		return [ $service, $customer ];
+	}
+
+	/**
+	 * Get a single appointment by ID
+	 *
+	 * @param int $id
+	 * @return array|null
+	 */
+	public function get_by_id( int $id ): ?array {
+		global $wpdb;
+
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$this->table_name} WHERE id = %d",
+			$id
+		);
+
+		$row = $wpdb->get_row( $sql, ARRAY_A );
+		if ( ! $row ) {
+			return null;
+		}
+		if ( isset( $row['amount_cents'] ) ) {
+			$row['price'] = floatval( intval( $row['amount_cents'] ) ) / 100;
+		}
+		return $row;
+	}
+
+	/**
+	 * Update appointment start and end times (for drag/drop on calendar)
+	 *
+	 * @param int $id
+	 * @param string $start_at (format: Y-m-d H:i:s)
+	 * @param string $end_at (format: Y-m-d H:i:s)
+	 * @return bool
+	 */
+	public function update_times( int $id, string $start_at, string $end_at ): bool {
+		global $wpdb;
+
+		$result = $wpdb->update(
+			$this->table_name,
+			[
+				'start_at' => $start_at,
+				'end_at' => $end_at,
+			],
+			[ 'id' => $id ],
+			[ '%s', '%s' ],
+			[ '%d' ]
+		);
+
+		return $result !== false;
 	}
 }
 

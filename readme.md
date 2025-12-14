@@ -1,6 +1,6 @@
 # Lazy Bookings Plugin
 
-**Version:** 0.4.4  
+**Version:** 1.0.1 
 **Author:** LazyTechLab  
 **License:** GPLv2 or later
 
@@ -77,11 +77,8 @@ Calendar-first variant:
 ## Documentation
 
 See `/docs` folder:
-- `SPEC.md` - Technical specification
 - `DB_SCHEMA.md` - Database structure
 - `API.md` - REST API endpoints
-- `DECISIONS.md` - Architecture decisions
-- `QA_CHECKLIST.md` - Testing procedures
 
 ## Support
 

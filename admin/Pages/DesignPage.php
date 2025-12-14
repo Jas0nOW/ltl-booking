@@ -3,6 +3,27 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_DesignPage {
 
+    private function get_contrast_text_color( $hex_color ): string {
+        $hex_color = is_string( $hex_color ) ? trim( $hex_color ) : '';
+        if ( ! preg_match( '/^#?[0-9A-Fa-f]{6}$/', $hex_color ) ) {
+            return '#ffffff';
+        }
+
+        $hex = str_replace( '#', '', $hex_color );
+
+        $r = hexdec( substr( $hex, 0, 2 ) ) / 255.0;
+        $g = hexdec( substr( $hex, 2, 2 ) ) / 255.0;
+        $b = hexdec( substr( $hex, 4, 2 ) ) / 255.0;
+
+        $r = $r <= 0.03928 ? $r / 12.92 : pow( ( $r + 0.055 ) / 1.055, 2.4 );
+        $g = $g <= 0.03928 ? $g / 12.92 : pow( ( $g + 0.055 ) / 1.055, 2.4 );
+        $b = $b <= 0.03928 ? $b / 12.92 : pow( ( $b + 0.055 ) / 1.055, 2.4 );
+
+        $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+
+        return $luminance > 0.5 ? '#000000' : '#ffffff';
+    }
+
     private function get_scope(): string {
         $scope = '';
         if ( isset( $_POST['ltlb_design_scope'] ) ) {
@@ -398,7 +419,7 @@ class LTLB_Admin_DesignPage {
                                 <tr>
                                     <th><label for="custom_css"><?php echo esc_html__('Custom CSS Rules', 'ltl-bookings'); ?></label></th>
                                     <td>
-                                        <textarea name="custom_css" id="custom_css" rows="8" class="large-text code ltlb-live-input" placeholder=".ltlb-booking .service-card { /* your styles */ }"><?php echo esc_textarea( $custom_css ); ?></textarea>
+                                        <textarea name="custom_css" id="custom_css" rows="8" class="large-text code ltlb-live-input" placeholder="<?php echo esc_attr__( '.ltlb-booking .service-card { /* your styles */ }', 'ltl-bookings' ); ?>"><?php echo esc_textarea( $custom_css ); ?></textarea>
                                         <span class="description"><?php echo esc_html__('Add custom CSS for advanced styling.', 'ltl-bookings'); ?></span>
                                     </td>
                                 </tr>
@@ -423,10 +444,22 @@ class LTLB_Admin_DesignPage {
                             --lazy-secondary-hover:<?php echo esc_attr( $secondary_hover ); ?>;
                             --lazy-text:<?php echo esc_attr( $text ); ?>;
                             --lazy-accent:<?php echo esc_attr( $accent ); ?>;
+                            --lazy-accent-hover:<?php echo esc_attr( $primary_hover ); ?>;
                             --lazy-border-color:<?php echo esc_attr( $border_color ); ?>;
                             --lazy-panel-bg:<?php echo esc_attr( $panel_bg ); ?>;
                             --lazy-button-text:<?php echo esc_attr( $button_text ); ?>;
-                            --lazy-secondary-text:<?php echo esc_attr( '#ffffff' ); ?>;
+                            --lazy-secondary-text:<?php echo esc_attr( $this->get_contrast_text_color( $secondary_hover ) ); ?>;
+
+                            /* Compatibility tokens (some components use these names) */
+                            --lazy-bg-primary:<?php echo esc_attr( ($panel_bg && $panel_bg !== 'transparent') ? $panel_bg : $bg ); ?>;
+                            --lazy-bg-secondary:<?php echo esc_attr( ($panel_bg && $panel_bg !== 'transparent') ? $panel_bg : $bg ); ?>;
+                            --lazy-bg-tertiary:<?php echo esc_attr( ($panel_bg && $panel_bg !== 'transparent') ? $panel_bg : $bg ); ?>;
+                            --lazy-text-primary:<?php echo esc_attr( $text ); ?>;
+                            --lazy-text-secondary:<?php echo esc_attr( $text ); ?>;
+                            --lazy-text-muted:<?php echo esc_attr( $text ); ?>;
+                            --lazy-border-light:<?php echo esc_attr( $border_color ); ?>;
+                            --lazy-border-medium:<?php echo esc_attr( $border_color ); ?>;
+                            --lazy-border-strong:<?php echo esc_attr( $border_color ); ?>;
                             --lazy-border-width:<?php echo esc_attr( $border_width ); ?>px;
                             --lazy-border-radius:<?php echo esc_attr( $border_radius ); ?>px;
                             --lazy-shadow-container:<?php echo $shadow_container ? "0 {$box_shadow_blur}px {$box_shadow_spread}px rgba(0,0,0,0.1)" : 'none'; ?>;
@@ -441,9 +474,9 @@ class LTLB_Admin_DesignPage {
                         ">
                             <div id="ltlb-live-preview-container" class="<?php echo $scope === 'backend' ? 'ltlb-admin ltlb-admin--preview' : 'ltlb-booking'; ?>" style="
                                 <?php if ( $scope === 'backend' ) : ?>
-                                padding:0;
+                                padding: 0;
                                 border: 0;
-                                background: transparent;
+                                background: <?php echo esc_attr( $panel_bg !== 'transparent' ? $panel_bg : 'transparent' ); ?>;
                                 color: var(--lazy-text);
                                 border-radius: 0;
                                 box-shadow: none;
@@ -528,7 +561,7 @@ class LTLB_Admin_DesignPage {
                                         cursor:pointer;
                                         box-shadow:var(--lazy-shadow-button);
                                         transition:all var(--lazy-transition-duration) ease;
-                                    ">Primary Button</button>
+                                    "><?php echo esc_html__( 'Primary Button', 'ltl-bookings' ); ?></button>
                                     
                                     <!-- Secondary Button -->
                                     <button type="button" data-ltlb-preview="secondary-button" style="
@@ -540,15 +573,15 @@ class LTLB_Admin_DesignPage {
                                         cursor:pointer;
                                         box-shadow:var(--lazy-shadow-button);
                                         transition:all var(--lazy-transition-duration) ease;
-                                    ">Secondary</button>
+                                    "><?php echo esc_html__( 'Secondary', 'ltl-bookings' ); ?></button>
 
                                     <!-- Input -->
-                                    <input type="text" data-ltlb-preview="input" placeholder="Input field" style="
+                                    <input type="text" data-ltlb-preview="input" placeholder="<?php echo esc_attr__( 'Input field', 'ltl-bookings' ); ?>" style="
                                         border:var(--lazy-border-width) solid var(--lazy-border-color);
                                         padding:8px 12px;
                                         border-radius:var(--lazy-border-radius);
                                         color:var(--lazy-text);
-                                        background:#fff;
+                                        background:var(--lazy-bg);
                                         width:100%;
                                         margin-top:10px;
                                         box-shadow:var(--lazy-shadow-input) !important;
@@ -557,7 +590,7 @@ class LTLB_Admin_DesignPage {
 
                                 <!-- Service Card -->
                                 <div data-ltlb-preview="card" style="
-                                    background:rgba(255,255,255,0.8);
+                                    background:var(--lazy-panel-bg, var(--lazy-bg));
                                     padding:15px;
                                     border-radius:var(--lazy-border-radius);
                                     border:var(--lazy-border-width) solid var(--lazy-border-color);
@@ -683,11 +716,25 @@ class LTLB_Admin_DesignPage {
                 preview.style.setProperty('--lazy-secondary-hover', secondaryHover);
                 preview.style.setProperty('--lazy-text', text);
                 preview.style.setProperty('--lazy-accent', accent);
+                preview.style.setProperty('--lazy-accent-hover', primaryHover);
                 preview.style.setProperty('--lazy-border-color', borderColor);
                 preview.style.setProperty('--lazy-panel-bg', panelBg);
                 const computedPrimaryText = autoButtonText ? getContrastTextColor(primary) : buttonText;
                 preview.style.setProperty('--lazy-button-text', computedPrimaryText);
                 preview.style.setProperty('--lazy-secondary-text', getContrastTextColor(secondaryHover));
+
+                // Compatibility token mapping for preview parity
+                const surfacePrimary = (panelBg && panelBg !== 'transparent') ? panelBg : bg;
+                preview.style.setProperty('--lazy-bg-primary', surfacePrimary);
+                preview.style.setProperty('--lazy-bg-secondary', surfacePrimary);
+                preview.style.setProperty('--lazy-bg-tertiary', surfacePrimary);
+                preview.style.setProperty('--lazy-text-primary', text);
+                preview.style.setProperty('--lazy-text-secondary', text);
+                preview.style.setProperty('--lazy-text-muted', text);
+                preview.style.setProperty('--lazy-border-light', borderColor);
+                preview.style.setProperty('--lazy-border-medium', borderColor);
+                preview.style.setProperty('--lazy-border-strong', borderColor);
+
                 preview.style.setProperty('--lazy-border-width', borderWidth);
                 preview.style.setProperty('--lazy-border-radius', borderRadius);
                 preview.style.setProperty('--lazy-shadow-container', shadowContainer);
@@ -699,7 +746,7 @@ class LTLB_Admin_DesignPage {
                 // Also apply styles directly to ensure the preview always visibly updates
                 if (previewInner) {
                     if (isBackend) {
-                        previewInner.style.background = 'transparent';
+                        previewInner.style.background = (panelBg && panelBg !== 'transparent') ? panelBg : 'transparent';
                         previewInner.style.color = text;
                         previewInner.style.border = '0';
                         previewInner.style.borderRadius = '0';

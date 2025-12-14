@@ -27,9 +27,13 @@ if ( $prefill_service_id > 0 && is_array( $services ?? null ) ) {
 
 // With the JS stepper, we always keep steps available so the user can go back.
 $hide_service_step = false;
+$prefill_date = isset( $prefill_date ) ? (string) $prefill_date : '';
+$prefill_time = isset( $prefill_time ) ? (string) $prefill_time : '';
+$prefill_checkin = isset( $prefill_checkin ) ? (string) $prefill_checkin : '';
+$prefill_checkout = isset( $prefill_checkout ) ? (string) $prefill_checkout : '';
+$prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) ) : 1;
 ?>
-<div class="ltlb-booking<?php echo $start_mode === 'calendar' ? ' ltlb-start-calendar' : ''; ?>" role="region" aria-label="<?php echo esc_attr__('Buchungsassistent', 'ltl-bookings'); ?>" data-ltlb-start-mode="<?php echo esc_attr( $start_mode ); ?>" data-ltlb-prefill-service="<?php echo esc_attr( $prefill_service_id ); ?>">
-<div class="ltlb-booking<?php echo $start_mode === 'calendar' ? ' ltlb-start-calendar' : ''; ?>" role="region" aria-label="<?php echo esc_attr__( 'Booking Wizard', 'ltl-bookings' ); ?>" data-ltlb-start-mode="<?php echo esc_attr( $start_mode ); ?>" data-ltlb-prefill-service="<?php echo esc_attr( $prefill_service_id ); ?>">
+<div class="ltlb-booking<?php echo $start_mode === 'calendar' ? ' ltlb-start-calendar' : ''; ?>" role="region" aria-label="<?php echo esc_attr__( 'Booking Wizard', 'ltl-bookings' ); ?>" data-ltlb-start-mode="<?php echo esc_attr( $start_mode ); ?>" data-ltlb-prefill-service="<?php echo esc_attr( $prefill_service_id ); ?>" data-ltlb-prefill-date="<?php echo esc_attr( $prefill_date ); ?>" data-ltlb-prefill-time="<?php echo esc_attr( $prefill_time ); ?>" data-ltlb-prefill-checkin="<?php echo esc_attr( $prefill_checkin ); ?>" data-ltlb-prefill-checkout="<?php echo esc_attr( $prefill_checkout ); ?>" data-ltlb-prefill-guests="<?php echo esc_attr( $prefill_guests ); ?>">
     <a href="#ltlb-form-start" class="ltlb-skip-link screen-reader-text"><?php echo esc_html__( 'Skip to booking form', 'ltl-bookings' ); ?></a>
     
     <form method="post" aria-label="<?php echo esc_attr__( 'Booking form', 'ltl-bookings' ); ?>" class="ltlb-wizard-form" novalidate>

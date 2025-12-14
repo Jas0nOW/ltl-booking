@@ -187,6 +187,13 @@ class HotelEngine implements BookingEngineInterface {
         }
 
         $default_status = $ls['default_status'] ?? 'pending';
+        $total_price_cents = isset( $avail['total_price_cents'] ) ? max( 0, intval( $avail['total_price_cents'] ) ) : 0;
+        $currency = 'EUR';
+        $service_repo_tmp = new LTLB_ServiceRepository();
+        $svc_tmp = $service_repo_tmp->get_by_id( $service_id );
+        if ( $svc_tmp && ! empty( $svc_tmp['currency'] ) ) {
+            $currency = sanitize_text_field( (string) $svc_tmp['currency'] );
+        }
 
         // Create appointment with seats=guests
         $appointment_repo = new LTLB_AppointmentRepository();
@@ -198,6 +205,8 @@ class HotelEngine implements BookingEngineInterface {
             'status'      => $default_status,
             'timezone'    => LTLB_Time::get_site_timezone_string(),
             'seats'       => $guests,
+            'amount_cents' => $total_price_cents,
+            'currency' => $currency,
 			'skip_conflict_check' => true,
         ] );
 

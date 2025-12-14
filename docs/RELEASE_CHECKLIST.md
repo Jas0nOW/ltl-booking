@@ -1,7 +1,7 @@
 # Release Checklist
 
 ## Before Release
-- Tag the repo: `v0.4.4` (matches `LTLB_VERSION`)
+- Tag the repo: `v1.0.1` (matches `LTLB_VERSION`)
 - Build ZIP (recommended):
   - Windows/PowerShell: run `scripts/build-zip.ps1`
   - Bash (macOS/Linux): run `scripts/build-zip.sh`
