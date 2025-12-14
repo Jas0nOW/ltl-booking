@@ -82,8 +82,7 @@ class LTLB_Admin_SettingsPage {
 
 				update_option( 'lazy_settings', $settings );
 
-			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
-            LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
+			$redirect = admin_url( 'admin.php?page=ltlb_settings&settings_updated=1' );
 			wp_safe_redirect( $redirect );
 			exit;
 		}
@@ -117,6 +116,12 @@ class LTLB_Admin_SettingsPage {
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_settings'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__( 'Settings', 'ltl-bookings' ); ?></h1>
             <hr class="wp-header-end">
+            
+            <?php if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === '1' ): ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><span class="dashicons dashicons-yes-alt" style="color:#46b450;"></span> <?php echo esc_html__( 'Settings saved successfully.', 'ltl-bookings' ); ?></p>
+                </div>
+            <?php endif; ?>
 
 			<form method="post">
 				<?php wp_nonce_field( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ); ?>
@@ -282,6 +287,10 @@ class LTLB_Admin_SettingsPage {
                     <?php submit_button( esc_html__( 'Send Test Email', 'ltl-bookings' ), 'secondary', 'submit', false ); ?>
                 </form>
             <?php LTLB_Admin_Component::card_end(); ?>
+            
+            <p class="submit" style="margin-top:20px;">
+                <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
+            </p>
 		</div>
 
 		<?php

@@ -44,6 +44,9 @@ $hide_service_step = false;
         <h3 class="ltlb-wizard-title">
             <?php echo $is_hotel_mode ? esc_html__( 'Book a room', 'ltl-bookings' ) : esc_html__( 'Book a service', 'ltl-bookings' ); ?>
         </h3>
+        <div class="ltlb-wizard-progress" role="status" aria-live="polite">
+            <span class="ltlb-wizard-progress__text"><?php echo esc_html__( 'Step', 'ltl-bookings' ); ?> <span class="ltlb-wizard-current-step">1</span> <?php echo esc_html__( 'of', 'ltl-bookings' ); ?> <span class="ltlb-wizard-total-steps">4</span></span>
+        </div>
 
         <?php if ( $is_hotel_mode ) : ?>
             <div id="ltlb-price-preview" class="ltlb-price-preview" style="display:none;">

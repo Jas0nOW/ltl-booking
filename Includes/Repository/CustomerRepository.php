@@ -123,5 +123,17 @@ class LTLB_CustomerRepository {
 		$res = $wpdb->update( $this->table_name, $update, [ 'id' => $id ], $formats, [ '%d' ] );
 		return $res !== false;
 	}
+
+	/**
+	 * Export customers as CSV array
+	 *
+	 * @return array
+	 */
+	public function get_all_for_export(): array {
+		global $wpdb;
+		$sql = "SELECT email, first_name, last_name, phone, notes, created_at FROM {$this->table_name} ORDER BY id DESC";
+		$rows = $wpdb->get_results( $sql, ARRAY_A );
+		return $rows ?: [];
+	}
 }
 

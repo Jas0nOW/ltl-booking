@@ -222,7 +222,7 @@ class LTLB_Admin_DesignPage {
                                     <th><label for="accent"><?php echo esc_html__('Accent Color', 'ltl-bookings'); ?></label></th>
                                     <td>
                                         <input name="accent" id="accent" type="color" value="<?php echo esc_attr( $accent ); ?>" class="ltlb-color-input ltlb-live-input">
-                                        <span class="description"><?php echo esc_html__('Small highlights (required *), and the gradient end color when Gradient is enabled.', 'ltl-bookings'); ?></span>
+                                        <span class="description"><?php echo esc_html__('Small highlights (required fields *), and the gradient end color when gradient is enabled.', 'ltl-bookings'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>

@@ -81,6 +81,17 @@
     if (!container || !window.FullCalendar) return;
 
     ensureApiFetchNonce();
+    
+    // Show calendar and hide loading spinner
+    var loading = qs('ltlb-admin-calendar-loading');
+    if (loading) {
+      setTimeout(function() {
+        loading.style.display = 'none';
+        container.hidden = false;
+      }, 100);
+    } else {
+      container.hidden = false;
+    }
 
     function statusOptions(selected) {
       var opts = [

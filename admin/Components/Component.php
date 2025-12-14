@@ -159,29 +159,48 @@ class LTLB_Admin_Component {
      */
     public static function pagination(int $total_items, int $per_page): void {
         $total_pages = ceil($total_items / $per_page);
-        if ($total_pages <= 1) {
+        if ($total_pages <= 1 && $total_items <= 20) {
             return;
         }
 
         $current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
-        $base_url = remove_query_arg('paged');
+        $base_url = remove_query_arg(['paged', 'per_page']);
+        $current_per_page = isset($_GET['per_page']) ? max(20, intval($_GET['per_page'])) : $per_page;
 
-        $links = paginate_links([
-            'base' => $base_url . '%_%',
-            'format' => '&paged=%#%',
-            'current' => $current_page,
-            'total' => $total_pages,
-            'prev_text' => __('&laquo; Prev', 'ltl-bookings'),
-            'next_text' => __('Next &raquo;', 'ltl-bookings'),
-            'type' => 'array',
-        ]);
-
-        if (is_array($links)) {
-            echo '<div class="ltlb-pagination">';
-            foreach ($links as $link) {
-                echo $link;
-            }
-            echo '</div>';
+        echo '<div class="ltlb-pagination-wrapper">';
+        
+        // Items per page dropdown
+        echo '<div class="ltlb-pagination-per-page">';
+        echo '<label for="ltlb-per-page-select">' . esc_html__('Items per page:', 'ltl-bookings') . '</label> ';
+        echo '<select id="ltlb-per-page-select" onchange="window.location.href=\'' . esc_url($base_url) . '&per_page=\' + this.value">';
+        foreach ([20, 50, 100] as $option) {
+            $selected = ($current_per_page == $option) ? ' selected' : '';
+            echo '<option value="' . esc_attr($option) . '"' . $selected . '>' . esc_html($option) . '</option>';
         }
+        echo '</select>';
+        echo '</div>';
+
+        // Page links
+        if ($total_pages > 1) {
+            $links = paginate_links([
+                'base' => $base_url . '%_%&per_page=' . $current_per_page,
+                'format' => '&paged=%#%',
+                'current' => $current_page,
+                'total' => $total_pages,
+                'prev_text' => __('&laquo; Prev', 'ltl-bookings'),
+                'next_text' => __('Next &raquo;', 'ltl-bookings'),
+                'type' => 'array',
+            ]);
+
+            if (is_array($links)) {
+                echo '<div class="ltlb-pagination">';
+                foreach ($links as $link) {
+                    echo $link;
+                }
+                echo '</div>';
+            }
+        }
+        
+        echo '</div>';
     }
 }

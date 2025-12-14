@@ -39,7 +39,7 @@ class LTLB_Admin_StaffPage {
             if ( $ok ) {
                 LTLB_Notices::add( __( 'Working hours saved.', 'ltl-bookings' ), 'success' );
             } else {
-                LTLB_Notices::add( __( 'An error occurred while saving.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'Failed to save working hours. Please check your input and try again.', 'ltl-bookings' ), 'error' );
             }
 
             wp_safe_redirect( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($user_id)) );
@@ -102,7 +102,7 @@ class LTLB_Admin_StaffPage {
                 <h2><?php echo esc_html__('Team', 'ltl-bookings'); ?></h2>
                 <table class="wp-list-table widefat striped">
                     <thead>
-                        <tr><th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Email', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
+                        <tr><th scope="col"><?php echo esc_html__('Name', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('Email', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $staff_users ) ) : ?>
@@ -121,7 +121,7 @@ class LTLB_Admin_StaffPage {
                                 <tr>
                                     <td><?php echo esc_html( $u->display_name ); ?></td>
                                     <td><?php echo esc_html( $u->user_email ); ?></td>
-                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-small"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
+                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -183,7 +183,7 @@ class LTLB_Admin_StaffPage {
 
                     <table class="wp-list-table widefat striped">
                         <thead>
-                            <tr><th><?php echo esc_html__('Date', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Off day', 'ltl-bookings'); ?></th><th><?php echo esc_html__('From', 'ltl-bookings'); ?></th><th><?php echo esc_html__('To', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Note', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
+                            <tr><th scope="col"><?php echo esc_html__('Date', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('Off day', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('From', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('To', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('Note', 'ltl-bookings'); ?></th><th scope="col"><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
                         </thead>
                         <tbody>
                             <?php if ( empty( $exceptions ) ) : ?>
@@ -202,7 +202,7 @@ class LTLB_Admin_StaffPage {
                                                 <input type="hidden" name="ltlb_exception_delete" value="1">
                                                 <input type="hidden" name="exception_id" value="<?php echo esc_attr( intval($e['id']) ); ?>">
                                                 <input type="hidden" name="user_id" value="<?php echo esc_attr( $user_id ); ?>">
-                                                <button class="button button-small" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
+                                                <button class="button button-secondary" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
                                             </form>
                                         </td>
                                     </tr>

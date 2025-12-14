@@ -20,12 +20,12 @@ class LTLB_Admin_HotelDashboardPage {
             <div class="ltlb-dashboard-header">
                 <h1 class="wp-heading-inline"><?php echo esc_html__('Hotel Dashboard', 'ltl-bookings'); ?></h1>
                 <div class="ltlb-quick-actions">
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="button button-primary">
-                        <span class="dashicons dashicons-plus"></span>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="button button-primary" aria-label="<?php echo esc_attr__('Create new room type', 'ltl-bookings'); ?>">
+                        <span class="dashicons dashicons-plus" aria-hidden="true"></span>
                         <?php echo esc_html__('New Room Type', 'ltl-bookings'); ?>
                     </a>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="button">
-                        <span class="dashicons dashicons-calendar-alt"></span>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="button" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
+                        <span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
                         <?php echo esc_html__('View Calendar', 'ltl-bookings'); ?>
                     </a>
                 </div>
@@ -64,10 +64,10 @@ class LTLB_Admin_HotelDashboardPage {
                                 <tr>
                                     <td><?php echo esc_html( $cust_name ); ?></td>
                                     <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
-                                    <td><?php echo esc_html( $b['start_at'] ); ?></td>
-                                    <td><?php echo esc_html( $b['end_at'] ); ?></td>
+                                    <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $b['start_at'] ) ) ); ?></td>
+                                    <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $b['end_at'] ) ) ); ?></td>
                                     <td>
-                                        <span class="ltlb-status-badge status-<?php echo esc_attr($b['status']); ?>"><?php echo esc_html( ucfirst($b['status']) ); ?></span>
+                                        <?php echo LTLB_Admin_AppointmentsDashboardPage::render_status_badge( $b['status'] ); ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

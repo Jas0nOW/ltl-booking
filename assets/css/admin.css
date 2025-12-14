@@ -993,3 +993,214 @@
     border: none;
     background: none;
 }
+
+/* Helper classes for replaced inline styles */
+.ltlb-card--narrow {
+    max-width: 800px;
+    margin-top: 20px;
+}
+
+.ltlb-currency-selector {
+    vertical-align: top;
+}
+
+.ltlb-checkbox-scroll {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.ltlb-checkbox-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.ltlb-settings-panel {
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.ltlb-flex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ltlb-narrow-table {
+    max-width: 520px;
+}
+
+.ltlb-weekdays-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ltlb-weekday-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ltlb-time-range {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ltlb-time-input {
+    margin-left: 6px;
+}
+
+.ltlb-service-desc {
+    margin: 5px 0 0;
+}
+
+.ltlb-weekdays-container {
+    margin-bottom: 10px;
+}
+
+.ltlb-weekday-checkbox,
+.ltlb-resource-checkbox {
+    margin-right: 15px;
+}
+
+.resources-checkbox-group {
+    margin-top: 10px;
+}
+
+/* Calendar loading spinner */
+.ltlb-calendar-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 300px;
+}
+
+.ltlb-calendar-loading .spinner {
+    float: none;
+    margin: 0 8px 0 0;
+}
+
+/* Pagination wrapper with items-per-page */
+.ltlb-pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.ltlb-pagination-per-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ltlb-pagination-per-page label {
+    margin: 0;
+    font-weight: normal;
+}
+
+.ltlb-pagination-per-page select {
+    padding: 2px 24px 2px 8px;
+}
+
+/* Breadcrumbs */
+.ltlb-breadcrumbs {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.ltlb-breadcrumbs a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.ltlb-breadcrumbs a:hover {
+    color: #005177;
+    text-decoration: underline;
+}
+
+.ltlb-breadcrumbs__sep {
+    margin: 0 4px;
+}
+
+.ltlb-breadcrumbs__current {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Wizard progress indicator */
+.ltlb-wizard-progress {
+    text-align: center;
+    margin: 16px 0;
+    padding: 8px;
+    background: #f0f6fc;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2c3338;
+}
+
+.ltlb-wizard-current-step {
+    font-weight: bold;
+    color: #0073aa;
+}
+
+/* Form validation errors */
+.ltlb-input-error {
+    border-color: #dc3232 !important;
+    box-shadow: 0 0 2px rgba(220, 50, 50, 0.8);
+}
+
+.ltlb-validation-error {
+    margin: 10px 0;
+}
+
+/* Bulk actions styling */
+.tablenav .bulkactions select {
+    margin-right: 8px;
+}
+
+.check-column {
+    width: 2.2em;
+    padding: 8px 0 0 3px;
+    vertical-align: top;
+}
+
+.check-column input[type="checkbox"] {
+    margin: 0;
+}
+
+/* KPI Card Comparison */
+.ltlb-kpi-card__comparison {
+    margin-top: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.ltlb-kpi-card__comparison.positive {
+    color: #46b450;
+}
+
+.ltlb-kpi-card__comparison.negative {
+    color: #dc3232;
+}
+
+.ltlb-kpi-card__comparison .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}

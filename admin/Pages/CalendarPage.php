@@ -21,7 +21,11 @@ class LTLB_Admin_CalendarPage {
 							<span class="ltlb-calendar-legend__item ltlb-fc-status-pending"><?php echo esc_html__( 'Pending', 'ltl-bookings' ); ?></span>
 							<span class="ltlb-calendar-legend__item ltlb-fc-status-cancelled"><?php echo esc_html__( 'Cancelled', 'ltl-bookings' ); ?></span>
 						</div>
-						<div id="ltlb-admin-calendar" style="min-height: 700px;"></div>
+				<div id="ltlb-admin-calendar-loading" class="ltlb-calendar-loading" role="status" aria-live="polite">
+					<span class="spinner is-active"></span>
+					<span class="screen-reader-text"><?php echo esc_html__( 'Loading calendar...', 'ltl-bookings' ); ?></span>
+				</div>
+				<div id="ltlb-admin-calendar" style="min-height: 700px;" hidden></div>
 					</div>
 					<div class="ltlb-calendar-layout__side">
 						<div id="ltlb-admin-calendar-details-empty" class="ltlb-calendar-details-empty">

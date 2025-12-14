@@ -99,6 +99,13 @@ class LTLB_Admin_Header {
 					<div class="ltlb-admin-header__title"><?php echo esc_html__('LazyBookings', 'ltl-bookings'); ?></div>
 					<div class="ltlb-admin-header__subtitle">v<?php echo esc_html(LTLB_VERSION); ?></div>
 				</div>
+				<?php if ( ! empty( $active_page ) && isset( $tabs[ $active_page ] ) ): ?>
+					<nav class="ltlb-breadcrumbs" aria-label="<?php echo esc_attr__('Breadcrumbs', 'ltl-bookings'); ?>">
+						<a href="<?php echo esc_url( admin_url('admin.php') ); ?>"><?php echo esc_html__('Dashboard', 'ltl-bookings'); ?></a>
+						<span class="ltlb-breadcrumbs__sep" aria-hidden="true">/</span>
+						<span class="ltlb-breadcrumbs__current"><?php echo esc_html( $tabs[ $active_page ]['label'] ); ?></span>
+					</nav>
+				<?php endif; ?>
 			</div>
 			<div class="ltlb-admin-header__main">
 				<div class="ltlb-mode-switcher">
@@ -129,6 +136,39 @@ class LTLB_Admin_Header {
 					</select>
 					<button type="submit" class="button button-small"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
 				</form>
+				<script>
+				(function(){
+					var modeLinks = document.querySelectorAll('.ltlb-admin-header__mode a');
+					for (var i = 0; i < modeLinks.length; i++) {
+						modeLinks[i].addEventListener('click', function(e) {
+							if (this.classList.contains('active')) return;
+							if (!confirm(<?php echo wp_json_encode( __( 'Switching modes may hide data specific to the current mode. Continue?', 'ltl-bookings' ) ); ?>)) {
+								e.preventDefault();
+							}
+						});
+					}
+				})();
+				// Global keyboard shortcuts
+				document.addEventListener('keydown', function(e) {
+					if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+					// S: Focus search if available
+					if (e.key === 's' || e.key === 'S') {
+						var searchInput = document.querySelector('.ltlb-admin input[type="search"], .ltlb-admin .search-box');
+						if (searchInput) {
+							e.preventDefault();
+							searchInput.focus();
+						}
+					}
+					// N: Click "Add New" button if available
+					if (e.key === 'n' || e.key === 'N') {
+						var newBtn = document.querySelector('.ltlb-admin .page-title-action');
+						if (newBtn) {
+							e.preventDefault();
+							newBtn.click();
+						}
+					}
+				});
+				</script>
 			</div>
 		</div>
 		<?php

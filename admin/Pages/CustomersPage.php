@@ -50,13 +50,25 @@ class LTLB_Admin_CustomersPage {
 			if ( $customer ) $editing = true;
 		}
 
-		$customers = $this->customer_repo->get_all();
+		// Pagination
+		$per_page = isset($_GET['per_page']) ? max(20, intval($_GET['per_page'])) : 20;
+		$current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+		$offset = ($current_page - 1) * $per_page;
+		
+		$total_customers = $this->customer_repo->get_count();
+		$customers = $this->customer_repo->get_all($per_page, $offset);
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_customers'); } ?>
 			<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
                 <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
+                <?php if ( !empty($customers) ) : ?>
+                    <a href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=ltlb_customers&action=export_csv'), 'ltlb_export_customers' ) ); ?>" class="page-title-action">
+                        <span class="dashicons dashicons-download" style="vertical-align:middle;" aria-hidden="true"></span>
+                        <?php echo esc_html__('Export CSV', 'ltl-bookings'); ?>
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
             <hr class="wp-header-end">
 			
@@ -128,8 +140,17 @@ class LTLB_Admin_CustomersPage {
 			<?php else: ?>
                 <div class="ltlb-card">
                     <?php if ( empty($customers) ) : ?>
-						<p><?php echo esc_html( $is_hotel_mode ? __( 'No guests found.', 'ltl-bookings' ) : __( 'No customers found.', 'ltl-bookings' ) ); ?></p>
-						<p><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="button button-primary"><?php echo esc_html( $is_hotel_mode ? __( 'Add New Guest', 'ltl-bookings' ) : __( 'Add New Customer', 'ltl-bookings' ) ); ?></a></p>
+						<?php
+						LTLB_Admin_Component::empty_state(
+							$is_hotel_mode ? __( 'No Guests Yet', 'ltl-bookings' ) : __( 'No Customers Yet', 'ltl-bookings' ),
+							$is_hotel_mode 
+								? __( 'Guests are created automatically when bookings are made, or you can add them manually.', 'ltl-bookings' )
+								: __( 'Customers are created automatically from bookings, or you can add them manually.', 'ltl-bookings' ),
+							$is_hotel_mode ? __( 'Add First Guest', 'ltl-bookings' ) : __( 'Add First Customer', 'ltl-bookings' ),
+							admin_url('admin.php?page=ltlb_customers&action=add'),
+							'dashicons-groups'
+						);
+						?>
                     <?php else : ?>
                         <table class="widefat striped">
                             <thead>
@@ -151,12 +172,13 @@ class LTLB_Admin_CustomersPage {
                                         </td>
                                         <td><?php echo esc_html( $c['phone'] ); ?></td>
                                         <td>
-									<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="button button-small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+									<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <?php LTLB_Admin_Component::pagination($total_customers, $per_page); ?>
                     <?php endif; ?>
                 </div>
 			<?php endif; ?>

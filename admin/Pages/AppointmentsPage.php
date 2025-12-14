@@ -61,15 +61,16 @@ class LTLB_Admin_AppointmentsPage {
             <form method="post">
                 <?php LTLB_Admin_Component::card_start(''); ?>
                     <div class="ltlb-table-toolbar">
-                        <div class="ltlb-table-toolbar__bulk-actions">
+                        <div class="ltlb-table-toolbar__bulk-actions" role="group" aria-label="<?php esc_attr_e( 'Bulk actions toolbar', 'ltl-bookings' ); ?>">
                             <label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select bulk action', 'ltl-bookings' ); ?></label>
-                            <select name="action" id="bulk-action-selector-top">
+                            <select name="action" id="bulk-action-selector-top" aria-describedby="bulk-action-help">
                                 <option value="-1"><?php esc_html_e( 'Bulk Actions', 'ltl-bookings' ); ?></option>
                                 <option value="set_status_confirmed"><?php esc_html_e( 'Change status to confirmed', 'ltl-bookings' ); ?></option>
                                 <option value="set_status_pending"><?php esc_html_e( 'Change status to pending', 'ltl-bookings' ); ?></option>
                                 <option value="set_status_cancelled"><?php esc_html_e( 'Change status to cancelled', 'ltl-bookings' ); ?></option>
                             </select>
-                            <?php submit_button( esc_html__( 'Apply', 'ltl-bookings' ), 'action', '', false ); ?>
+                            <?php submit_button( esc_html__( 'Apply', 'ltl-bookings' ), 'action', '', false, [ 'aria-label' => esc_attr__( 'Apply bulk action to selected appointments', 'ltl-bookings' ) ] ); ?>
+                            <span id="bulk-action-help" class="screen-reader-text"><?php esc_html_e( 'Select appointments using checkboxes, choose an action, then click Apply', 'ltl-bookings' ); ?></span>
                         </div>
                         <form method="get">
                             <input type="hidden" name="page" value="ltlb_appointments">

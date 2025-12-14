@@ -98,8 +98,8 @@ class LTLB_Admin_ResourcesPage {
                                 <tr>
                                     <th><label for="capacity"><?php echo esc_html__('Capacity', 'ltl-bookings'); ?></label></th>
                                     <td>
-                                        <input name="capacity" id="capacity" type="number" value="<?php echo esc_attr( $capacity ); ?>" class="small-text" required min="1">
-                                        <p class="description"><?php echo esc_html__('How many concurrent bookings can this resource cover?', 'ltl-bookings'); ?></p>
+                                        <input name="capacity" id="capacity" type="number" value="<?php echo esc_attr( $capacity ); ?>" class="small-text" required min="1" aria-describedby="capacity-desc">
+                                        <p class="description" id="capacity-desc"><?php echo esc_html__('Maximum number of simultaneous bookings this resource can handle (e.g., 1 for exclusive use, 10 for a meeting room).', 'ltl-bookings'); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -165,7 +165,7 @@ class LTLB_Admin_ResourcesPage {
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=edit&id='.$r['id']) ); ?>" class="button button-small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=edit&id='.$r['id']) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

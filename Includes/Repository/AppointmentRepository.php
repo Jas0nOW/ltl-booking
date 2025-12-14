@@ -354,6 +354,23 @@ class LTLB_AppointmentRepository {
 	}
 
 	/**
+	 * Get count for date range (for week-over-week comparisons)
+	 *
+	 * @param string $from Start date (Y-m-d H:i:s)
+	 * @param string $to End date (Y-m-d H:i:s)
+	 * @return int
+	 */
+	public function get_count_by_date_range( string $from, string $to ): int {
+		global $wpdb;
+		$count = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$this->table_name} WHERE start_at >= %s AND start_at < %s",
+			$from,
+			$to
+		) );
+		return (int) $count;
+	}
+
+	/**
 	 * Retrieves the service and customer for an appointment.
 	 *
 	 * @param int $service_id
