@@ -51,7 +51,7 @@ Fokus liegt auf:
 - Dashboard
 - Services (CRUD)
 - Customers (Liste)
-- Appointments (Liste, Filter, CSV Export)
+- Appointments (Liste, Filter, Bulk Actions, Pagination)
 - Calendar (Kalenderansicht mit Drag & Drop)
 - Staff (Arbeitszeiten + Ausnahmen)
 - Resources (CRUD)

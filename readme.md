@@ -27,7 +27,7 @@ LazyBookings ist eine High-End-Lösung für Termin- und Ressourcenmanagement in 
 - ✅ **Diagnostics Dashboard** - System health monitoring
 - ✅ **MySQL Named Locks** - Race condition protection
 - ✅ **Performance Indexes** - Optimized database queries
-- ✅ **Admin UX Upgrades** - Filters, CSV export
+- ✅ **Admin UX Upgrades** - Filters, Bulk Actions, Pagination
 - ✅ **Calendar Management** - Drag & drop appointments, edit status/customer, delete
 - ✅ **Per-User Admin Language** - English/Deutsch switch in admin header
 - ✅ **Email Deliverability** - Reply-To, test emails
@@ -46,9 +46,9 @@ LazyBookings ist eine High-End-Lösung für Termin- und Ressourcenmanagement in 
 
 ### Admin Panel
 - **Dashboard** - Overview and quick stats
-- **Services** - Create and manage bookable services
-- **Customers** - Customer database with search
-- **Appointments** - View, filter, export bookings
+- **Services** - Create and manage bookable services (wizard)
+- **Customers** - Customer database
+- **Appointments** - View and filter bookings; bulk status updates
 - **Calendar** - Calendar view with drag & drop rescheduling and quick edits
 - **Resources** - Manage rooms, equipment (capacity)
 - **Staff** - Configure availability per staff member
@@ -104,7 +104,7 @@ For issues and feature requests, please check the documentation first.
 - Added diagnostics page with system info & migration runner
 - Implemented MySQL named lock protection for bookings
 - Added performance indexes on staff tables
-- Enhanced admin UX with filters and CSV export
+- Enhanced admin UX with filters, bulk actions, and pagination
 - Improved email deliverability (Reply-To, test button)
 - Added GDPR basics (retention settings, anonymization)
 - Implemented privacy-safe logging with PII protection

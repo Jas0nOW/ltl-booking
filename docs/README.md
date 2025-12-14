@@ -12,7 +12,6 @@ Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der
 - **[DB_SCHEMA.md](DB_SCHEMA.md)** - Datenbankschema (aktuelle Tables + Planung)
 - **[DESIGN_GUIDE.md](DESIGN_GUIDE.md)** - Design Tokens (lazy_design) & CSS Variablen
 - **[ERROR_HANDLING.md](ERROR_HANDLING.md)** - Error-Handling-Konventionen
-- **[ENGINE_DECISION.md](ENGINE_DECISION.md)** - Architektur-Entscheidung: Service vs Hotel Engine
 
 ### 🔧 Entwicklung
 - **[DECISIONS.md](DECISIONS.md)** - Architektur- und Implementierungsentscheidungen (Ist-Stand)
@@ -57,7 +56,7 @@ Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
 
 ### Update-Policy
 - **SPEC.md** ist Source of Truth - hier Updates zuerst
-- **DECISIONS.md** ist append-only (historische Log)
+- **DECISIONS.md** enthält die wichtigsten Architektur-Entscheidungen (kuratiert) + ggf. Legacy-Notizen
 - Technische Docs (API, DB_SCHEMA) bei Code-Änderungen updaten
 
 ---
@@ -80,8 +79,8 @@ Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
 → [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
 
 ### Architektur-Entscheidungen
-→ [ENGINE_DECISION.md](ENGINE_DECISION.md)  
-→ [REPOSITORY_OPTIMIZATION.md](REPOSITORY_OPTIMIZATION.md)
+→ [DECISIONS.md](DECISIONS.md)  
+→ [archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)
 
 ---
 

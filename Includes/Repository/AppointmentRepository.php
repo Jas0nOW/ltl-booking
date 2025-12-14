@@ -58,7 +58,14 @@ class LTLB_AppointmentRepository {
 			$where_sql = ' AND ' . implode(' AND ', $where);
 		}
 
-		$sql = "SELECT {$this->table_name}.* FROM {$this->table_name} {$join} WHERE 1=1 {$where_sql} ORDER BY {$this->table_name}.start_at DESC";
+		$limit_sql = '';
+		if (isset($filters['limit']) && isset($filters['offset'])) {
+			$limit_sql = 'LIMIT %d OFFSET %d';
+			$params[] = intval($filters['limit']);
+			$params[] = intval($filters['offset']);
+		}
+
+		$sql = "SELECT {$this->table_name}.* FROM {$this->table_name} {$join} WHERE 1=1 {$where_sql} ORDER BY {$this->table_name}.start_at DESC {$limit_sql}";
 
 		if ( empty( $params ) ) {
 			$rows = $wpdb->get_results( $sql, ARRAY_A );
@@ -69,30 +76,85 @@ class LTLB_AppointmentRepository {
 		return $rows ?: [];
 	}
 
-	public function get_by_id( int $id ): ?array {
+	public function get_count_by_status( string $status ): int {
 		global $wpdb;
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$this->table_name} WHERE id = %d", $id ), ARRAY_A );
-		return $row ?: null;
+		$status = sanitize_key( $status );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s", $status ) );
+		return (int) $count;
 	}
 
-	public function delete( int $id ): bool {
+	public function get_count_for_today(): int {
 		global $wpdb;
-		$res = $wpdb->delete( $this->table_name, [ 'id' => $id ], [ '%d' ] );
-		return $res !== false;
+		$today_start = date( 'Y-m-d 00:00:00' );
+		$today_end = date( 'Y-m-d 23:59:59' );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$this->table_name} WHERE start_at >= %s AND start_at <= %s AND status != 'cancelled'", $today_start, $today_end ) );
+		return (int) $count;
 	}
 
-	public function update_times( int $id, string $start_at, string $end_at ): bool {
+	public function get_count_check_ins_today(): int {
 		global $wpdb;
-		$start_at = sanitize_text_field( $start_at );
-		$end_at = sanitize_text_field( $end_at );
-		$res = $wpdb->update(
-			$this->table_name,
-			[ 'start_at' => $start_at, 'end_at' => $end_at, 'updated_at' => current_time('mysql') ],
-			[ 'id' => $id ],
-			[ '%s', '%s', '%s' ],
-			[ '%d' ]
-		);
-		return $res !== false;
+		$today = date('Y-m-d');
+		$sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE DATE(start_at) = %s AND status = 'confirmed'";
+		$count = $wpdb->get_var($wpdb->prepare($sql, $today));
+		return (int) $count;
+	}
+
+	public function get_count_check_outs_today(): int {
+		global $wpdb;
+		$today = date('Y-m-d');
+		$sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE DATE(end_at) = %s AND status = 'confirmed'";
+		$count = $wpdb->get_var($wpdb->prepare($sql, $today));
+		return (int) $count;
+	}
+
+	public function get_count_occupied_rooms_today(): int {
+		global $wpdb;
+		$today = date('Y-m-d');
+		$sql = "SELECT COUNT(DISTINCT resource_id) 
+                FROM {$wpdb->prefix}lazy_appointment_resources ar
+                JOIN {$this->table_name} a ON ar.appointment_id = a.id
+                WHERE %s >= DATE(a.start_at) AND %s < DATE(a.end_at) AND a.status = 'confirmed'";
+		$count = $wpdb->get_var($wpdb->prepare($sql, $today, $today));
+		return (int) $count;
+	}
+
+	public function get_count(array $filters = []): int {
+		global $wpdb;
+		// This logic needs to mirror get_all() to count correctly with filters.
+		$where = [];
+		$params = [];
+		$join = '';
+		$customers_table = $wpdb->prefix . 'lazy_customers';
+
+		if ( ! empty( $filters['customer_search'] ) ) {
+			$join = " LEFT JOIN {$customers_table} c ON {$this->table_name}.customer_id = c.id";
+			$search = '%' . $wpdb->esc_like( $filters['customer_search'] ) . '%';
+			$where[] = "(c.email LIKE %s OR c.first_name LIKE %s OR c.last_name LIKE %s)";
+			$params = array_merge($params, [$search, $search, $search]);
+		}
+		if ( ! empty( $filters['from'] ) ) {
+			$where[] = "{$this->table_name}.start_at >= %s";
+			$params[] = $filters['from'];
+		}
+		if ( ! empty( $filters['to'] ) ) {
+			$where[] = "{$this->table_name}.end_at <= %s";
+			$params[] = $filters['to'];
+		}
+		if ( ! empty( $filters['status'] ) ) {
+			$where[] = "{$this->table_name}.status = %s";
+			$params[] = $filters['status'];
+		}
+		if ( ! empty( $filters['service_id'] ) ) {
+			$where[] = "{$this->table_name}.service_id = %d";
+			$params[] = intval( $filters['service_id'] );
+		}
+
+		$where_sql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+		
+		$sql = "SELECT COUNT({$this->table_name}.id) FROM {$this->table_name} {$join} {$where_sql}";
+		
+		$count = $wpdb->get_var($wpdb->prepare($sql, ...$params));
+		return (int) $count;
 	}
 
 	/**
@@ -228,6 +290,20 @@ class LTLB_AppointmentRepository {
 		global $wpdb;
 		$res = $wpdb->update( $this->table_name, [ 'status' => sanitize_text_field($status), 'updated_at' => current_time('mysql') ], [ 'id' => $id ], [ '%s', '%s' ], [ '%d' ] );
 		return $res !== false;
+	}
+
+	public function update_status_bulk(array $ids, string $status): bool {
+		global $wpdb;
+		if (empty($ids)) {
+			return false;
+		}
+		$ids_placeholder = implode(', ', array_fill(0, count($ids), '%d'));
+		$sql = $wpdb->prepare(
+			"UPDATE {$this->table_name} SET status = %s, updated_at = %s WHERE id IN ($ids_placeholder)",
+			array_merge([sanitize_text_field($status), current_time('mysql')], $ids)
+		);
+		$result = $wpdb->query($sql);
+		return $result !== false;
 	}
 
 	/**

@@ -109,6 +109,23 @@ class LTLB_Plugin {
             if ( class_exists('LTLB_Admin_StaffProfile') ) {
                 new LTLB_Admin_StaffProfile();
             }
+
+			// Handle admin mode switch
+			if ( isset( $_GET['ltlb_admin_mode'] ) ) {
+				$new_mode = sanitize_text_field( $_GET['ltlb_admin_mode'] );
+				if ( in_array( $new_mode, [ 'appointments', 'hotel' ] ) ) {
+					$settings = get_option( 'lazy_settings', [] );
+					if ( ! is_array( $settings ) ) {
+						$settings = [];
+					}
+					$settings['admin_mode'] = $new_mode;
+					update_option( 'lazy_settings', $settings );
+
+					// Redirect to remove the query arg
+					wp_safe_redirect( remove_query_arg( 'ltlb_admin_mode' ) );
+					exit;
+				}
+			}
         }
     }
 
@@ -123,6 +140,11 @@ class LTLB_Plugin {
             26
         );
 
+		$settings = get_option( 'lazy_settings', [] );
+		$admin_mode = is_array( $settings ) && isset( $settings['admin_mode'] ) ? $settings['admin_mode'] : 'appointments';
+		$is_hotel_frontend = is_array($settings) && isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
+
+
         // Dashboard (explicit label + first submenu item)
         add_submenu_page(
             'ltlb_dashboard',
@@ -133,11 +155,12 @@ class LTLB_Plugin {
             [ $this, 'render_dashboard_page' ]
         );
 
-        // Appointments
+        // Appointments / Bookings
+		$appointments_label = $admin_mode === 'hotel' ? __( 'Bookings', 'ltl-bookings' ) : __( 'Appointments', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
-            __( 'Appointments', 'ltl-bookings' ),
-            __( 'Appointments', 'ltl-bookings' ),
+			$appointments_label,
+			$appointments_label,
             'manage_options',
             'ltlb_appointments',
             [ $this, 'render_appointments_page' ]
@@ -153,20 +176,21 @@ class LTLB_Plugin {
             [ $this, 'render_calendar_page' ]
         );
 
-        // Customers
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Customers', 'ltl-bookings' ),
-            __( 'Customers', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_customers',
-            [ $this, 'render_customers_page' ]
-        );
+		if ($admin_mode === 'appointments') {
+			// Customers
+			add_submenu_page(
+				'ltlb_dashboard',
+				__( 'Customers', 'ltl-bookings' ),
+				__( 'Customers', 'ltl-bookings' ),
+				'manage_options',
+				'ltlb_customers',
+				[ $this, 'render_customers_page' ]
+			);
+		}
+
 
         // Services (context-aware label)
-        $settings = get_option('lazy_settings', []);
-        $is_hotel = isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
-        $services_label = $is_hotel ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
+        $services_label = $admin_mode === 'hotel' ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
             $services_label,
@@ -176,18 +200,20 @@ class LTLB_Plugin {
             [ $this, 'render_services_page' ]
         );
 
-        // Staff
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Staff', 'ltl-bookings' ),
-            __( 'Staff', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_staff',
-            [ $this, 'render_staff_page' ]
-        );
+		if ($admin_mode === 'appointments') {
+			// Staff
+			add_submenu_page(
+				'ltlb_dashboard',
+				__( 'Staff', 'ltl-bookings' ),
+				__( 'Staff', 'ltl-bookings' ),
+				'manage_options',
+				'ltlb_staff',
+				[ $this, 'render_staff_page' ]
+			);
+		}
 
         // Resources (context-aware label)
-        $resources_label = $is_hotel ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
+        $resources_label = $admin_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
             $resources_label,
@@ -217,15 +243,15 @@ class LTLB_Plugin {
             [ $this, 'render_design_page' ]
         );
 
-        // Diagnostics
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Diagnostics', 'ltl-bookings' ),
-            __( 'Diagnostics', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_diagnostics',
-            [ $this, 'render_diagnostics_page' ]
-        );
+		// Diagnostics
+		add_submenu_page(
+			'ltlb_dashboard',
+			__( 'Diagnostics', 'ltl-bookings' ),
+			__( 'Diagnostics', 'ltl-bookings' ),
+			'manage_options',
+			'ltlb_diagnostics',
+			[ $this, 'render_diagnostics_page' ]
+		);
 
         // Privacy
         add_submenu_page(
@@ -239,11 +265,23 @@ class LTLB_Plugin {
     }
 
     public function render_dashboard_page(): void {
-        if ( class_exists('LTLB_Admin_DashboardPage') ) {
-            $page = new LTLB_Admin_DashboardPage();
+        $settings = get_option( 'lazy_settings', [] );
+        $admin_mode = is_array( $settings ) && isset( $settings['admin_mode'] ) ? $settings['admin_mode'] : 'appointments';
+
+        if ( $admin_mode === 'hotel' ) {
+            if ( class_exists('LTLB_Admin_HotelDashboardPage') ) {
+                $page = new LTLB_Admin_HotelDashboardPage();
+                $page->render();
+                return;
+            }
+        } 
+        
+        if ( class_exists('LTLB_Admin_AppointmentsDashboardPage') ) {
+            $page = new LTLB_Admin_AppointmentsDashboardPage();
             $page->render();
             return;
         }
+
 
         echo '<div class="wrap"><h1>' . esc_html__( 'LazyBookings Dashboard', 'ltl-bookings' ) . '</h1></div>';
     }
@@ -683,6 +721,11 @@ class LTLB_Plugin {
         if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
 
         wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], LTLB_VERSION );
+
+        // Wizard JS
+        if ($page === 'ltlb_services' && isset($_GET['action'])) {
+            wp_enqueue_script( 'ltlb-admin-wizard', LTLB_URL . 'assets/js/admin-wizard.js', [], LTLB_VERSION, true );
+        }
 
         if ( $page === 'ltlb_calendar' ) {
             $ls = get_option( 'lazy_settings', [] );

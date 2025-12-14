@@ -77,6 +77,9 @@ class LTLB_Admin_SettingsPage {
 				// Template Mode
 				$settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? 'service' );
 
+				// Admin Mode
+				$settings['admin_mode'] = LTLB_Sanitizer::text( $_POST['admin_mode'] ?? 'appointments' );
+
 				update_option( 'lazy_settings', $settings );
 
 			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
@@ -106,6 +109,7 @@ class LTLB_Admin_SettingsPage {
 			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
 			$log_level = $settings['log_level'] ?? 'error';
 			$template_mode = $settings['template_mode'] ?? 'service';
+			$admin_mode = $settings['admin_mode'] ?? 'appointments';
 
 		$timezones = timezone_identifiers_list();
 		?>
@@ -124,8 +128,7 @@ class LTLB_Admin_SettingsPage {
 				</p>
 
                 <!-- GENERAL SETTINGS -->
-                <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__( 'General Settings', 'ltl-bookings' ); ?></h2>
+                <?php LTLB_Admin_Component::card_start(__( 'General Settings', 'ltl-bookings' )); ?>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -181,14 +184,22 @@ class LTLB_Admin_SettingsPage {
                                     </select>
                                     <p class="description" id="ltlb-template-mode-desc"><?php echo esc_html__( 'Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings' ); ?></p>
                                 </td>
+                            <tr>
+                                <th><label for="admin_mode"><?php echo esc_html__( 'Admin View Mode', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <select name="admin_mode" id="admin_mode" aria-describedby="ltlb-admin-mode-desc" title="<?php echo esc_attr__( 'Controls the admin user interface layout and menus.', 'ltl-bookings' ); ?>">
+                                        <option value="appointments" <?php selected( $admin_mode, 'appointments' ); ?>><?php echo esc_html__( 'Appointments Mode', 'ltl-bookings' ); ?></option>
+                                        <option value="hotel" <?php selected( $admin_mode, 'hotel' ); ?>><?php echo esc_html__( 'Hotel Mode', 'ltl-bookings' ); ?></option>
+                                    </select>
+                                    <p class="description" id="ltlb-admin-mode-desc"><?php echo esc_html__( 'Switch the admin interface between managing appointments or hotel bookings.', 'ltl-bookings' ); ?></p>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                <?php LTLB_Admin_Component::card_end(); ?>
 
                 <!-- EMAIL SETTINGS -->
-                <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__( 'Email Settings', 'ltl-bookings' ); ?></h2>
+                <?php LTLB_Admin_Component::card_start(__( 'Email Settings', 'ltl-bookings' )); ?>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -225,11 +236,10 @@ class LTLB_Admin_SettingsPage {
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                <?php LTLB_Admin_Component::card_end(); ?>
 
                 <!-- LOGGING SETTINGS -->
-                <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__( 'Logging', 'ltl-bookings' ); ?></h2>
+                <?php LTLB_Admin_Component::card_start(__( 'Logging', 'ltl-bookings' )); ?>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -253,7 +263,7 @@ class LTLB_Admin_SettingsPage {
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                <?php LTLB_Admin_Component::card_end(); ?>
 
 				<p class="submit" style="margin-top:20px;">
                     <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
@@ -261,8 +271,7 @@ class LTLB_Admin_SettingsPage {
 			</form>
 
             <!-- TEST EMAIL -->
-            <div class="ltlb-card" style="margin-top:20px;">
-                <h3><?php echo esc_html__( 'Test Email Configuration', 'ltl-bookings' ); ?></h3>
+            <?php LTLB_Admin_Component::card_start(__( 'Test Email Configuration', 'ltl-bookings' )); ?>
                 <form method="post" style="display:flex; gap:10px; align-items:flex-end;">
                     <?php wp_nonce_field( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ); ?>
                     <input type="hidden" name="ltlb_send_test_email" value="1">
@@ -272,7 +281,7 @@ class LTLB_Admin_SettingsPage {
                     </div>
                     <?php submit_button( esc_html__( 'Send Test Email', 'ltl-bookings' ), 'secondary', 'submit', false ); ?>
                 </form>
-            </div>
+            <?php LTLB_Admin_Component::card_end(); ?>
 		</div>
 
 		<?php

@@ -10,9 +10,29 @@ class LTLB_CustomerRepository {
 		$this->table_name = $wpdb->prefix . 'lazy_customers';
 	}
 
-	public function get_all(): array {
+	public function get_count(): int {
 		global $wpdb;
-		$rows = $wpdb->get_results( "SELECT * FROM {$this->table_name} ORDER BY id DESC", ARRAY_A );
+		$count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->table_name}" );
+		return (int) $count;
+	}
+
+	/**
+	 * Get all customers with optional limit/offset
+	 *
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array
+	 */
+	public function get_all( int $limit = 0, int $offset = 0 ): array {
+		global $wpdb;
+		$sql = "SELECT * FROM {$this->table_name} ORDER BY id DESC";
+		if ( $limit > 0 ) {
+			$sql .= $wpdb->prepare( " LIMIT %d", $limit );
+			if ( $offset > 0 ) {
+				$sql .= $wpdb->prepare( " OFFSET %d", $offset );
+			}
+		}
+		$rows = $wpdb->get_results( $sql, ARRAY_A );
 		return $rows ?: [];
 	}
 

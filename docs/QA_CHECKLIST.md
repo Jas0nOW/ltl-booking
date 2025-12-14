@@ -48,8 +48,9 @@
 - [ ] (Optional) Appointment has a room mapping in DB (`lazy_appointment_resources`)
 
 ### 6. Admin Functions
-- [ ] View appointments list - filters work (service, customer search)
-- [ ] Export CSV - download successful, contains correct data
+- [ ] View appointments list - filters work (date range, status)
+- [ ] Bulk status change works (select multiple, apply status)
+- [ ] Pagination works (next/prev pages)
 - [ ] Calendar page loads (LazyBookings → Calendar)
 - [ ] Calendar shows existing appointments as events
 - [ ] Drag & drop an event to a new time → reload page → time change persisted
@@ -91,12 +92,11 @@
 - [ ] All appointments show correct service, resource, datetime, status
 - [ ] Create new appointment - success
 - [ ] View old appointment - all data displays correctly
-- [ ] CSV export includes old + new appointments
 
 ### Feature Regression Check
 - [ ] Shortcode page renders without errors
 - [ ] Availability API returns time slots (`/wp-json/ltlb/v1/availability?service_id=1&date=2024-12-20&slots=1`)
-- [ ] Admin filters work (service dropdown, customer search)
+- [ ] Admin filters work (date range, status)
 - [ ] Settings save correctly
 - [ ] Email sending works
 

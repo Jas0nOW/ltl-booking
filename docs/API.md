@@ -464,9 +464,9 @@ wp ltlb seed --mode=hotel
   A future refactor could centralize registration, but it is not required for correctness.
 
 ### Security Enhancements
-- Add `permission_callback` for admin endpoints with `manage_options` capability check
-- Implement rate limiting for public endpoints (prevent abuse)
-- Add nonce validation for POST requests
+- Admin endpoints are protected via `manage_options` in `permission_callback`.
+- Public read endpoints support an optional transient-based rate limit (disabled by default via `lazy_settings.rate_limit_enabled`).
+- If you add new write endpoints: require admin auth + REST nonce (`X-WP-Nonce`).
 
 ### Performance Optimizations
 - Cache availability results per-day (transients)
@@ -479,7 +479,7 @@ wp ltlb seed --mode=hotel
 
 - **Database Schema:** [DB_SCHEMA.md](DB_SCHEMA.md)
 - **Error Handling:** [ERROR_HANDLING.md](ERROR_HANDLING.md)
-- **Architecture Decisions:** [ENGINE_DECISION.md](ENGINE_DECISION.md)
+- **Architecture Decisions:** [DECISIONS.md](DECISIONS.md)
 - **Full Specification:** [SPEC.md](SPEC.md)
 
 ---

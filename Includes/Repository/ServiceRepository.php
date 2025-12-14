@@ -151,4 +151,42 @@ class LTLB_ServiceRepository {
         $res = $wpdb->update( $this->table_name, [ 'is_active' => 0, 'updated_at' => current_time('mysql') ], [ 'id' => $id ], [ '%d', '%s' ], [ '%d' ] );
         return $res !== false;
     }
+
+    /**
+     * Get the total count of services
+     *
+     * @return int
+     */
+    public function get_count(): int {
+        global $wpdb;
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
+        return (int)$count;
+    }
+
+    /**
+     * Get all services with staff information, supports pagination
+     *
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function get_all_with_staff_and_resources(int $limit = 20, int $offset = 0): array {
+        global $wpdb;
+
+        $staff_query = "
+            SELECT s.id, s.name, s.duration_min, s.price_cents, s.currency, u.display_name as staff_name
+            FROM {$this->table_name} s
+            LEFT JOIN {$wpdb->users} u ON s.staff_user_id = u.ID
+            ORDER BY s.id DESC
+            LIMIT %d OFFSET %d
+        ";
+
+        $services = $wpdb->get_results($wpdb->prepare($staff_query, $limit, $offset), ARRAY_A);
+
+        if (empty($services)) {
+            return [];
+        }
+
+        return $services;
+    }
 }

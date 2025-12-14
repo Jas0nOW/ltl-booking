@@ -2,276 +2,155 @@
 if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_AppointmentsPage {
+	public function render(): void {
+		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
 
-    private $appointment_repository;
-    private $service_repository;
-    private $resource_repository;
-    private $customer_repository;
+		$appointment_repo = new LTLB_AppointmentRepository();
+		$service_repo = new LTLB_ServiceRepository();
+		$customer_repo = new LTLB_CustomerRepository();
 
-    public function __construct() {
-        $this->appointment_repository = new LTLB_AppointmentRepository();
-        $this->service_repository = new LTLB_ServiceRepository();
-        $this->resource_repository = new LTLB_ResourceRepository();
-        $this->customer_repository = new LTLB_CustomerRepository();
-    }
+		// Handle bulk actions
+		if (isset($_POST['action']) && $_POST['action'] !== '-1' && isset($_POST['appointment_ids']) && !empty($_POST['appointment_ids'])) {
+			if (!check_admin_referer('ltlb_appointments_bulk_action')) {
+				wp_die('Security check failed');
+			}
+			$action = sanitize_text_field($_POST['action']);
+			$ids = array_map('intval', $_POST['appointment_ids']);
 
-    public function render(): void {
-        if ( ! current_user_can('manage_options') ) {
-            wp_die( esc_html__('You do not have permission to view this page.', 'ltl-bookings') );
-        }
+			if ($action === 'delete') {
+				// To be implemented if needed
+			} else if (strpos($action, 'set_status_') === 0) {
+				$status = str_replace('set_status_', '', $action);
+				if (in_array($status, ['pending', 'confirmed', 'cancelled'])) {
+					$appointment_repo->update_status_bulk($ids, $status);
+					LTLB_Notices::add(count($ids) . ' ' . __('appointments updated.', 'ltl-bookings'), 'success');
+				}
+			}
+			wp_safe_redirect(remove_query_arg(['action', 'paged'], wp_get_referer()));
+			exit;
+		}
 
-        // Handle CSV Export
-        if ( isset($_GET['action']) && $_GET['action'] === 'export_csv' ) {
-            if ( ! isset($_GET['_wpnonce']) || ! wp_verify_nonce($_GET['_wpnonce'], 'ltlb_export_csv') ) {
-                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
-            }
-            $this->export_csv();
-            return; // Stop rendering
-        }
+		// Get filters from URL
+		$date_from = isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '';
+		$date_to = isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '';
+		$status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+		$service_id = isset($_GET['service_id']) ? intval($_GET['service_id']) : 0;
+		$customer_search = isset($_GET['customer_search']) ? sanitize_text_field($_GET['customer_search']) : '';
 
-        // Handle Delete
-        if ( isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id']) ) {
-            if ( check_admin_referer('ltlb_delete_appointment') ) {
-                $this->appointment_repository->delete( intval($_GET['id']) );
-                LTLB_Notices::add( __('Appointment deleted.', 'ltl-bookings'), 'success' );
-                wp_safe_redirect( admin_url('admin.php?page=ltlb_appointments') );
-                exit;
-            }
-        }
+		$filters = [];
+		if (!empty($date_from)) $filters['from'] = $date_from . ' 00:00:00';
+		if (!empty($date_to)) $filters['to'] = $date_to . ' 23:59:59';
+		if (!empty($status)) $filters['status'] = $status;
+		if ($service_id > 0) $filters['service_id'] = $service_id;
+		if (!empty($customer_search)) $filters['customer_search'] = $customer_search;
 
-        // Handle Status Change
-        if ( isset($_GET['action']) && $_GET['action'] === 'status' && isset($_GET['id']) && isset($_GET['new_status']) ) {
-            if ( check_admin_referer('ltlb_status_appointment') ) {
-                $this->appointment_repository->update_status( intval($_GET['id']), sanitize_text_field($_GET['new_status']) );
-                LTLB_Notices::add( __('Status updated.', 'ltl-bookings'), 'success' );
-                wp_safe_redirect( admin_url('admin.php?page=ltlb_appointments') );
-                exit;
-            }
-        }
+		$per_page = 20;
+		$current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+		$offset = ($current_page - 1) * $per_page;
 
-        // Filter params
-        $filter_date_from = isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '';
-        $filter_date_to = isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '';
-        $filter_status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
-        $filter_service = isset($_GET['service_id']) ? intval($_GET['service_id']) : 0;
+		$total_appointments = $appointment_repo->get_count($filters);
+		$appointments = $appointment_repo->get_all(array_merge($filters, ['limit' => $per_page, 'offset' => $offset]));
 
-        // Build query args (repository expects: from/to/status/service_id)
-        $args = [];
-        if ( $filter_date_from ) $args['from'] = $filter_date_from . ' 00:00:00';
-        if ( $filter_date_to ) $args['to'] = $filter_date_to . ' 23:59:59';
-        if ( $filter_status ) $args['status'] = $filter_status;
-        if ( $filter_service ) $args['service_id'] = $filter_service;
-
-        $appointments = $this->appointment_repository->get_all( $args );
-        $services = $this->service_repository->get_all();
-
-        ?>
+		$all_services = $service_repo->get_all();
+		?>
         <div class="wrap ltlb-admin">
-            <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_appointments'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Appointments', 'ltl-bookings'); ?></h1>
-            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_calendar') ); ?>" class="page-title-action"><?php echo esc_html__('View Calendar', 'ltl-bookings'); ?></a>
-            <a href="<?php echo esc_attr( wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=export_csv'), 'ltlb_export_csv' ) ); ?>" class="page-title-action"><?php echo esc_html__('Export CSV', 'ltl-bookings'); ?></a>
+            <?php LTLB_Admin_Header::render('ltlb_appointments'); ?>
+            <h1 class="wp-heading-inline"><?php echo esc_html__( 'Appointments', 'ltl-bookings' ); ?></h1>
             <hr class="wp-header-end">
-
-            <?php // Notices rendered via hook ?>
-
-            <div class="ltlb-card" style="margin-top:20px; padding:15px;">
-                <form method="get">
-                    <input type="hidden" name="page" value="ltlb_appointments" />
-                    <div class="tablenav top" style="height:auto;">
-                        <div class="alignleft actions">
-                            <input type="date" name="date_from" value="<?php echo esc_attr($filter_date_from); ?>" placeholder="<?php echo esc_attr__('From Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter from date', 'ltl-bookings'); ?>">
-                            <input type="date" name="date_to" value="<?php echo esc_attr($filter_date_to); ?>" placeholder="<?php echo esc_attr__('To Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter to date', 'ltl-bookings'); ?>">
-
-                            <select name="status" aria-label="<?php echo esc_attr__('Filter by status', 'ltl-bookings'); ?>">
-                                <option value=""><?php echo esc_html__('All Statuses', 'ltl-bookings'); ?></option>
-                                <option value="confirmed" <?php selected($filter_status, 'confirmed'); ?>><?php echo esc_html__('Confirmed', 'ltl-bookings'); ?></option>
-                                <option value="pending" <?php selected($filter_status, 'pending'); ?>><?php echo esc_html__('Pending', 'ltl-bookings'); ?></option>
-                                <option value="cancelled" <?php selected($filter_status, 'cancelled'); ?>><?php echo esc_html__('Cancelled', 'ltl-bookings'); ?></option>
+            
+            <form method="post">
+                <?php LTLB_Admin_Component::card_start(''); ?>
+                    <div class="ltlb-table-toolbar">
+                        <div class="ltlb-table-toolbar__bulk-actions">
+                            <label for="bulk-action-selector-top" class="screen-reader-text"><?php esc_html_e( 'Select bulk action' ); ?></label>
+                            <select name="action" id="bulk-action-selector-top">
+                                <option value="-1"><?php esc_html_e( 'Bulk Actions' ); ?></option>
+                                <option value="set_status_confirmed"><?php esc_html_e( 'Change status to confirmed' ); ?></option>
+                                <option value="set_status_pending"><?php esc_html_e( 'Change status to pending' ); ?></option>
+                                <option value="set_status_cancelled"><?php esc_html_e( 'Change status to cancelled' ); ?></option>
                             </select>
-
-                            <select name="service_id">
-                                <option value="0"><?php echo esc_html__('All Services', 'ltl-bookings'); ?></option>
-                                <?php foreach ($services as $s): ?>
-                                    <option value="<?php echo esc_attr($s['id']); ?>" <?php selected($filter_service, $s['id']); ?>><?php echo esc_html($s['name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-
-                            <input type="submit" class="button" value="<?php echo esc_attr__('Filter', 'ltl-bookings'); ?>">
-                            <?php if ( ! empty($args) ) : ?>
-                                <a href="<?php echo admin_url('admin.php?page=ltlb_appointments'); ?>" class="button"><?php echo esc_html__('Reset', 'ltl-bookings'); ?></a>
-                            <?php endif; ?>
+                            <?php submit_button( esc_html__( 'Apply' ), 'action', '', false ); ?>
                         </div>
+                        <form method="get">
+                            <input type="hidden" name="page" value="ltlb_appointments">
+                            <input type="date" name="date_from" value="<?php echo esc_attr($date_from); ?>">
+                            <input type="date" name="date_to" value="<?php echo esc_attr($date_to); ?>">
+                            <select name="status">
+                                <option value=""><?php echo esc_html__( 'All Statuses', 'ltl-bookings' ); ?></option>
+                                <option value="pending" <?php selected($status, 'pending'); ?>><?php echo esc_html__( 'Pending', 'ltl-bookings' ); ?></option>
+                                <option value="confirmed" <?php selected($status, 'confirmed'); ?>><?php echo esc_html__( 'Confirmed', 'ltl-bookings' ); ?></option>
+                                <option value="cancelled" <?php selected($status, 'cancelled'); ?>><?php echo esc_html__( 'Cancelled', 'ltl-bookings' ); ?></option>
+                            </select>
+                            <button type="submit" class="button"><?php echo esc_html__( 'Filter', 'ltl-bookings' ); ?></button>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments')); ?>" class="button"><?php echo esc_html__('Reset', 'ltl-bookings'); ?></a>
+                        </form>
                     </div>
-                </form>
 
-                <?php if ( empty($appointments) ) : ?>
-                    <p>
-                        <?php
-                        if ( ! empty( $args ) ) {
-                            echo esc_html__( 'No appointments found for the current filters.', 'ltl-bookings' );
-                        } else {
-                            echo esc_html__( 'No appointments yet. Once someone books via the booking form, they will appear here.', 'ltl-bookings' );
-                        }
-                        ?>
-                    </p>
-                    <p>
-                        <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_calendar') ); ?>" class="button button-primary"><?php echo esc_html__( 'View Calendar', 'ltl-bookings' ); ?></a>
-                        <?php if ( ! empty( $args ) ) : ?>
-                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_appointments') ); ?>" class="button"><?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?></a>
-                        <?php endif; ?>
-                    </p>
-                <?php else : ?>
-                    <table class="widefat striped">
+                    <table class="wp-list-table widefat fixed striped">
                         <thead>
                             <tr>
-                                <th><?php echo esc_html__('ID', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Date & Time', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Customer', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Service', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Resource', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
+                                <td id="cb" class="manage-column column-cb check-column">
+                                    <label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All' ); ?></label>
+                                    <input id="cb-select-all-1" type="checkbox">
+                                </td>
+                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Customer', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Service', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Start', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column"><?php echo esc_html__( 'End', 'ltl-bookings' ); ?></th>
+                                <th scope="col" class="manage-column"><?php echo esc_html__( 'Status', 'ltl-bookings' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ( $appointments as $appt ): 
-                                $cust = isset($appt['customer_id']) ? $this->customer_repository->get_by_id( (int) $appt['customer_id'] ) : null;
-                                $svc = isset($appt['service_id']) ? $this->service_repository->get_by_id( (int) $appt['service_id'] ) : null;
-                                $res = null;
-                                if ( isset($appt['resource_id']) && $appt['resource_id'] !== null && $appt['resource_id'] !== '' ) {
-                                    $res = $this->resource_repository->get_by_id( (int) $appt['resource_id'] );
-                                }
-
-                                $start_raw = $appt['start_at'] ?? '';
-                                $end_raw = $appt['end_at'] ?? '';
-                                $start_ts = $start_raw ? strtotime( $start_raw ) : 0;
-                                $end_ts = $end_raw ? strtotime( $end_raw ) : 0;
-
-                                $cust_name = '—';
-                                $cust_email = '';
-                                $cust_phone = '';
-                                if ( is_array($cust) ) {
-                                    $first = trim( (string)($cust['first_name'] ?? '') );
-                                    $last = trim( (string)($cust['last_name'] ?? '') );
-                                    $full = trim( $first . ' ' . $last );
-                                    $cust_name = $full !== '' ? $full : (string)($cust['name'] ?? '—');
-                                    $cust_email = (string)($cust['email'] ?? '');
-                                    $cust_phone = (string)($cust['phone'] ?? '');
-                                }
-                                ?>
+                            <?php if (empty($appointments)): ?>
                                 <tr>
-                                    <td>#<?php echo intval($appt['id']); ?></td>
-                                    <td>
-                                        <?php if ( $start_ts ) : ?>
-                                            <?php echo date_i18n( get_option('date_format'), $start_ts ); ?> <br>
-                                            <small>
-                                                <?php echo date_i18n( get_option('time_format'), $start_ts ); ?>
-                                                <?php if ( $end_ts ) : ?> - <?php echo date_i18n( get_option('time_format'), $end_ts ); ?><?php endif; ?>
-                                            </small>
-                                        <?php else : ?>
-                                            —
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
+                                    <td colspan="6">
                                         <?php 
-                                        echo '<strong>' . esc_html($cust_name) . '</strong><br>';
-                                        if ( $cust_email !== '' ) {
-                                            echo '<a href="mailto:' . esc_attr($cust_email) . '">' . esc_html($cust_email) . '</a><br>';
-                                        }
-                                        if ( $cust_phone !== '' ) {
-                                            echo esc_html($cust_phone);
-                                        }
+                                        LTLB_Admin_Component::empty_state(
+                                            __('No Appointments Found', 'ltl-bookings'),
+                                            __('There are no appointments matching your current filters.', 'ltl-bookings'),
+                                            __('Clear Filters', 'ltl-bookings'),
+                                            admin_url('admin.php?page=ltlb_appointments'),
+                                            'dashicons-calendar-alt'
+                                        ); 
                                         ?>
-                                    </td>
-                                    <td><?php echo $svc ? esc_html($svc['name']) : '—'; ?></td>
-                                    <td><?php echo $res ? esc_html($res['name']) : '—'; ?></td>
-                                    <td>
-                                        <?php
-                                        $status_class = 'status-pending';
-                                        if ( $appt['status'] === 'confirmed' ) $status_class = 'status-active';
-                                        if ( $appt['status'] === 'cancelled' ) $status_class = 'status-inactive';
-
-                                        $status_label = $appt['status'];
-                                        if ( $appt['status'] === 'confirmed' ) $status_label = __( 'Confirmed', 'ltl-bookings' );
-                                        if ( $appt['status'] === 'pending' ) $status_label = __( 'Pending', 'ltl-bookings' );
-                                        if ( $appt['status'] === 'cancelled' ) $status_label = __( 'Cancelled', 'ltl-bookings' );
-                                        ?>
-                                        <span class="ltlb-status-badge <?php echo esc_attr($status_class); ?>"><?php echo esc_html( $status_label ); ?></span>
-                                    </td>
-                                    <td>
-                                        <?php if ( $appt['status'] !== 'cancelled' ) : ?>
-                                            <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=status&new_status=cancelled&id='.$appt['id']), 'ltlb_status_appointment' ); ?>" class="button button-small" onclick="return confirm('<?php echo esc_js( __( 'Cancel this appointment?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
-                                        <?php endif; ?>
-                                        <?php if ( $appt['status'] === 'pending' ) : ?>
-                                            <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=status&new_status=confirmed&id='.$appt['id']), 'ltlb_status_appointment' ); ?>" class="button button-small button-primary"><?php echo esc_html__('Confirm', 'ltl-bookings'); ?></a>
-                                        <?php endif; ?>
-                                        
-                                        <a href="<?php echo wp_nonce_url( admin_url('admin.php?page=ltlb_appointments&action=delete&id='.$appt['id']), 'ltlb_delete_appointment' ); ?>" class="button button-small" style="color:#a00;" onclick="return confirm('<?php echo esc_js( __( 'Permanently delete?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></a>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php foreach ($appointments as $appointment): 
+                                    $customer = $customer_repo->get_by_id($appointment['customer_id']);
+                                    $service = $service_repo->get_by_id($appointment['service_id']);
+                                ?>
+                                    <tr>
+                                        <th scope="row" class="check-column">
+                                            <input type="checkbox" name="appointment_ids[]" value="<?php echo esc_attr( $appointment['id'] ); ?>">
+                                        </th>
+                                        <td><?php echo esc_html($customer['first_name'] . ' ' . $customer['last_name']); ?></td>
+                                        <td><?php echo esc_html($service['name']); ?></td>
+                                        <td><?php echo esc_html($appointment['start_at']); ?></td>
+                                        <td><?php echo esc_html($appointment['end_at']); ?></td>
+                                        <td><span class="ltlb-status-badge status-<?php echo esc_attr($appointment['status']); ?>"><?php echo esc_html(ucfirst($appointment['status'])); ?></span></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
-                <?php endif; ?>
-            </div>
+                    <?php LTLB_Admin_Component::pagination($total_appointments, $per_page); ?>
+                <?php LTLB_Admin_Component::card_end(); ?>
+                <?php wp_nonce_field('ltlb_appointments_bulk_action'); ?>
+            </form>
         </div>
-        <?php
-    }
-
-    private function export_csv(): void {
-        $filename = 'appointments-' . date('Y-m-d') . '.csv';
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        
-        $output = fopen('php://output', 'w');
-        fputcsv($output, [
-            __( 'ID', 'ltl-bookings' ),
-            __( 'Start', 'ltl-bookings' ),
-            __( 'End', 'ltl-bookings' ),
-            __( 'Customer Name', 'ltl-bookings' ),
-            __( 'Customer Email', 'ltl-bookings' ),
-            __( 'Customer Phone', 'ltl-bookings' ),
-            __( 'Service', 'ltl-bookings' ),
-            __( 'Resource', 'ltl-bookings' ),
-            __( 'Status', 'ltl-bookings' ),
-        ]);
-
-        $appointments = $this->appointment_repository->get_all();
-        foreach ($appointments as $appt) {
-            $cust = isset($appt['customer_id']) ? $this->customer_repository->get_by_id( (int) $appt['customer_id'] ) : null;
-            $svc = isset($appt['service_id']) ? $this->service_repository->get_by_id( (int) $appt['service_id'] ) : null;
-            $res = null;
-            if ( isset($appt['resource_id']) && $appt['resource_id'] !== null && $appt['resource_id'] !== '' ) {
-                $res = $this->resource_repository->get_by_id( (int) $appt['resource_id'] );
-            }
-
-            $cust_name = '';
-            $cust_email = '';
-            $cust_phone = '';
-            if ( is_array($cust) ) {
-                $first = trim( (string)($cust['first_name'] ?? '') );
-                $last = trim( (string)($cust['last_name'] ?? '') );
-                $full = trim( $first . ' ' . $last );
-                $cust_name = $full !== '' ? $full : (string)($cust['name'] ?? '');
-                $cust_email = (string)($cust['email'] ?? '');
-                $cust_phone = (string)($cust['phone'] ?? '');
-            }
-
-            fputcsv($output, [
-                $appt['id'],
-                $appt['start_at'] ?? '',
-                $appt['end_at'] ?? '',
-                $cust_name,
-                $cust_email,
-                $cust_phone,
-                $svc ? $svc['name'] : '',
-                $res ? $res['name'] : '',
-                $appt['status']
-            ]);
-        }
-        fclose($output);
-        exit;
-    }
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const selectAll = document.getElementById('cb-select-all-1');
+                const checkboxes = document.querySelectorAll('input[name="appointment_ids[]"]');
+                if (selectAll) {
+                    selectAll.addEventListener('change', function(e) {
+                        checkboxes.forEach(cb => cb.checked = e.target.checked);
+                    });
+                }
+            });
+        </script>
+		<?php
+	}
 }
 
