@@ -237,7 +237,7 @@ Hotel bookings created via the frontend shortcode submission are protected by a 
 
 **URL:** `GET /wp-json/ltlb/v1/time-slots`
 
-**Status:** Supported. Prefer `/availability?slots=1` if you need `slot_step` control.
+**Status:** Supported. Prefer `/availability?slots=1` if you want the plain slot array (without the wrapper).
 
 **Registered in:** [public/Shortcodes.php](../public/Shortcodes.php)
 
@@ -332,14 +332,14 @@ Hotel mode uses `checkin` + `checkout` + `guests`, and optionally `resource_id` 
 
 Note: the schema supports `seats` internally, but the current frontend wizard does not expose a “number of seats” input yet.
 
-**Hotel Mode Fields (wizard inputs exist):**
-These inputs exist in the wizard UI when Template Mode is set to `hotel`, but they are not yet processed by the v0.4.4 booking submission handler.
+**Hotel Mode Fields:**
+These inputs are used when Template Mode is set to `hotel` and are processed by the booking submission handler.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `checkin` | string | UI | Check-in date `YYYY-MM-DD` |
-| `checkout` | string | UI | Check-out date `YYYY-MM-DD` |
-| `guests` | int | UI | Number of guests |
+| `checkin` | string | ✅ Yes | Check-in date `YYYY-MM-DD` |
+| `checkout` | string | ✅ Yes | Check-out date `YYYY-MM-DD` |
+| `guests` | int | No | Number of guests (defaults to `1`, maps to `appointments.seats`) |
 
 **Optional Fields:**
 | Field | Type | Description |
@@ -464,9 +464,9 @@ wp ltlb seed --mode=hotel
   A future refactor could centralize registration, but it is not required for correctness.
 
 ### Security Enhancements
-- Add `permission_callback` for admin endpoints with `manage_options` capability check
-- Implement rate limiting for public endpoints (prevent abuse)
-- Add nonce validation for POST requests
+- Admin endpoints are protected via `manage_options` in `permission_callback`.
+- Public read endpoints support an optional transient-based rate limit (disabled by default via `lazy_settings.rate_limit_enabled`).
+- If you add new write endpoints: require admin auth + REST nonce (`X-WP-Nonce`).
 
 ### Performance Optimizations
 - Cache availability results per-day (transients)
@@ -479,7 +479,7 @@ wp ltlb seed --mode=hotel
 
 - **Database Schema:** [DB_SCHEMA.md](DB_SCHEMA.md)
 - **Error Handling:** [ERROR_HANDLING.md](ERROR_HANDLING.md)
-- **Architecture Decisions:** [ENGINE_DECISION.md](ENGINE_DECISION.md)
+- **Architecture Decisions:** [DECISIONS.md](DECISIONS.md)
 - **Full Specification:** [SPEC.md](SPEC.md)
 
 ---

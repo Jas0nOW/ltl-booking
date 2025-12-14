@@ -1,9 +1,12 @@
 # Release Checklist
 
 ## Before Release
-- Tag the repo: `v0.4.4` (matches `LTLB_VERSION`)
-- Build ZIP: create a ZIP of the plugin folder `ltl-bookings/` (exclude local dev artifacts)
-- If you ship artifacts in `dist/`, update `dist/SHA256SUMS.txt`
+- Tag the repo: `v1.0.1` (matches `LTLB_VERSION`)
+- Build ZIP (recommended):
+  - Windows/PowerShell: run `scripts/build-zip.ps1`
+  - Bash (macOS/Linux): run `scripts/build-zip.sh`
+  - Output: `dist/ltl-bookings-<version>.zip` and `dist/SHA256SUMS.txt`
+  - Excludes: `.git/`, `.github/`, `docs/`, `scripts/`, `node_modules/`, `vendor/`, `.env`, `*.log`, `dist/`
 - Smoke tests:
   - Activate plugin, ensure no warnings
   - Services CRUD works

@@ -27,6 +27,10 @@ class LTLB_DB_Schema {
                 available_start_time TIME NULL,
                 available_end_time TIME NULL,
                 fixed_weekly_slots LONGTEXT NULL,
+                beds_type VARCHAR(50) NULL,
+                amenities LONGTEXT NULL,
+                max_adults SMALLINT UNSIGNED NOT NULL DEFAULT 2,
+                max_children SMALLINT UNSIGNED NOT NULL DEFAULT 0,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
                 PRIMARY KEY  (id),
@@ -59,6 +63,11 @@ class LTLB_DB_Schema {
                 start_at DATETIME NOT NULL,
                 end_at DATETIME NOT NULL,
                 status VARCHAR(20) NOT NULL DEFAULT 'pending',
+                amount_cents INT UNSIGNED NOT NULL DEFAULT 0,
+                currency CHAR(3) NOT NULL DEFAULT 'EUR',
+                payment_status VARCHAR(20) NOT NULL DEFAULT 'free',
+                payment_ref VARCHAR(190) NULL,
+                paid_at DATETIME NULL,
                 timezone VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin',
                 seats SMALLINT UNSIGNED NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
@@ -113,6 +122,7 @@ class LTLB_DB_Schema {
                 name VARCHAR(190) NOT NULL,
                 description LONGTEXT NULL,
                 capacity INT UNSIGNED NOT NULL DEFAULT 1,
+                cost_per_night_cents INT UNSIGNED NOT NULL DEFAULT 0,
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL,
@@ -136,6 +146,31 @@ class LTLB_DB_Schema {
                 resource_id BIGINT UNSIGNED NOT NULL,
                 PRIMARY KEY (service_id,resource_id),
                 KEY resource_id (resource_id)
+            ) {$charset_collate};";
+        }
+
+        if ( $type === 'ai_actions' ) {
+            return "CREATE TABLE {$table_name} (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                created_at DATETIME NOT NULL,
+                updated_at DATETIME NOT NULL,
+                user_id BIGINT UNSIGNED NOT NULL,
+                action_type VARCHAR(50) NOT NULL,
+                status VARCHAR(20) NOT NULL DEFAULT 'draft',
+                ai_input LONGTEXT NULL,
+                ai_output LONGTEXT NULL,
+                final_state LONGTEXT NULL,
+                metadata LONGTEXT NULL,
+                notes TEXT NULL,
+                approved_by BIGINT UNSIGNED NULL,
+                approved_at DATETIME NULL,
+                executed_at DATETIME NULL,
+                failed_at DATETIME NULL,
+                error_message TEXT NULL,
+                PRIMARY KEY  (id),
+                KEY status (status),
+                KEY action_type (action_type),
+                KEY created_at (created_at)
             ) {$charset_collate};";
         }
         return '';

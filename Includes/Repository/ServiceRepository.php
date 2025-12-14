@@ -67,11 +67,15 @@ class LTLB_ServiceRepository {
             'available_start_time' => isset($data['available_start_time']) ? sanitize_text_field($data['available_start_time']) : null,
             'available_end_time' => isset($data['available_end_time']) ? sanitize_text_field($data['available_end_time']) : null,
             'fixed_weekly_slots' => isset($data['fixed_weekly_slots']) ? wp_kses_post($data['fixed_weekly_slots']) : null,
+            'beds_type' => isset($data['beds_type']) ? sanitize_text_field($data['beds_type']) : null,
+            'amenities' => isset($data['amenities']) ? sanitize_textarea_field($data['amenities']) : null,
+            'max_adults' => isset($data['max_adults']) ? intval($data['max_adults']) : 2,
+            'max_children' => isset($data['max_children']) ? intval($data['max_children']) : 0,
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
-        $formats = ['%s','%s','%d','%d','%d','%d','%d','%s','%d','%d','%d','%s','%s','%s','%s','%s','%s','%s'];
+        $formats = ['%s','%s','%d','%d','%d','%d','%d','%s','%d','%d','%d','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d'];
         $res = $wpdb->insert( $this->table_name, $insert, $formats );
         if ( $res === false ) return false;
         return (int) $wpdb->insert_id;
@@ -107,13 +111,17 @@ class LTLB_ServiceRepository {
             'available_start_time',
             'available_end_time',
             'fixed_weekly_slots',
+            'beds_type',
+            'amenities',
+            'max_adults',
+            'max_children',
         ];
         foreach ( $allowed as $col ) {
             if ( isset( $data[ $col ] ) ) {
                 if ( $col === 'staff_user_id' ) {
                     $update[ $col ] = $data[ $col ] !== null ? intval( $data[ $col ] ) : null;
                     $formats[] = '%d';
-                } elseif ( in_array( $col, ['duration_min','buffer_before_min','buffer_after_min','price_cents','is_active','is_group','max_seats_per_booking'], true ) ) {
+                } elseif ( in_array( $col, ['duration_min','buffer_before_min','buffer_after_min','price_cents','is_active','is_group','max_seats_per_booking','max_adults','max_children'], true ) ) {
                     $update[ $col ] = intval( $data[ $col ] );
                     $formats[] = '%d';
                 } elseif ( $col === 'availability_mode' ) {
@@ -121,6 +129,9 @@ class LTLB_ServiceRepository {
                     $formats[] = '%s';
                 } elseif ( $col === 'fixed_weekly_slots' ) {
                     $update[ $col ] = wp_kses_post( $data[ $col ] );
+                    $formats[] = '%s';
+                } elseif ( $col === 'amenities' ) {
+                    $update[ $col ] = sanitize_textarea_field( $data[ $col ] );
                     $formats[] = '%s';
                 } else {
                     $update[ $col ] = sanitize_text_field( $data[ $col ] );
@@ -150,5 +161,68 @@ class LTLB_ServiceRepository {
         global $wpdb;
         $res = $wpdb->update( $this->table_name, [ 'is_active' => 0, 'updated_at' => current_time('mysql') ], [ 'id' => $id ], [ '%d', '%s' ], [ '%d' ] );
         return $res !== false;
+    }
+
+    /**
+     * Bulk soft delete multiple services
+     *
+     * @param array $ids Array of service IDs
+     * @return int Number of services deleted
+     */
+    public function bulk_soft_delete(array $ids): int {
+        global $wpdb;
+        
+        if (empty($ids)) {
+            return 0;
+        }
+        
+        $ids = array_map('intval', $ids);
+        $ids_str = implode(',', $ids);
+        
+        $updated = $wpdb->query(
+            "UPDATE {$this->table_name} 
+             SET is_active = 0, updated_at = '" . current_time('mysql') . "' 
+             WHERE id IN ({$ids_str})"
+        );
+        
+        return (int)$updated;
+    }
+
+    /**
+     * Get the total count of services
+     *
+     * @return int
+     */
+    public function get_count(): int {
+        global $wpdb;
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
+        return (int)$count;
+    }
+
+    /**
+     * Get all services with staff information, supports pagination
+     *
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function get_all_with_staff_and_resources(int $limit = 20, int $offset = 0): array {
+        global $wpdb;
+
+        $staff_query = "
+            SELECT s.id, s.name, s.duration_min, s.price_cents, s.currency, u.display_name as staff_name
+            FROM {$this->table_name} s
+            LEFT JOIN {$wpdb->users} u ON s.staff_user_id = u.ID
+            ORDER BY s.id DESC
+            LIMIT %d OFFSET %d
+        ";
+
+        $services = $wpdb->get_results($wpdb->prepare($staff_query, $limit, $offset), ARRAY_A);
+
+        if (empty($services)) {
+            return [];
+        }
+
+        return $services;
     }
 }

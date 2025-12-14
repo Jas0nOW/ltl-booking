@@ -1,15 +1,22 @@
 <?php
 /**
- * Plugin Name: Lazy Bookings
- * Description: Booking plugin (Amelia replacement MVP).
- * Version: 0.4.4
- * Author: LazyTechLab
+ * Plugin Name: LazyBookings
+ * Plugin URI: https://lazytechnologylab.com/lazybookings
+ * Description: Professional booking system with dual-mode functionality: Appointments & Hotel/PMS management with premium admin UI.
+ * Version: 1.0.0
+ * Author: Lazy Technology Lab
+ * Author URI: https://lazytechnologylab.com
  * Text Domain: ltl-bookings
+ * Domain Path: /languages
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'LTLB_VERSION', '0.4.4' );
+define( 'LTLB_VERSION', '1.0.0' );
 define( 'LTLB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LTLB_URL', plugin_dir_url( __FILE__ ) );
 

@@ -2,6 +2,7 @@
 if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Plugin {
+    private const OPTION_CALENDAR_STATUS_COLORS = 'ltlb_calendar_status_colors';
 
     public function run(): void {
         add_action('init', [ $this, 'on_init' ]);
@@ -14,7 +15,11 @@ class LTLB_Plugin {
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
 		add_action( 'ltlb_retention_cleanup', [ 'LTLB_Retention', 'run' ] );
+        add_action( 'ltlb_automation_runner', [ 'LTLB_Automations', 'run_due_rules' ] );
+        add_action('admin_init', [ $this, 'handle_csv_export' ]);
+        add_action('wp_ajax_ltlb_test_ai_connection', [ $this, 'handle_test_ai_connection' ]);
         $this->ensure_retention_cron();
+		$this->ensure_automation_cron();
 
 		// Per-user admin language setting
 		add_action( 'admin_post_ltlb_set_admin_lang', [ $this, 'handle_set_admin_lang' ] );
@@ -36,6 +41,15 @@ class LTLB_Plugin {
         }
     }
 
+    private function ensure_automation_cron(): void {
+        if ( ! function_exists( 'wp_next_scheduled' ) || ! function_exists( 'wp_schedule_event' ) ) {
+            return;
+        }
+        if ( ! wp_next_scheduled( 'ltlb_automation_runner' ) ) {
+            wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'ltlb_automation_runner' );
+        }
+    }
+
     private function load_classes(): void {
 
         // Utilities
@@ -45,10 +59,18 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Util/LockManager.php';
         require_once LTLB_PATH . 'Includes/Util/Logger.php';
         require_once LTLB_PATH . 'Includes/Util/Mailer.php';
-        require_once LTLB_PATH . 'Includes/Util/Validator.php';
+        require_once LTLB_PATH . 'Includes/Util/BookingService.php';
         require_once LTLB_PATH . 'Includes/Util/Availability.php';
 		require_once LTLB_PATH . 'Includes/Util/I18n.php';
         require_once LTLB_PATH . 'Includes/Util/Retention.php';
+        require_once LTLB_PATH . 'Includes/Util/Analytics.php';
+        require_once LTLB_PATH . 'Includes/Util/Finance.php';
+        require_once LTLB_PATH . 'Includes/Util/EmailNotifications.php';
+        require_once LTLB_PATH . 'Includes/Util/BookingStatus.php';
+        require_once LTLB_PATH . 'Includes/Util/ICS_Export.php';
+        require_once LTLB_PATH . 'Includes/Util/RoleManager.php';
+        require_once LTLB_PATH . 'Includes/Util/AIOutbox.php';
+		require_once LTLB_PATH . 'Includes/Util/Automations.php';
 
         // Domain
         require_once LTLB_PATH . 'Includes/Domain/Appointment.php';
@@ -65,20 +87,32 @@ class LTLB_Plugin {
 
         // Admin pages
         require_once LTLB_PATH . 'admin/Components/AdminHeader.php';
-        require_once LTLB_PATH . 'admin/Pages/DashboardPage.php';
+        require_once LTLB_PATH . 'admin/Components/Component.php';
+        require_once LTLB_PATH . 'admin/Pages/AppointmentsDashboardPage.php';
+        require_once LTLB_PATH . 'admin/Pages/HotelDashboardPage.php';
         require_once LTLB_PATH . 'admin/Pages/ServicesPage.php';
         require_once LTLB_PATH . 'admin/Pages/CustomersPage.php';
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
         require_once LTLB_PATH . 'admin/Pages/CalendarPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
+        require_once LTLB_PATH . 'admin/Pages/AIPage.php';
+        require_once LTLB_PATH . 'admin/Pages/OutboxPage.php';
+        require_once LTLB_PATH . 'admin/Pages/RoomAssistantPage.php';
+        require_once LTLB_PATH . 'admin/Pages/AutomationsPage.php';
+        require_once LTLB_PATH . 'admin/Pages/ReplyTemplatesPage.php';
         require_once LTLB_PATH . 'admin/Pages/StaffPage.php';
         require_once LTLB_PATH . 'admin/Pages/ResourcesPage.php';
         require_once LTLB_PATH . 'admin/Pages/DiagnosticsPage.php';
         require_once LTLB_PATH . 'admin/Pages/PrivacyPage.php';
         
-        // Booking Engines
-        require_once LTLB_PATH . 'Includes/Engine/EngineFactory.php';
+        // Booking Engine (Hotel mode)
+        require_once LTLB_PATH . 'Includes/Engine/BookingEngineInterface.php';
+        require_once LTLB_PATH . 'Includes/Engine/HotelEngine.php';
+        require_once LTLB_PATH . 'Includes/Engine/PaymentEngine.php';
+        require_once LTLB_PATH . 'Includes/Engine/AIProviderInterface.php';
+        require_once LTLB_PATH . 'Includes/Engine/AIGemini.php';
+        require_once LTLB_PATH . 'Includes/Engine/AIFactory.php';
         // Admin: profile helpers
         require_once LTLB_PATH . 'Includes/Admin/StaffProfile.php';
         // Public: Shortcodes
@@ -95,6 +129,15 @@ class LTLB_Plugin {
     public function on_init(): void {
         // Initialize Shortcodes
         LTLB_Shortcodes::init();
+
+		// Ensure roles/caps exist even on existing installs (idempotent).
+		if ( class_exists( 'LTLB_Role_Manager' ) ) {
+			LTLB_Role_Manager::register_roles();
+			LTLB_Role_Manager::register_capabilities();
+		}
+        
+        // ICS Feed Handler
+        $this->handle_ics_feed();
         
         // Register WP-CLI commands
         if ( defined('WP_CLI') && WP_CLI ) {
@@ -108,6 +151,23 @@ class LTLB_Plugin {
             if ( class_exists('LTLB_Admin_StaffProfile') ) {
                 new LTLB_Admin_StaffProfile();
             }
+
+            // Handle template mode switch
+            if ( isset( $_GET['ltlb_template_mode'] ) ) {
+                $new_mode = sanitize_text_field( $_GET['ltlb_template_mode'] );
+                if ( in_array( $new_mode, [ 'service', 'hotel' ] ) ) {
+                    $settings = get_option( 'lazy_settings', [] );
+                    if ( ! is_array( $settings ) ) {
+                        $settings = [];
+                    }
+                    $settings['template_mode'] = $new_mode;
+                    update_option( 'lazy_settings', $settings );
+
+                    // Redirect to remove the query arg
+                    wp_safe_redirect( remove_query_arg( 'ltlb_template_mode' ) );
+                    exit;
+                }
+            }
         }
     }
 
@@ -115,28 +175,34 @@ class LTLB_Plugin {
         add_menu_page(
             __( 'LazyBookings', 'ltl-bookings' ),
             __( 'LazyBookings', 'ltl-bookings' ),
-            'manage_options',
+            'view_ai_reports',
             'ltlb_dashboard',
             [ $this, 'render_dashboard_page' ],
             'dashicons-calendar-alt',
             26
         );
 
+		$settings = get_option( 'lazy_settings', [] );
+		$template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
+		$is_hotel_frontend = $template_mode === 'hotel';
+
+
         // Dashboard (explicit label + first submenu item)
         add_submenu_page(
             'ltlb_dashboard',
             __( 'Dashboard', 'ltl-bookings' ),
             __( 'Dashboard', 'ltl-bookings' ),
-            'manage_options',
+            'view_ai_reports',
             'ltlb_dashboard',
             [ $this, 'render_dashboard_page' ]
         );
 
-        // Appointments
+        // Appointments / Bookings
+		$appointments_label = $template_mode === 'hotel' ? __( 'Bookings', 'ltl-bookings' ) : __( 'Appointments', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
-            __( 'Appointments', 'ltl-bookings' ),
-            __( 'Appointments', 'ltl-bookings' ),
+			$appointments_label,
+			$appointments_label,
             'manage_options',
             'ltlb_appointments',
             [ $this, 'render_appointments_page' ]
@@ -152,20 +218,20 @@ class LTLB_Plugin {
             [ $this, 'render_calendar_page' ]
         );
 
-        // Customers
+        // Customers / Guests
+        $customers_label = $template_mode === 'hotel' ? __( 'Guests', 'ltl-bookings' ) : __( 'Customers', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
-            __( 'Customers', 'ltl-bookings' ),
-            __( 'Customers', 'ltl-bookings' ),
+            $customers_label,
+            $customers_label,
             'manage_options',
             'ltlb_customers',
             [ $this, 'render_customers_page' ]
         );
 
+
         // Services (context-aware label)
-        $settings = get_option('lazy_settings', []);
-        $is_hotel = isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
-        $services_label = $is_hotel ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
+        $services_label = $template_mode === 'hotel' ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
             $services_label,
@@ -175,18 +241,20 @@ class LTLB_Plugin {
             [ $this, 'render_services_page' ]
         );
 
-        // Staff
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Staff', 'ltl-bookings' ),
-            __( 'Staff', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_staff',
-            [ $this, 'render_staff_page' ]
-        );
+		if ($template_mode === 'service') {
+			// Staff
+			add_submenu_page(
+				'ltlb_dashboard',
+				__( 'Staff', 'ltl-bookings' ),
+				__( 'Staff', 'ltl-bookings' ),
+				'manage_options',
+				'ltlb_staff',
+				[ $this, 'render_staff_page' ]
+			);
+		}
 
         // Resources (context-aware label)
-        $resources_label = $is_hotel ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
+        $resources_label = $template_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
         add_submenu_page(
             'ltlb_dashboard',
             $resources_label,
@@ -216,15 +284,67 @@ class LTLB_Plugin {
             [ $this, 'render_design_page' ]
         );
 
-        // Diagnostics
+		// AI & Automations
+		add_submenu_page(
+			'ltlb_dashboard',
+			__( 'AI & Automations', 'ltl-bookings' ),
+			__( 'AI', 'ltl-bookings' ),
+			'manage_ai_settings',
+			'ltlb_ai',
+			[ $this, 'render_ai_page' ]
+		);
+
+        // Outbox (Draft Center)
         add_submenu_page(
             'ltlb_dashboard',
-            __( 'Diagnostics', 'ltl-bookings' ),
-            __( 'Diagnostics', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_diagnostics',
-            [ $this, 'render_diagnostics_page' ]
+            __( 'Outbox', 'ltl-bookings' ),
+            __( 'Outbox', 'ltl-bookings' ),
+            'approve_ai_drafts',
+            'ltlb_outbox',
+            [ $this, 'render_outbox_page' ]
         );
+
+        // Hotel: Smart Room Assistant
+        if ( $template_mode === 'hotel' ) {
+            add_submenu_page(
+                'ltlb_dashboard',
+                __( 'Smart Room Assistant', 'ltl-bookings' ),
+                __( 'Room Assistant', 'ltl-bookings' ),
+                'approve_ai_drafts',
+                'ltlb_room_assistant',
+                [ $this, 'render_room_assistant_page' ]
+            );
+        }
+
+        // Automation rules
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Automations', 'ltl-bookings' ),
+            __( 'Automations', 'ltl-bookings' ),
+            'manage_ai_settings',
+            'ltlb_automations',
+            [ $this, 'render_automations_page' ]
+        );
+
+        // Reply templates
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Reply Templates', 'ltl-bookings' ),
+            __( 'Templates', 'ltl-bookings' ),
+            'manage_ai_settings',
+            'ltlb_reply_templates',
+            [ $this, 'render_reply_templates_page' ]
+        );
+
+		// Diagnostics
+		add_submenu_page(
+			'ltlb_dashboard',
+			__( 'Diagnostics', 'ltl-bookings' ),
+			__( 'Diagnostics', 'ltl-bookings' ),
+			'manage_options',
+			'ltlb_diagnostics',
+			[ $this, 'render_diagnostics_page' ]
+		);
 
         // Privacy
         add_submenu_page(
@@ -238,11 +358,23 @@ class LTLB_Plugin {
     }
 
     public function render_dashboard_page(): void {
-        if ( class_exists('LTLB_Admin_DashboardPage') ) {
-            $page = new LTLB_Admin_DashboardPage();
+        $settings = get_option( 'lazy_settings', [] );
+        $template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
+
+        if ( $template_mode === 'hotel' ) {
+            if ( class_exists('LTLB_Admin_HotelDashboardPage') ) {
+                $page = new LTLB_Admin_HotelDashboardPage();
+                $page->render();
+                return;
+            }
+        } 
+        
+        if ( class_exists('LTLB_Admin_AppointmentsDashboardPage') ) {
+            $page = new LTLB_Admin_AppointmentsDashboardPage();
             $page->render();
             return;
         }
+
 
         echo '<div class="wrap"><h1>' . esc_html__( 'LazyBookings Dashboard', 'ltl-bookings' ) . '</h1></div>';
     }
@@ -250,6 +382,51 @@ class LTLB_Plugin {
     public function render_services_page(): void {
         $page = new LTLB_Admin_ServicesPage();
         $page->render();
+    }
+
+    public function render_ai_page(): void {
+        if ( class_exists('LTLB_Admin_AIPage') ) {
+            $page = new LTLB_Admin_AIPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__('AI & Automations', 'ltl-bookings') . '</h1></div>';
+    }
+
+    public function render_outbox_page(): void {
+        if ( class_exists('LTLB_Admin_OutboxPage') ) {
+            $page = new LTLB_Admin_OutboxPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Outbox', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_room_assistant_page(): void {
+        if ( class_exists( 'LTLB_Admin_RoomAssistantPage' ) ) {
+            $page = new LTLB_Admin_RoomAssistantPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Smart Room Assistant', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_automations_page(): void {
+        if ( class_exists('LTLB_Admin_AutomationsPage') ) {
+            $page = new LTLB_Admin_AutomationsPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Automations', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_reply_templates_page(): void {
+        if ( class_exists('LTLB_Admin_ReplyTemplatesPage') ) {
+            $page = new LTLB_Admin_ReplyTemplatesPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Reply Templates', 'ltl-bookings' ) . '</h1></div>';
     }
 
     public function render_customers_page(): void {
@@ -346,6 +523,18 @@ class LTLB_Plugin {
             'callback' => [ $this, 'rest_admin_calendar_events' ],
             'permission_callback' => [ $this, 'rest_admin_permission' ],
         ]);
+
+        // Admin: calendar UI settings (status colors)
+        register_rest_route( 'ltlb/v1', '/admin/calendar/colors', [
+            'methods' => 'GET',
+            'callback' => [ $this, 'rest_admin_calendar_colors_get' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ] );
+        register_rest_route( 'ltlb/v1', '/admin/calendar/colors', [
+            'methods' => 'POST',
+            'callback' => [ $this, 'rest_admin_calendar_colors_update' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ] );
         register_rest_route('ltlb/v1', '/admin/appointments/(?P<id>\d+)', [
             'methods' => 'GET',
             'callback' => [ $this, 'rest_admin_appointment_get' ],
@@ -371,10 +560,108 @@ class LTLB_Plugin {
             'callback' => [ $this, 'rest_admin_customer_update' ],
             'permission_callback' => [ $this, 'rest_admin_permission' ],
         ]);
+
+        // Admin: hotel calendar helpers (occupancy + room assistant)
+        register_rest_route('ltlb/v1', '/admin/calendar/occupancy', [
+            'methods' => 'GET',
+            'callback' => [ $this, 'rest_admin_calendar_occupancy' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ]);
+
+		register_rest_route('ltlb/v1', '/admin/calendar/rooms', [
+			'methods' => 'GET',
+			'callback' => [ $this, 'rest_admin_calendar_rooms' ],
+			'permission_callback' => [ $this, 'rest_admin_permission' ],
+		]);
+        register_rest_route('ltlb/v1', '/admin/appointments/(?P<id>\\d+)/room-suggestions', [
+            'methods' => 'GET',
+            'callback' => [ $this, 'rest_admin_appointment_room_suggestions' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ]);
+        register_rest_route('ltlb/v1', '/admin/appointments/(?P<id>\\d+)/assign-room', [
+            'methods' => 'POST',
+            'callback' => [ $this, 'rest_admin_appointment_assign_room' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ]);
+        register_rest_route('ltlb/v1', '/admin/appointments/(?P<id>\\d+)/propose-room', [
+            'methods' => 'POST',
+            'callback' => [ $this, 'rest_admin_appointment_propose_room' ],
+            'permission_callback' => [ $this, 'rest_admin_permission' ],
+        ]);
+    }
+
+    private function is_hotel_mode(): bool {
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) {
+            $ls = [];
+        }
+        return ( $ls['template_mode'] ?? 'service' ) === 'hotel';
+    }
+
+    private function pending_blocks_enabled(): bool {
+        $ls = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $ls ) ) {
+            $ls = [];
+        }
+        return ! empty( $ls['pending_blocks'] );
     }
 
     public function rest_admin_permission(): bool {
         return current_user_can('manage_options');
+    }
+
+    private function sanitize_hex_color( $value, string $fallback ): string {
+        $s = is_string( $value ) ? trim( $value ) : '';
+        if ( $s === '' ) return $fallback;
+        if ( preg_match( '/^#[0-9A-Fa-f]{6}$/', $s ) ) return strtolower( $s );
+        if ( preg_match( '/^[0-9A-Fa-f]{6}$/', $s ) ) return '#' . strtolower( $s );
+        return $fallback;
+    }
+
+    private function get_calendar_status_colors(): array {
+        $defaults = [
+            'confirmed' => '#2271b1',
+            'pending' => '#2271b1',
+            'cancelled' => '#ccd0d4',
+        ];
+
+        $saved = get_option( self::OPTION_CALENDAR_STATUS_COLORS, [] );
+        if ( ! is_array( $saved ) ) {
+            $saved = [];
+        }
+
+        return [
+            'confirmed' => $this->sanitize_hex_color( $saved['confirmed'] ?? null, $defaults['confirmed'] ),
+            'pending' => $this->sanitize_hex_color( $saved['pending'] ?? null, $defaults['pending'] ),
+            'cancelled' => $this->sanitize_hex_color( $saved['cancelled'] ?? null, $defaults['cancelled'] ),
+        ];
+    }
+
+    public function rest_admin_calendar_colors_get( WP_REST_Request $request ): WP_REST_Response {
+        return $this->rest_ok( [
+            'ok' => true,
+            'colors' => $this->get_calendar_status_colors(),
+        ] );
+    }
+
+    public function rest_admin_calendar_colors_update( WP_REST_Request $request ): WP_REST_Response {
+        $colors = $request->get_param( 'colors' );
+        if ( ! is_array( $colors ) ) {
+            return $this->rest_error( 400, 'invalid_colors', 'colors must be an object' );
+        }
+
+        $defaults = $this->get_calendar_status_colors();
+        $next = [
+            'confirmed' => $this->sanitize_hex_color( $colors['confirmed'] ?? null, $defaults['confirmed'] ),
+            'pending' => $this->sanitize_hex_color( $colors['pending'] ?? null, $defaults['pending'] ),
+            'cancelled' => $this->sanitize_hex_color( $colors['cancelled'] ?? null, $defaults['cancelled'] ),
+        ];
+
+        update_option( self::OPTION_CALENDAR_STATUS_COLORS, $next, false );
+        return $this->rest_ok( [
+            'ok' => true,
+            'colors' => $next,
+        ] );
     }
 
     private function rest_error( int $status, string $error, string $message = '', array $data = [] ): WP_REST_Response {
@@ -410,6 +697,33 @@ class LTLB_Plugin {
 
         $repo = new LTLB_AppointmentRepository();
         $rows = $repo->get_calendar_rows( LTLB_Time::format_wp_datetime( $start_dt ), LTLB_Time::format_wp_datetime( $end_dt ) );
+
+        // Map appointments to assigned rooms (hotel mode uses this for per-room calendar rendering).
+        global $wpdb;
+        $resource_ids_by_appointment = [];
+        $appt_ids = [];
+        foreach ( $rows as $r ) {
+            $aid = intval( $r['id'] ?? 0 );
+            if ( $aid > 0 ) {
+                $appt_ids[ $aid ] = true;
+            }
+        }
+        $appt_ids = array_keys( $appt_ids );
+        if ( ! empty( $appt_ids ) ) {
+            $in = implode( ',', array_fill( 0, count( $appt_ids ), '%d' ) );
+            $ar_table = $wpdb->prefix . 'lazy_appointment_resources';
+            $sql = $wpdb->prepare( "SELECT appointment_id, resource_id FROM {$ar_table} WHERE appointment_id IN ({$in})", ...$appt_ids );
+            $assigned = $wpdb->get_results( $sql, ARRAY_A );
+            foreach ( $assigned as $a ) {
+                $aid = intval( $a['appointment_id'] ?? 0 );
+                $rid = intval( $a['resource_id'] ?? 0 );
+                if ( $aid <= 0 || $rid <= 0 ) continue;
+                if ( ! isset( $resource_ids_by_appointment[ $aid ] ) ) {
+                    $resource_ids_by_appointment[ $aid ] = [];
+                }
+                $resource_ids_by_appointment[ $aid ][ $rid ] = true;
+            }
+        }
 
         $events = [];
         foreach ( $rows as $row ) {
@@ -457,6 +771,8 @@ class LTLB_Plugin {
                     'service_id' => intval( $row['service_id'] ?? 0 ),
                     'customer_id' => intval( $row['customer_id'] ?? 0 ),
                     'customer_email' => $row['customer_email'] ?? '',
+					'seats' => intval( $row['seats'] ?? 1 ),
+					'resource_ids' => array_map( 'intval', array_keys( $resource_ids_by_appointment[ intval( $row['id'] ) ] ?? [] ) ),
                 ],
             ];
         }
@@ -471,6 +787,7 @@ class LTLB_Plugin {
         }
 
         $appointments = new LTLB_AppointmentRepository();
+        $include_pending = $this->pending_blocks_enabled();
         $services = new LTLB_ServiceRepository();
         $customers = new LTLB_CustomerRepository();
 
@@ -627,6 +944,363 @@ class LTLB_Plugin {
 		return $this->rest_ok( [ 'ok' => true ], 200 );
     }
 
+    public function rest_admin_calendar_occupancy( WP_REST_Request $request ): WP_REST_Response {
+        if ( ! $this->is_hotel_mode() ) {
+            return $this->rest_ok( [ 'days' => [] ], 200 );
+        }
+
+        $start = sanitize_text_field( (string) $request->get_param('start') );
+        $end = sanitize_text_field( (string) $request->get_param('end') );
+        if ( empty( $start ) || empty( $end ) ) {
+            return $this->rest_error( 400, 'missing_params', 'start and end required' );
+        }
+
+        $start_dt = LTLB_Time::create_datetime_immutable( $start );
+        $end_dt = LTLB_Time::create_datetime_immutable( $end );
+        if ( ! $start_dt || ! $end_dt ) {
+            return $this->rest_error( 400, 'invalid_datetime', 'invalid start/end' );
+        }
+
+        $resources_repo = new LTLB_ResourceRepository();
+        $resources = array_filter( $resources_repo->get_all(), function( $r ) {
+            return ! empty( $r['is_active'] );
+        } );
+        $total_rooms = count( $resources );
+
+        $appointments = new LTLB_AppointmentRepository();
+        $include_pending = $this->pending_blocks_enabled();
+
+        $cur = $start_dt->setTime( 0, 0, 0 );
+        $end_day = $end_dt->setTime( 0, 0, 0 );
+        $days = [];
+        // FullCalendar's end is exclusive; iterate while cur < end.
+        while ( $cur < $end_day ) {
+            $date = $cur->format( 'Y-m-d' );
+            $occupied_assigned = $appointments->get_count_occupied_rooms_on_date( $date, $include_pending );
+            $occupied_unassigned = $appointments->get_count_unassigned_room_bookings_on_date( $date, $include_pending );
+            $occupied = min( $total_rooms, max( 0, (int) $occupied_assigned + (int) $occupied_unassigned ) );
+            $rate = $total_rooms > 0 ? (int) round( ( $occupied / $total_rooms ) * 100 ) : 0;
+            $days[] = [
+                'date' => $date,
+                'occupied' => (int) $occupied,
+                'total' => (int) $total_rooms,
+                'rate' => (int) $rate,
+                'assigned' => (int) $occupied_assigned,
+                'unassigned' => (int) $occupied_unassigned,
+            ];
+            $cur = $cur->modify( '+1 day' );
+        }
+
+        return $this->rest_ok( [ 'days' => $days ], 200 );
+    }
+
+    private function infer_room_type_code( array $service ): string {
+        $max_adults = isset( $service['max_adults'] ) ? (int) $service['max_adults'] : 2;
+        $max_children = isset( $service['max_children'] ) ? (int) $service['max_children'] : 0;
+        if ( $max_adults <= 1 && $max_children <= 0 ) return 'EZ';
+        if ( $max_adults === 2 && $max_children <= 0 ) return 'DZ';
+        if ( $max_adults >= 2 && $max_children >= 1 ) return 'Fam';
+        if ( $max_adults > 2 ) return 'Fam';
+        return '';
+    }
+
+    public function rest_admin_calendar_rooms( WP_REST_Request $request ): WP_REST_Response {
+        if ( ! $this->is_hotel_mode() ) {
+            return $this->rest_ok( [ 'rooms' => [] ], 200 );
+        }
+
+        $resources_repo = new LTLB_ResourceRepository();
+        $service_repo = new LTLB_ServiceRepository();
+        $sr_repo = new LTLB_ServiceResourcesRepository();
+
+        $resources = array_values( array_filter( $resources_repo->get_all(), function( $r ) {
+            return ! empty( $r['is_active'] );
+        } ) );
+        $services = array_values( array_filter( $service_repo->get_all(), function( $s ) {
+            return ! empty( $s['is_active'] );
+        } ) );
+
+        $service_by_id = [];
+        foreach ( $services as $s ) {
+            $service_by_id[ (int) ( $s['id'] ?? 0 ) ] = $s;
+        }
+
+        // Build resource_id => [service_id, ...]
+        global $wpdb;
+        $map_table = $wpdb->prefix . 'lazy_service_resources';
+        $rows = $wpdb->get_results( "SELECT service_id, resource_id FROM {$map_table}", ARRAY_A );
+        $service_ids_by_resource = [];
+        foreach ( $rows as $row ) {
+            $rid = (int) ( $row['resource_id'] ?? 0 );
+            $sid = (int) ( $row['service_id'] ?? 0 );
+            if ( $rid <= 0 || $sid <= 0 ) continue;
+            if ( ! isset( $service_ids_by_resource[ $rid ] ) ) {
+                $service_ids_by_resource[ $rid ] = [];
+            }
+            $service_ids_by_resource[ $rid ][ $sid ] = true;
+        }
+
+        $rooms = [];
+        foreach ( $resources as $r ) {
+            $rid = (int) ( $r['id'] ?? 0 );
+            $type_names = [];
+            $type_code = '';
+            $first_service = null;
+            $capacity = (int) ( $r['capacity'] ?? 1 );
+            if ( $rid > 0 && isset( $service_ids_by_resource[ $rid ] ) ) {
+                foreach ( array_keys( $service_ids_by_resource[ $rid ] ) as $sid ) {
+                    if ( isset( $service_by_id[ (int) $sid ] ) ) {
+                        $s = $service_by_id[ (int) $sid ];
+                        if ( $first_service === null ) {
+                            $first_service = $s;
+                        }
+                        $name = isset( $s['name'] ) ? (string) $s['name'] : '';
+                        if ( $name !== '' ) {
+                            $type_names[] = $name;
+                        }
+                    }
+                }
+            }
+            if ( $first_service !== null ) {
+                $type_code = $this->infer_room_type_code( $first_service );
+            }
+            // Hard fallback so every room ends up in EZ/DZ/Fam.
+            if ( $type_code !== 'EZ' && $type_code !== 'DZ' && $type_code !== 'Fam' ) {
+                if ( $capacity <= 1 ) {
+                    $type_code = 'EZ';
+                } elseif ( $capacity === 2 ) {
+                    $type_code = 'DZ';
+                } else {
+                    $type_code = 'Fam';
+                }
+            }
+
+            $rooms[] = [
+                'id' => (string) $rid,
+                'name' => (string) ( $r['name'] ?? '' ),
+                'capacity' => $capacity,
+                'typeNames' => array_values( array_unique( $type_names ) ),
+                'typeCode' => $type_code,
+            ];
+        }
+
+        usort( $rooms, function( $a, $b ) {
+            return strnatcasecmp( (string) ( $a['name'] ?? '' ), (string) ( $b['name'] ?? '' ) );
+        } );
+
+        return $this->rest_ok( [ 'rooms' => $rooms ], 200 );
+    }
+
+    private function compute_room_suggestions( int $appointment_id, array $appointment ): array {
+        $start_at = isset( $appointment['start_at'] ) ? (string) $appointment['start_at'] : '';
+        $end_at = isset( $appointment['end_at'] ) ? (string) $appointment['end_at'] : '';
+        if ( $start_at === '' || $end_at === '' ) {
+            return [ 'assigned' => null, 'candidates' => [] ];
+        }
+
+        $guests = isset( $appointment['seats'] ) ? max( 1, intval( $appointment['seats'] ) ) : 1;
+        $service_id = isset( $appointment['service_id'] ) ? intval( $appointment['service_id'] ) : 0;
+
+        $resources_repo = new LTLB_ResourceRepository();
+        $ar_repo = new LTLB_AppointmentResourcesRepository();
+        $service_resources = new LTLB_ServiceResourcesRepository();
+
+        $assigned_id = $ar_repo->get_resource_for_appointment( $appointment_id );
+        $assigned = null;
+        if ( $assigned_id ) {
+            $assigned = $resources_repo->get_by_id( (int) $assigned_id );
+        }
+
+        $include_pending = $this->pending_blocks_enabled();
+        $blocked = $ar_repo->get_blocked_resources( $start_at, $end_at, $include_pending );
+        if ( $assigned_id ) {
+            $rid = (int) $assigned_id;
+            if ( isset( $blocked[ $rid ] ) ) {
+                $blocked[ $rid ] = max( 0, (int) $blocked[ $rid ] - $guests );
+            }
+        }
+
+        $allowed_ids = [];
+        if ( $service_id > 0 ) {
+            $allowed_ids = $service_resources->get_resources_for_service( $service_id );
+        }
+        $allowed_lookup = [];
+        foreach ( $allowed_ids as $rid ) {
+            $allowed_lookup[ (int) $rid ] = true;
+        }
+
+        $resources = $resources_repo->get_all();
+        $candidates = [];
+        foreach ( $resources as $r ) {
+            $rid = intval( $r['id'] ?? 0 );
+            if ( $rid <= 0 ) continue;
+            if ( empty( $r['is_active'] ) ) continue;
+            if ( ! empty( $allowed_lookup ) && empty( $allowed_lookup[ $rid ] ) ) continue;
+
+            $capacity = isset( $r['capacity'] ) ? max( 1, intval( $r['capacity'] ) ) : 1;
+            $used = isset( $blocked[ $rid ] ) ? (int) $blocked[ $rid ] : 0;
+            $available = max( 0, $capacity - $used );
+            if ( $available < $guests ) continue;
+
+            $candidates[] = [
+                'id' => $rid,
+                'name' => (string) ( $r['name'] ?? '' ),
+                'capacity' => $capacity,
+                'available' => $available,
+                'leftover' => $available - $guests,
+            ];
+        }
+
+        usort( $candidates, function( $a, $b ) {
+            $la = (int) ( $a['leftover'] ?? 0 );
+            $lb = (int) ( $b['leftover'] ?? 0 );
+            if ( $la !== $lb ) return $la <=> $lb;
+            return strcmp( (string) ( $a['name'] ?? '' ), (string) ( $b['name'] ?? '' ) );
+        } );
+
+        return [
+            'assigned' => $assigned,
+            'assigned_id' => $assigned_id ? (int) $assigned_id : 0,
+            'guests' => $guests,
+            'candidates' => $candidates,
+        ];
+    }
+
+    public function rest_admin_appointment_room_suggestions( WP_REST_Request $request ): WP_REST_Response {
+        if ( ! $this->is_hotel_mode() ) {
+            return $this->rest_error( 400, 'not_hotel_mode', 'Room suggestions require hotel mode.' );
+        }
+        $id = intval( $request->get_param('id') );
+        if ( $id <= 0 ) {
+            return $this->rest_error( 400, 'invalid_id', 'Invalid appointment id' );
+        }
+
+        $appointments = new LTLB_AppointmentRepository();
+        $appointment = $appointments->get_by_id( $id );
+        if ( ! $appointment ) {
+            return $this->rest_error( 404, 'not_found', 'Appointment not found' );
+        }
+
+        $computed = $this->compute_room_suggestions( $id, $appointment );
+        $best_id = 0;
+        if ( ! empty( $computed['candidates'] ) ) {
+            $best_id = (int) ( $computed['candidates'][0]['id'] ?? 0 );
+        }
+
+        return $this->rest_ok( [
+            'ok' => true,
+            'appointment_id' => $id,
+            'guests' => (int) ( $computed['guests'] ?? 1 ),
+            'assigned' => $computed['assigned'],
+            'assigned_id' => (int) ( $computed['assigned_id'] ?? 0 ),
+            'best_id' => $best_id,
+            'candidates' => $computed['candidates'],
+        ], 200 );
+    }
+
+    public function rest_admin_appointment_assign_room( WP_REST_Request $request ): WP_REST_Response {
+        if ( ! $this->is_hotel_mode() ) {
+            return $this->rest_error( 400, 'not_hotel_mode', 'Room assignment requires hotel mode.' );
+        }
+        $id = intval( $request->get_param('id') );
+        if ( $id <= 0 ) {
+            return $this->rest_error( 400, 'invalid_id', 'Invalid appointment id' );
+        }
+
+        $params = $request->get_json_params();
+        if ( ! is_array( $params ) ) {
+            $params = $request->get_body_params();
+        }
+        if ( ! is_array( $params ) ) {
+            $params = [];
+        }
+
+        $resource_id = isset( $params['resource_id'] ) ? intval( $params['resource_id'] ) : 0;
+        if ( $resource_id <= 0 ) {
+            return $this->rest_error( 400, 'missing_params', 'resource_id required' );
+        }
+
+        $appointments = new LTLB_AppointmentRepository();
+        $appointment = $appointments->get_by_id( $id );
+        if ( ! $appointment ) {
+            return $this->rest_error( 404, 'not_found', 'Appointment not found' );
+        }
+
+        $resources = new LTLB_ResourceRepository();
+        $resource = $resources->get_by_id( $resource_id );
+        if ( ! $resource || empty( $resource['is_active'] ) ) {
+            return $this->rest_error( 404, 'resource_not_found', 'Resource not found' );
+        }
+
+        $ar_repo = new LTLB_AppointmentResourcesRepository();
+        $ok = $ar_repo->set_resource_for_appointment( $id, $resource_id );
+        if ( ! $ok ) {
+            return $this->rest_error( 500, 'assign_failed', 'Could not assign room' );
+        }
+
+        return $this->rest_ok( [
+            'ok' => true,
+            'appointment_id' => $id,
+            'resource_id' => $resource_id,
+        ], 200 );
+    }
+
+    public function rest_admin_appointment_propose_room( WP_REST_Request $request ): WP_REST_Response {
+        if ( ! $this->is_hotel_mode() ) {
+            return $this->rest_error( 400, 'not_hotel_mode', 'Room proposals require hotel mode.' );
+        }
+        if ( ! class_exists( 'LTLB_AIOutbox' ) ) {
+            return $this->rest_error( 500, 'outbox_missing', 'AI Outbox not available.' );
+        }
+        $id = intval( $request->get_param('id') );
+        if ( $id <= 0 ) {
+            return $this->rest_error( 400, 'invalid_id', 'Invalid appointment id' );
+        }
+
+        $params = $request->get_json_params();
+        if ( ! is_array( $params ) ) {
+            $params = $request->get_body_params();
+        }
+        if ( ! is_array( $params ) ) {
+            $params = [];
+        }
+        $resource_id = isset( $params['resource_id'] ) ? intval( $params['resource_id'] ) : 0;
+
+        $appointments = new LTLB_AppointmentRepository();
+        $appointment = $appointments->get_by_id( $id );
+        if ( ! $appointment ) {
+            return $this->rest_error( 404, 'not_found', 'Appointment not found' );
+        }
+
+        if ( $resource_id <= 0 ) {
+            $computed = $this->compute_room_suggestions( $id, $appointment );
+            if ( ! empty( $computed['candidates'] ) ) {
+                $resource_id = (int) ( $computed['candidates'][0]['id'] ?? 0 );
+            }
+        }
+        if ( $resource_id <= 0 ) {
+            return $this->rest_error( 400, 'no_suggestion', 'No suitable room found.' );
+        }
+
+        $resources = new LTLB_ResourceRepository();
+        $resource = $resources->get_by_id( $resource_id );
+        if ( ! $resource || empty( $resource['is_active'] ) ) {
+            return $this->rest_error( 404, 'resource_not_found', 'Resource not found' );
+        }
+
+        $outbox = new LTLB_AIOutbox();
+        $res = $outbox->queue_or_execute_assign_room( $id, $resource_id, [
+            'source' => 'calendar',
+        ] );
+
+        return $this->rest_ok( [
+            'ok' => true,
+            'appointment_id' => $id,
+            'resource_id' => $resource_id,
+            'outbox' => $res,
+        ], 200 );
+    }
+
     public function rest_availability( WP_REST_Request $request ) {
         $service_id = intval( $request->get_param('service_id') );
         $date = sanitize_text_field( (string) $request->get_param('date') );
@@ -666,13 +1340,13 @@ class LTLB_Plugin {
 
         $want_slots = $request->get_param('slots');
         $slot_step = intval( $request->get_param('slot_step') );
+        $step = $slot_step > 0 ? $slot_step : 15;
         if ( $want_slots ) {
-            $step = $slot_step > 0 ? $slot_step : 15;
             $data = $avail->compute_time_slots( $service_id, $date, $step );
             return new WP_REST_Response( $data, 200 );
         }
 
-        $data = $avail->compute_availability( $service_id, $date );
+        $data = $avail->compute_availability( $service_id, $date, $step );
         return new WP_REST_Response( $data, 200 );
     }
 
@@ -681,7 +1355,48 @@ class LTLB_Plugin {
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
         if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
 
-        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], LTLB_VERSION );
+        $debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
+        $admin_css_ver = LTLB_VERSION;
+        if ( $debug_assets ) {
+            $mtime = @filemtime( LTLB_PATH . 'assets/css/admin.css' );
+            if ( $mtime ) {
+                $admin_css_ver = (string) $mtime;
+            }
+        }
+
+        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], $admin_css_ver );
+
+        if ( $page === 'ltlb_ai' ) {
+            $ai_ver = LTLB_VERSION;
+            if ( $debug_assets ) {
+                $mtime = @filemtime( LTLB_PATH . 'assets/js/admin-ai.js' );
+                if ( $mtime ) {
+                    $ai_ver = (string) $mtime;
+                }
+            }
+            wp_enqueue_script( 'ltlb-admin-ai', LTLB_URL . 'assets/js/admin-ai.js', [], $ai_ver, true );
+            wp_localize_script( 'ltlb-admin-ai', 'ltlbAdminAI', [
+                'ajaxUrl' => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+                'nonce' => wp_create_nonce( 'ltlb_ai_nonce' ),
+                'i18n' => [
+                    'testing' => __( 'Testing…', 'ltl-bookings' ),
+                    'successFallback' => __( 'Connection OK.', 'ltl-bookings' ),
+                    'errorFallback' => __( 'Connection failed.', 'ltl-bookings' ),
+                ],
+            ] );
+        }
+
+        // Wizard JS
+        if ($page === 'ltlb_services' && isset($_GET['action'])) {
+            $wizard_ver = LTLB_VERSION;
+            if ( $debug_assets ) {
+                $mtime = @filemtime( LTLB_PATH . 'assets/js/admin-wizard.js' );
+                if ( $mtime ) {
+                    $wizard_ver = (string) $mtime;
+                }
+            }
+            wp_enqueue_script( 'ltlb-admin-wizard', LTLB_URL . 'assets/js/admin-wizard.js', [], $wizard_ver, true );
+        }
 
         if ( $page === 'ltlb_calendar' ) {
             $ls = get_option( 'lazy_settings', [] );
@@ -690,9 +1405,14 @@ class LTLB_Plugin {
             }
             $wh_start = isset( $ls['working_hours_start'] ) ? max( 0, min( 23, intval( $ls['working_hours_start'] ) ) ) : null;
             $wh_end = isset( $ls['working_hours_end'] ) ? max( 0, min( 23, intval( $ls['working_hours_end'] ) ) ) : null;
+            $template_mode = isset( $ls['template_mode'] ) ? (string) $ls['template_mode'] : 'service';
 
-            $user_locale = function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
-            $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
+                // Ensure admin locale matches the per-user language switch in the plugin header.
+                // Fall back to WordPress user/site locale if our helper isn't available.
+                $user_locale = ( class_exists( 'LTLB_I18n' ) && method_exists( 'LTLB_I18n', 'get_user_admin_locale' ) )
+                    ? LTLB_I18n::get_user_admin_locale()
+                    : ( function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale() );
+                $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
 
             wp_enqueue_style( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css', [], '6.1.11' );
             wp_enqueue_script( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js', [], '6.1.11', true );
@@ -701,18 +1421,29 @@ class LTLB_Plugin {
             wp_enqueue_script( 'ltlb-fullcalendar-locales', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js', [ 'ltlb-fullcalendar' ], '6.1.11', true );
 
             wp_enqueue_script( 'wp-api-fetch' );
-            wp_enqueue_script( 'ltlb-admin-calendar', LTLB_URL . 'assets/js/admin-calendar.js', [ 'ltlb-fullcalendar', 'ltlb-fullcalendar-locales', 'wp-api-fetch' ], LTLB_VERSION, true );
+
+            $calendar_ver = LTLB_VERSION;
+            if ( $debug_assets ) {
+                $mtime = @filemtime( LTLB_PATH . 'assets/js/admin-calendar.js' );
+                if ( $mtime ) {
+                    $calendar_ver = (string) $mtime;
+                }
+            }
+            wp_enqueue_script( 'ltlb-admin-calendar', LTLB_URL . 'assets/js/admin-calendar.js', [ 'ltlb-fullcalendar', 'ltlb-fullcalendar-locales', 'wp-api-fetch' ], $calendar_ver, true );
             wp_localize_script( 'ltlb-admin-calendar', 'ltlbAdminCalendar', [
                 'restBase' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'workingHoursStart' => $wh_start,
                 'workingHoursEnd' => $wh_end,
                 'locale' => $fc_locale,
+                'templateMode' => $template_mode,
+				'statusColors' => $this->get_calendar_status_colors(),
                 'i18n' => [
-                    'today' => __( 'Heute', 'ltl-bookings' ),
-                    'month' => __( 'Monat', 'ltl-bookings' ),
-                    'week' => __( 'Woche', 'ltl-bookings' ),
-                    'day' => __( 'Tag', 'ltl-bookings' ),
+                    // Use English msgids so the built-in de_DE dictionary can translate consistently.
+                    'today' => __( 'Today', 'ltl-bookings' ),
+                    'month' => __( 'Month', 'ltl-bookings' ),
+                    'week' => __( 'Week', 'ltl-bookings' ),
+                    'day' => __( 'Day', 'ltl-bookings' ),
                     'pending' => __( 'Pending', 'ltl-bookings' ),
                     'confirmed' => __( 'Confirmed', 'ltl-bookings' ),
                     'cancelled' => __( 'Cancelled', 'ltl-bookings' ),
@@ -740,6 +1471,33 @@ class LTLB_Plugin {
                     'could_not_save_customer' => __( 'Could not save customer.', 'ltl-bookings' ),
                     'conflict_message' => __( 'This time slot conflicts with an existing booking.', 'ltl-bookings' ),
                     'no_customer_data' => __( 'No customer data.', 'ltl-bookings' ),
+                    'loading_details' => __( 'Loading appointment details…', 'ltl-bookings' ),
+                    'details_loaded' => __( 'Appointment details loaded.', 'ltl-bookings' ),
+                    'status_updated' => __( 'Status updated.', 'ltl-bookings' ),
+                    'appointment_updated' => __( 'Appointment updated.', 'ltl-bookings' ),
+                    'appointment_deleted' => __( 'Appointment deleted.', 'ltl-bookings' ),
+                    'occupancy' => __( 'Occupancy', 'ltl-bookings' ),
+                    'rooms' => __( 'Rooms', 'ltl-bookings' ),
+                    'room' => __( 'Room', 'ltl-bookings' ),
+                    'room_assignment' => __( 'Room Assignment', 'ltl-bookings' ),
+                    'assigned_room' => __( 'Assigned room', 'ltl-bookings' ),
+                    'unassigned' => __( 'Unassigned', 'ltl-bookings' ),
+					'other' => __( 'Other', 'ltl-bookings' ),
+                    'suggested_room' => __( 'Suggested room', 'ltl-bookings' ),
+                    'choose_room' => __( 'Choose room', 'ltl-bookings' ),
+                    'assign_room' => __( 'Assign room', 'ltl-bookings' ),
+                    'propose_room' => __( 'Propose via Outbox', 'ltl-bookings' ),
+                    'loading_room' => __( 'Loading room suggestions…', 'ltl-bookings' ),
+                    'room_assigned' => __( 'Room assigned.', 'ltl-bookings' ),
+                    'room_proposed' => __( 'Room proposal sent to Outbox.', 'ltl-bookings' ),
+                    'could_not_load_room' => __( 'Could not load room suggestions.', 'ltl-bookings' ),
+                    'could_not_assign_room' => __( 'Could not assign room.', 'ltl-bookings' ),
+                    'could_not_propose_room' => __( 'Could not propose room.', 'ltl-bookings' ),
+					'change_color' => __( 'Change color', 'ltl-bookings' ),
+					'color_saved' => __( 'Color saved.', 'ltl-bookings' ),
+					'could_not_save_color' => __( 'Could not save color.', 'ltl-bookings' ),
+					'no_rooms' => __( 'No rooms found.', 'ltl-bookings' ),
+					'could_not_load_rooms' => __( 'Could not load rooms.', 'ltl-bookings' ),
                 ],
             ] );
         }
@@ -805,7 +1563,20 @@ class LTLB_Plugin {
         if ( ! function_exists('has_shortcode') ) return;
         global $post;
         if ( empty( $post ) ) return;
-        if ( ! has_shortcode( $post->post_content, 'lazy_book' ) ) return;
+        $content = is_string( $post->post_content ?? null ) ? $post->post_content : '';
+        $has_ltlb_shortcode = (
+            has_shortcode( $content, 'lazy_book' ) ||
+            has_shortcode( $content, 'lazy_book_calendar' ) ||
+            has_shortcode( $content, 'lazy_book_bar' ) ||
+            has_shortcode( $content, 'lazy_hotel_bar' ) ||
+            has_shortcode( $content, 'lazy_book_widget' ) ||
+            has_shortcode( $content, 'lazy_hotel_widget' ) ||
+            has_shortcode( $content, 'lazy_services' ) ||
+            has_shortcode( $content, 'lazy_room_types' ) ||
+            has_shortcode( $content, 'lazy_testimonials' ) ||
+            has_shortcode( $content, 'lazy_trust' )
+        );
+        if ( ! $has_ltlb_shortcode ) return;
 
         $design = get_option( 'lazy_design', [] );
         if ( ! is_array( $design ) ) $design = [];
@@ -853,7 +1624,17 @@ class LTLB_Plugin {
         $shadow_input_val = $shadow_input ? "0 {$box_shadow_blur}px {$box_shadow_spread}px rgba(0,0,0,0.12)" : 'none';
         $shadow_card_val = $shadow_card ? "0 {$box_shadow_blur}px {$box_shadow_spread}px rgba(0,0,0,0.1)" : 'none';
 
-        $css = ".ltlb-booking{
+        $selector = implode( ',', [
+            '.ltlb-booking',
+            '.ltlb-booking-bar',
+            '.ltlb-booking-widget',
+            '.ltlb-services-grid',
+            '.ltlb-trust',
+        ] );
+
+        $surface_primary = ($panel_bg && $panel_bg !== 'transparent') ? $panel_bg : $bg;
+
+        $css = "{$selector}{
             --lazy-bg:{$bg_final};
             --lazy-primary:{$primary};
             --lazy-primary-hover:{$primary_hover};
@@ -862,6 +1643,7 @@ class LTLB_Plugin {
             --lazy-secondary-text:{$secondary_text};
             --lazy-text:{$text};
             --lazy-accent:{$accent};
+            --lazy-accent-hover:{$primary_hover};
             --lazy-border-color:{$border_color};
             --lazy-panel-bg:{$panel_bg};
             --lazy-button-text:{$button_text};
@@ -872,6 +1654,19 @@ class LTLB_Plugin {
             --lazy-shadow-input:{$shadow_input_val};
             --lazy-shadow-card:{$shadow_card_val};
             --lazy-transition-duration:" . ($enable_animations ? $transition_duration : 0) . "ms;
+
+            /* Compatibility tokens used by some components */
+            --lazy-bg-primary:{$surface_primary};
+            --lazy-bg-secondary:{$surface_primary};
+            --lazy-bg-tertiary:{$surface_primary};
+            --lazy-text-primary:{$text};
+            --lazy-text-secondary:{$text};
+            --lazy-text-muted:{$text};
+            --lazy-border-medium:{$border_color};
+            --lazy-border-light:{$border_color};
+            --lazy-border-strong:{$border_color};
+            --lazy-shadow-sm:{$shadow_card_val};
+            --lazy-shadow-md:{$shadow_card_val};
         }";
 
         echo "<style id=\"ltlb-design-vars\">{$css}</style>";
@@ -952,6 +1747,7 @@ class LTLB_Plugin {
 
         // Scope vars to our admin wrapper (used across all LazyBookings pages).
         // This avoids affecting wp-admin UI globally.
+        $surface_primary = ($panel_bg && $panel_bg !== 'transparent') ? $panel_bg : $bg;
         $css = ".ltlb-admin{
             --lazy-bg:{$bg_final};
             --lazy-primary:{$primary};
@@ -960,7 +1756,8 @@ class LTLB_Plugin {
             --lazy-secondary-hover:{$secondary_hover};
             --lazy-secondary-text:{$secondary_text};
             --lazy-text:{$text};
-            --lazy-accent:{$accent};
+            --lazy-accent:{$primary};
+            --lazy-accent-hover:{$primary_hover};
             --lazy-border-color:{$border_color};
             --lazy-panel-bg:{$panel_bg};
             --lazy-button-text:{$button_text};
@@ -971,8 +1768,87 @@ class LTLB_Plugin {
             --lazy-shadow-input:{$shadow_input_val};
             --lazy-shadow-card:{$shadow_card_val};
             --lazy-transition-duration:" . ($enable_animations ? $transition_duration : 0) . "ms;
+
+            /* Map frontend palette into admin token set */
+            --lazy-bg-primary:{$bg};
+            --lazy-bg-secondary:{$surface_primary};
+            --lazy-bg-tertiary:{$surface_primary};
+            --lazy-text-primary:{$text};
+            --lazy-text-secondary:{$text};
+            --lazy-text-muted:{$text};
+            --lazy-border-light:{$border_color};
+            --lazy-border-medium:{$border_color};
+            --lazy-border-strong:{$border_color};
         }";
 
         echo "<style id=\"ltlb-design-vars-admin\">{$css}</style>";
+    }
+
+    /**
+     * Handle CSV export from dashboard
+     */
+    public function handle_csv_export(): void {
+        if ( ! isset($_GET['ltlb_export']) || $_GET['ltlb_export'] !== 'csv' ) {
+            return;
+        }
+
+        if ( ! current_user_can('manage_options') ) {
+            wp_die( esc_html__('No access', 'ltl-bookings') );
+        }
+
+        if ( ! isset($_GET['_wpnonce']) || ! wp_verify_nonce( sanitize_text_field($_GET['_wpnonce']), 'ltlb_export' ) ) {
+            wp_die( esc_html__('Security check failed', 'ltl-bookings') );
+        }
+
+        $start_date = isset($_GET['start']) ? sanitize_text_field($_GET['start']) : date('Y-m-d', strtotime('-30 days'));
+        $end_date = isset($_GET['end']) ? sanitize_text_field($_GET['end']) : date('Y-m-d');
+
+        $analytics = LTLB_Analytics::instance();
+        $csv_content = $analytics->export_csv($start_date, $end_date);
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="lazy-bookings-export-' . date('Y-m-d') . '.csv"');
+        echo $csv_content;
+        exit;
+    }
+
+    /**
+     * Handle ICS calendar feed requests
+     */
+    private function handle_ics_feed(): void {
+        if ( ! isset($_GET['ltlb_ics_feed']) ) {
+            return;
+        }
+
+        $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
+        $user_id = LTLB_ICS_Export::verify_feed_token( $token );
+
+        if ( ! $user_id ) {
+            wp_die( esc_html__('Invalid token', 'ltl-bookings'), 403 );
+        }
+
+        $filters = [ 'status' => 'confirmed' ];
+        LTLB_ICS_Export::download_ics( $filters, 'lazybookings-' . $user_id . '.ics' );
+    }
+
+    /**
+     * AJAX: Test AI connection
+     */
+    public function handle_test_ai_connection(): void {
+        check_ajax_referer( 'ltlb_ai_nonce', 'nonce' );
+
+        if ( ! current_user_can('manage_ai_secrets') ) {
+            wp_send_json_error([
+                'message' => __('No permission', 'ltl-bookings'),
+            ]);
+        }
+
+        $provider = sanitize_text_field( $_POST['provider'] ?? 'gemini' );
+        $api_key = sanitize_text_field( $_POST['api_key'] ?? '' );
+        $model = sanitize_text_field( $_POST['model'] ?? '' );
+
+        $result = LTLB_AI_Factory::test_connection( $provider, $api_key, $model );
+
+        wp_send_json( $result );
     }
 }

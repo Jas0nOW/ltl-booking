@@ -16,10 +16,14 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 rsync -a --exclude '.git/' \
           --exclude '.github/' \
+          --exclude 'docs/' \
+          --exclude 'scripts/' \
           --exclude 'node_modules/' \
           --exclude 'vendor/' \
           --exclude '.env' \
           --exclude '*.log' \
+          --exclude '.DS_Store' \
+          --exclude 'Thumbs.db' \
           --exclude 'dist/' \
           "$ROOT_DIR/" "$TMP_DIR/$PLUGIN_SLUG/"
 
@@ -28,7 +32,7 @@ rsync -a --exclude '.git/' \
 
 # SHA256 checksum
 SHA_FILE="$DIST_DIR/SHA256SUMS.txt"
-sha256sum "$ZIP_PATH" > "$SHA_FILE"
+(cd "$DIST_DIR" && sha256sum "$ZIP_NAME" > "$SHA_FILE")
 
 echo "Built: $ZIP_PATH"
 echo "Checksums: $SHA_FILE"

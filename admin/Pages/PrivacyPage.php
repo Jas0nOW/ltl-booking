@@ -5,14 +5,14 @@ class LTLB_PrivacyPage {
 
     public function render(): void {
         if (!current_user_can('manage_options')) {
-            wp_die( esc_html__( 'Insufficient permissions', 'ltl-bookings' ) );
+            wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
         }
 
         // Handle manual cleanup trigger
         if ( isset( $_GET['action'] ) && $_GET['action'] === 'run_cleanup' ) {
             $nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
             if ( ! wp_verify_nonce( $nonce, 'ltlb_run_cleanup' ) ) {
-                wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
+                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
             }
             if ( class_exists( 'LTLB_Retention' ) ) {
                 $result = LTLB_Retention::run( true );
@@ -32,7 +32,7 @@ class LTLB_PrivacyPage {
         // Handle anonymize customer action
         if (isset($_POST['ltlb_anonymize_customer']) && !empty($_POST['customer_email'])) {
             if (!check_admin_referer('ltlb_anonymize_customer', 'ltlb_anonymize_nonce')) {
-				wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
+				wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
             }
 
             $email = sanitize_email($_POST['customer_email']);
@@ -53,7 +53,7 @@ class LTLB_PrivacyPage {
         // Handle retention settings save
         if (isset($_POST['ltlb_save_retention'])) {
             if (!check_admin_referer('ltlb_save_retention', 'ltlb_retention_nonce')) {
-				wp_die( esc_html__( 'Nonce verification failed', 'ltl-bookings' ) );
+				wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
             }
 
             $settings = get_option('lazy_settings', []);
@@ -153,7 +153,7 @@ class LTLB_PrivacyPage {
         }
 
         $anonymized_email = 'anonymized_' . md5($email . time()) . '@deleted.local';
-        $anonymized_name = 'Anonymized User';
+        $anonymized_name = 'Anonymized';
         $anonymized_phone = '';
 
         $result = $wpdb->update(

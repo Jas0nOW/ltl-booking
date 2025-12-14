@@ -67,6 +67,41 @@
         var activeStep = null;
         var lastStep = null;
 
+        var $stepIndicator = $root.find('[data-ltlb-step-indicator]');
+        var $stepCount = $stepIndicator.find('[data-ltlb-step-count]');
+        var $stepTitle = $stepIndicator.find('[data-ltlb-step-title]');
+
+        function getPanelTitle($panel) {
+            if (!$panel || !$panel.length) return '';
+            var $legend = $panel.find('legend').first();
+            if (!$legend.length) return '';
+            // Remove required marker etc.
+            var $clone = $legend.clone();
+            $clone.find('.ltlb-required').remove();
+            return String($clone.text() || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function syncStepIndicator() {
+            if (!$stepIndicator.length) return;
+            if (!activeStep) return;
+
+            var $active = $panels.filter('[data-ltlb-step="' + activeStep + '"]');
+            if (!$active.length) return;
+
+            var $visible = getVisiblePanels();
+            var idx = $visible.index($active);
+            if (idx < 0) idx = 0;
+
+            var current = idx + 1;
+            var total = $visible.length || 1;
+            var title = getPanelTitle($active);
+
+            var stepText = window.ltlbI18n && window.ltlbI18n.step_of ? window.ltlbI18n.step_of : 'Step %s of %s';
+            stepText = stepText.replace('%s', current).replace('%s', total);
+            $stepCount.text(stepText);
+            $stepTitle.text(title ? '— ' + title : '');
+        }
+
         function getVisiblePanels() {
             return $panels.filter(function() {
                 return $(this).css('display') !== 'none';
@@ -117,6 +152,7 @@
             }
 
             $target.addClass('is-active');
+            syncStepIndicator();
             setTimeout(setStepperHeight, 0);
         }
 
@@ -229,9 +265,12 @@
                     var totalCents = priceCents * nights;
                     var pricePerNight = (priceCents / 100).toFixed(2);
                     var total = (totalCents / 100).toFixed(2);
+                    var nightLabel = (nights === 1) ? 
+                        (window.ltlbI18n && window.ltlbI18n.night ? window.ltlbI18n.night : 'night') : 
+                        (window.ltlbI18n && window.ltlbI18n.nights ? window.ltlbI18n.nights : 'nights');
 
                     $priceAmount.text('€' + total);
-                    $priceBreakdown.text(nights + ' night' + (nights !== 1 ? 's' : '') + ' × €' + pricePerNight);
+                    $priceBreakdown.text(nights + ' ' + nightLabel + ' × €' + pricePerNight);
                     $pricePreview.show();
                 } else {
                     $pricePreview.hide();
@@ -291,6 +330,189 @@
         var startMode = String($root.data('ltlb-start-mode') || 'wizard');
         var prefillServiceId = parseInt($root.data('ltlb-prefill-service') || 0, 10);
 
+        // Optional prefill (from query params via PHP data attributes)
+        var prefillDate = String($root.data('ltlb-prefill-date') || '');
+        var prefillTime = String($root.data('ltlb-prefill-time') || '');
+        var prefillCheckin = String($root.data('ltlb-prefill-checkin') || '');
+        var prefillCheckout = String($root.data('ltlb-prefill-checkout') || '');
+        var prefillGuests = parseInt($root.data('ltlb-prefill-guests') || 0, 10);
+
+        if ($dateInput.length && prefillDate && !$dateInput.val()) {
+            $dateInput.val(prefillDate);
+        }
+        if ($checkinInput.length && prefillCheckin && !$checkinInput.val()) {
+            $checkinInput.val(prefillCheckin);
+        }
+        if ($checkoutInput.length && prefillCheckout && !$checkoutInput.val()) {
+            $checkoutInput.val(prefillCheckout);
+        }
+        if (prefillGuests && $root.find('#ltlb-guests').length) {
+            $root.find('#ltlb-guests').val(String(prefillGuests));
+        }
+
+        function getInlineMessageEl($anchor, kind) {
+            // kind: 'info' | 'error'
+            if (!$anchor || !$anchor.length) return null;
+            var $group = $anchor.closest('.ltlb-form-group');
+            if (!$group.length) return null;
+
+            var attr = kind === 'error' ? 'data-ltlb-ajax-error' : 'data-ltlb-ajax-info';
+            var cls = kind === 'error' ? 'ltlb-error' : 'ltlb-info';
+            var role = kind === 'error' ? 'alert' : 'status';
+            var $existing = $group.find('[' + attr + ']').first();
+            if ($existing.length) return $existing;
+
+            var $el = $('<div/>', {
+                'class': cls,
+                'role': role,
+                'aria-live': kind === 'error' ? 'assertive' : 'polite'
+            }).attr(attr, '1').hide();
+
+            $group.append($el);
+            return $el;
+        }
+
+        function clearInlineMessages($anchor) {
+            var $info = getInlineMessageEl($anchor, 'info');
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($info && $info.length) $info.hide().empty();
+            if ($err && $err.length) $err.hide().text('');
+        }
+
+        function showInlineInfo($anchor, text, withSpinner) {
+            var $info = getInlineMessageEl($anchor, 'info');
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($err && $err.length) $err.hide().text('');
+            if (!$info || !$info.length) return;
+
+            $info.empty();
+            if (withSpinner) {
+                $info.append($('<span/>', { 'class': 'ltlb-spinner', 'aria-hidden': 'true' }));
+            }
+            $info.append(document.createTextNode(String(text || '')));
+            $info.show();
+        }
+
+        function showInlineError($anchor, text) {
+            var $err = getInlineMessageEl($anchor, 'error');
+            var $info = getInlineMessageEl($anchor, 'info');
+            if ($info && $info.length) $info.hide().empty();
+            if (!$err || !$err.length) return;
+            $err.text(String(text || '')).show();
+        }
+
+        function clearInlineErrorOnly($anchor) {
+            if (!$anchor || !$anchor.length) return;
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($err && $err.length) {
+                $err.hide().text('');
+            }
+            $anchor.removeAttr('aria-invalid');
+        }
+
+        function focusField($field) {
+            if (!$field || !$field.length) return;
+            try {
+                $field.trigger('focus');
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        function showStepValidation(stepName) {
+            var firstInvalid = null;
+
+            if (stepName === 'service') {
+                clearInlineErrorOnly($serviceSelect);
+                var serviceId = parseInt($serviceSelect.val() || 0, 10);
+                if (!serviceId) {
+                    $serviceSelect.attr('aria-invalid', 'true');
+                    showInlineError($serviceSelect, 'Please select a service.');
+                    firstInvalid = $serviceSelect;
+                }
+            }
+
+            // Service-mode datetime
+            if (stepName === 'datetime' && $dateInput.length && $timeSelect.length) {
+                clearInlineErrorOnly($dateInput);
+                clearInlineErrorOnly($timeSelect);
+
+                var d = String($dateInput.val() || '');
+                var t = String($timeSelect.val() || '');
+
+                if (!d) {
+                    $dateInput.attr('aria-invalid', 'true');
+                    showInlineError($dateInput, 'Please select a date.');
+                    firstInvalid = $dateInput;
+                } else if ($timeSelect.prop('disabled')) {
+                    // Slots still loading or unavailable
+                    showInlineInfo($timeSelect, 'Available times are still loading…', true);
+                    firstInvalid = $timeSelect;
+                } else if (!t) {
+                    $timeSelect.attr('aria-invalid', 'true');
+                    showInlineError($timeSelect, 'Please select a time.');
+                    firstInvalid = $timeSelect;
+                }
+            }
+
+            // Hotel-mode dates
+            if (stepName === 'datetime' && $checkinInput.length && $checkoutInput.length) {
+                clearInlineErrorOnly($checkinInput);
+                clearInlineErrorOnly($checkoutInput);
+
+                var ci = String($checkinInput.val() || '');
+                var co = String($checkoutInput.val() || '');
+
+                if (!ci) {
+                    $checkinInput.attr('aria-invalid', 'true');
+                    showInlineError($checkinInput, 'Please select a check-in date.');
+                    firstInvalid = $checkinInput;
+                } else if (!co) {
+                    $checkoutInput.attr('aria-invalid', 'true');
+                    showInlineError($checkoutInput, 'Please select a check-out date.');
+                    firstInvalid = $checkoutInput;
+                } else {
+                    var ciD = parseIsoDateLocal(ci);
+                    var coD = parseIsoDateLocal(co);
+                    if (ciD && ciD < startOfTodayLocal()) {
+                        $checkinInput.attr('aria-invalid', 'true');
+                        showInlineError($checkinInput, 'The date cannot be in the past.');
+                        firstInvalid = $checkinInput;
+                    } else if (ciD && coD && coD <= ciD) {
+                        $checkoutInput.attr('aria-invalid', 'true');
+                        showInlineError($checkoutInput, 'Check-out must be after check-in.');
+                        firstInvalid = $checkoutInput;
+                    }
+                }
+            }
+
+            if (stepName === 'details') {
+                var $email = $root.find('#ltlb-email');
+                if ($email.length) {
+                    clearInlineErrorOnly($email);
+                    var emailVal = String($email.val() || '').trim();
+                    var el = $email.get(0);
+
+                    if (!emailVal) {
+                        $email.attr('aria-invalid', 'true');
+                        showInlineError($email, 'Please enter your email address.');
+                        firstInvalid = $email;
+                    } else if (el && typeof el.checkValidity === 'function' && !el.checkValidity()) {
+                        $email.attr('aria-invalid', 'true');
+                        showInlineError($email, 'Please enter a valid email address.');
+                        firstInvalid = $email;
+                    }
+                }
+            }
+
+            if (firstInvalid) {
+                focusField(firstInvalid);
+                setTimeout(setStepperHeight, 0);
+                return false;
+            }
+            return true;
+        }
+
         function resetTimeSelect(message) {
             if (!$timeSelect.length) return;
             $timeSelect.empty().append($('<option/>', { value: '', text: message }));
@@ -299,8 +521,9 @@
 
         function resetResourceStep() {
             if (!$resourceStep.length) return;
-            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any' }));
             $resourceStep.hide();
+            syncStepIndicator();
         }
 
         function loadHotelAvailability() {
@@ -314,14 +537,19 @@
             if (!guests || guests < 1) guests = 1;
 
             resetResourceStep();
+            clearInlineMessages($resourceSelect);
 
             if (!serviceId || !checkin || !checkout || !restRoot) {
                 setTimeout(setStepperHeight, 0);
                 return;
             }
 
+            $resourceSelect.prop('disabled', true);
+            showInlineInfo($resourceSelect, 'Loading availability…', true);
+
             $.getJSON(restRoot + '/hotel/availability', { service_id: serviceId, checkin: checkin, checkout: checkout, guests: guests })
                 .done(function(resp) {
+                    clearInlineMessages($resourceSelect);
                     if (!resp || !Array.isArray(resp.resources)) {
                         setTimeout(setStepperHeight, 0);
                         return;
@@ -335,26 +563,39 @@
 
                     if (selectable.length <= 1) {
                         $resourceStep.hide();
+                        $resourceSelect.prop('disabled', false);
                         if (activeStep === 'resource') {
                             setActiveStep('details');
                         }
+                        syncStepIndicator();
                         syncNextButtons();
                         setTimeout(setStepperHeight, 0);
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+                    var anyText = window.ltlbI18n && window.ltlbI18n.any ? window.ltlbI18n.any : 'Any';
+                    var roomPrefix = window.ltlbI18n && window.ltlbI18n.room_number ? window.ltlbI18n.room_number : 'Room #';
+                    var selectRoomText = window.ltlbI18n && window.ltlbI18n.select_room_optional ? window.ltlbI18n.select_room_optional : 'Optional: select a room.';
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: anyText }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Room #' + r.id))
+                            text: String(r.name || (roomPrefix + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Choose a preferred room (optional).');
+                        $resourceHint.text(selectRoomText);
                     }
+                    $resourceSelect.prop('disabled', false);
                     $resourceStep.show();
+                    syncStepIndicator();
                     syncNextButtons();
+                    setTimeout(setStepperHeight, 0);
+                })
+                .fail(function() {
+                    $resourceSelect.prop('disabled', true);
+                    var errorText = window.ltlbI18n && window.ltlbI18n.availability_error ? window.ltlbI18n.availability_error : 'Availability could not be loaded. Please try again.';
+                    showInlineError($resourceSelect, errorText);
                     setTimeout(setStepperHeight, 0);
                 });
         }
@@ -372,28 +613,34 @@
             var date = $dateInput.val();
 
             resetResourceStep();
+            clearInlineMessages($timeSelect);
 
             if (!serviceId || !date) {
-                resetTimeSelect('Select date first');
+                resetTimeSelect('Select a date first');
                 syncNextButtons();
                 return;
             }
 
             if (!restRoot) {
-                resetTimeSelect('Unable to load slots');
+                resetTimeSelect('Times could not be loaded');
+                showInlineError($timeSelect, 'Times could not be loaded. Please reload the page.');
                 syncNextButtons();
                 return;
             }
 
-            resetTimeSelect('Loading…');
+            // Loading state: disable select and show spinner/status (avoid "Loading..." as an option)
+            resetTimeSelect('—');
+            showInlineInfo($timeSelect, 'Loading available times…', true);
 
             $.getJSON(restRoot + '/time-slots', { service_id: serviceId, date: date })
                 .done(function(slots) {
+                    clearInlineMessages($timeSelect);
                     $timeSelect.empty();
 
                     if (!Array.isArray(slots) || slots.length === 0) {
-                        $timeSelect.append($('<option/>', { value: '', text: 'No slots available' }));
+                        $timeSelect.append($('<option/>', { value: '', text: 'No times available' }));
                         $timeSelect.prop('disabled', true);
+                        showInlineInfo($timeSelect, 'No times are available for this date.', false);
                         syncNextButtons();
                         return;
                     }
@@ -413,11 +660,23 @@
                     }
 
                     $timeSelect.prop('disabled', false);
+
+                    // Apply optional prefilled time once slots exist
+                    if (prefillTime && !$timeSelect.val()) {
+                        var has = $timeSelect.find('option[value="' + String(prefillTime).replace(/"/g, '\\"') + '"]').length;
+                        if (has) {
+                            $timeSelect.val(String(prefillTime));
+                            prefillTime = '';
+                            onTimeChanged();
+                        }
+                    }
+
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
                 })
                 .fail(function() {
-                    resetTimeSelect('Unable to load slots');
+                    resetTimeSelect('—');
+                    showInlineError($timeSelect, 'Times could not be loaded. Please try again.');
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
                 });
@@ -430,13 +689,19 @@
             var start = $selected.attr('data-start') || '';
 
             resetResourceStep();
+            clearInlineMessages($resourceSelect);
 
             if (!serviceId || !start || !restRoot) {
                 return;
             }
 
+            $resourceSelect.prop('disabled', true);
+            showInlineInfo($resourceSelect, 'Loading resources…', true);
+
             $.getJSON(restRoot + '/slot-resources', { service_id: serviceId, start: start })
                 .done(function(resp) {
+                    clearInlineMessages($resourceSelect);
+                    $resourceSelect.prop('disabled', false);
                     if (!resp || !Array.isArray(resp.resources)) return;
 
                     var selectable = resp.resources.filter(function(r) {
@@ -445,6 +710,7 @@
 
                     if (selectable.length <= 1) {
                         $resourceStep.hide();
+                        syncStepIndicator();
                         syncNextButtons();
                         setTimeout(setStepperHeight, 0);
                         // Skip resource step entirely
@@ -456,17 +722,21 @@
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+                    var anyText = window.ltlbI18n && window.ltlbI18n.any ? window.ltlbI18n.any : 'Any';
+                    var resourcePrefix = window.ltlbI18n && window.ltlbI18n.resource_number ? window.ltlbI18n.resource_number : 'Resource #';
+                    var selectResourceText = window.ltlbI18n && window.ltlbI18n.select_resource_optional ? window.ltlbI18n.select_resource_optional : 'Optional: select a resource.';
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: anyText }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Resource #' + r.id))
+                            text: String(r.name || (resourcePrefix + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Choose a preferred resource (optional).');
+                        $resourceHint.text(selectResourceText);
                     }
                     $resourceStep.show();
+                    syncStepIndicator();
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
 
@@ -474,6 +744,12 @@
                     if (activeStep === 'datetime') {
                         setActiveStep('resource');
                     }
+                })
+                .fail(function() {
+                    $resourceSelect.prop('disabled', true);
+                    var errorText = window.ltlbI18n && window.ltlbI18n.resources_error ? window.ltlbI18n.resources_error : 'Resources could not be loaded. Please try again.';
+                    showInlineError($resourceSelect, errorText);
+                    setTimeout(setStepperHeight, 0);
                 });
         }
 
@@ -513,24 +789,30 @@
             var prev = getPrevStepName(stepName);
             if (prev) setActiveStep(prev);
             syncNextButtons();
+            updateWizardProgress();
         });
+        
+        function updateWizardProgress() {
+            var $steps = $root.find('[data-ltlb-step]');
+            var $visible = $steps.filter(':visible');
+            var currentIndex = $steps.index($visible) + 1;
+            var totalSteps = $steps.length;
+            
+            $root.find('.ltlb-wizard-current-step').text(currentIndex);
+            $root.find('.ltlb-wizard-total-steps').text(totalSteps);
+        }
 
         $root.on('click', '[data-ltlb-next]', function() {
             var $panel = $(this).closest('[data-ltlb-step]');
             var stepName = String($panel.data('ltlb-step'));
             if (!isValidForStep(stepName)) {
-                // Trigger native validation UI if possible
-                try {
-                    var formEl = $root.find('form').get(0);
-                    if (formEl && typeof formEl.reportValidity === 'function') {
-                        formEl.reportValidity();
-                    }
-                } catch (e) {
-                    // ignore
-                }
+                showStepValidation(stepName);
                 syncNextButtons();
                 return;
             }
+            
+            // Update wizard progress counter
+            updateWizardProgress();
 
             // Service mode: after datetime step, decide if resource step needed
             if (stepName === 'datetime' && $dateInput.length && $timeSelect.length) {
@@ -551,6 +833,7 @@
 
         // Auto-advance: service selection
         $serviceSelect.on('change', function() {
+            clearInlineErrorOnly($serviceSelect);
             syncNextButtons();
             if (parseInt($serviceSelect.val() || 0, 10)) {
                 // In service mode, slot loading depends on service+date
@@ -576,16 +859,22 @@
             resetResourceStep();
             loadTimeSlots();
             $dateInput.on('change', function() {
+                clearInlineErrorOnly($dateInput);
                 resetResourceStep();
                 loadTimeSlots();
                 syncNextButtons();
             });
-            $timeSelect.on('change', onTimeChanged);
+            $timeSelect.on('change', function() {
+                clearInlineErrorOnly($timeSelect);
+                onTimeChanged();
+            });
         }
 
         // Hotel-mode datetime validation
         if ($checkinInput.length && $checkoutInput.length) {
             var syncHotel = function() {
+                clearInlineErrorOnly($checkinInput);
+                clearInlineErrorOnly($checkoutInput);
                 syncNextButtons();
                 updatePricePreview();
 				loadHotelAvailability();
@@ -597,10 +886,14 @@
         }
 
         // Details validation
-        $root.find('#ltlb-email').on('input change', syncNextButtons);
+        $root.find('#ltlb-email').on('input change', function() {
+            clearInlineErrorOnly($(this));
+            syncNextButtons();
+        });
 
         // Initial sync
         syncNextButtons();
+        syncStepIndicator();
         setStepperHeight();
 
         // Keep window responsive if fonts/layout change

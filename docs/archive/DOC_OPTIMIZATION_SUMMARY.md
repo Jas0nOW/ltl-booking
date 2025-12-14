@@ -3,11 +3,11 @@
 ## ✅ Changes Applied
 
 ### 1. Created New Files
-- **[README.md](README.md)** - Documentation hub with navigation guide, reading order recommendations, and quick reference links
+- **[README.md](../README.md)** - Documentation hub with navigation guide, reading order recommendations, and quick reference links
 
 ### 2. Consolidated Duplicate Files
 - **Removed:** `REST_API.md` (duplicate of API.md)
-- **Replaced:** [API.md](API.md) with comprehensive, consolidated version covering:
+- **Replaced:** [API.md](../API.md) with comprehensive, consolidated version covering:
   - REST API endpoints (all modes)
   - Form submission API
   - WP-CLI commands
@@ -15,7 +15,7 @@
   - Known issues & improvements
 
 ### 3. Cleaned Up Existing Files
-- **[QA_CHECKLIST.md](QA_CHECKLIST.md):**
+- **[QA_CHECKLIST.md](../QA_CHECKLIST.md):**
   - Removed verbose/redundant text
   - Streamlined test instructions
   - Added clear time estimates
@@ -29,17 +29,16 @@
 ### 🎯 Core Documentation
 | File | Purpose | Target Audience |
 |------|---------|----------------|
-| **[README.md](README.md)** | Documentation hub & navigation | All users |
-| **[SPEC.md](SPEC.md)** | Master specification | Developers |
-| **[API.md](API.md)** | REST API + CLI reference | Integrators, Developers |
+| **[README.md](../README.md)** | Documentation hub & navigation | All users |
+| **[SPEC.md](../SPEC.md)** | Master specification | Developers |
+| **[API.md](../API.md)** | REST API + CLI reference | Integrators, Developers |
 
 ### 🏗️ Architecture
 | File | Purpose | Target Audience |
 |------|---------|----------------|
-| **[DB_SCHEMA.md](DB_SCHEMA.md)** | Database schema (current + planned) | Developers, DBAs |
-| **[ENGINE_DECISION.md](ENGINE_DECISION.md)** | Service vs Hotel engine design | Architects |
-| **[ERROR_HANDLING.md](ERROR_HANDLING.md)** | Error handling conventions | Developers |
-| **[DECISIONS.md](DECISIONS.md)** | Historical commit decisions | Developers |
+| **[DB_SCHEMA.md](../DB_SCHEMA.md)** | Database schema (current + planned) | Developers, DBAs |
+| **[ERROR_HANDLING.md](../ERROR_HANDLING.md)** | Error handling conventions | Developers |
+| **[DECISIONS.md](../DECISIONS.md)** | Architecture & implementation decisions | Developers |
 
 ### ✅ Testing & Quality
 | File | Purpose | Target Audience |

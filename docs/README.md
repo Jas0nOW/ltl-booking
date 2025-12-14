@@ -1,27 +1,20 @@
-# 📚 LazyBookings Dokumentation (v0.4.4)
+# 📚 LazyBookings Dokumentation (v1.0.1)
 
 Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der Dokumentationsstruktur zurechtzufinden.
 
 ## 📖 Dokumentations-Struktur
 
 ### 🎯 Schnellstart
-- **[SPEC.md](SPEC.md)** - Master-Spezifikation und Entwickler-Prompt (Start hier!)
 - **[API.md](API.md)** - Public API-Dokumentation (REST + Form Submission)
 
 ### 🏗️ Architektur & Design
 - **[DB_SCHEMA.md](DB_SCHEMA.md)** - Datenbankschema (aktuelle Tables + Planung)
 - **[DESIGN_GUIDE.md](DESIGN_GUIDE.md)** - Design Tokens (lazy_design) & CSS Variablen
 - **[ERROR_HANDLING.md](ERROR_HANDLING.md)** - Error-Handling-Konventionen
-- **[ENGINE_DECISION.md](ENGINE_DECISION.md)** - Architektur-Entscheidung: Service vs Hotel Engine
 
 ### 🔧 Entwicklung
-- **[DECISIONS.md](DECISIONS.md)** - Architektur- und Implementierungsentscheidungen (Ist-Stand)
 - **[archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)** - Performance-Ideen (Archiv)
 - **[archive/ADMIN_COLUMNS.md](archive/ADMIN_COLUMNS.md)** - Admin-UI-Ideen (Archiv)
-
-### ✅ Testing & Qualität
-- **[QA_CHECKLIST.md](QA_CHECKLIST.md)** - Manuelle Test-Checkliste
-- **[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)** - Release-Prozess
 
 ### 🗂️ Archiv & Ideen
 - **[archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)** - Performance-Optimierung (optional)
@@ -34,11 +27,9 @@ Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der
 
 **Empfohlene Lese-Reihenfolge:**
 
-1. **[SPEC.md](SPEC.md)** → Verstehe Projektziel und Struktur
 2. **[DB_SCHEMA.md](DB_SCHEMA.md)** → Lerne die Datenstruktur kennen
 3. **[API.md](API.md)** → Verstehe die öffentliche API
 4. **[ERROR_HANDLING.md](ERROR_HANDLING.md)** → Lerne Code-Konventionen
-5. **[DECISIONS.md](DECISIONS.md)** → Verstehe "Warum" hinter dem Code
 
 ---
 
@@ -52,12 +43,12 @@ Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der
 
 ### Version-Referenzen
 Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
-- Aktuell: **v0.4.4**
+- Aktuell: **v1.0.1**
 - DB-Version: wird über die Option `ltlb_db_version` verfolgt (läuft typischerweise parallel zur Plugin-Version)
 
 ### Update-Policy
 - **SPEC.md** ist Source of Truth - hier Updates zuerst
-- **DECISIONS.md** ist append-only (historische Log)
+- **DECISIONS.md** enthält die wichtigsten Architektur-Entscheidungen (kuratiert) + ggf. Legacy-Notizen
 - Technische Docs (API, DB_SCHEMA) bei Code-Änderungen updaten
 
 ---
@@ -80,8 +71,8 @@ Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
 → [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
 
 ### Architektur-Entscheidungen
-→ [ENGINE_DECISION.md](ENGINE_DECISION.md)  
-→ [REPOSITORY_OPTIMIZATION.md](REPOSITORY_OPTIMIZATION.md)
+→ [DECISIONS.md](DECISIONS.md)  
+→ [archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)
 
 ---
 

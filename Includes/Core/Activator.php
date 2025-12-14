@@ -4,6 +4,12 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Activator {
 
     public static function activate(): void {
+        // Register capabilities first
+        if ( class_exists('LTLB_Role_Manager') ) {
+			LTLB_Role_Manager::register_roles();
+            LTLB_Role_Manager::register_capabilities();
+        }
+
         // Tabellen anlegen
         LTLB_DB_Migrator::migrate();
 
@@ -20,6 +26,9 @@ class LTLB_Activator {
 			// Retention defaults (0 = disabled)
 			'retention_delete_canceled_days' => 0,
 			'retention_anonymize_after_days' => 0,
+            // AI defaults
+            'ai_enabled' => 0,
+            'ai_operating_mode' => 'human-in-the-loop',
         ]);
 
         add_option('lazy_design', [
@@ -68,6 +77,36 @@ class LTLB_Activator {
             'panel_background' => 'transparent',
             'button_text' => '#ffffff',
         ]);
+
+        // AI Config
+        add_option('lazy_ai_config', [
+            'provider' => 'gemini',
+            'model' => 'gemini-2.5-flash',
+            'operating_mode' => 'human-in-the-loop',
+            'enabled' => 0,
+        ]);
+
+        // Business Context (empty by default, admin fills in)
+        add_option('lazy_business_context', [
+            'brand_name' => '',
+            'brand_voice' => '',
+            'faq' => '',
+            'policies' => '',
+            'invoice_terms' => '',
+            'contact_info' => '',
+            'send_brand_name' => 0,
+            'send_brand_voice' => 1,
+            'send_faq' => 1,
+            'send_policies' => 1,
+            'send_invoice_terms' => 1,
+            'send_contact_info' => 0,
+        ]);
+
+        // API Keys (autoload: false for security)
+        add_option('lazy_api_keys', [], '', 'no');
+
+		// Payment Keys (autoload: false for security)
+		add_option('lazy_payment_keys', [], '', 'no');
 
 		// Schedule retention cleanup (daily)
 		if ( function_exists( 'wp_next_scheduled' ) && function_exists( 'wp_schedule_event' ) ) {
