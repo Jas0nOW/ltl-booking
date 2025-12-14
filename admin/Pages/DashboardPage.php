@@ -3,7 +3,13 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_DashboardPage {
 	public function render(): void {
-		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+
+        $settings = get_option( 'lazy_settings', [] );
+        $template_mode = is_array( $settings ) ? ( $settings['template_mode'] ?? 'service' ) : 'service';
+		$service_label = $template_mode === 'hotel' ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
+		$service_singular_label = $template_mode === 'hotel' ? __( 'Room Type', 'ltl-bookings' ) : __( 'Service', 'ltl-bookings' );
+		$resource_label = $template_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
 
 		$svc_repo = new LTLB_ServiceRepository();
 		$cust_repo = new LTLB_CustomerRepository();
@@ -45,14 +51,14 @@ class LTLB_Admin_DashboardPage {
                 <div class="ltlb-stat-card">
                     <div class="ltlb-stat-icon dashicons dashicons-list-view"></div>
                     <div class="ltlb-stat-content">
-                        <span class="ltlb-stat-label"><?php echo esc_html__('Services', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-stat-label"><?php echo esc_html( $service_label ); ?></span>
                         <span class="ltlb-stat-value"><?php echo intval(count($services)); ?></span>
                     </div>
                 </div>
                 <div class="ltlb-stat-card">
                     <div class="ltlb-stat-icon dashicons dashicons-building"></div>
                     <div class="ltlb-stat-content">
-                        <span class="ltlb-stat-label"><?php echo esc_html__('Resources', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-stat-label"><?php echo esc_html( $resource_label ); ?></span>
                         <span class="ltlb-stat-value"><?php echo intval(count($resources)); ?></span>
                     </div>
                 </div>
@@ -68,11 +74,11 @@ class LTLB_Admin_DashboardPage {
                         <thead>
                             <tr>
                                 <th><?php echo esc_html__('ID', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Service', 'ltl-bookings'); ?></th>
+                                <th><?php echo esc_html( $service_singular_label ); ?></th>
                                 <th><?php echo esc_html__('Customer', 'ltl-bookings'); ?></th>
                                 <th><?php echo esc_html__('Start', 'ltl-bookings'); ?></th>
                                 <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Resource', 'ltl-bookings'); ?></th>
+                                <th><?php echo esc_html( $template_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resource', 'ltl-bookings' ) ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,9 +98,9 @@ class LTLB_Admin_DashboardPage {
                                     <td>
                                         <?php
                                         $status_label = $a['status'];
-                                        if ( $a['status'] === 'confirmed' ) $status_label = __( 'Confirmed', 'ltl-bookings' );
-                                        if ( $a['status'] === 'pending' ) $status_label = __( 'Pending', 'ltl-bookings' );
-                                        if ( $a['status'] === 'cancelled' ) $status_label = __( 'Cancelled', 'ltl-bookings' );
+									if ( $a['status'] === 'confirmed' ) $status_label = __( 'Confirmed', 'ltl-bookings' );
+									if ( $a['status'] === 'pending' ) $status_label = __( 'Pending', 'ltl-bookings' );
+									if ( $a['status'] === 'cancelled' ) $status_label = __( 'Cancelled', 'ltl-bookings' );
                                         ?>
                                         <span class="ltlb-status-badge status-<?php echo esc_attr($a['status']); ?>"><?php echo esc_html( $status_label ); ?></span>
                                     </td>

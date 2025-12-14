@@ -21,12 +21,12 @@ class LTLB_Admin_ServicesPage {
         // Context-aware labels
         $settings = get_option('lazy_settings', []);
         $is_hotel = isset($settings['template_mode']) && $settings['template_mode'] === 'hotel';
-        $label_singular = $is_hotel ? __('Room Type', 'ltl-bookings') : __('Service', 'ltl-bookings');
-        $label_plural = $is_hotel ? __('Room Types', 'ltl-bookings') : __('Services', 'ltl-bookings');
+		$label_singular = $is_hotel ? __('Room Type', 'ltl-bookings') : __('Service', 'ltl-bookings');
+		$label_plural = $is_hotel ? __('Room Types', 'ltl-bookings') : __('Services', 'ltl-bookings');
         // Handle form submissions
         if ( isset( $_POST['ltlb_service_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_service_save_action', 'ltlb_service_nonce' ) ) {
-                wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
             }
 
             $id = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : 0;
@@ -92,7 +92,7 @@ class LTLB_Admin_ServicesPage {
 
             $redirect = admin_url( 'admin.php?page=ltlb_services' );
             if ( $ok ) {
-                LTLB_Notices::add( __( 'Service saved.', 'ltl-bookings' ), 'success' );
+                LTLB_Notices::add( __( 'Saved.', 'ltl-bookings' ), 'success' );
             } else {
                 LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
             }
@@ -174,7 +174,7 @@ class LTLB_Admin_ServicesPage {
                 
                 <div class="ltlb-card" style="max-width: 800px; margin-top: 20px;">
                     <h2>
-                        <?php echo $editing ? sprintf(esc_html__('Edit %s', 'ltl-bookings'), $label_singular) : sprintf(esc_html__('Add New %s', 'ltl-bookings'), $label_singular); ?>
+                        <?php echo $editing ? sprintf( esc_html__( 'Edit %s', 'ltl-bookings' ), $label_singular ) : sprintf( esc_html__( 'Create %s', 'ltl-bookings' ), $label_singular ); ?>
                     </h2>
                     
                     <form method="post">
@@ -184,7 +184,7 @@ class LTLB_Admin_ServicesPage {
 
                         <table class="form-table">
                             <tr>
-                                <th><label for="name"><?php echo esc_html__('Service Name', 'ltl-bookings'); ?></label></th>
+                                <th><label for="name"><?php echo esc_html__('Name', 'ltl-bookings'); ?></label></th>
                                 <td><input name="name" type="text" id="name" value="<?php echo esc_attr( $name ); ?>" class="regular-text" required aria-required="true"></td>
                             </tr>
                             <tr>
@@ -247,17 +247,17 @@ class LTLB_Admin_ServicesPage {
                             <tr>
                                 <th><label><?php echo esc_html__('Availability (optional)', 'ltl-bookings'); ?></label></th>
                                 <td>
-                                    <p class="description" style="margin-top:0;">
+                                    <p class="description" id="ltlb-availability-mode-desc" style="margin-top:0;">
                                         <?php echo esc_html__('Limit this class to specific days/times. Choose a window (any time inside) or fixed weekly start times (e.g. Fri 18:00). If left empty, global working hours apply.', 'ltl-bookings'); ?>
                                     </p>
 
                                     <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin: 10px 0 14px;">
                                         <label style="display:inline-flex;align-items:center;gap:6px;">
-                                            <input type="radio" name="availability_mode" value="window" <?php checked($availability_mode, 'window'); ?>>
+                                            <input type="radio" name="availability_mode" value="window" <?php checked($availability_mode, 'window'); ?> aria-describedby="ltlb-availability-mode-desc" title="<?php echo esc_attr__('Window (any start time within)', 'ltl-bookings'); ?>">
                                             <?php echo esc_html__('Window (any start time within)', 'ltl-bookings'); ?>
                                         </label>
                                         <label style="display:inline-flex;align-items:center;gap:6px;">
-                                            <input type="radio" name="availability_mode" value="fixed" <?php checked($availability_mode, 'fixed'); ?>>
+                                            <input type="radio" name="availability_mode" value="fixed" <?php checked($availability_mode, 'fixed'); ?> aria-describedby="ltlb-availability-mode-desc" title="<?php echo esc_attr__('Fixed weekly start times', 'ltl-bookings'); ?>">
                                             <?php echo esc_html__('Fixed weekly start times', 'ltl-bookings'); ?>
                                         </label>
                                     </div>
@@ -384,7 +384,7 @@ class LTLB_Admin_ServicesPage {
                         <?php endif; ?>
 
                         <p class="submit">
-                            <?php submit_button( esc_html__('Save Service', 'ltl-bookings'), 'primary', 'ltlb_service_save', false ); ?>
+                            <?php submit_button( esc_html__('Save', 'ltl-bookings'), 'primary', 'ltlb_service_save', false ); ?>
                             <a href="<?php echo admin_url('admin.php?page=ltlb_services'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>

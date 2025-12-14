@@ -2,14 +2,29 @@
  * LazyBookings Admin Styles
  */
 
+/* Spacing tokens (scoped to plugin admin UI) */
+.ltlb-admin {
+    --lazy-space-2: 2px;
+    --lazy-space-4: 4px;
+    --lazy-space-5: 5px;
+    --lazy-space-6: 6px;
+    --lazy-space-8: 8px;
+    --lazy-space-10: 10px;
+    --lazy-space-12: 12px;
+    --lazy-space-14: 14px;
+    --lazy-space-15: 15px;
+    --lazy-space-16: 16px;
+    --lazy-space-20: 20px;
+}
+
 /* Shared Admin Header */
 .ltlb-admin .ltlb-admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    padding: 14px 16px;
-    margin: 0 0 16px 0;
+    gap: var(--lazy-space-16, 16px);
+    padding: var(--lazy-space-14, 14px) var(--lazy-space-16, 16px);
+    margin: 0 0 var(--lazy-space-16, 16px) 0;
     background: var(--lazy-panel-bg, #fff);
     border: 1px solid var(--lazy-border-color, #ccd0d4);
     border-radius: var(--lazy-border-radius, 6px);
@@ -19,7 +34,7 @@
 .ltlb-admin .ltlb-admin-header__brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--lazy-space-10, 10px);
     min-width: 220px;
 }
 
@@ -46,7 +61,7 @@
 .ltlb-admin .ltlb-admin-header__nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--lazy-space-6, 6px);
     justify-content: flex-end;
 }
 
@@ -58,14 +73,14 @@
 /* Design page: Frontend/Backend sub-tabs */
 .ltlb-admin .ltlb-design-subnav {
     display: flex;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
     flex-wrap: wrap;
 }
 
 .ltlb-admin .ltlb-admin-lang {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
 }
 
 .ltlb-admin .ltlb-admin-lang select {
@@ -97,18 +112,29 @@
     color: var(--lazy-button-text, #fff);
 }
 
+@supports selector(:focus-visible) {
+    .ltlb-admin a:focus-visible,
+    .ltlb-admin button:focus-visible,
+    .ltlb-admin input:focus-visible,
+    .ltlb-admin select:focus-visible,
+    .ltlb-admin textarea:focus-visible {
+        outline: 2px solid var(--lazy-primary, #2271b1);
+        outline-offset: 2px;
+    }
+}
+
 @media (max-width: 1024px) {
     .ltlb-admin .ltlb-admin-header { flex-direction: column; align-items: flex-start; }
     .ltlb-admin .ltlb-admin-header__nav { width: 100%; justify-content: flex-start; }
 }
 
 .ltlb-card {
-    background: #fff;
+    background: var(--lazy-panel-bg, #fff);
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    padding: 20px;
+    padding: var(--lazy-space-20, 20px);
     border-radius: 4px;
-    margin-top: 20px;
+    margin-top: var(--lazy-space-20, 20px);
 }
 
 /* Premium admin look (exclude dashboard) */
@@ -127,18 +153,18 @@
 }
 
 .ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: var(--lazy-space-12, 12px);
+    padding-bottom: var(--lazy-space-12, 12px);
 }
 
 .ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table td {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: var(--lazy-space-12, 12px);
+    padding-bottom: var(--lazy-space-12, 12px);
 }
 
 .ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .submit {
     display: flex;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
     flex-wrap: wrap;
     align-items: center;
 }
@@ -149,9 +175,34 @@
     overflow: hidden;
 }
 
+/* Table hover/focus states */
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr > td {
+    transition: background var(--lazy-transition-duration, 200ms) ease;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr:hover > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr:hover > td,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr:focus-within > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .widefat tbody tr:focus-within > td {
+    background: rgba(0,0,0,0.02);
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr > td {
+    transition: background var(--lazy-transition-duration, 200ms) ease;
+}
+
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr:hover > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr:hover > td,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr:focus-within > th,
+.ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-card .form-table tbody tr:focus-within > td {
+    background: rgba(0,0,0,0.02);
+}
+
 .ltlb-card .description {
     display: block;
-    margin-top: 6px;
+    margin-top: var(--lazy-space-6, 6px);
     color: #646970;
 }
 
@@ -159,7 +210,7 @@
 .ltlb-admin .ltlb-calendar-layout {
     display: grid;
     grid-template-columns: 1fr 360px;
-    gap: 16px;
+    gap: var(--lazy-space-16, 16px);
     align-items: start;
 }
 
@@ -169,7 +220,7 @@
     border: 1px solid var(--lazy-border-color, #ccd0d4);
     border-radius: var(--lazy-border-radius, 8px);
     box-shadow: var(--lazy-shadow-container, 0 1px 3px rgba(0,0,0,0.04));
-    padding: 10px;
+    padding: var(--lazy-space-10, 10px);
 }
 
 @media (max-width: 1200px) {
@@ -187,16 +238,16 @@
 .ltlb-admin .ltlb-calendar-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
     align-items: center;
-    margin: 0 0 10px 0;
+    margin: 0 0 var(--lazy-space-10, 10px) 0;
 }
 
 .ltlb-admin .ltlb-calendar-legend__item {
     display: inline-flex;
     align-items: center;
     height: 24px;
-    padding: 0 10px;
+    padding: 0 var(--lazy-space-10, 10px);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
@@ -204,7 +255,7 @@
 }
 
 .ltlb-admin .ltlb-calendar-details-empty {
-    padding: 12px 12px;
+    padding: var(--lazy-space-12, 12px) var(--lazy-space-12, 12px);
     border: 1px dashed rgba(0,0,0,0.12);
     border-radius: 6px;
     background: rgba(0,0,0,0.02);
@@ -218,19 +269,19 @@
 }
 
 .ltlb-admin .ltlb-calendar-details__header {
-    margin-bottom: 10px;
+    margin-bottom: var(--lazy-space-10, 10px);
 }
 
 .ltlb-admin .ltlb-calendar-details__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--lazy-space-12, 12px);
+    margin-bottom: var(--lazy-space-12, 12px);
 }
 
 .ltlb-admin .ltlb-calendar-details__actions {
     display: flex;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
     flex-wrap: wrap;
 }
 
@@ -301,7 +352,7 @@
 }
 
 .ltlb-admin .fc .fc-timegrid-col-frame {
-    background: #fff;
+    background: var(--lazy-panel-bg, #fff);
 }
 
 .ltlb-admin .fc .fc-timegrid-now-indicator-line {
@@ -336,12 +387,12 @@
 .ltlb-admin .fc .fc-timegrid-event,
 .ltlb-admin .fc .fc-daygrid-event {
     border-radius: 6px;
-    padding: 2px 4px;
+    padding: var(--lazy-space-2, 2px) var(--lazy-space-4, 4px);
 }
 
 .ltlb-admin .fc .ltlb-fc-event {
     display: flex;
-    gap: 6px;
+    gap: var(--lazy-space-6, 6px);
     align-items: flex-start;
 }
 
@@ -378,20 +429,20 @@
 
 .ltlb-admin .ltlb-calendar-details__section-title {
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: var(--lazy-space-8, 8px);
 }
 
 .ltlb-admin .ltlb-inline {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--lazy-space-8, 8px);
     flex-wrap: wrap;
 }
 
 .ltlb-admin .ltlb-form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 10px;
+    gap: var(--lazy-space-10, 10px);
 }
 
 .ltlb-admin .ltlb-form-grid input,
@@ -405,32 +456,32 @@
 .ltlb-card h2 {
     margin-top: 0;
     border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
+    padding-bottom: var(--lazy-space-15, 15px);
     font-size: 1.3em;
 }
 
 .ltlb-card h3 {
     margin-top: 0;
     border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
+    padding-bottom: var(--lazy-space-15, 15px);
     font-size: 1.1em;
 }
 
 /* Form table adjustments inside cards */
 .ltlb-card .form-table th {
-    padding: 15px 10px 15px 0;
+    padding: var(--lazy-space-15, 15px) var(--lazy-space-10, 10px) var(--lazy-space-15, 15px) 0;
 }
 
 .ltlb-card .form-table td {
-    padding: 15px 10px;
+    padding: var(--lazy-space-15, 15px) var(--lazy-space-10, 10px);
 }
 
 /* Design Page Styles */
 .ltlb-design-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 20px;
+    gap: var(--lazy-space-20, 20px);
+    margin-top: var(--lazy-space-20, 20px);
     align-items: flex-start;
 }
 .ltlb-design-settings {
@@ -445,12 +496,12 @@
     align-self: flex-start;
 }
 .ltlb-preview-card {
-    background: #fff;
+    background: var(--lazy-panel-bg, #fff);
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    padding: 20px;
+    padding: var(--lazy-space-20, 20px);
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: var(--lazy-space-20, 20px);
 }
 
 .ltlb-admin:not(.ltlb-admin--dashboard) .ltlb-preview-card {
@@ -474,11 +525,11 @@
     height: 40px;
     cursor: pointer;
     border: 1px solid #ddd;
-    padding: 2px;
+    padding: var(--lazy-space-2, 2px);
     border-radius: 4px;
 }
-.ltlb-design-settings .form-table th { padding: 15px 10px 15px 0; width: 200px; }
-.ltlb-design-settings .form-table td { padding: 15px 10px; }
+.ltlb-design-settings .form-table th { padding: var(--lazy-space-15, 15px) var(--lazy-space-10, 10px) var(--lazy-space-15, 15px) 0; width: 200px; }
+.ltlb-design-settings .form-table td { padding: var(--lazy-space-15, 15px) var(--lazy-space-10, 10px); }
 
 .ltlb-design-settings .form-table {
     table-layout: fixed;
@@ -501,7 +552,7 @@
 /* Status Badges */
 .ltlb-status-badge {
     display: inline-block;
-    padding: 2px 8px;
+    padding: var(--lazy-space-2, 2px) var(--lazy-space-8, 8px);
     border-radius: 12px;
     font-size: 11px;
     font-weight: 600;
@@ -509,21 +560,21 @@
 }
 .status-active, .status-confirmed { background: #d1fae5; color: #065f46; }
 .status-inactive { background: #f3f4f6; color: #374151; }
-.status-pending { background: #fef3c7; color: #92400e; }
+.status-pending { background: #fef3c7; color: #92400e; outline: 1px solid rgba(0,0,0,0.12); outline-offset: -1px; }
 .status-canceled { background: #fee2e2; color: #991b1b; }
 
 /* Dashboard Stats */
 .ltlb-dashboard-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    gap: var(--lazy-space-20, 20px);
+    margin-top: var(--lazy-space-20, 20px);
 }
 .ltlb-stat-card {
-    background: #fff;
+    background: var(--lazy-panel-bg, #fff);
     border: 1px solid #ccd0d4;
     border-radius: 4px;
-    padding: 20px;
+    padding: var(--lazy-space-20, 20px);
     display: flex;
     align-items: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -532,7 +583,7 @@
     font-size: 32px;
     width: 32px;
     height: 32px;
-    margin-right: 15px;
+    margin-right: var(--lazy-space-15, 15px);
     color: #2271b1;
 }
 .ltlb-stat-content {
@@ -556,15 +607,15 @@
 .ltlb-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: var(--lazy-space-15, 15px);
     align-items: flex-end;
-    margin-bottom: 20px;
+    margin-bottom: var(--lazy-space-20, 20px);
 }
 
 .ltlb-filter-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--lazy-space-5, 5px);
 }
 .ltlb-filter-group label {
     font-weight: 600;
@@ -573,8 +624,44 @@
 }
 .ltlb-filter-actions {
     display: flex;
-    gap: 10px;
+    gap: var(--lazy-space-10, 10px);
     margin-left: auto;
     align-items: flex-end;
     flex-grow: 1;
+}
+
+@media print {
+    /* Hide interactive UI and navigation */
+    .ltlb-admin .ltlb-admin-header,
+    .ltlb-admin .ltlb-admin-header__nav,
+    .ltlb-admin .ltlb-admin-header__actions,
+    .ltlb-admin .page-title-action,
+    .ltlb-admin .submit,
+    .ltlb-admin .ltlb-filters,
+    .ltlb-admin button,
+    .ltlb-admin .button,
+    .ltlb-admin .button-primary,
+    .ltlb-admin .button-secondary {
+        display: none !important;
+    }
+
+    /* Print-friendly panels */
+    .ltlb-admin .ltlb-card,
+    .ltlb-admin .ltlb-preview-card,
+    .ltlb-admin .ltlb-stat-card,
+    .ltlb-admin #ltlb-admin-calendar {
+        box-shadow: none !important;
+    }
+
+    .ltlb-admin .ltlb-calendar-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ltlb-admin .ltlb-calendar-layout__side {
+        position: static;
+    }
+
+    .ltlb-admin .widefat {
+        page-break-inside: avoid;
+    }
 }

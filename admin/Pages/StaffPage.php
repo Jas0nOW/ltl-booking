@@ -18,7 +18,7 @@ class LTLB_Admin_StaffPage {
         // Handle saving weekly hours
         if ( isset( $_POST['ltlb_staff_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_staff_save_action', 'ltlb_staff_nonce' ) ) {
-                wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
             }
 
             $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
@@ -49,7 +49,7 @@ class LTLB_Admin_StaffPage {
         // Handle creating exception
         if ( isset($_POST['ltlb_exception_create']) ) {
             if ( ! check_admin_referer( 'ltlb_exception_create_action', 'ltlb_exception_nonce' ) ) {
-                wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
             }
 
             $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
@@ -63,7 +63,7 @@ class LTLB_Admin_StaffPage {
             if ( $res ) {
                 LTLB_Notices::add( __( 'Exception created.', 'ltl-bookings' ), 'success' );
             } else {
-                LTLB_Notices::add( __( 'Failed to create exception.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'Could not create exception.', 'ltl-bookings' ), 'error' );
             }
 
             wp_safe_redirect( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($user_id)) );
@@ -73,7 +73,7 @@ class LTLB_Admin_StaffPage {
         // Handle deleting exception
         if ( isset($_POST['ltlb_exception_delete']) ) {
             if ( ! check_admin_referer( 'ltlb_exception_delete_action', 'ltlb_exception_delete_nonce' ) ) {
-                wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
             }
             $id = isset($_POST['exception_id']) ? intval($_POST['exception_id']) : 0;
             $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
@@ -81,7 +81,7 @@ class LTLB_Admin_StaffPage {
             if ( $ok ) {
                 LTLB_Notices::add( __( 'Exception deleted.', 'ltl-bookings' ), 'success' );
             } else {
-                LTLB_Notices::add( __( 'Failed to delete exception.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'Could not delete exception.', 'ltl-bookings' ), 'error' );
             }
             wp_safe_redirect( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($user_id)) );
             exit;
@@ -99,20 +99,29 @@ class LTLB_Admin_StaffPage {
             <hr class="wp-header-end">
 
             <div class="ltlb-card" style="margin-top:20px;">
-                <h2><?php echo esc_html__('Staff Members', 'ltl-bookings'); ?></h2>
+                <h2><?php echo esc_html__('Team', 'ltl-bookings'); ?></h2>
                 <table class="wp-list-table widefat striped">
                     <thead>
                         <tr><th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Email', 'ltl-bookings'); ?></th><th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th></tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $staff_users ) ) : ?>
-                            <tr><td colspan="3"><?php echo esc_html__('No staff users found.', 'ltl-bookings'); ?></td></tr>
+                            <tr>
+                                <td colspan="3">
+                                    <p style="margin: 0 0 8px;">
+                                        <?php echo esc_html__( 'No staff members found.', 'ltl-bookings' ); ?>
+                                    </p>
+                                    <a class="button button-primary" href="<?php echo esc_attr( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>">
+                                        <?php echo esc_html__( 'Add staff member', 'ltl-bookings' ); ?>
+                                    </a>
+                                </td>
+                            </tr>
                         <?php else : ?>
                             <?php foreach ( $staff_users as $u ) : ?>
                                 <tr>
                                     <td><?php echo esc_html( $u->display_name ); ?></td>
                                     <td><?php echo esc_html( $u->user_email ); ?></td>
-                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-small"><?php echo esc_html__('Edit hours', 'ltl-bookings'); ?></a></td>
+                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-small"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -129,7 +138,7 @@ class LTLB_Admin_StaffPage {
                 ?>
                 
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__('Edit Working Hours', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_staff_save_action', 'ltlb_staff_nonce' ); ?>
                         <input type="hidden" name="ltlb_staff_save" value="1" />
@@ -158,7 +167,7 @@ class LTLB_Admin_StaffPage {
                         </table>
 
                         <p class="submit">
-                            <?php submit_button( esc_html__('Save Working Hours', 'ltl-bookings'), 'primary', 'submit', false ); ?>
+                            <?php submit_button( esc_html__('Save working hours', 'ltl-bookings'), 'primary', 'submit', false ); ?>
                         </p>
                     </form>
                 </div>
@@ -204,7 +213,7 @@ class LTLB_Admin_StaffPage {
                 </div>
 
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h3><?php echo esc_html__('Create Exception', 'ltl-bookings'); ?></h3>
+                    <h3><?php echo esc_html__('Create exception', 'ltl-bookings'); ?></h3>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_exception_create_action', 'ltlb_exception_nonce' ); ?>
                         <input type="hidden" name="ltlb_exception_create" value="1">
@@ -217,11 +226,11 @@ class LTLB_Admin_StaffPage {
                                 </tr>
                                 <tr>
                                     <th><?php echo esc_html__('Off day', 'ltl-bookings'); ?></th>
-                                    <td><label><input type="checkbox" name="is_off_day" value="1"> <?php echo esc_html__('Yes, staff is off', 'ltl-bookings'); ?></label></td>
+                                    <td><label><input type="checkbox" name="is_off_day" value="1"> <?php echo esc_html__('Yes, off', 'ltl-bookings'); ?></label></td>
                                 </tr>
                                 <tr>
                                     <th><?php echo esc_html__('Start time', 'ltl-bookings'); ?></th>
-                                    <td><input type="time" name="start_time"> <span class="description"><?php echo esc_html__('Leave empty if off day', 'ltl-bookings'); ?></span></td>
+                                    <td><input type="time" name="start_time"> <span class="description"><?php echo esc_html__('Leave empty if off', 'ltl-bookings'); ?></span></td>
                                 </tr>
                                 <tr>
                                     <th><?php echo esc_html__('End time', 'ltl-bookings'); ?></th>
@@ -234,7 +243,7 @@ class LTLB_Admin_StaffPage {
                             </tbody>
                         </table>
                         <p class="submit">
-                            <?php submit_button( esc_html__('Create Exception', 'ltl-bookings'), 'secondary', 'submit', false ); ?>
+                            <?php submit_button( esc_html__('Create exception', 'ltl-bookings'), 'secondary', 'submit', false ); ?>
                         </p>
                     </form>
                 </div>

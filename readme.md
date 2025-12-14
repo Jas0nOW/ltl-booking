@@ -112,7 +112,7 @@ For issues and feature requests, please check the documentation first.
 
 ### 0.3.0 (Phase 4 - Hotel Mode)
 - Hotel mode UI scaffold (check-in/check-out/guests inputs + price preview)
-- Hotel engine code present for date-range availability (not exposed as a dedicated public hotel REST endpoint)
+- Hotel engine code present for date-range availability (public hotel REST endpoint added in later versions)
 - Resource capacity management
 
 ### 0.2.0 (Phase 2-3)

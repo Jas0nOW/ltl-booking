@@ -82,7 +82,7 @@ class LTLB_Admin_AppointmentsPage {
                         <div class="alignleft actions">
                             <input type="date" name="date_from" value="<?php echo esc_attr($filter_date_from); ?>" placeholder="<?php echo esc_attr__('From Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter from date', 'ltl-bookings'); ?>">
                             <input type="date" name="date_to" value="<?php echo esc_attr($filter_date_to); ?>" placeholder="<?php echo esc_attr__('To Date', 'ltl-bookings'); ?>" aria-label="<?php echo esc_attr__('Filter to date', 'ltl-bookings'); ?>">
-                            
+
                             <select name="status" aria-label="<?php echo esc_attr__('Filter by status', 'ltl-bookings'); ?>">
                                 <option value=""><?php echo esc_html__('All Statuses', 'ltl-bookings'); ?></option>
                                 <option value="confirmed" <?php selected($filter_status, 'confirmed'); ?>><?php echo esc_html__('Confirmed', 'ltl-bookings'); ?></option>
@@ -106,7 +106,21 @@ class LTLB_Admin_AppointmentsPage {
                 </form>
 
                 <?php if ( empty($appointments) ) : ?>
-                    <p><?php echo esc_html__('No appointments found.', 'ltl-bookings'); ?></p>
+                    <p>
+                        <?php
+                        if ( ! empty( $args ) ) {
+                            echo esc_html__( 'No appointments found for the current filters.', 'ltl-bookings' );
+                        } else {
+                            echo esc_html__( 'No appointments yet. Once someone books via the booking form, they will appear here.', 'ltl-bookings' );
+                        }
+                        ?>
+                    </p>
+                    <p>
+                        <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_calendar') ); ?>" class="button button-primary"><?php echo esc_html__( 'View Calendar', 'ltl-bookings' ); ?></a>
+                        <?php if ( ! empty( $args ) ) : ?>
+                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_appointments') ); ?>" class="button"><?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?></a>
+                        <?php endif; ?>
+                    </p>
                 <?php else : ?>
                     <table class="widefat striped">
                         <thead>

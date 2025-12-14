@@ -5,13 +5,13 @@ class LTLB_DiagnosticsPage {
 
     public function render(): void {
         if (!current_user_can('manage_options')) {
-            wp_die( esc_html__( 'Insufficient permissions', 'ltl-bookings' ) );
+            wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
         }
 
         // Handle migration action
         if (isset($_POST['ltlb_run_migrations']) && check_admin_referer('ltlb_run_migrations', 'ltlb_migrations_nonce')) {
             LTLB_DB_Migrator::migrate();
-            echo '<div class="notice notice-success"><p>' . esc_html__( 'Migrations executed successfully.', 'ltl-bookings' ) . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . esc_html__( 'Migrations ran successfully.', 'ltl-bookings' ) . '</p></div>';
         }
 
         global $wpdb;
@@ -48,7 +48,7 @@ class LTLB_DiagnosticsPage {
                             <td><?php echo esc_html($wpdb->prefix); ?></td>
                         </tr>
                         <tr>
-                            <td><strong><?php echo esc_html__( 'Template Mode', 'ltl-bookings' ); ?></strong></td>
+                            <td><strong><?php echo esc_html__( 'Booking Mode', 'ltl-bookings' ); ?></strong></td>
                             <td><?php echo esc_html($template_mode); ?></td>
                         </tr>
                         <tr>
@@ -93,9 +93,9 @@ class LTLB_DiagnosticsPage {
                     <?php wp_nonce_field('ltlb_run_migrations', 'ltlb_migrations_nonce'); ?>
                     <p>
                         <button type="submit" name="ltlb_run_migrations" class="button button-secondary">
-                            <?php echo esc_html__( 'Run Migrations', 'ltl-bookings' ); ?>
+                            <?php echo esc_html__( 'Run migrations', 'ltl-bookings' ); ?>
                         </button>
-                        <span class="description"><?php echo esc_html__( 'Re-runs database migrations. Safe to execute multiple times (uses dbDelta).', 'ltl-bookings' ); ?></span>
+                        <span class="description"><?php echo esc_html__( 'Runs database migrations again. Can be run multiple times (uses dbDelta).', 'ltl-bookings' ); ?></span>
                     </p>
                 </form>
                 
@@ -103,7 +103,7 @@ class LTLB_DiagnosticsPage {
                     <?php wp_nonce_field('ltlb_run_doctor', 'ltlb_doctor_nonce'); ?>
                     <p>
                         <button type="submit" name="ltlb_run_doctor" class="button button-secondary">
-                            <?php echo esc_html__( 'Run Doctor', 'ltl-bookings' ); ?>
+                            <?php echo esc_html__( 'Run system check', 'ltl-bookings' ); ?>
                         </button>
                         <span class="description"><?php echo esc_html__( 'Run system diagnostics (read-only).', 'ltl-bookings' ); ?></span>
                     </p>
@@ -130,13 +130,13 @@ class LTLB_DiagnosticsPage {
                 ];
 
                 echo '<table class="widefat striped" style="border:none; box-shadow:none;">';
-                echo '<thead><tr><th>' . esc_html__( 'Table Name', 'ltl-bookings' ) . '</th><th>' . esc_html__( 'Status', 'ltl-bookings' ) . '</th><th>' . esc_html__( 'Rows', 'ltl-bookings' ) . '</th></tr></thead>';
+                echo '<thead><tr><th>' . esc_html__( 'Table name', 'ltl-bookings' ) . '</th><th>' . esc_html__( 'Status', 'ltl-bookings' ) . '</th><th>' . esc_html__( 'Rows', 'ltl-bookings' ) . '</th></tr></thead>';
                 echo '<tbody>';
 
                 foreach ($tables as $table) {
                     $full_table = $wpdb->prefix . $table;
                     $exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $full_table));
-                    $status = $exists ? __( '✓ Exists', 'ltl-bookings' ) : __( '✗ Missing', 'ltl-bookings' );
+                    $status = $exists ? __( '✓ Present', 'ltl-bookings' ) : __( '✗ Missing', 'ltl-bookings' );
                     $row_count = $exists ? $wpdb->get_var("SELECT COUNT(*) FROM `{$full_table}`") : __( 'N/A', 'ltl-bookings' );
 
                     echo '<tr>';
@@ -158,7 +158,7 @@ class LTLB_DiagnosticsPage {
         $settings = get_option('lazy_settings', []);
         
         echo '<div class="notice notice-info" style="margin-top: 20px; padding: 15px; background: #f0f0f1; border-left: 4px solid #72aee6;">';
-        echo '<h3 style="margin-top: 0;">' . esc_html__( 'System Diagnostics Results', 'ltl-bookings' ) . '</h3>';
+        echo '<h3 style="margin-top: 0;">' . esc_html__( 'System Check Results', 'ltl-bookings' ) . '</h3>';
         
         // Version info
         $plugin_version = defined('LTLB_VERSION') ? LTLB_VERSION : __( 'unknown', 'ltl-bookings' );
@@ -167,14 +167,14 @@ class LTLB_DiagnosticsPage {
         echo '<p><strong>' . esc_html__( 'DB Version:', 'ltl-bookings' ) . '</strong> ' . esc_html($db_version) . '</p>';
         
         if (version_compare($plugin_version, $db_version, '>')) {
-            echo '<p style="color: #d63638;"><strong>' . esc_html__( '⚠ DB version is behind plugin version.', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Consider running migrations.', 'ltl-bookings' ) . '</p>';
+            echo '<p style="color: #d63638;"><strong>' . esc_html__( '⚠ DB version is behind plugin version.', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Please run migrations.', 'ltl-bookings' ) . '</p>';
         } elseif (version_compare($plugin_version, $db_version, '=')) {
-            echo '<p style="color: #00a32a;"><strong>' . esc_html__( '✓ DB version matches plugin version', 'ltl-bookings' ) . '</strong></p>';
+            echo '<p style="color: #00a32a;"><strong>' . esc_html__( '✓ DB version matches plugin version.', 'ltl-bookings' ) . '</strong></p>';
         }
         
         // Template mode
         $template_mode = $settings['template_mode'] ?? 'service';
-        echo '<p><strong>' . esc_html__( 'Template Mode:', 'ltl-bookings' ) . '</strong> ' . esc_html($template_mode) . '</p>';
+        echo '<p><strong>' . esc_html__( 'Booking Mode:', 'ltl-bookings' ) . '</strong> ' . esc_html($template_mode) . '</p>';
         
         // Lock support
         $lock_test = $wpdb->get_var("SELECT GET_LOCK('ltlb_test_lock', 0)");
@@ -190,7 +190,7 @@ class LTLB_DiagnosticsPage {
         $from_email = $settings['mail_from_email'] ?? get_option('admin_email');
         $from_name = $settings['mail_from_name'] ?? get_bloginfo('name');
         $reply_to = $settings['mail_reply_to'] ?? '';
-        echo '<p><strong>' . esc_html__( 'Email From:', 'ltl-bookings' ) . '</strong> ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
+        echo '<p><strong>' . esc_html__( 'Email from:', 'ltl-bookings' ) . '</strong> ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
         if (!empty($reply_to)) {
             echo '<p><strong>' . esc_html__( 'Reply-To:', 'ltl-bookings' ) . '</strong> ' . esc_html($reply_to) . '</p>';
         }

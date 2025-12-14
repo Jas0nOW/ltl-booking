@@ -4,12 +4,12 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_SettingsPage {
 
 	public function render(): void {
-		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'No access', 'ltl-bookings' ) );
 
 		// Handle test email
 		if ( isset( $_POST['ltlb_send_test_email'] ) ) {
 			if ( ! check_admin_referer( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ) ) {
-				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
 			}
 			$test_email = sanitize_email( $_POST['test_email_address'] ?? '' );
 			if ( ! empty( $test_email ) && is_email( $test_email ) ) {
@@ -35,12 +35,12 @@ class LTLB_Admin_SettingsPage {
 
 				$sent = wp_mail( $test_email, $subject, $body, $headers );
 				if ( $sent ) {
-					LTLB_Notices::add( __( 'Test email sent successfully to ', 'ltl-bookings' ) . $test_email, 'success' );
+                    LTLB_Notices::add( __( 'Test email sent successfully to ', 'ltl-bookings' ) . $test_email, 'success' );
 				} else {
-					LTLB_Notices::add( __( 'Failed to send test email.', 'ltl-bookings' ), 'error' );
+                    LTLB_Notices::add( __( 'Failed to send test email.', 'ltl-bookings' ), 'error' );
 				}
 			} else {
-				LTLB_Notices::add( __( 'Invalid email address.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'Invalid email address.', 'ltl-bookings' ), 'error' );
 			}
 			wp_safe_redirect( admin_url( 'admin.php?page=ltlb_settings' ) );
 			exit;
@@ -48,8 +48,8 @@ class LTLB_Admin_SettingsPage {
 
 		// Handle save
 			if ( isset( $_POST['ltlb_settings_save'] ) ) {
-			if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
-				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+            if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
+                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
 			}
 				// Collect and sanitize into a single lazy_settings option
 				$settings = get_option( 'lazy_settings', [] );
@@ -80,7 +80,7 @@ class LTLB_Admin_SettingsPage {
 				update_option( 'lazy_settings', $settings );
 
 			$redirect = admin_url( 'admin.php?page=ltlb_settings' );
-			LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
+            LTLB_Notices::add( __( 'Settings saved.', 'ltl-bookings' ), 'success' );
 			wp_safe_redirect( $redirect );
 			exit;
 		}
@@ -111,7 +111,7 @@ class LTLB_Admin_SettingsPage {
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_settings'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Settings', 'ltl-bookings'); ?></h1>
+            <h1 class="wp-heading-inline"><?php echo esc_html__( 'Settings', 'ltl-bookings' ); ?></h1>
             <hr class="wp-header-end">
 
 			<form method="post">
@@ -120,35 +120,35 @@ class LTLB_Admin_SettingsPage {
 
 				<!-- Save Button at Top -->
 				<p class="submit" style="margin-top:10px; padding-top:0;">
-					<?php submit_button( esc_html__('Save Settings', 'ltl-bookings'), 'primary', 'ltlb_settings_save_top', false ); ?>
+                    <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save_top', false ); ?>
 				</p>
 
                 <!-- GENERAL SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__('General Settings', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__( 'General Settings', 'ltl-bookings' ); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label for="working_hours_start"><?php echo esc_html__('Working Hours', 'ltl-bookings'); ?></label></th>
+                                <th><label for="working_hours_start"><?php echo esc_html__( 'Working Hours', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <label><?php echo esc_html__('Start:', 'ltl-bookings'); ?> <input name="working_hours_start" id="working_hours_start" type="number" value="<?php echo esc_attr( $start ); ?>" class="small-text" min="0" max="23"></label>
+                                    <label><?php echo esc_html__( 'Start:', 'ltl-bookings' ); ?> <input name="working_hours_start" id="working_hours_start" type="number" value="<?php echo esc_attr( $start ); ?>" class="small-text" min="0" max="23"></label>
                                     &nbsp;&nbsp;
-                                    <label><?php echo esc_html__('End:', 'ltl-bookings'); ?> <input name="working_hours_end" id="working_hours_end" type="number" value="<?php echo esc_attr( $end ); ?>" class="small-text" min="0" max="23"></label>
-                                    <p class="description"><?php echo esc_html__('Global working hours (0-23). Individual staff hours can override this.', 'ltl-bookings'); ?></p>
+                                    <label><?php echo esc_html__( 'End:', 'ltl-bookings' ); ?> <input name="working_hours_end" id="working_hours_end" type="number" value="<?php echo esc_attr( $end ); ?>" class="small-text" min="0" max="23"></label>
+                                    <p class="description"><?php echo esc_html__( 'Global working hours (0-23). Individual staff hours can override this.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="slot_size_minutes"><?php echo esc_html__('Slot Size (minutes)', 'ltl-bookings'); ?></label></th>
+                                <th><label for="slot_size_minutes"><?php echo esc_html__( 'Slot Size (minutes)', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <input name="slot_size_minutes" id="slot_size_minutes" type="number" value="<?php echo esc_attr( $slot ); ?>" class="small-text" min="5" step="5">
-                                    <p class="description"><?php echo esc_html__('Base time slot interval for calendar generation.', 'ltl-bookings'); ?></p>
+                                    <input name="slot_size_minutes" id="slot_size_minutes" type="number" value="<?php echo esc_attr( $slot ); ?>" class="small-text" min="5" step="5" aria-describedby="ltlb-slot-size-desc" title="<?php echo esc_attr__( 'Controls the time grid used to compute available times.', 'ltl-bookings' ); ?>">
+                                    <p class="description" id="ltlb-slot-size-desc"><?php echo esc_html__( 'Base time slot interval for calendar generation.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="ltlb_timezone"><?php echo esc_html__('Timezone', 'ltl-bookings'); ?></label></th>
+                                <th><label for="ltlb_timezone"><?php echo esc_html__( 'Timezone', 'ltl-bookings' ); ?></label></th>
                                 <td>
                                     <select name="ltlb_timezone" id="ltlb_timezone">
-                                        <option value=""><?php echo esc_html__('WordPress Default', 'ltl-bookings'); ?></option>
+                                        <option value=""><?php echo esc_html__( 'WordPress Default', 'ltl-bookings' ); ?></option>
                                         <?php foreach ( $timezones as $tzid ): ?>
                                             <option value="<?php echo esc_attr( $tzid ); ?>" <?php selected( $tz, $tzid ); ?>><?php echo esc_html( $tzid ); ?></option>
                                         <?php endforeach; ?>
@@ -156,29 +156,30 @@ class LTLB_Admin_SettingsPage {
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="default_status"><?php echo esc_html__('Default Booking Status', 'ltl-bookings'); ?></label></th>
+                                <th><label for="default_status"><?php echo esc_html__( 'Default Booking Status', 'ltl-bookings' ); ?></label></th>
                                 <td>
                                     <select name="default_status" id="default_status">
-                                        <option value="pending" <?php selected( $default_status, 'pending' ); ?>><?php echo esc_html__('Pending', 'ltl-bookings'); ?></option>
-                                        <option value="confirmed" <?php selected( $default_status, 'confirmed' ); ?>><?php echo esc_html__('Confirmed', 'ltl-bookings'); ?></option>
+                                        <option value="pending" <?php selected( $default_status, 'pending' ); ?>><?php echo esc_html__( 'Pending', 'ltl-bookings' ); ?></option>
+                                        <option value="confirmed" <?php selected( $default_status, 'confirmed' ); ?>><?php echo esc_html__( 'Confirmed', 'ltl-bookings' ); ?></option>
                                     </select>
-                                    <p class="description"><?php echo esc_html__('Status assigned to new bookings.', 'ltl-bookings'); ?></p>
+                                    <p class="description"><?php echo esc_html__( 'Status assigned to new bookings.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="pending_blocks"><?php echo esc_html__('Pending Blocks Availability', 'ltl-bookings'); ?></label></th>
+                                <th><label for="pending_blocks"><?php echo esc_html__( 'Pending Blocks Availability', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <label><input name="pending_blocks" id="pending_blocks" type="checkbox" value="1" <?php checked( $pending_blocks ); ?>> <?php echo esc_html__('Yes, pending bookings block the time slot', 'ltl-bookings'); ?></label>
+                                    <label><input name="pending_blocks" id="pending_blocks" type="checkbox" value="1" <?php checked( $pending_blocks ); ?> aria-describedby="ltlb-pending-blocks-desc" title="<?php echo esc_attr__( 'If enabled, pending bookings are treated as occupied.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Yes, pending bookings block the time slot', 'ltl-bookings' ); ?></label>
+                                    <p class="description" id="ltlb-pending-blocks-desc"><?php echo esc_html__( 'Useful to avoid double bookings before you confirm.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="template_mode"><?php echo esc_html__('Booking Template Mode', 'ltl-bookings'); ?></label></th>
+                                <th><label for="template_mode"><?php echo esc_html__( 'Booking Template Mode', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <select name="template_mode" id="template_mode">
-                                        <option value="service" <?php selected( $template_mode, 'service' ); ?>><?php echo esc_html__('Service Booking (Appointments)', 'ltl-bookings'); ?></option>
-                                        <option value="hotel" <?php selected( $template_mode, 'hotel' ); ?>><?php echo esc_html__('Hotel Booking (Check-in/Check-out)', 'ltl-bookings'); ?></option>
+                                    <select name="template_mode" id="template_mode" aria-describedby="ltlb-template-mode-desc" title="<?php echo esc_attr__( 'Controls whether services (appointments) or hotel date ranges are bookable.', 'ltl-bookings' ); ?>">
+                                        <option value="service" <?php selected( $template_mode, 'service' ); ?>><?php echo esc_html__( 'Service Booking (Appointments)', 'ltl-bookings' ); ?></option>
+                                        <option value="hotel" <?php selected( $template_mode, 'hotel' ); ?>><?php echo esc_html__( 'Hotel Booking (Check-in/Check-out)', 'ltl-bookings' ); ?></option>
                                     </select>
-                                    <p class="description"><?php echo esc_html__('Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings'); ?></p>
+                                    <p class="description" id="ltlb-template-mode-desc"><?php echo esc_html__( 'Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                         </tbody>
@@ -187,38 +188,39 @@ class LTLB_Admin_SettingsPage {
 
                 <!-- EMAIL SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__('Email Settings', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__( 'Email Settings', 'ltl-bookings' ); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label><?php echo esc_html__('Sender Info', 'ltl-bookings'); ?></label></th>
+                                <th><label><?php echo esc_html__( 'Sender Info', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <p><label><?php echo esc_html__('From Name:', 'ltl-bookings'); ?> <input name="ltlb_email_from_name" type="text" value="<?php echo esc_attr( $mail_from_name ); ?>" class="regular-text"></label></p>
-                                    <p><label><?php echo esc_html__('From Email:', 'ltl-bookings'); ?> <input name="ltlb_email_from_address" type="email" value="<?php echo esc_attr( $mail_from_email ); ?>" class="regular-text"></label></p>
-                                    <p><label><?php echo esc_html__('Reply-To:', 'ltl-bookings'); ?> <input name="ltlb_email_reply_to" type="email" value="<?php echo esc_attr( $mail_reply_to ); ?>" class="regular-text"></label></p>
+                                    <p><label><?php echo esc_html__( 'From Name:', 'ltl-bookings' ); ?> <input name="ltlb_email_from_name" type="text" value="<?php echo esc_attr( $mail_from_name ); ?>" class="regular-text"></label></p>
+                                    <p><label><?php echo esc_html__( 'From Email:', 'ltl-bookings' ); ?> <input name="ltlb_email_from_address" type="email" value="<?php echo esc_attr( $mail_from_email ); ?>" class="regular-text"></label></p>
+                                    <p><label><?php echo esc_html__( 'Reply-To:', 'ltl-bookings' ); ?> <input name="ltlb_email_reply_to" type="email" value="<?php echo esc_attr( $mail_reply_to ); ?>" class="regular-text"></label></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label><?php echo esc_html__('Admin Notifications', 'ltl-bookings'); ?></label></th>
+                                <th><label><?php echo esc_html__( 'Admin Notifications', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <label><input name="ltlb_email_send_admin" type="checkbox" value="1" <?php checked( $mail_admin_enabled ); ?>> <?php echo esc_html__('Send email to admin on new booking', 'ltl-bookings'); ?></label>
+                                    <label><input name="ltlb_email_send_admin" type="checkbox" value="1" <?php checked( $mail_admin_enabled ); ?>> <?php echo esc_html__( 'Send email to admin on new booking', 'ltl-bookings' ); ?></label>
                                     <br><br>
-                                    <label><?php echo esc_html__('Subject:', 'ltl-bookings'); ?> <input name="ltlb_email_admin_subject" type="text" value="<?php echo esc_attr( $mail_admin_subject ); ?>" class="large-text"></label>
+                                    <label><?php echo esc_html__( 'Subject:', 'ltl-bookings' ); ?> <input name="ltlb_email_admin_subject" type="text" value="<?php echo esc_attr( $mail_admin_subject ); ?>" class="large-text"></label>
                                     <br>
-                                    <label><?php echo esc_html__('Body:', 'ltl-bookings'); ?><br>
-                                    <textarea name="ltlb_email_admin_body" class="large-text" rows="5"><?php echo esc_textarea( $mail_admin_template ); ?></textarea></label>
-                                    <p class="description"><?php echo esc_html__('Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}', 'ltl-bookings'); ?></p>
+                                    <label><?php echo esc_html__( 'Body:', 'ltl-bookings' ); ?><br>
+                                    <textarea name="ltlb_email_admin_body" class="large-text" rows="5" aria-describedby="ltlb-email-admin-placeholders" title="<?php echo esc_attr__( 'You can use tags that will be replaced automatically.', 'ltl-bookings' ); ?>"><?php echo esc_textarea( $mail_admin_template ); ?></textarea></label>
+                                    <p class="description" id="ltlb-email-admin-placeholders"><?php echo esc_html__( 'Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><label><?php echo esc_html__('Customer Notifications', 'ltl-bookings'); ?></label></th>
+                                <th><label><?php echo esc_html__( 'Customer Notifications', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( $mail_customer_enabled ); ?>> <?php echo esc_html__('Send confirmation email to customer', 'ltl-bookings'); ?></label>
+                                    <label><input name="ltlb_email_send_customer" type="checkbox" value="1" <?php checked( $mail_customer_enabled ); ?>> <?php echo esc_html__( 'Send confirmation email to customer', 'ltl-bookings' ); ?></label>
                                     <br><br>
-                                    <label><?php echo esc_html__('Subject:', 'ltl-bookings'); ?> <input name="ltlb_email_customer_subject" type="text" value="<?php echo esc_attr( $mail_customer_subject ); ?>" class="large-text"></label>
+                                    <label><?php echo esc_html__( 'Subject:', 'ltl-bookings' ); ?> <input name="ltlb_email_customer_subject" type="text" value="<?php echo esc_attr( $mail_customer_subject ); ?>" class="large-text"></label>
                                     <br>
-                                    <label><?php echo esc_html__('Body:', 'ltl-bookings'); ?><br>
-                                    <textarea name="ltlb_email_customer_body" class="large-text" rows="5"><?php echo esc_textarea( $mail_customer_template ); ?></textarea></label>
+                                    <label><?php echo esc_html__( 'Body:', 'ltl-bookings' ); ?><br>
+                                    <textarea name="ltlb_email_customer_body" class="large-text" rows="5" aria-describedby="ltlb-email-customer-placeholders" title="<?php echo esc_attr__( 'You can use tags that will be replaced automatically.', 'ltl-bookings' ); ?>"><?php echo esc_textarea( $mail_customer_template ); ?></textarea></label>
+                                    <p class="description" id="ltlb-email-customer-placeholders"><?php echo esc_html__( 'Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                         </tbody>
@@ -227,22 +229,26 @@ class LTLB_Admin_SettingsPage {
 
                 <!-- LOGGING SETTINGS -->
                 <div class="ltlb-card" style="margin-top:20px;">
-                    <h2><?php echo esc_html__('Logging', 'ltl-bookings'); ?></h2>
+                    <h2><?php echo esc_html__( 'Logging', 'ltl-bookings' ); ?></h2>
                     <table class="form-table">
                         <tbody>
                             <tr>
-                                <th><label for="logging_enabled"><?php echo esc_html__('Enable Logging', 'ltl-bookings'); ?></label></th>
-                                <td><label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?>> <?php echo esc_html__('Log errors and events to file', 'ltl-bookings'); ?></label></td>
+                                <th><label for="logging_enabled"><?php echo esc_html__( 'Enable Logging', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?> aria-describedby="ltlb-logging-enabled-desc" title="<?php echo esc_attr__( 'Writes events/errors to a log file for diagnostics.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Log errors and events to file', 'ltl-bookings' ); ?></label>
+                                    <p class="description" id="ltlb-logging-enabled-desc"><?php echo esc_html__( 'Enable this only when needed (e.g., for debugging).', 'ltl-bookings' ); ?></p>
+                                </td>
                             </tr>
                             <tr>
-                                <th><label for="log_level"><?php echo esc_html__('Log Level', 'ltl-bookings'); ?></label></th>
+                                <th><label for="log_level"><?php echo esc_html__( 'Log Level', 'ltl-bookings' ); ?></label></th>
                                 <td>
-                                    <select name="log_level" id="log_level">
-                                        <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__('Error', 'ltl-bookings'); ?></option>
-                                        <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__('Warning', 'ltl-bookings'); ?></option>
+                                    <select name="log_level" id="log_level" aria-describedby="ltlb-log-level-desc" title="<?php echo esc_attr__( 'Controls how verbose logging is.', 'ltl-bookings' ); ?>">
+                                        <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__( 'Error', 'ltl-bookings' ); ?></option>
+                                        <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__( 'Warning', 'ltl-bookings' ); ?></option>
                                         <option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info', 'ltl-bookings'); ?></option>
                                         <option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug', 'ltl-bookings'); ?></option>
                                     </select>
+                                    <p class="description" id="ltlb-log-level-desc"><?php echo esc_html__( 'For normal use, "Error" is usually enough. Use "Debug" only temporarily.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                         </tbody>
@@ -250,21 +256,21 @@ class LTLB_Admin_SettingsPage {
                 </div>
 
 				<p class="submit" style="margin-top:20px;">
-                    <?php submit_button( esc_html__('Save Settings', 'ltl-bookings'), 'primary', 'ltlb_settings_save', false ); ?>
+                    <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
                 </p>
 			</form>
 
             <!-- TEST EMAIL -->
             <div class="ltlb-card" style="margin-top:20px;">
-                <h3><?php echo esc_html__('Test Email Configuration', 'ltl-bookings'); ?></h3>
+                <h3><?php echo esc_html__( 'Test Email Configuration', 'ltl-bookings' ); ?></h3>
                 <form method="post" style="display:flex; gap:10px; align-items:flex-end;">
                     <?php wp_nonce_field( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ); ?>
                     <input type="hidden" name="ltlb_send_test_email" value="1">
                     <div>
-                        <label for="test_email_address" style="display:block;margin-bottom:5px;"><?php echo esc_html__('Send test email to:', 'ltl-bookings'); ?></label>
+                        <label for="test_email_address" style="display:block;margin-bottom:5px;"><?php echo esc_html__( 'Send test email to:', 'ltl-bookings' ); ?></label>
                         <input type="email" name="test_email_address" id="test_email_address" class="regular-text" value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" required>
                     </div>
-                    <?php submit_button( esc_html__('Send Test Email', 'ltl-bookings'), 'secondary', 'submit', false ); ?>
+                    <?php submit_button( esc_html__( 'Send Test Email', 'ltl-bookings' ), 'secondary', 'submit', false ); ?>
                 </form>
             </div>
 		</div>

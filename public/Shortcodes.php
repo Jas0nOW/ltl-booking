@@ -72,13 +72,13 @@ class LTLB_Shortcodes {
 		$date = sanitize_text_field( (string) $request->get_param( 'date' ) );
 
 		if ( $service_id <= 0 || empty( $date ) ) {
-			return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Erforderliche Parameter fehlen.' ], 400 );
 		}
 		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid date' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültiges Datum' ], 400 );
 		}
 		if ( class_exists( 'LTLB_Time' ) && ! LTLB_Time::create_datetime_immutable( $date ) ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid date' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültiges Datum' ], 400 );
 		}
 
 		// Block booking in the past.
@@ -104,20 +104,20 @@ class LTLB_Shortcodes {
 		$service_id = intval( $request->get_param( 'service_id' ) );
 		$start = sanitize_text_field( (string) $request->get_param( 'start' ) ); // ISO or YYYY-MM-DD HH:MM:SS
 		if ( ! $service_id || ! $start ) {
-			return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Erforderliche Parameter fehlen.' ], 400 );
 		}
 
 		$service_repo = new LTLB_ServiceRepository();
 		$service = $service_repo->get_by_id( $service_id );
-		if ( ! $service ) return new WP_REST_Response( [ 'error' => 'Invalid service' ], 400 );
+		if ( ! $service ) return new WP_REST_Response( [ 'error' => 'Ungültige Leistung' ], 400 );
 
 		$duration = intval( $service['duration_min'] ?? 60 );
 		$start_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::create_datetime_immutable( $start ) : null;
-		if ( ! $start_dt ) return new WP_REST_Response( [ 'error' => 'Invalid start' ], 400 );
+		if ( ! $start_dt ) return new WP_REST_Response( [ 'error' => 'Ungültige Startzeit' ], 400 );
 		if ( class_exists( 'LTLB_Time' ) ) {
 			$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
 			if ( $start_dt < $now ) {
-				return new WP_REST_Response( [ 'error' => 'Start time is in the past' ], 400 );
+				return new WP_REST_Response( [ 'error' => 'Startzeit liegt in der Vergangenheit' ], 400 );
 			}
 		}
 		$end_dt = $start_dt->modify('+' . $duration . ' minutes');
@@ -163,26 +163,26 @@ class LTLB_Shortcodes {
 		if ( $guests < 1 ) $guests = 1;
 
 		if ( $service_id <= 0 || empty( $checkin ) || empty( $checkout ) ) {
-			return new WP_REST_Response( [ 'error' => 'Missing required parameters.' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Erforderliche Parameter fehlen.' ], 400 );
 		}
 		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $checkin ) || ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $checkout ) ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid dates' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültige Daten' ], 400 );
 		}
 		if ( class_exists( 'LTLB_Time' ) ) {
 			if ( ! LTLB_Time::create_datetime_immutable( $checkin ) || ! LTLB_Time::create_datetime_immutable( $checkout ) ) {
-				return new WP_REST_Response( [ 'error' => 'Invalid dates' ], 400 );
+				return new WP_REST_Response( [ 'error' => 'Ungültige Daten' ], 400 );
 			}
 		}
 
 		$service_repo = new LTLB_ServiceRepository();
 		$service = $service_repo->get_by_id( $service_id );
 		if ( ! $service ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid service' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültige Leistung' ], 400 );
 		}
 
 		$nights = class_exists( 'LTLB_Time' ) ? LTLB_Time::nights_between( $checkin, $checkout ) : 0;
 		if ( $nights < 1 ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid dates: checkout must be after checkin' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültige Daten: Abreise muss nach Anreise sein' ], 400 );
 		}
 
 		$ls = get_option( 'lazy_settings', [] );
@@ -193,12 +193,12 @@ class LTLB_Shortcodes {
 		$checkin_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::combine_date_time( $checkin, $checkin_time ) : null;
 		$checkout_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::combine_date_time( $checkout, $checkout_time ) : null;
 		if ( ! $checkin_dt || ! $checkout_dt ) {
-			return new WP_REST_Response( [ 'error' => 'Invalid date/time format' ], 400 );
+			return new WP_REST_Response( [ 'error' => 'Ungültiges Datums-/Zeitformat' ], 400 );
 		}
 		if ( class_exists( 'LTLB_Time' ) ) {
 			$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
 			if ( $checkin_dt < $now ) {
-				return new WP_REST_Response( [ 'error' => 'Check-in is in the past' ], 400 );
+				return new WP_REST_Response( [ 'error' => 'Anreise liegt in der Vergangenheit' ], 400 );
 			}
 		}
 
@@ -397,29 +397,33 @@ class LTLB_Shortcodes {
 	if ( file_exists( $template_path ) ) {
 		include $template_path;
 	} else {
-		echo '<div class="ltlb-booking"><div class="ltlb-error">Template file not found: ' . esc_html( $template_path ) . '</div></div>';
+		echo '<div class="ltlb-booking"><div class="ltlb-error">' . esc_html__( 'Template-Datei nicht gefunden:', 'ltl-bookings' ) . ' ' . esc_html( $template_path ) . '</div></div>';
 	}
 	return ob_get_clean();
 	}
 	private static function handle_submission(): string {
-		if ( ! self::_validate_submission() ) {
-			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Unable to process your request. Please try again.', 'ltl-bookings' ) . '</div></div>';
+		$valid = self::_validate_submission();
+		if ( is_wp_error( $valid ) ) {
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Fehler:', 'ltl-bookings' ) . '</strong> ' . esc_html( $valid->get_error_message() ) . '</div></div>';
+		}
+		if ( $valid !== true ) {
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Fehler:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Deine Anfrage konnte nicht verarbeitet werden. Bitte versuche es erneut.', 'ltl-bookings' ) . '</div></div>';
 		}
 
 		$is_hotel_mode = self::_is_hotel_mode();
 		$data = $is_hotel_mode ? self::_get_sanitized_hotel_submission_data() : self::_get_sanitized_submission_data();
 
 		if ( is_wp_error( $data ) ) {
-			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html( $data->get_error_message() ) . '</div></div>';
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Fehler:', 'ltl-bookings' ) . '</strong> ' . esc_html( $data->get_error_message() ) . '</div></div>';
 		}
 
 		$appointment_id = $is_hotel_mode ? self::_create_hotel_booking_from_submission( $data ) : self::_create_appointment_from_submission( $data );
 
 		if ( is_wp_error( $appointment_id ) ) {
-			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html( $appointment_id->get_error_message() ) . '</div></div>';
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Fehler:', 'ltl-bookings' ) . '</strong> ' . esc_html( $appointment_id->get_error_message() ) . '</div></div>';
 		}
 
-		return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Success!', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Your booking has been received and is pending confirmation. Check your email for details.', 'ltl-bookings' ) . '</div></div>';
+		return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Erfolgreich!', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Deine Buchung ist eingegangen und wartet auf Bestätigung. Bitte prüfe deine E-Mails für Details.', 'ltl-bookings' ) . '</div></div>';
 	}
 
 	private static function _is_hotel_mode(): bool {
@@ -431,9 +435,10 @@ class LTLB_Shortcodes {
 		return ( ( $settings['template_mode'] ?? 'service' ) === 'hotel' );
 	}
 
-	private static function _validate_submission(): bool {
-		if ( ! isset( $_POST['ltlb_book_nonce'] ) || ! wp_verify_nonce( $_POST['ltlb_book_nonce'], 'ltlb_book_action' ) ) {
-			return false;
+	private static function _validate_submission(): bool|WP_Error {
+		$nonce = isset( $_POST['ltlb_book_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ltlb_book_nonce'] ) ) : '';
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'ltlb_book_action' ) ) {
+			return new WP_Error( 'ltlb_nonce_failed', __( 'Sicherheitsprüfung fehlgeschlagen. Bitte lade die Seite neu und versuche es erneut.', 'ltl-bookings' ) );
 		}
 
 		// Honeypot: if filled, silently fail
@@ -453,7 +458,7 @@ class LTLB_Shortcodes {
 			$key = 'ltlb_rate_' . md5( $ip );
 			$count = (int) get_transient( $key );
 			if ( $count >= 10 ) {
-				return false;
+				return new WP_Error( 'ltlb_rate_limited', __( 'Zu viele Anfragen. Bitte versuche es in ein paar Minuten erneut.', 'ltl-bookings' ) );
 			}
 			set_transient( $key, $count + 1, 10 * MINUTE_IN_SECONDS );
 		}
@@ -472,7 +477,7 @@ class LTLB_Shortcodes {
 		$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
 
 		if ( empty( $service_id ) || empty( $date ) || empty( $time ) || empty( $email ) ) {
-			return new WP_Error( 'missing_fields', __( 'Please fill the required fields.', 'ltl-bookings' ) );
+			return new WP_Error( 'missing_fields', __( 'Bitte fülle die Pflichtfelder aus.', 'ltl-bookings' ) );
 		}
 
 		$resource_id = isset( $_POST['resource_id'] ) ? intval( $_POST['resource_id'] ) : 0;
@@ -492,14 +497,14 @@ class LTLB_Shortcodes {
 		$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
 
 		if ( empty( $service_id ) || empty( $checkin ) || empty( $checkout ) || empty( $email ) || empty( $guests ) ) {
-			return new WP_Error( 'missing_fields', __( 'Please fill the required fields.', 'ltl-bookings' ) );
+			return new WP_Error( 'missing_fields', __( 'Bitte fülle die Pflichtfelder aus.', 'ltl-bookings' ) );
 		}
 		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $checkin ) || ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $checkout ) ) {
-			return new WP_Error( 'invalid_date', __( 'Invalid dates.', 'ltl-bookings' ) );
+			return new WP_Error( 'invalid_date', __( 'Ungültige Daten.', 'ltl-bookings' ) );
 		}
 		if ( class_exists( 'LTLB_Time' ) ) {
 			if ( ! LTLB_Time::create_datetime_immutable( $checkin ) || ! LTLB_Time::create_datetime_immutable( $checkout ) ) {
-				return new WP_Error( 'invalid_date', __( 'Invalid dates.', 'ltl-bookings' ) );
+				return new WP_Error( 'invalid_date', __( 'Ungültige Daten.', 'ltl-bookings' ) );
 			}
 		}
 
@@ -509,165 +514,11 @@ class LTLB_Shortcodes {
 	}
 
 	private static function _create_hotel_booking_from_submission( array $data ): int|WP_Error {
-		// Block booking in the past (server-side)
-		$ls = get_option( 'lazy_settings', [] );
-		if ( ! is_array( $ls ) ) $ls = [];
-		$checkin_time = $ls['hotel_checkin_time'] ?? '15:00';
-		$checkin_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::combine_date_time( (string) $data['checkin'], (string) $checkin_time ) : null;
-		if ( $checkin_dt && class_exists( 'LTLB_Time' ) ) {
-			$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
-			if ( $checkin_dt < $now ) {
-				return new WP_Error( 'past_date', __( 'Selected check-in is in the past.', 'ltl-bookings' ) );
-			}
-		}
-
-		$lock_key = LTLB_LockManager::build_hotel_lock_key( intval( $data['service_id'] ), (string) $data['checkin'], (string) $data['checkout'], ! empty( $data['resource_id'] ) ? intval( $data['resource_id'] ) : null );
-
-		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $data ) {
-			$engine = new HotelEngine();
-			return $engine->create_hotel_booking( $data );
-		} );
-
-		if ( $result === false ) {
-			LTLB_Logger::warn( 'Hotel booking lock timeout', [ 'service_id' => intval( $data['service_id'] ), 'checkin' => (string) $data['checkin'], 'checkout' => (string) $data['checkout'] ] );
-			return new WP_Error( 'lock_timeout', __( 'Another booking is in progress. Please try again.', 'ltl-bookings' ) );
-		}
-		if ( is_wp_error( $result ) ) {
-			LTLB_Logger::error( 'Hotel booking creation failed: ' . $result->get_error_message(), [ 'service_id' => intval( $data['service_id'] ), 'email' => (string) $data['email' ] ] );
-			return $result;
-		}
-
-		$appt_id = intval( $result );
-		LTLB_Logger::info( 'Hotel booking created successfully', [ 'appointment_id' => $appt_id, 'service_id' => intval( $data['service_id'] ), 'email' => (string) $data['email' ] ] );
-		return $appt_id;
+		return LTLB_BookingService::create_hotel_booking_from_submission( $data );
 	}
 
 	private static function _create_appointment_from_submission( array $data ): int|WP_Error {
-		// compute start_at and end_at based on service duration
-		$service_repo = new LTLB_ServiceRepository();
-		$service = $service_repo->get_by_id( $data['service_id'] );
-		$duration = $service && isset( $service['duration_min'] ) ? intval( $service['duration_min'] ) : 60;
-
-		$start_dt = LTLB_Time::parse_date_and_time( $data['date'], $data['time'] );
-		if ( ! $start_dt ) {
-			return new WP_Error( 'invalid_date', __( 'Invalid date/time.', 'ltl-bookings' ) );
-		}
-		$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
-		if ( $start_dt < $now ) {
-			return new WP_Error( 'past_date', __( 'Selected time is in the past.', 'ltl-bookings' ) );
-		}
-
-		$end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
-
-		$start_at_sql = LTLB_Time::format_wp_datetime( $start_dt );
-		$end_at_sql = LTLB_Time::format_wp_datetime( $end_dt );
-
-		$appointment_repo = new LTLB_AppointmentRepository();
-		$customer_repo = new LTLB_CustomerRepository();
-
-		// Build lock key for this booking slot
-		$lock_key = LTLB_LockManager::build_service_lock_key( $data['service_id'], $start_at_sql, $data['resource_id'] ?: null );
-
-		// Execute booking within lock protection
-		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $appointment_repo, $customer_repo, $data, $start_at_sql, $end_at_sql, $start_dt, $end_dt ) {
-			// conflict check
-			if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $data['service_id'], null ) ) {
-				return new WP_Error( 'conflict', __( 'Selected slot is already booked.', 'ltl-bookings' ) );
-			}
-
-			// upsert customer
-			$customer_id = $customer_repo->upsert_by_email( [
-				'email'      => $data['email'],
-				'first_name' => $data['first'],
-				'last_name'  => $data['last'],
-				'phone'      => $data['phone'],
-			] );
-
-			if ( ! $customer_id ) {
-				return new WP_Error( 'customer_error', __( 'Unable to save customer.', 'ltl-bookings' ) );
-			}
-
-			$ls = get_option( 'lazy_settings', [] );
-			if ( ! is_array( $ls ) ) {
-				$ls = [];
-			}
-			$default_status = $ls['default_status'] ?? 'pending';
-			$appt_id = $appointment_repo->create( [
-				'service_id'  => $data['service_id'],
-				'customer_id' => $customer_id,
-				'start_at'    => $start_dt,
-				'end_at'      => $end_dt,
-				'status'      => $default_status,
-				'timezone'    => LTLB_Time::get_site_timezone_string(),
-			] );
-
-			return $appt_id;
-		});
-
-		// Check if lock acquisition failed
-		if ( $result === false ) {
-			LTLB_Logger::warn( 'Booking lock timeout', [ 'service_id' => $data['service_id'], 'start' => $start_at_sql ] );
-			return new WP_Error( 'lock_timeout', __( 'Another booking is in progress. Please try again.', 'ltl-bookings' ) );
-		}
-
-		// Check if appointment creation returned error
-		if ( is_wp_error( $result ) ) {
-			LTLB_Logger::error( 'Booking creation failed: ' . $result->get_error_message(), [ 'service_id' => $data['service_id'], 'email' => $data['email'] ] );
-			return $result;
-		}
-
-		$appt_id = $result;
-		LTLB_Logger::info( 'Booking created successfully', [ 'appointment_id' => $appt_id, 'service_id' => $data['service_id'], 'email' => $data['email'] ] );
-
-		// If user selected a resource, try to persist it (validate capacity and mapping), otherwise select automatically
-		$service_resources_repo = new LTLB_ServiceResourcesRepository();
-		$resource_repo = new LTLB_ResourceRepository();
-		$appt_resource_repo = new LTLB_AppointmentResourcesRepository();
-
-		$allowed_resources = $service_resources_repo->get_resources_for_service( intval( $data['service_id'] ) );
-		if ( empty( $allowed_resources ) ) {
-			$all = $resource_repo->get_all();
-			$allowed_resources = array_map(function($r){ return intval($r['id']); }, $all );
-		}
-
-		$ls = get_option( 'lazy_settings', [] );
-		if ( ! is_array( $ls ) ) $ls = [];
-		$include_pending = ! empty( $ls['pending_blocks'] );
-		$blocked_counts = $appt_resource_repo->get_blocked_resources( $start_at_sql, $end_at_sql, $include_pending );
-
-		$chosen = isset($data['resource_id']) ? intval($data['resource_id']) : 0;
-		if ( $chosen > 0 && in_array($chosen, $allowed_resources, true) ) {
-			// validate capacity
-			$res = $resource_repo->get_by_id( $chosen );
-			if ( $res ) {
-				$cap = intval($res['capacity'] ?? 1);
-				$used = isset($blocked_counts[$chosen]) ? intval($blocked_counts[$chosen]) : 0;
-				if ( $used < $cap ) {
-					$appt_resource_repo->set_resource_for_appointment( intval($appt_id), $chosen );
-				}
-			}
-		} else {
-			foreach ( $allowed_resources as $rid ) {
-				$res = $resource_repo->get_by_id( intval($rid) );
-				if ( ! $res ) continue;
-				$capacity = intval( $res['capacity'] ?? 1 );
-				$used = isset( $blocked_counts[ $rid ] ) ? intval( $blocked_counts[ $rid ] ) : 0;
-				if ( $used < $capacity ) {
-					$appt_resource_repo->set_resource_for_appointment( intval($appt_id), intval($rid) );
-					break;
-				}
-			}
-		}
-
-		// fetch fresh service and customer data and send notifications
-		$service = $service_repo->get_by_id( $data['service_id'] );
-		$customer = $customer_repo->get_by_id( $customer_id );
-
-		if ( class_exists( 'LTLB_Mailer' ) ) {
-			LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
-		}
-
-		return $appt_id;
+		return LTLB_BookingService::create_service_booking_from_submission( $data );
 	}
 }
 

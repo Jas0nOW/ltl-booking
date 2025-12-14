@@ -51,6 +51,25 @@
     return fallback || key;
   }
 
+  function announce(message, opts) {
+    var msg = fmt(message).trim();
+    if (!msg) return;
+
+    var isAssertive = opts && opts.assertive;
+    var el = qs(isAssertive ? 'ltlb-admin-calendar-live-assertive' : 'ltlb-admin-calendar-live');
+    if (!el) return;
+
+    // Clear then set text to ensure screen readers announce repeated messages.
+    try {
+      el.textContent = '';
+      window.setTimeout(function () {
+        el.textContent = msg;
+      }, 25);
+    } catch (e) {
+      // ignore
+    }
+  }
+
   function cssEscape(v) {
     var s = String(v);
     if (window.CSS && CSS.escape) return CSS.escape(s);
@@ -259,7 +278,12 @@
           var title = fmt(info.event.title);
           var start = info.event.start ? info.event.start.toLocaleString() : '';
           var end = info.event.end ? info.event.end.toLocaleString() : '';
-          info.el.setAttribute('title', [title, st ? ('Status: ' + st) : '', start ? ('Start: ' + start) : '', end ? ('End: ' + end) : ''].filter(Boolean).join('\n'));
+          info.el.setAttribute('title', [
+            title,
+            st ? (t('status', 'Status') + ': ' + st) : '',
+            start ? (t('start', 'Start') + ': ' + start) : '',
+            end ? (t('end', 'End') + ': ' + end) : ''
+          ].filter(Boolean).join('\n'));
         } catch (e) {
           // ignore
         }
@@ -276,15 +300,20 @@
         }).then(function (res) {
           if (!res || !res.ok) {
             info.revert();
+      announce(t('could_not_update_appointment', 'Could not update appointment.'), { assertive: true });
 			alert(t('could_not_update_appointment', 'Could not update appointment.'));
+            return;
           }
+          announce(t('appointment_updated', 'Appointment updated.'), { assertive: false });
         }).catch(function (err) {
           info.revert();
 		  if (err && err.data && err.data.error === 'conflict') {
-      alert(t('conflict_message', 'This time slot conflicts with an existing booking.'));
+    announce(t('conflict_message', 'This time slot conflicts with an existing booking.'), { assertive: true });
+		alert(t('conflict_message', 'This time slot conflicts with an existing booking.'));
 			return;
 		  }
-      alert(t('could_not_update_appointment', 'Could not update appointment.'));
+      announce(t('could_not_update_appointment', 'Could not update appointment.'), { assertive: true });
+		  alert(t('could_not_update_appointment', 'Could not update appointment.'));
         });
       },
       eventResize: function (info) {
@@ -299,20 +328,27 @@
         }).then(function (res) {
           if (!res || !res.ok) {
             info.revert();
+      announce(t('could_not_update_appointment', 'Could not update appointment.'), { assertive: true });
 			alert(t('could_not_update_appointment', 'Could not update appointment.'));
+            return;
           }
+          announce(t('appointment_updated', 'Appointment updated.'), { assertive: false });
         }).catch(function (err) {
           info.revert();
 		  if (err && err.data && err.data.error === 'conflict') {
-      alert(t('conflict_message', 'This time slot conflicts with an existing booking.'));
+    announce(t('conflict_message', 'This time slot conflicts with an existing booking.'), { assertive: true });
+		alert(t('conflict_message', 'This time slot conflicts with an existing booking.'));
 			return;
 		  }
-      alert(t('could_not_update_appointment', 'Could not update appointment.'));
+      announce(t('could_not_update_appointment', 'Could not update appointment.'), { assertive: true });
+		  alert(t('could_not_update_appointment', 'Could not update appointment.'));
         });
       },
       eventClick: function (info) {
         var ev = info.event;
         clearDetails();
+
+        announce(t('loading_details', 'Loading appointment details…'), { assertive: false });
 
         if (selectedEl) {
           selectedEl.classList.remove('ltlb-fc-selected');
@@ -326,7 +362,9 @@
           path: restPath('/ltlb/v1/admin/appointments/' + encodeURIComponent(ev.id))
         }).then(function (payload) {
           renderDetails(ev, payload);
+		  announce(t('details_loaded', 'Appointment details loaded.'), { assertive: false });
         }).catch(function () {
+          announce(t('could_not_load_details', 'Could not load appointment details.'), { assertive: true });
           setDetails('<div class="notice notice-error"><p>' + esc(t('could_not_load_details', 'Could not load appointment details.')) + '</p></div>');
         });
       }
@@ -351,10 +389,13 @@
           if (res && res.ok) {
             clearDetails();
             calendar.refetchEvents();
+    			announce(t('appointment_deleted', 'Appointment deleted.'), { assertive: false });
           } else {
+    			announce(t('could_not_delete_appointment', 'Could not delete appointment.'), { assertive: true });
             alert(t('could_not_delete_appointment', 'Could not delete appointment.'));
           }
         }).catch(function () {
+    		  announce(t('could_not_delete_appointment', 'Could not delete appointment.'), { assertive: true });
           alert(t('could_not_delete_appointment', 'Could not delete appointment.'));
         });
         return;
@@ -374,10 +415,13 @@
         }).then(function (res) {
           if (res && res.ok) {
             calendar.refetchEvents();
+    			announce(t('status_updated', 'Status updated.'), { assertive: false });
           } else {
+    			announce(t('could_not_update_status', 'Could not update status.'), { assertive: true });
             alert(t('could_not_update_status', 'Could not update status.'));
           }
         }).catch(function () {
+    		  announce(t('could_not_update_status', 'Could not update status.'), { assertive: true });
           alert(t('could_not_update_status', 'Could not update status.'));
         });
         return;
@@ -407,11 +451,14 @@
         }).then(function (res) {
           if (res && res.ok) {
             calendar.refetchEvents();
+    			announce(t('customer_saved', 'Customer saved.'), { assertive: false });
             alert(t('customer_saved', 'Customer saved.'));
           } else {
+    			announce(t('could_not_save_customer', 'Could not save customer.'), { assertive: true });
             alert(t('could_not_save_customer', 'Could not save customer.'));
           }
         }).catch(function () {
+    		  announce(t('could_not_save_customer', 'Could not save customer.'), { assertive: true });
           alert(t('could_not_save_customer', 'Could not save customer.'));
         });
         return;

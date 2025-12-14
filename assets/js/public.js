@@ -67,6 +67,39 @@
         var activeStep = null;
         var lastStep = null;
 
+        var $stepIndicator = $root.find('[data-ltlb-step-indicator]');
+        var $stepCount = $stepIndicator.find('[data-ltlb-step-count]');
+        var $stepTitle = $stepIndicator.find('[data-ltlb-step-title]');
+
+        function getPanelTitle($panel) {
+            if (!$panel || !$panel.length) return '';
+            var $legend = $panel.find('legend').first();
+            if (!$legend.length) return '';
+            // Remove required marker etc.
+            var $clone = $legend.clone();
+            $clone.find('.ltlb-required').remove();
+            return String($clone.text() || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function syncStepIndicator() {
+            if (!$stepIndicator.length) return;
+            if (!activeStep) return;
+
+            var $active = $panels.filter('[data-ltlb-step="' + activeStep + '"]');
+            if (!$active.length) return;
+
+            var $visible = getVisiblePanels();
+            var idx = $visible.index($active);
+            if (idx < 0) idx = 0;
+
+            var current = idx + 1;
+            var total = $visible.length || 1;
+            var title = getPanelTitle($active);
+
+            $stepCount.text('Schritt ' + current + ' von ' + total);
+            $stepTitle.text(title ? '— ' + title : '');
+        }
+
         function getVisiblePanels() {
             return $panels.filter(function() {
                 return $(this).css('display') !== 'none';
@@ -117,6 +150,7 @@
             }
 
             $target.addClass('is-active');
+            syncStepIndicator();
             setTimeout(setStepperHeight, 0);
         }
 
@@ -229,9 +263,10 @@
                     var totalCents = priceCents * nights;
                     var pricePerNight = (priceCents / 100).toFixed(2);
                     var total = (totalCents / 100).toFixed(2);
+                    var nightLabel = (nights === 1) ? 'Nacht' : 'Nächte';
 
                     $priceAmount.text('€' + total);
-                    $priceBreakdown.text(nights + ' night' + (nights !== 1 ? 's' : '') + ' × €' + pricePerNight);
+                    $priceBreakdown.text(nights + ' ' + nightLabel + ' × €' + pricePerNight);
                     $pricePreview.show();
                 } else {
                     $pricePreview.hide();
@@ -291,6 +326,169 @@
         var startMode = String($root.data('ltlb-start-mode') || 'wizard');
         var prefillServiceId = parseInt($root.data('ltlb-prefill-service') || 0, 10);
 
+        function getInlineMessageEl($anchor, kind) {
+            // kind: 'info' | 'error'
+            if (!$anchor || !$anchor.length) return null;
+            var $group = $anchor.closest('.ltlb-form-group');
+            if (!$group.length) return null;
+
+            var attr = kind === 'error' ? 'data-ltlb-ajax-error' : 'data-ltlb-ajax-info';
+            var cls = kind === 'error' ? 'ltlb-error' : 'ltlb-info';
+            var role = kind === 'error' ? 'alert' : 'status';
+            var $existing = $group.find('[' + attr + ']').first();
+            if ($existing.length) return $existing;
+
+            var $el = $('<div/>', {
+                'class': cls,
+                'role': role,
+                'aria-live': kind === 'error' ? 'assertive' : 'polite'
+            }).attr(attr, '1').hide();
+
+            $group.append($el);
+            return $el;
+        }
+
+        function clearInlineMessages($anchor) {
+            var $info = getInlineMessageEl($anchor, 'info');
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($info && $info.length) $info.hide().empty();
+            if ($err && $err.length) $err.hide().text('');
+        }
+
+        function showInlineInfo($anchor, text, withSpinner) {
+            var $info = getInlineMessageEl($anchor, 'info');
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($err && $err.length) $err.hide().text('');
+            if (!$info || !$info.length) return;
+
+            $info.empty();
+            if (withSpinner) {
+                $info.append($('<span/>', { 'class': 'ltlb-spinner', 'aria-hidden': 'true' }));
+            }
+            $info.append(document.createTextNode(String(text || '')));
+            $info.show();
+        }
+
+        function showInlineError($anchor, text) {
+            var $err = getInlineMessageEl($anchor, 'error');
+            var $info = getInlineMessageEl($anchor, 'info');
+            if ($info && $info.length) $info.hide().empty();
+            if (!$err || !$err.length) return;
+            $err.text(String(text || '')).show();
+        }
+
+        function clearInlineErrorOnly($anchor) {
+            if (!$anchor || !$anchor.length) return;
+            var $err = getInlineMessageEl($anchor, 'error');
+            if ($err && $err.length) {
+                $err.hide().text('');
+            }
+            $anchor.removeAttr('aria-invalid');
+        }
+
+        function focusField($field) {
+            if (!$field || !$field.length) return;
+            try {
+                $field.trigger('focus');
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        function showStepValidation(stepName) {
+            var firstInvalid = null;
+
+            if (stepName === 'service') {
+                clearInlineErrorOnly($serviceSelect);
+                var serviceId = parseInt($serviceSelect.val() || 0, 10);
+                if (!serviceId) {
+                    $serviceSelect.attr('aria-invalid', 'true');
+                    showInlineError($serviceSelect, 'Bitte wähle eine Leistung.');
+                    firstInvalid = $serviceSelect;
+                }
+            }
+
+            // Service-mode datetime
+            if (stepName === 'datetime' && $dateInput.length && $timeSelect.length) {
+                clearInlineErrorOnly($dateInput);
+                clearInlineErrorOnly($timeSelect);
+
+                var d = String($dateInput.val() || '');
+                var t = String($timeSelect.val() || '');
+
+                if (!d) {
+                    $dateInput.attr('aria-invalid', 'true');
+                    showInlineError($dateInput, 'Bitte wähle ein Datum.');
+                    firstInvalid = $dateInput;
+                } else if ($timeSelect.prop('disabled')) {
+                    // Slots still loading or unavailable
+                    showInlineInfo($timeSelect, 'Verfügbare Zeiten werden noch geladen…', true);
+                    firstInvalid = $timeSelect;
+                } else if (!t) {
+                    $timeSelect.attr('aria-invalid', 'true');
+                    showInlineError($timeSelect, 'Bitte wähle eine Uhrzeit.');
+                    firstInvalid = $timeSelect;
+                }
+            }
+
+            // Hotel-mode dates
+            if (stepName === 'datetime' && $checkinInput.length && $checkoutInput.length) {
+                clearInlineErrorOnly($checkinInput);
+                clearInlineErrorOnly($checkoutInput);
+
+                var ci = String($checkinInput.val() || '');
+                var co = String($checkoutInput.val() || '');
+
+                if (!ci) {
+                    $checkinInput.attr('aria-invalid', 'true');
+                    showInlineError($checkinInput, 'Bitte wähle ein Anreise-Datum.');
+                    firstInvalid = $checkinInput;
+                } else if (!co) {
+                    $checkoutInput.attr('aria-invalid', 'true');
+                    showInlineError($checkoutInput, 'Bitte wähle ein Abreise-Datum.');
+                    firstInvalid = $checkoutInput;
+                } else {
+                    var ciD = parseIsoDateLocal(ci);
+                    var coD = parseIsoDateLocal(co);
+                    if (ciD && ciD < startOfTodayLocal()) {
+                        $checkinInput.attr('aria-invalid', 'true');
+                        showInlineError($checkinInput, 'Das Datum darf nicht in der Vergangenheit liegen.');
+                        firstInvalid = $checkinInput;
+                    } else if (ciD && coD && coD <= ciD) {
+                        $checkoutInput.attr('aria-invalid', 'true');
+                        showInlineError($checkoutInput, 'Die Abreise muss nach der Anreise liegen.');
+                        firstInvalid = $checkoutInput;
+                    }
+                }
+            }
+
+            if (stepName === 'details') {
+                var $email = $root.find('#ltlb-email');
+                if ($email.length) {
+                    clearInlineErrorOnly($email);
+                    var emailVal = String($email.val() || '').trim();
+                    var el = $email.get(0);
+
+                    if (!emailVal) {
+                        $email.attr('aria-invalid', 'true');
+                        showInlineError($email, 'Bitte gib deine E-Mail-Adresse ein.');
+                        firstInvalid = $email;
+                    } else if (el && typeof el.checkValidity === 'function' && !el.checkValidity()) {
+                        $email.attr('aria-invalid', 'true');
+                        showInlineError($email, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+                        firstInvalid = $email;
+                    }
+                }
+            }
+
+            if (firstInvalid) {
+                focusField(firstInvalid);
+                setTimeout(setStepperHeight, 0);
+                return false;
+            }
+            return true;
+        }
+
         function resetTimeSelect(message) {
             if (!$timeSelect.length) return;
             $timeSelect.empty().append($('<option/>', { value: '', text: message }));
@@ -299,8 +497,9 @@
 
         function resetResourceStep() {
             if (!$resourceStep.length) return;
-            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+            $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
             $resourceStep.hide();
+            syncStepIndicator();
         }
 
         function loadHotelAvailability() {
@@ -314,14 +513,19 @@
             if (!guests || guests < 1) guests = 1;
 
             resetResourceStep();
+            clearInlineMessages($resourceSelect);
 
             if (!serviceId || !checkin || !checkout || !restRoot) {
                 setTimeout(setStepperHeight, 0);
                 return;
             }
 
+            $resourceSelect.prop('disabled', true);
+            showInlineInfo($resourceSelect, 'Verfügbarkeit wird geladen…', true);
+
             $.getJSON(restRoot + '/hotel/availability', { service_id: serviceId, checkin: checkin, checkout: checkout, guests: guests })
                 .done(function(resp) {
+                    clearInlineMessages($resourceSelect);
                     if (!resp || !Array.isArray(resp.resources)) {
                         setTimeout(setStepperHeight, 0);
                         return;
@@ -335,26 +539,35 @@
 
                     if (selectable.length <= 1) {
                         $resourceStep.hide();
+                        $resourceSelect.prop('disabled', false);
                         if (activeStep === 'resource') {
                             setActiveStep('details');
                         }
+                        syncStepIndicator();
                         syncNextButtons();
                         setTimeout(setStepperHeight, 0);
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Room #' + r.id))
+                            text: String(r.name || ('Zimmer #' + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Choose a preferred room (optional).');
+                        $resourceHint.text('Optional: Zimmer auswählen.');
                     }
+                    $resourceSelect.prop('disabled', false);
                     $resourceStep.show();
+                    syncStepIndicator();
                     syncNextButtons();
+                    setTimeout(setStepperHeight, 0);
+                })
+                .fail(function() {
+                    $resourceSelect.prop('disabled', true);
+                    showInlineError($resourceSelect, 'Verfügbarkeit konnte nicht geladen werden. Bitte erneut versuchen.');
                     setTimeout(setStepperHeight, 0);
                 });
         }
@@ -372,33 +585,39 @@
             var date = $dateInput.val();
 
             resetResourceStep();
+            clearInlineMessages($timeSelect);
 
             if (!serviceId || !date) {
-                resetTimeSelect('Select date first');
+                resetTimeSelect('Zuerst Datum wählen');
                 syncNextButtons();
                 return;
             }
 
             if (!restRoot) {
-                resetTimeSelect('Unable to load slots');
+                resetTimeSelect('Zeiten konnten nicht geladen werden');
+                showInlineError($timeSelect, 'Zeiten konnten nicht geladen werden. Bitte Seite neu laden.');
                 syncNextButtons();
                 return;
             }
 
-            resetTimeSelect('Loading…');
+            // Loading state: disable select and show spinner/status (avoid "Loading..." as an option)
+            resetTimeSelect('—');
+            showInlineInfo($timeSelect, 'Verfügbare Zeiten werden geladen…', true);
 
             $.getJSON(restRoot + '/time-slots', { service_id: serviceId, date: date })
                 .done(function(slots) {
+                    clearInlineMessages($timeSelect);
                     $timeSelect.empty();
 
                     if (!Array.isArray(slots) || slots.length === 0) {
-                        $timeSelect.append($('<option/>', { value: '', text: 'No slots available' }));
+                        $timeSelect.append($('<option/>', { value: '', text: 'Keine Zeiten verfügbar' }));
                         $timeSelect.prop('disabled', true);
+                        showInlineInfo($timeSelect, 'Für dieses Datum sind keine Zeiten verfügbar.', false);
                         syncNextButtons();
                         return;
                     }
 
-                    $timeSelect.append($('<option/>', { value: '', text: 'Select a time' }));
+                    $timeSelect.append($('<option/>', { value: '', text: 'Uhrzeit auswählen' }));
                     for (var i = 0; i < slots.length; i++) {
                         var slot = slots[i] || {};
                         var label = String(slot.time || '');
@@ -417,7 +636,8 @@
                     setTimeout(setStepperHeight, 0);
                 })
                 .fail(function() {
-                    resetTimeSelect('Unable to load slots');
+                    resetTimeSelect('—');
+                    showInlineError($timeSelect, 'Zeiten konnten nicht geladen werden. Bitte erneut versuchen.');
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
                 });
@@ -430,13 +650,19 @@
             var start = $selected.attr('data-start') || '';
 
             resetResourceStep();
+            clearInlineMessages($resourceSelect);
 
             if (!serviceId || !start || !restRoot) {
                 return;
             }
 
+            $resourceSelect.prop('disabled', true);
+            showInlineInfo($resourceSelect, 'Ressourcen werden geladen…', true);
+
             $.getJSON(restRoot + '/slot-resources', { service_id: serviceId, start: start })
                 .done(function(resp) {
+                    clearInlineMessages($resourceSelect);
+                    $resourceSelect.prop('disabled', false);
                     if (!resp || !Array.isArray(resp.resources)) return;
 
                     var selectable = resp.resources.filter(function(r) {
@@ -445,6 +671,7 @@
 
                     if (selectable.length <= 1) {
                         $resourceStep.hide();
+                        syncStepIndicator();
                         syncNextButtons();
                         setTimeout(setStepperHeight, 0);
                         // Skip resource step entirely
@@ -456,17 +683,18 @@
                         return;
                     }
 
-                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Any available' }));
+                    $resourceSelect.empty().append($('<option/>', { value: '', text: 'Beliebig' }));
                     selectable.forEach(function(r) {
                         $resourceSelect.append($('<option/>', {
                             value: r.id,
-                            text: String(r.name || ('Resource #' + r.id))
+                            text: String(r.name || ('Ressource #' + r.id))
                         }));
                     });
                     if ($resourceHint.length) {
-                        $resourceHint.text('Choose a preferred resource (optional).');
+                        $resourceHint.text('Optional: Ressource auswählen.');
                     }
                     $resourceStep.show();
+                    syncStepIndicator();
                     syncNextButtons();
                     setTimeout(setStepperHeight, 0);
 
@@ -474,6 +702,11 @@
                     if (activeStep === 'datetime') {
                         setActiveStep('resource');
                     }
+                })
+                .fail(function() {
+                    $resourceSelect.prop('disabled', true);
+                    showInlineError($resourceSelect, 'Ressourcen konnten nicht geladen werden. Bitte erneut versuchen.');
+                    setTimeout(setStepperHeight, 0);
                 });
         }
 
@@ -519,15 +752,7 @@
             var $panel = $(this).closest('[data-ltlb-step]');
             var stepName = String($panel.data('ltlb-step'));
             if (!isValidForStep(stepName)) {
-                // Trigger native validation UI if possible
-                try {
-                    var formEl = $root.find('form').get(0);
-                    if (formEl && typeof formEl.reportValidity === 'function') {
-                        formEl.reportValidity();
-                    }
-                } catch (e) {
-                    // ignore
-                }
+                showStepValidation(stepName);
                 syncNextButtons();
                 return;
             }
@@ -551,6 +776,7 @@
 
         // Auto-advance: service selection
         $serviceSelect.on('change', function() {
+            clearInlineErrorOnly($serviceSelect);
             syncNextButtons();
             if (parseInt($serviceSelect.val() || 0, 10)) {
                 // In service mode, slot loading depends on service+date
@@ -576,16 +802,22 @@
             resetResourceStep();
             loadTimeSlots();
             $dateInput.on('change', function() {
+                clearInlineErrorOnly($dateInput);
                 resetResourceStep();
                 loadTimeSlots();
                 syncNextButtons();
             });
-            $timeSelect.on('change', onTimeChanged);
+            $timeSelect.on('change', function() {
+                clearInlineErrorOnly($timeSelect);
+                onTimeChanged();
+            });
         }
 
         // Hotel-mode datetime validation
         if ($checkinInput.length && $checkoutInput.length) {
             var syncHotel = function() {
+                clearInlineErrorOnly($checkinInput);
+                clearInlineErrorOnly($checkoutInput);
                 syncNextButtons();
                 updatePricePreview();
 				loadHotelAvailability();
@@ -597,10 +829,14 @@
         }
 
         // Details validation
-        $root.find('#ltlb-email').on('input change', syncNextButtons);
+        $root.find('#ltlb-email').on('input change', function() {
+            clearInlineErrorOnly($(this));
+            syncNextButtons();
+        });
 
         // Initial sync
         syncNextButtons();
+        syncStepIndicator();
         setStepperHeight();
 
         // Keep window responsive if fonts/layout change

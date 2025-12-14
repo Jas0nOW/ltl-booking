@@ -24,7 +24,7 @@ Ziel: Du kannst diese Datei einer externen KI geben, ohne Code zu teilen, und si
 
 LazyBookings ist ein Buchungs-Plugin für:
 - **Service/Kurs-Modus**: Zeit-Slots an einem Datum (z.B. Yoga-Kurse, Termine)
-- **Hotel/Room-Modus**: ist im Projekt als Konzept/Engine vorhanden; das öffentliche REST-Interface ist aktuell primär für Service/Kurs-Slots ausgelegt
+- **Hotel/Room-Modus**: Engine + Frontend-Flow (Check-in/Check-out + Gäste) sind vorhanden; zusätzlich gibt es einen öffentlichen Hotel-Verfügbarkeits-Endpoint (siehe REST API)
 
 Fokus liegt auf:
 - Performance (Custom Tables statt `wp_posts`)
@@ -141,7 +141,9 @@ Namespace: `/wp-json/ltlb/v1`
 
 Hinweis: `start` akzeptiert auch ISO 8601 (z.B. `2025-12-13T09:00:00+01:00`).
 
-⚠️ Es gibt aktuell **keinen separaten öffentlichen Hotel-Availability Endpoint** im REST.
+✅ `GET /hotel/availability?service_id=...&checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&guests=...`
+- prüft Verfügbarkeit im Hotel-Modus für einen Datumsbereich
+- `guests` ist optional (Default `1`)
 
 Optional (disabled by default): Lightweight Rate-Limiting für öffentliche Read-Endpunkte via `lazy_settings.rate_limit_enabled`.
 
@@ -231,7 +233,7 @@ Service hat:
 - Admin-Formulare sind nonce-geschützt
 - REST Read-Endpunkte sind aktuell public (keine Auth), da fürs Frontend benötigt
 - Logging ist privacy-safe (PII wird reduziert/gehäschte Ausgabe), standardmäßig nicht aggressiv
-- Privacy/GDPR Seite ist vorhanden inkl. Retention-Settings (Delete cancelled / Anonymize), scheduled Cleanup (Cron) und manuellen Tools (Cleanup now + Anonymize by email)
+- Datenschutz & DSGVO Seite ist vorhanden inkl. Aufbewahrungseinstellungen (stornierte Termine löschen / Kundendaten anonymisieren), automatischer Bereinigung (Cron) und manuellen Tools ("Bereinigung jetzt ausführen" + "Kunden anonymisieren" per Kunden-E-Mail)
 
 ---
 
@@ -242,7 +244,7 @@ Nicht (voll) umgesetzt:
 - Payments (Stripe/PayPal)
 - Wiederkehrende Kurse/Recurrence Rules (iCal/ICS)
 - Warteliste / Coupons / Rabatte
-- Vollständige Hotel REST API (Check-in/out Availability)
+- Weitere Hotel-REST-Endpunkte (über `GET /hotel/availability` hinaus)
 - Vollständige “Seats” UX (Mehrere Plätze pro Buchung) ist nur teilweise vorbereitet
 
 ---

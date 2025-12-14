@@ -34,10 +34,14 @@ Write-Host "Copying files to temp directory..." -ForegroundColor Yellow
 $Exclude = @(
     '.git',
     '.github',
+    'docs',
+    'scripts',
     'node_modules',
     'vendor',
     '.env',
     '*.log',
+    '.DS_Store',
+    'Thumbs.db',
     'dist'
 )
 

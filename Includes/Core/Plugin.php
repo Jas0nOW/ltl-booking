@@ -45,7 +45,7 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Util/LockManager.php';
         require_once LTLB_PATH . 'Includes/Util/Logger.php';
         require_once LTLB_PATH . 'Includes/Util/Mailer.php';
-        require_once LTLB_PATH . 'Includes/Util/Validator.php';
+        require_once LTLB_PATH . 'Includes/Util/BookingService.php';
         require_once LTLB_PATH . 'Includes/Util/Availability.php';
 		require_once LTLB_PATH . 'Includes/Util/I18n.php';
         require_once LTLB_PATH . 'Includes/Util/Retention.php';
@@ -77,8 +77,9 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/DiagnosticsPage.php';
         require_once LTLB_PATH . 'admin/Pages/PrivacyPage.php';
         
-        // Booking Engines
-        require_once LTLB_PATH . 'Includes/Engine/EngineFactory.php';
+        // Booking Engine (Hotel mode)
+        require_once LTLB_PATH . 'Includes/Engine/BookingEngineInterface.php';
+        require_once LTLB_PATH . 'Includes/Engine/HotelEngine.php';
         // Admin: profile helpers
         require_once LTLB_PATH . 'Includes/Admin/StaffProfile.php';
         // Public: Shortcodes
@@ -666,13 +667,13 @@ class LTLB_Plugin {
 
         $want_slots = $request->get_param('slots');
         $slot_step = intval( $request->get_param('slot_step') );
+        $step = $slot_step > 0 ? $slot_step : 15;
         if ( $want_slots ) {
-            $step = $slot_step > 0 ? $slot_step : 15;
             $data = $avail->compute_time_slots( $service_id, $date, $step );
             return new WP_REST_Response( $data, 200 );
         }
 
-        $data = $avail->compute_availability( $service_id, $date );
+        $data = $avail->compute_availability( $service_id, $date, $step );
         return new WP_REST_Response( $data, 200 );
     }
 
@@ -691,8 +692,12 @@ class LTLB_Plugin {
             $wh_start = isset( $ls['working_hours_start'] ) ? max( 0, min( 23, intval( $ls['working_hours_start'] ) ) ) : null;
             $wh_end = isset( $ls['working_hours_end'] ) ? max( 0, min( 23, intval( $ls['working_hours_end'] ) ) ) : null;
 
-            $user_locale = function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
-            $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
+                // Ensure admin locale matches the per-user language switch in the plugin header.
+                // Fall back to WordPress user/site locale if our helper isn't available.
+                $user_locale = ( class_exists( 'LTLB_I18n' ) && method_exists( 'LTLB_I18n', 'get_user_admin_locale' ) )
+                    ? LTLB_I18n::get_user_admin_locale()
+                    : ( function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale() );
+                $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
 
             wp_enqueue_style( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css', [], '6.1.11' );
             wp_enqueue_script( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js', [], '6.1.11', true );
@@ -709,10 +714,11 @@ class LTLB_Plugin {
                 'workingHoursEnd' => $wh_end,
                 'locale' => $fc_locale,
                 'i18n' => [
-                    'today' => __( 'Heute', 'ltl-bookings' ),
-                    'month' => __( 'Monat', 'ltl-bookings' ),
-                    'week' => __( 'Woche', 'ltl-bookings' ),
-                    'day' => __( 'Tag', 'ltl-bookings' ),
+                    // Use English msgids so the built-in de_DE dictionary can translate consistently.
+                    'today' => __( 'Today', 'ltl-bookings' ),
+                    'month' => __( 'Month', 'ltl-bookings' ),
+                    'week' => __( 'Week', 'ltl-bookings' ),
+                    'day' => __( 'Day', 'ltl-bookings' ),
                     'pending' => __( 'Pending', 'ltl-bookings' ),
                     'confirmed' => __( 'Confirmed', 'ltl-bookings' ),
                     'cancelled' => __( 'Cancelled', 'ltl-bookings' ),
@@ -740,6 +746,11 @@ class LTLB_Plugin {
                     'could_not_save_customer' => __( 'Could not save customer.', 'ltl-bookings' ),
                     'conflict_message' => __( 'This time slot conflicts with an existing booking.', 'ltl-bookings' ),
                     'no_customer_data' => __( 'No customer data.', 'ltl-bookings' ),
+                    'loading_details' => __( 'Loading appointment details…', 'ltl-bookings' ),
+                    'details_loaded' => __( 'Appointment details loaded.', 'ltl-bookings' ),
+                    'status_updated' => __( 'Status updated.', 'ltl-bookings' ),
+                    'appointment_updated' => __( 'Appointment updated.', 'ltl-bookings' ),
+                    'appointment_deleted' => __( 'Appointment deleted.', 'ltl-bookings' ),
                 ],
             ] );
         }

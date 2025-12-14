@@ -10,11 +10,11 @@ class LTLB_Admin_CustomersPage {
 	}
 
 	public function render(): void {
-		if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
+        if ( ! current_user_can('manage_options') ) wp_die( esc_html__('No access', 'ltl-bookings') );
 		// Handle save
 		if ( isset( $_POST['ltlb_customer_save'] ) ) {
 			if ( ! check_admin_referer( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ) ) {
-				wp_die( esc_html__('Nonce verification failed', 'ltl-bookings') );
+                wp_die( esc_html__('Security check failed', 'ltl-bookings') );
 			}
 
 			$data = [];
@@ -28,9 +28,9 @@ class LTLB_Admin_CustomersPage {
 
 			$redirect = admin_url( 'admin.php?page=ltlb_customers' );
 			if ( $res ) {
-				LTLB_Notices::add( __( 'Customer saved.', 'ltl-bookings' ), 'success' );
+                LTLB_Notices::add( __( 'Customer saved.', 'ltl-bookings' ), 'success' );
 			} else {
-				LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
+                LTLB_Notices::add( __( 'An error occurred.', 'ltl-bookings' ), 'error' );
 			}
 			wp_safe_redirect( $redirect );
 			exit;
@@ -48,9 +48,9 @@ class LTLB_Admin_CustomersPage {
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_customers'); } ?>
-			<h1 class="wp-heading-inline"><?php echo esc_html__('Customers', 'ltl-bookings'); ?></h1>
+            <h1 class="wp-heading-inline"><?php echo esc_html__('Customers', 'ltl-bookings'); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
-			    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
+                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <?php endif; ?>
             <hr class="wp-header-end">
 			
@@ -66,7 +66,7 @@ class LTLB_Admin_CustomersPage {
 				$notes = $editing ? $customer['notes'] : '';
 				?>
                 <div class="ltlb-card" style="max-width:800px;">
-                    <h2><?php echo $editing ? esc_html__('Edit Customer', 'ltl-bookings') : esc_html__('Add New Customer', 'ltl-bookings'); ?></h2>
+					<h2><?php echo $editing ? esc_html__('Edit Customer', 'ltl-bookings') : esc_html__('Add New Customer', 'ltl-bookings'); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ); ?>
                         <input type="hidden" name="ltlb_customer_save" value="1" />
@@ -78,42 +78,43 @@ class LTLB_Admin_CustomersPage {
                                     <td><input name="email" id="email" type="email" value="<?php echo esc_attr( $email ); ?>" class="regular-text" required></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="first_name"><?php echo esc_html__('First name', 'ltl-bookings'); ?></label></th>
+							<th><label for="first_name"><?php echo esc_html__('First Name', 'ltl-bookings'); ?></label></th>
                                     <td><input name="first_name" id="first_name" type="text" value="<?php echo esc_attr( $first ); ?>" class="regular-text"></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="last_name"><?php echo esc_html__('Last name', 'ltl-bookings'); ?></label></th>
+							<th><label for="last_name"><?php echo esc_html__('Last Name', 'ltl-bookings'); ?></label></th>
                                     <td><input name="last_name" id="last_name" type="text" value="<?php echo esc_attr( $last ); ?>" class="regular-text"></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="phone"><?php echo esc_html__('Phone', 'ltl-bookings'); ?></label></th>
+							<th><label for="phone"><?php echo esc_html__('Phone', 'ltl-bookings'); ?></label></th>
                                     <td><input name="phone" id="phone" type="text" value="<?php echo esc_attr( $phone ); ?>" class="regular-text"></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="notes"><?php echo esc_html__('Notes', 'ltl-bookings'); ?></label></th>
+							<th><label for="notes"><?php echo esc_html__('Notes', 'ltl-bookings'); ?></label></th>
                                     <td><textarea name="notes" id="notes" class="large-text" rows="5"><?php echo esc_textarea( $notes ); ?></textarea></td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <p class="submit">
-                            <?php submit_button( $editing ? esc_html__('Update Customer', 'ltl-bookings') : esc_html__('Create Customer', 'ltl-bookings'), 'primary', 'submit', false ); ?>
-                            <a href="<?php echo admin_url('admin.php?page=ltlb_customers'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+						<?php submit_button( $editing ? esc_html__('Update Customer', 'ltl-bookings') : esc_html__('Create Customer', 'ltl-bookings'), 'primary', 'submit', false ); ?>
+						<a href="<?php echo admin_url('admin.php?page=ltlb_customers'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>
                 </div>
 			<?php else: ?>
                 <div class="ltlb-card">
                     <?php if ( empty($customers) ) : ?>
-                        <p><?php echo esc_html__('No customers found.', 'ltl-bookings'); ?></p>
+						<p><?php echo esc_html__('No customers found.', 'ltl-bookings'); ?></p>
+						<p><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="button button-primary"><?php echo esc_html__('Add New Customer', 'ltl-bookings'); ?></a></p>
                     <?php else : ?>
                         <table class="widefat striped">
                             <thead>
                                 <tr>
                                     <th><?php echo esc_html__('Email', 'ltl-bookings'); ?></th>
                                     <th><?php echo esc_html__('Name', 'ltl-bookings'); ?></th>
-                                    <th><?php echo esc_html__('Phone', 'ltl-bookings'); ?></th>
-                                    <th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
+								<th><?php echo esc_html__('Phone', 'ltl-bookings'); ?></th>
+								<th><?php echo esc_html__('Actions', 'ltl-bookings'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -127,7 +128,7 @@ class LTLB_Admin_CustomersPage {
                                         </td>
                                         <td><?php echo esc_html( $c['phone'] ); ?></td>
                                         <td>
-                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="button button-small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+									<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="button button-small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
