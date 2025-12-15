@@ -261,6 +261,12 @@ class LTLB_AppointmentRepository {
 			$currency = sanitize_text_field( (string) $service['currency'] );
 		}
 		$payment_status = $amount_cents > 0 ? 'unpaid' : 'free';
+		$payment_method = 'none';
+		if ( array_key_exists( 'payment_method', $data ) && is_string( $data['payment_method'] ) && $data['payment_method'] !== '' ) {
+			$payment_method = sanitize_key( (string) $data['payment_method'] );
+		} else {
+			$payment_method = $payment_status === 'free' ? 'free' : 'unpaid';
+		}
 
 		$insert = [
 			'service_id' => $service_id,
@@ -272,6 +278,7 @@ class LTLB_AppointmentRepository {
 			'amount_cents' => $amount_cents,
 			'currency' => $currency,
 			'payment_status' => $payment_status,
+			'payment_method' => $payment_method,
 			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : LTLB_Time::get_site_timezone_string(),
 			'seats' => $seats,
 			'created_at' => $now,
@@ -316,7 +323,7 @@ class LTLB_AppointmentRepository {
 			if ( array_key_exists( 'staff_user_id', $insert ) ) {
 				$formats[] = '%d';
 			}
-			$formats = array_merge( $formats, [ '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s', '%s' ] );
+			$formats = array_merge( $formats, [ '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ] );
 
 			$res = $wpdb->insert( $this->table_name, $insert, $formats );
 			if ( $res === false ) {
@@ -334,8 +341,19 @@ class LTLB_AppointmentRepository {
 		$appointment_id = (int) $result;
 
 		// Send email notifications
+		if ( ! empty( $data['skip_mailer'] ) ) {
+			return $appointment_id;
+		}
 		list( $service, $customer ) = $this->_get_service_and_customer( $insert['service_id'], $insert['customer_id'] );
-		if ( $service && $customer ) {
+		$should_send_notifications = true;
+		$payment_engine = class_exists( 'LTLB_PaymentEngine' ) ? LTLB_PaymentEngine::instance() : null;
+		if ( $payment_engine && method_exists( $payment_engine, 'is_enabled' ) && $payment_engine->is_enabled() ) {
+			$service_price_cents = is_array( $service ) ? intval( $service['price_cents'] ?? 0 ) : 0;
+			if ( $service_price_cents > 0 ) {
+				$should_send_notifications = false;
+			}
+		}
+		if ( $should_send_notifications && $service && $customer ) {
 			LTLB_Mailer::send_booking_notifications( $appointment_id, $service, $customer, $insert['start_at'], $insert['end_at'], $insert['status'] );
 		}
 

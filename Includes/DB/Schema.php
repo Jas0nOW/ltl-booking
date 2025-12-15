@@ -66,6 +66,7 @@ class LTLB_DB_Schema {
                 amount_cents INT UNSIGNED NOT NULL DEFAULT 0,
                 currency CHAR(3) NOT NULL DEFAULT 'EUR',
                 payment_status VARCHAR(20) NOT NULL DEFAULT 'free',
+                payment_method VARCHAR(32) NOT NULL DEFAULT 'none',
                 payment_ref VARCHAR(190) NULL,
                 paid_at DATETIME NULL,
                 timezone VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin',

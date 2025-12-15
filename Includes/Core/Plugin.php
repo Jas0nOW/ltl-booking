@@ -14,6 +14,7 @@ class LTLB_Plugin {
         add_action('admin_head', [ $this, 'print_design_css_admin' ]);
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ]);
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
+		add_action( 'template_redirect', [ $this, 'handle_payment_return' ] );
 		add_action( 'ltlb_retention_cleanup', [ 'LTLB_Retention', 'run' ] );
         add_action( 'ltlb_automation_runner', [ 'LTLB_Automations', 'run_due_rules' ] );
         add_action('admin_init', [ $this, 'handle_csv_export' ]);
@@ -590,6 +591,272 @@ class LTLB_Plugin {
             'callback' => [ $this, 'rest_admin_appointment_propose_room' ],
             'permission_callback' => [ $this, 'rest_admin_permission' ],
         ]);
+
+        // Payments: Stripe webhook for Checkout (no auth, verified via signature).
+        register_rest_route( 'ltlb/v1', '/payments/stripe/webhook', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'handle_stripe_webhook' ],
+            'permission_callback' => '__return_true',
+        ] );
+    }
+
+    public function handle_payment_return(): void {
+        if ( is_admin() ) {
+            return;
+        }
+        if ( empty( $_GET['ltlb_payment_return'] ) ) {
+            return;
+        }
+
+        $provider = isset( $_GET['provider'] ) ? sanitize_key( (string) wp_unslash( $_GET['provider'] ) ) : '';
+        $appointment_id = isset( $_GET['appointment_id'] ) ? intval( $_GET['appointment_id'] ) : 0;
+        $status = isset( $_GET['status'] ) ? sanitize_key( (string) wp_unslash( $_GET['status'] ) ) : '';
+        $retry_url = function_exists( 'get_permalink' ) ? get_permalink() : home_url( '/' );
+
+        // PayPal: capture on return (server-side). No webhook required for MVP.
+        if ( $provider === 'paypal' ) {
+            $headline = '';
+            $message = '';
+            if ( $status === 'cancel' ) {
+                $headline = __( 'Payment cancelled', 'ltl-bookings' );
+                $message = __( 'Your booking was created but payment was cancelled. You can try again.', 'ltl-bookings' );
+            } elseif ( $status === 'success' ) {
+                $token = '';
+                if ( isset( $_GET['token'] ) ) {
+                    $token = sanitize_text_field( (string) wp_unslash( $_GET['token'] ) );
+                } elseif ( isset( $_GET['paypal_order_id'] ) ) {
+                    $token = sanitize_text_field( (string) wp_unslash( $_GET['paypal_order_id'] ) );
+                }
+
+                if ( $token !== '' && class_exists( 'LTLB_PaymentEngine' ) ) {
+                    $appt_repo = class_exists( 'LTLB_AppointmentRepository' ) ? new LTLB_AppointmentRepository() : null;
+
+                    // Bind the PayPal order token to the correct appointment.
+                    $target_id = $appointment_id;
+                    $existing = $appt_repo ? $appt_repo->get_by_id( $target_id ) : null;
+                    $existing_ref = is_array( $existing ) ? (string) ( $existing['payment_ref'] ?? '' ) : '';
+                    $existing_method = is_array( $existing ) ? sanitize_key( (string) ( $existing['payment_method'] ?? '' ) ) : '';
+                    if ( ! $existing || $existing_method !== 'paypal' || ( $existing_ref !== '' && $existing_ref !== $token ) ) {
+                        global $wpdb;
+                        $table = $wpdb->prefix . 'lazy_appointments';
+                        $found_id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE payment_method = 'paypal' AND payment_ref = %s ORDER BY id DESC LIMIT 1", $token ) );
+                        if ( $found_id > 0 ) {
+                            $target_id = $found_id;
+                            $existing = $appt_repo ? $appt_repo->get_by_id( $target_id ) : null;
+                            $existing_ref = is_array( $existing ) ? (string) ( $existing['payment_ref'] ?? '' ) : '';
+                            $existing_method = is_array( $existing ) ? sanitize_key( (string) ( $existing['payment_method'] ?? '' ) ) : '';
+                        }
+                    }
+
+                    if ( ! $existing || $existing_method !== 'paypal' || $existing_ref !== $token ) {
+                        $headline = __( 'Payment processing', 'ltl-bookings' );
+                        $message = __( 'We received your return from PayPal, but could not match the payment to your booking. Please contact us if you were charged.', 'ltl-bookings' );
+                    } elseif ( (string) ( $existing['payment_status'] ?? '' ) === 'paid' ) {
+                        $headline = __( 'Payment received', 'ltl-bookings' );
+                        $message = __( 'Thank you! Your payment has been confirmed and your booking is confirmed.', 'ltl-bookings' );
+                    } else {
+                        $engine = LTLB_PaymentEngine::instance();
+                        $res = method_exists( $engine, 'capture_paypal_order' ) ? $engine->capture_paypal_order( $token ) : [ 'success' => false ];
+                        if ( is_array( $res ) && ! empty( $res['success'] ) ) {
+                            global $wpdb;
+                            $table = $wpdb->prefix . 'lazy_appointments';
+                            $ref = (string) $token;
+                            $wpdb->update(
+                                $table,
+                                [
+                                    'status' => 'confirmed',
+                                    'payment_status' => 'paid',
+                                    'payment_method' => 'paypal',
+                                    'payment_ref' => $ref,
+                                    'paid_at' => current_time( 'mysql' ),
+                                    'updated_at' => current_time( 'mysql' ),
+                                ],
+                                [ 'id' => $target_id ],
+                                [ '%s', '%s', '%s', '%s', '%s', '%s' ],
+                                [ '%d' ]
+                            );
+
+                            if ( class_exists( 'LTLB_EmailNotifications' ) ) {
+                                LTLB_EmailNotifications::send_customer_booking_confirmation( intval( $target_id ) );
+                                LTLB_EmailNotifications::send_admin_booking_notification( intval( $target_id ) );
+                            }
+
+                            $headline = __( 'Payment received', 'ltl-bookings' );
+                            $message = __( 'Thank you! Your payment has been confirmed and your booking is confirmed.', 'ltl-bookings' );
+                        } else {
+                            $headline = __( 'Payment processing', 'ltl-bookings' );
+                            $message = __( 'We received your return from PayPal, but could not confirm the payment. Your booking is still pending. Please try again or contact us if you were charged.', 'ltl-bookings' );
+                        }
+                    }
+                } else {
+                    $headline = __( 'Payment status', 'ltl-bookings' );
+                    $message = __( 'Your payment status is being processed.', 'ltl-bookings' );
+                }
+            } else {
+                $headline = __( 'Payment status', 'ltl-bookings' );
+                $message = __( 'Your payment status is being processed.', 'ltl-bookings' );
+            }
+
+            status_header( 200 );
+            nocache_headers();
+            header( 'Content-Type: text/html; charset=' . get_bloginfo( 'charset' ) );
+            echo '<!doctype html><html><head><meta charset="' . esc_attr( get_bloginfo( 'charset' ) ) . '">';
+            echo '<meta name="viewport" content="width=device-width,initial-scale=1">';
+            echo '<title>' . esc_html( get_bloginfo( 'name' ) ) . '</title>';
+            echo '</head><body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;">';
+            echo '<h1>' . esc_html( $headline ) . '</h1>';
+            echo '<p>' . esc_html( $message ) . '</p>';
+            if ( $status === 'cancel' ) {
+                echo '<p>' . esc_html__( 'You may close this page and try booking again.', 'ltl-bookings' ) . '</p>';
+                echo '<p><a href="' . esc_url( $retry_url ) . '">' . esc_html__( 'Return to booking page', 'ltl-bookings' ) . '</a></p>';
+            }
+            echo '</body></html>';
+            exit;
+        }
+
+        $headline = '';
+        $message = '';
+        if ( $status === 'success' ) {
+            $headline = __( 'Payment received', 'ltl-bookings' );
+            $message = __( 'Thank you! Your payment return was received. We will confirm your booking after the payment is verified.', 'ltl-bookings' );
+        } elseif ( $status === 'cancel' ) {
+            $headline = __( 'Payment cancelled', 'ltl-bookings' );
+            $message = __( 'Your booking was created but payment was cancelled. You can try again.', 'ltl-bookings' );
+        } else {
+            $headline = __( 'Payment status', 'ltl-bookings' );
+            $message = __( 'Your payment status is being processed.', 'ltl-bookings' );
+        }
+
+        status_header( 200 );
+        nocache_headers();
+        header( 'Content-Type: text/html; charset=' . get_bloginfo( 'charset' ) );
+        echo '<!doctype html><html><head><meta charset="' . esc_attr( get_bloginfo( 'charset' ) ) . '">';
+        echo '<meta name="viewport" content="width=device-width,initial-scale=1">';
+        echo '<title>' . esc_html( get_bloginfo( 'name' ) ) . '</title>';
+        echo '</head><body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;">';
+        echo '<h1>' . esc_html( $headline ) . '</h1>';
+        echo '<p>' . esc_html( $message ) . '</p>';
+        if ( $status === 'cancel' ) {
+            echo '<p>' . esc_html__( 'You may close this page and try booking again.', 'ltl-bookings' ) . '</p>';
+            echo '<p><a href="' . esc_url( $retry_url ) . '">' . esc_html__( 'Return to booking page', 'ltl-bookings' ) . '</a></p>';
+        }
+        echo '</body></html>';
+        exit;
+    }
+
+    public function handle_stripe_webhook( WP_REST_Request $request ): WP_REST_Response {
+        $keys = get_option( 'lazy_payment_keys', [] );
+        if ( ! is_array( $keys ) ) {
+            $keys = [];
+        }
+        $secret = (string) ( $keys['stripe_webhook_secret'] ?? '' );
+        if ( $secret === '' ) {
+            return new WP_REST_Response( [ 'error' => 'webhook_not_configured' ], 400 );
+        }
+
+        $payload = (string) $request->get_body();
+        $sig_header = (string) $request->get_header( 'stripe-signature' );
+        if ( $payload === '' || $sig_header === '' ) {
+            return new WP_REST_Response( [ 'error' => 'missing_signature' ], 400 );
+        }
+
+        $parts = array_map( 'trim', explode( ',', $sig_header ) );
+        $timestamp = 0;
+        $v1_sigs = [];
+        foreach ( $parts as $p ) {
+            if ( strpos( $p, '=' ) === false ) continue;
+            list( $k, $v ) = array_map( 'trim', explode( '=', $p, 2 ) );
+            if ( $k === 't' ) {
+                $timestamp = (int) $v;
+            } elseif ( $k === 'v1' ) {
+                $v1_sigs[] = $v;
+            }
+        }
+        if ( $timestamp <= 0 || empty( $v1_sigs ) ) {
+            return new WP_REST_Response( [ 'error' => 'invalid_signature_header' ], 400 );
+        }
+        if ( abs( time() - $timestamp ) > 300 ) {
+            return new WP_REST_Response( [ 'error' => 'signature_timestamp_out_of_tolerance' ], 400 );
+        }
+
+        $signed_payload = $timestamp . '.' . $payload;
+        $expected = hash_hmac( 'sha256', $signed_payload, $secret );
+        $valid = false;
+        foreach ( $v1_sigs as $sig ) {
+            if ( hash_equals( $expected, $sig ) ) {
+                $valid = true;
+                break;
+            }
+        }
+        if ( ! $valid ) {
+            return new WP_REST_Response( [ 'error' => 'signature_verification_failed' ], 400 );
+        }
+
+        $event = json_decode( $payload, true );
+        if ( ! is_array( $event ) || empty( $event['type'] ) || empty( $event['data']['object'] ) ) {
+            return new WP_REST_Response( [ 'error' => 'invalid_payload' ], 400 );
+        }
+
+        $type = (string) $event['type'];
+        $obj = $event['data']['object'];
+        $appointment_id = 0;
+        if ( is_array( $obj ) ) {
+            if ( ! empty( $obj['metadata']['appointment_id'] ) ) {
+                $appointment_id = intval( $obj['metadata']['appointment_id'] );
+            } elseif ( ! empty( $obj['client_reference_id'] ) ) {
+                $appointment_id = intval( $obj['client_reference_id'] );
+            }
+        }
+        if ( $appointment_id <= 0 ) {
+            return new WP_REST_Response( [ 'ok' => true ], 200 );
+        }
+
+        $appt_repo = class_exists( 'LTLB_AppointmentRepository' ) ? new LTLB_AppointmentRepository() : null;
+        $existing = $appt_repo ? $appt_repo->get_by_id( $appointment_id ) : null;
+        if ( is_array( $existing ) ) {
+            $existing_payment_status = (string) ( $existing['payment_status'] ?? '' );
+            if ( $existing_payment_status === 'paid' ) {
+                return new WP_REST_Response( [ 'ok' => true ], 200 );
+            }
+        }
+
+        if ( $type === 'checkout.session.completed' || $type === 'checkout.session.async_payment_succeeded' ) {
+            $payment_intent = is_array( $obj ) && ! empty( $obj['payment_intent'] ) ? (string) $obj['payment_intent'] : '';
+            $session_id = is_array( $obj ) && ! empty( $obj['id'] ) ? (string) $obj['id'] : '';
+            $ref = $payment_intent !== '' ? $payment_intent : $session_id;
+
+            $method_to_set = 'stripe_card';
+            if ( is_array( $existing ) ) {
+                $existing_method = sanitize_key( (string) ( $existing['payment_method'] ?? '' ) );
+                if ( $existing_method !== '' && $existing_method !== 'none' && $existing_method !== 'unpaid' ) {
+                    $method_to_set = $existing_method;
+                }
+            }
+
+            global $wpdb;
+            $table = $wpdb->prefix . 'lazy_appointments';
+            $wpdb->update(
+                $table,
+                [
+                    'status' => 'confirmed',
+                    'payment_status' => 'paid',
+                    'payment_method' => $method_to_set,
+                    'payment_ref' => $ref,
+                    'paid_at' => current_time( 'mysql' ),
+                    'updated_at' => current_time( 'mysql' ),
+                ],
+                [ 'id' => $appointment_id ],
+                [ '%s', '%s', '%s', '%s', '%s', '%s' ],
+                [ '%d' ]
+            );
+
+            if ( class_exists( 'LTLB_EmailNotifications' ) ) {
+                LTLB_EmailNotifications::send_customer_booking_confirmation( intval( $appointment_id ) );
+                LTLB_EmailNotifications::send_admin_booking_notification( intval( $appointment_id ) );
+            }
+        }
+
+        return new WP_REST_Response( [ 'ok' => true ], 200 );
     }
 
     private function is_hotel_mode(): bool {
@@ -1409,18 +1676,27 @@ class LTLB_Plugin {
             $wh_end = isset( $ls['working_hours_end'] ) ? max( 0, min( 23, intval( $ls['working_hours_end'] ) ) ) : null;
             $template_mode = isset( $ls['template_mode'] ) ? (string) $ls['template_mode'] : 'service';
 
-                // Ensure admin locale matches the per-user language switch in the plugin header.
-                // Fall back to WordPress user/site locale if our helper isn't available.
-                $user_locale = ( class_exists( 'LTLB_I18n' ) && method_exists( 'LTLB_I18n', 'get_user_admin_locale' ) )
-                    ? LTLB_I18n::get_user_admin_locale()
-                    : ( function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale() );
-                $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
+            // Ensure admin locale matches the per-user language switch in the plugin header.
+            // Fall back to WordPress user/site locale if our helper isn't available.
+            $user_locale = ( class_exists( 'LTLB_I18n' ) && method_exists( 'LTLB_I18n', 'get_user_admin_locale' ) )
+                ? LTLB_I18n::get_user_admin_locale()
+                : ( function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale() );
+            $fc_locale = is_string( $user_locale ) && $user_locale !== '' ? strtolower( substr( $user_locale, 0, 2 ) ) : 'en';
 
-            wp_enqueue_style( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css', [], '6.1.11' );
-            wp_enqueue_script( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js', [], '6.1.11', true );
+            $fc_ver = '6.1.11';
+            $fc_vendor_dir = LTLB_PATH . 'assets/vendor/fullcalendar/6.1.11/';
+            $fc_vendor_url = LTLB_URL . 'assets/vendor/fullcalendar/6.1.11/';
+            $has_local_fc = file_exists( $fc_vendor_dir . 'index.global.min.js' ) && file_exists( $fc_vendor_dir . 'locales-all.global.min.js' );
 
-            // Needed for non-English day/month names and date/time formatting.
-            wp_enqueue_script( 'ltlb-fullcalendar-locales', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js', [ 'ltlb-fullcalendar' ], '6.1.11', true );
+            if ( $has_local_fc ) {
+                // FullCalendar global bundle injects its own CSS via <style data-fullcalendar>.
+                wp_enqueue_script( 'ltlb-fullcalendar', $fc_vendor_url . 'index.global.min.js', [], $fc_ver, true );
+                wp_enqueue_script( 'ltlb-fullcalendar-locales', $fc_vendor_url . 'locales-all.global.min.js', [ 'ltlb-fullcalendar' ], $fc_ver, true );
+            } else {
+                // CDN fallback (kept for safety if local vendor files are missing).
+                wp_enqueue_script( 'ltlb-fullcalendar', 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js', [], $fc_ver, true );
+                wp_enqueue_script( 'ltlb-fullcalendar-locales', 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales-all.global.min.js', [ 'ltlb-fullcalendar' ], $fc_ver, true );
+            }
 
             wp_enqueue_script( 'wp-api-fetch' );
 

@@ -191,6 +191,50 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
 					<input type="tel" id="ltlb-phone" name="phone" autocomplete="tel" class="ltlb-input">
                 </div>
 
+                <?php
+                $ltlb_payment_methods = isset( $ltlb_payment_methods ) && is_array( $ltlb_payment_methods ) ? $ltlb_payment_methods : [];
+                $ltlb_default_payment_method = isset( $ltlb_default_payment_method ) ? sanitize_key( (string) $ltlb_default_payment_method ) : '';
+                if ( empty( $ltlb_default_payment_method ) ) {
+                    $ltlb_default_payment_method = ! empty( $ltlb_payment_methods ) ? (string) $ltlb_payment_methods[0] : '';
+                }
+                $labels = [
+                    'stripe_card' => __( 'Pay online (card)', 'ltl-bookings' ),
+                    'cash' => __( 'Pay on site (cash)', 'ltl-bookings' ),
+                    'pos_card' => __( 'Pay on site (card / POS)', 'ltl-bookings' ),
+                    'invoice' => __( 'Company invoice', 'ltl-bookings' ),
+                    'paypal' => __( 'PayPal', 'ltl-bookings' ),
+                    'klarna' => __( 'Klarna', 'ltl-bookings' ),
+                ];
+                ?>
+                <?php if ( ! empty( $ltlb_payment_methods ) ) : ?>
+                    <fieldset class="ltlb-form-group" aria-labelledby="ltlb-payment-method-label">
+                        <legend id="ltlb-payment-method-label"><?php echo esc_html__( 'Payment method', 'ltl-bookings' ); ?></legend>
+                        <div class="ltlb-radio-group" data-ltlb-payment-methods>
+                            <?php foreach ( $ltlb_payment_methods as $m ) :
+                                $m = sanitize_key( (string) $m );
+                                if ( $m === '' ) continue;
+                                $label = $labels[ $m ] ?? ucfirst( str_replace( '_', ' ', $m ) );
+                                $checked = ( $m === $ltlb_default_payment_method ) ? ' checked' : '';
+                            ?>
+                                <label style="display:block;margin:6px 0;">
+                                    <input type="radio" name="payment_method" value="<?php echo esc_attr( $m ); ?>"<?php echo $checked; ?>>
+                                    <?php echo esc_html( $label ); ?>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </fieldset>
+
+                    <div class="ltlb-form-group" data-ltlb-invoice-fields style="display:none;">
+                        <label for="ltlb-company-name"><?php echo esc_html__( 'Company name', 'ltl-bookings' ); ?></label>
+                        <input type="text" id="ltlb-company-name" name="company_name" class="ltlb-input" autocomplete="organization">
+                        <span class="ltlb-field-hint"><?php echo esc_html__( 'Required for company invoices.', 'ltl-bookings' ); ?></span>
+                    </div>
+                    <div class="ltlb-form-group" data-ltlb-invoice-fields style="display:none;">
+                        <label for="ltlb-company-vat"><?php echo esc_html__( 'VAT / Tax ID', 'ltl-bookings' ); ?></label>
+                        <input type="text" id="ltlb-company-vat" name="company_vat" class="ltlb-input" autocomplete="off">
+                    </div>
+                <?php endif; ?>
+
                 <div class="ltlb-step-nav">
                     <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
                     <?php submit_button( esc_html__( 'Confirm booking', 'ltl-bookings' ), 'primary', 'ltlb_book_submit', false, [ 'aria-label' => esc_attr__( 'Submit booking form', 'ltl-bookings' ) ] ); ?>

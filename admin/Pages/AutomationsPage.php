@@ -36,6 +36,25 @@ class LTLB_Admin_AutomationsPage {
 					<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Add Default Rules', 'ltl-bookings' ); ?></button>
 				</form>
 
+				<form method="post" style="margin:12px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+					<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
+					<input type="hidden" name="ltlb_automations_do" value="add_rule">
+					<div>
+						<label for="ltlb_add_rule_type" class="ltlb-muted" style="display:block; margin-bottom:4px;"><?php echo esc_html__( 'Type', 'ltl-bookings' ); ?></label>
+						<select id="ltlb_add_rule_type" name="type">
+							<option value="payment_reminder"><?php echo esc_html__( 'Payment reminder', 'ltl-bookings' ); ?></option>
+							<option value="invoice_send"><?php echo esc_html__( 'Invoice', 'ltl-bookings' ); ?></option>
+							<option value="overdue_reminder"><?php echo esc_html__( 'Overdue reminder', 'ltl-bookings' ); ?></option>
+							<option value="insights_report"><?php echo esc_html__( 'Insights report', 'ltl-bookings' ); ?></option>
+						</select>
+					</div>
+					<div>
+						<label for="ltlb_add_rule_name" class="ltlb-muted" style="display:block; margin-bottom:4px;"><?php echo esc_html__( 'Name (optional)', 'ltl-bookings' ); ?></label>
+						<input id="ltlb_add_rule_name" class="regular-text" type="text" name="name" value="" placeholder="<?php echo esc_attr__( 'e.g., Weekly report', 'ltl-bookings' ); ?>" />
+					</div>
+					<button type="submit" class="button button-primary"><?php echo esc_html__( 'Add Rule', 'ltl-bookings' ); ?></button>
+				</form>
+
 				<table class="widefat striped">
 					<thead>
 						<tr>
@@ -104,6 +123,12 @@ class LTLB_Admin_AutomationsPage {
 											<input type="hidden" name="rule_id" value="<?php echo esc_attr( $rid ); ?>">
 											<input type="hidden" name="ltlb_automations_do" value="run_now">
 											<button class="button button-small" type="submit"><?php echo esc_html__( 'Run Now', 'ltl-bookings' ); ?></button>
+										</form>
+										<form method="post" style="display:inline-block; margin-left:6px;">
+											<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
+											<input type="hidden" name="rule_id" value="<?php echo esc_attr( $rid ); ?>">
+											<input type="hidden" name="ltlb_automations_do" value="delete">
+											<button class="button button-small" type="submit" onclick="return confirm('<?php echo esc_js( __( 'Delete this rule?', 'ltl-bookings' ) ); ?>')"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></button>
 										</form>
 									</td>
 								</tr>
@@ -292,6 +317,61 @@ class LTLB_Admin_AutomationsPage {
 		$do = sanitize_key( (string) $_POST['ltlb_automations_do'] );
 		$rules = LTLB_Automations::get_rules();
 
+		if ( $do === 'add_rule' ) {
+			$type = sanitize_key( (string) ( $_POST['type'] ?? '' ) );
+			$name = sanitize_text_field( (string) ( $_POST['name'] ?? '' ) );
+			if ( ! in_array( $type, [ 'payment_reminder', 'invoice_send', 'overdue_reminder', 'insights_report' ], true ) ) {
+				LTLB_Notices::add( __( 'Invalid rule type.', 'ltl-bookings' ), 'error' );
+				wp_safe_redirect( admin_url( 'admin.php?page=ltlb_automations' ) );
+				exit;
+			}
+
+			$rule_id = wp_generate_uuid4();
+			$base = [
+				'id' => $rule_id,
+				'name' => $name !== '' ? $name : ucfirst( str_replace( '_', ' ', $type ) ),
+				'type' => $type,
+				'enabled' => 1,
+				'mode' => 'inherit',
+				'schedule' => 'daily',
+				'time_hhmm' => '09:00',
+				'last_run_ts' => 0,
+				'next_run_ts' => 0,
+			];
+
+			if ( $type === 'payment_reminder' ) {
+				$base['name'] = $name !== '' ? $name : __( 'Payment reminders (unpaid bookings)', 'ltl-bookings' );
+				$base['days_before'] = 2;
+				$base['template_id'] = 'payment_reminder_default';
+				$base['limit'] = 50;
+			}
+			if ( $type === 'invoice_send' ) {
+				$base['name'] = $name !== '' ? $name : __( 'Invoices (unpaid bookings)', 'ltl-bookings' );
+				$base['days_before'] = 0;
+				$base['template_id'] = 'invoice_default';
+				$base['limit'] = 50;
+				$base['time_hhmm'] = '09:05';
+			}
+			if ( $type === 'overdue_reminder' ) {
+				$base['name'] = $name !== '' ? $name : __( 'Overdue reminders (past bookings, unpaid)', 'ltl-bookings' );
+				$base['template_id'] = 'overdue_reminder_default';
+				$base['limit'] = 50;
+				$base['time_hhmm'] = '09:10';
+			}
+			if ( $type === 'insights_report' ) {
+				$base['name'] = $name !== '' ? $name : __( 'Weekly outlook report (next 7 days)', 'ltl-bookings' );
+				$base['schedule'] = 'weekly';
+				$base['time_hhmm'] = '08:00';
+				$base['weekday'] = 1;
+			}
+
+			$rules[] = $base;
+			LTLB_Automations::save_rules( $rules );
+			LTLB_Notices::add( __( 'Rule added.', 'ltl-bookings' ), 'success' );
+			wp_safe_redirect( admin_url( 'admin.php?page=ltlb_automations&action=edit&rule_id=' . rawurlencode( $rule_id ) ) );
+			exit;
+		}
+
 		if ( $do === 'add_defaults' ) {
 			$existing_types = [];
 			foreach ( $rules as $r ) {
@@ -370,6 +450,21 @@ class LTLB_Admin_AutomationsPage {
 		if ( $rule_id === '' ) {
 			LTLB_Notices::add( __( 'Invalid rule.', 'ltl-bookings' ), 'error' );
 			return;
+		}
+
+		if ( $do === 'delete' ) {
+			$before = count( $rules );
+			$rules = array_values( array_filter( $rules, static function( $r ) use ( $rule_id ) {
+				return is_array( $r ) && (string) ( $r['id'] ?? '' ) !== $rule_id;
+			} ) );
+			if ( count( $rules ) === $before ) {
+				LTLB_Notices::add( __( 'Rule not found.', 'ltl-bookings' ), 'error' );
+				return;
+			}
+			LTLB_Automations::save_rules( $rules );
+			LTLB_Notices::add( __( 'Rule deleted.', 'ltl-bookings' ), 'success' );
+			wp_safe_redirect( admin_url( 'admin.php?page=ltlb_automations' ) );
+			exit;
 		}
 
 		foreach ( $rules as &$rule ) {

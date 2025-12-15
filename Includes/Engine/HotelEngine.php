@@ -175,11 +175,25 @@ class HotelEngine implements BookingEngineInterface {
 
         // Upsert customer
         $customer_repo = new LTLB_CustomerRepository();
+        $notes = null;
+        $payment_method = isset( $payload['payment_method'] ) ? sanitize_key( (string) $payload['payment_method'] ) : '';
+        if ( $payment_method === 'invoice' ) {
+            $existing = $customer_repo->get_by_email( (string) ( $payload['email'] ?? '' ) );
+            $existing_notes = is_array( $existing ) ? (string) ( $existing['notes'] ?? '' ) : '';
+            $company_name = isset( $payload['company_name'] ) ? sanitize_text_field( (string) $payload['company_name'] ) : '';
+            $company_vat = isset( $payload['company_vat'] ) ? sanitize_text_field( (string) $payload['company_vat'] ) : '';
+            $line = 'Invoice: ' . $company_name;
+            if ( $company_vat !== '' ) {
+                $line .= ' (VAT/Tax ID: ' . $company_vat . ')';
+            }
+            $notes = trim( $existing_notes . "\n" . $line );
+        }
         $customer_id = $customer_repo->upsert_by_email( [
             'email'      => $payload['email'],
             'first_name' => $payload['first'] ?? '',
             'last_name'  => $payload['last'] ?? '',
             'phone'      => $payload['phone'] ?? '',
+            'notes'      => $notes,
         ] );
 
         if ( ! $customer_id ) {
@@ -207,7 +221,9 @@ class HotelEngine implements BookingEngineInterface {
             'seats'       => $guests,
             'amount_cents' => $total_price_cents,
             'currency' => $currency,
+			'payment_method' => isset( $payload['payment_method'] ) ? sanitize_key( (string) $payload['payment_method'] ) : '',
 			'skip_conflict_check' => true,
+			'skip_mailer' => true,
         ] );
 
         if ( is_wp_error( $appt_id ) ) {
@@ -222,14 +238,6 @@ class HotelEngine implements BookingEngineInterface {
             // Auto-assign first available room computed during availability check
             $rid = intval( $free_ids[0] );
             $appt_res_repo->set_resource_for_appointment( intval($appt_id), $rid );
-        }
-
-        // Send notifications
-        $service_repo = new LTLB_ServiceRepository();
-        $service = $service_repo->get_by_id( $service_id );
-        $customer = $customer_repo->get_by_id( $customer_id );
-        if ( class_exists( 'LTLB_Mailer' ) ) {
-            LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status, $guests );
         }
 
         return $appt_id;
