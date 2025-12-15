@@ -2,14 +2,29 @@
 if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Mailer {
+    private static bool $smtp_context_enabled = false;
 
     public static function init(): void {
         add_action( 'phpmailer_init', [ __CLASS__, 'configure_phpmailer' ] );
     }
 
     /**
+     * Send an email through wp_mail() while marking it as a LazyBookings email.
+     * This allows SMTP settings to be applied only to LazyBookings mails when configured.
+     */
+    public static function wp_mail( $to, $subject, $message, $headers = '', $attachments = [] ): bool {
+        $prev = self::$smtp_context_enabled;
+        self::$smtp_context_enabled = true;
+        try {
+            return (bool) wp_mail( $to, $subject, $message, $headers, $attachments );
+        } finally {
+            self::$smtp_context_enabled = $prev;
+        }
+    }
+
+    /**
      * Configure PHPMailer for SMTP when enabled in LazyBookings settings.
-     * Note: This affects all wp_mail() calls site-wide while enabled.
+     * Scope is configurable: global (all wp_mail) or plugin-only (LazyBookings emails).
      */
     public static function configure_phpmailer( $phpmailer ): void {
         $settings = get_option( 'lazy_settings', [] );
@@ -17,6 +32,14 @@ class LTLB_Mailer {
             return;
         }
         if ( empty( $settings['smtp_enabled'] ) ) {
+            return;
+        }
+
+        $scope = isset( $settings['smtp_scope'] ) ? sanitize_key( (string) $settings['smtp_scope'] ) : 'global';
+        if ( $scope !== 'global' && $scope !== 'plugin' ) {
+            $scope = 'global';
+        }
+        if ( $scope === 'plugin' && ! self::$smtp_context_enabled ) {
             return;
         }
 
@@ -129,7 +152,7 @@ class LTLB_Mailer {
             $headers[] = 'Reply-To: ' . $reply_to;
         }
 
-        $results['admin'] = wp_mail( $admin_to, $subj, $body, $headers );
+        $results['admin'] = self::wp_mail( $admin_to, $subj, $body, $headers );
 
         // customer email
         if ( $customer_send && ! empty( $customer['email'] ) ) {
@@ -143,7 +166,7 @@ class LTLB_Mailer {
             $csubj = self::replace_placeholders( $customer_subject, $placeholders );
             $cbody = self::replace_placeholders( $customer_body, $placeholders );
 
-            $results['customer'] = wp_mail( $customer['email'], $csubj, $cbody, $headers );
+            $results['customer'] = self::wp_mail( $customer['email'], $csubj, $cbody, $headers );
         }
 
         return $results;
