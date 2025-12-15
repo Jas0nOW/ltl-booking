@@ -797,18 +797,7 @@
             var prev = getPrevStepName(stepName);
             if (prev) setActiveStep(prev);
             syncNextButtons();
-            updateWizardProgress();
         });
-        
-        function updateWizardProgress() {
-            var $steps = $root.find('[data-ltlb-step]');
-            var $visible = $steps.filter(':visible');
-            var currentIndex = $steps.index($visible) + 1;
-            var totalSteps = $steps.length;
-            
-            $root.find('.ltlb-wizard-current-step').text(currentIndex);
-            $root.find('.ltlb-wizard-total-steps').text(totalSteps);
-        }
 
         $root.on('click', '[data-ltlb-next]', function() {
             var $panel = $(this).closest('[data-ltlb-step]');
@@ -819,9 +808,6 @@
                 return;
             }
             
-            // Update wizard progress counter
-            updateWizardProgress();
-
             // Service mode: after datetime step, decide if resource step needed
             if (stepName === 'datetime' && $dateInput.length && $timeSelect.length) {
                 if ($resourceStep.is(':visible')) {
