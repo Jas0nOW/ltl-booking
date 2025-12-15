@@ -3,6 +3,73 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Mailer {
 
+    public static function init(): void {
+        add_action( 'phpmailer_init', [ __CLASS__, 'configure_phpmailer' ] );
+    }
+
+    /**
+     * Configure PHPMailer for SMTP when enabled in LazyBookings settings.
+     * Note: This affects all wp_mail() calls site-wide while enabled.
+     */
+    public static function configure_phpmailer( $phpmailer ): void {
+        $settings = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $settings ) ) {
+            return;
+        }
+        if ( empty( $settings['smtp_enabled'] ) ) {
+            return;
+        }
+
+        $host = isset( $settings['smtp_host'] ) ? sanitize_text_field( (string) $settings['smtp_host'] ) : '';
+        $port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 0;
+        $encryption = isset( $settings['smtp_encryption'] ) ? sanitize_key( (string) $settings['smtp_encryption'] ) : '';
+        $auth = ! empty( $settings['smtp_auth'] );
+        $username = isset( $settings['smtp_username'] ) ? sanitize_text_field( (string) $settings['smtp_username'] ) : '';
+
+        $mail_keys = get_option( 'lazy_mail_keys', [] );
+        if ( ! is_array( $mail_keys ) ) {
+            $mail_keys = [];
+        }
+        $password = isset( $mail_keys['smtp_password'] ) ? (string) $mail_keys['smtp_password'] : '';
+
+        if ( $host === '' || $port <= 0 ) {
+            return;
+        }
+
+        try {
+            $phpmailer->isSMTP();
+            $phpmailer->Host = $host;
+            $phpmailer->Port = $port;
+            $phpmailer->SMTPAuth = $auth;
+
+            if ( $encryption === 'tls' || $encryption === 'ssl' ) {
+                $phpmailer->SMTPSecure = $encryption;
+            }
+
+            if ( $auth ) {
+                $phpmailer->Username = $username;
+                $phpmailer->Password = $password;
+            }
+
+            $from_email = $settings['mail_from_email'] ?? '';
+            $from_name = $settings['mail_from_name'] ?? '';
+            if ( is_string( $from_email ) ) {
+                $from_email = sanitize_email( $from_email );
+            }
+            if ( is_string( $from_name ) ) {
+                $from_name = sanitize_text_field( $from_name );
+            }
+            if ( $from_email && is_email( $from_email ) ) {
+                $phpmailer->setFrom( $from_email, $from_name ?: '' , false );
+            }
+        } catch ( Throwable $e ) {
+            // Never break the page because of SMTP config.
+            if ( class_exists( 'LTLB_Logger' ) ) {
+                LTLB_Logger::error( 'SMTP init failed: ' . $e->getMessage() );
+            }
+        }
+    }
+
     public static function replace_placeholders(string $template, array $placeholders): string {
         $search = [];
         $replace = [];

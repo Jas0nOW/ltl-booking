@@ -108,6 +108,9 @@ class LTLB_Activator {
 		// Payment Keys (autoload: false for security)
 		add_option('lazy_payment_keys', [], '', 'no');
 
+        // Mail Keys (autoload: false for security)
+        add_option('lazy_mail_keys', [], '', 'no');
+
 		// Schedule retention cleanup (daily)
 		if ( function_exists( 'wp_next_scheduled' ) && function_exists( 'wp_schedule_event' ) ) {
 			if ( ! wp_next_scheduled( 'ltlb_retention_cleanup' ) ) {

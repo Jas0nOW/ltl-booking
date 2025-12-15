@@ -339,6 +339,14 @@ class LTLB_DiagnosticsPage {
         if (!empty($reply_to)) {
             echo '<p><strong>' . esc_html__( 'Reply-To:', 'ltl-bookings' ) . '</strong> ' . esc_html($reply_to) . '</p>';
         }
+
+		$smtp_enabled = ! empty( $settings['smtp_enabled'] );
+		$smtp_host = isset( $settings['smtp_host'] ) ? (string) $settings['smtp_host'] : '';
+		$smtp_port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 0;
+		echo '<p><strong>' . esc_html__( 'SMTP:', 'ltl-bookings' ) . '</strong> ' . esc_html( $smtp_enabled ? 'Enabled' : 'Disabled' ) . '</p>';
+		if ( $smtp_enabled && $smtp_host !== '' && $smtp_port > 0 ) {
+			echo '<p><strong>' . esc_html__( 'SMTP server:', 'ltl-bookings' ) . '</strong> ' . esc_html( $smtp_host ) . ':' . esc_html( (string) $smtp_port ) . '</p>';
+		}
         
         // Logging
         $logging_enabled = !empty($settings['logging_enabled']);
