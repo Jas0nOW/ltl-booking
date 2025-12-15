@@ -601,6 +601,16 @@ class LTLB_Shortcodes {
 			}
 		}
 		$enabled_methods = array_values( array_unique( $enabled_methods ) );
+
+		// Safety: if the booking has a price and payments are enabled, do not allow completing
+		// the booking with no configured payment methods (would look like a free booking).
+		if ( $price > 0 && $enable_payments && empty( $enabled_methods ) ) {
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>'
+				. esc_html__( 'Payment required:', 'ltl-bookings' )
+				. '</strong> '
+				. esc_html__( 'Online payments are enabled, but no payment methods are configured. Please contact us or try again later.', 'ltl-bookings' )
+				. '</div></div>';
+		}
 		$payment_method = isset( $data['payment_method'] ) ? sanitize_key( (string) $data['payment_method'] ) : '';
 		if ( $payment_method === '' ) {
 			$payment_method = in_array( 'stripe_card', $enabled_methods, true ) ? 'stripe_card' : ( ! empty( $enabled_methods ) ? (string) $enabled_methods[0] : '' );
