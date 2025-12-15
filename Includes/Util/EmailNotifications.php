@@ -300,6 +300,9 @@ class LTLB_EmailNotifications {
             $headers[] = 'Reply-To: ' . $reply_to;
         }
 
+        if ( class_exists( 'LTLB_Mailer' ) && method_exists( 'LTLB_Mailer', 'wp_mail' ) ) {
+            return LTLB_Mailer::wp_mail( $to, $subject, $body, $headers );
+        }
         return wp_mail( $to, $subject, $body, $headers );
     }
 }

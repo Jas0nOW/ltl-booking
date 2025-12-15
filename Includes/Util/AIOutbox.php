@@ -329,7 +329,9 @@ class LTLB_AI_Outbox {
 				return [ 'success' => false, 'message' => __( 'Email subject/body missing.', 'ltl-bookings' ) ];
 			}
 
-			$sent = wp_mail( $to, $subject, $body );
+			$sent = ( class_exists( 'LTLB_Mailer' ) && method_exists( 'LTLB_Mailer', 'wp_mail' ) )
+				? LTLB_Mailer::wp_mail( $to, $subject, $body )
+				: wp_mail( $to, $subject, $body );
 			if ( ! $sent ) {
 				return [ 'success' => false, 'message' => __( 'wp_mail failed.', 'ltl-bookings' ) ];
 			}

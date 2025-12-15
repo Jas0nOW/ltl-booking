@@ -343,7 +343,14 @@ class LTLB_DiagnosticsPage {
 		$smtp_enabled = ! empty( $settings['smtp_enabled'] );
 		$smtp_host = isset( $settings['smtp_host'] ) ? (string) $settings['smtp_host'] : '';
 		$smtp_port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 0;
+        $smtp_scope = isset( $settings['smtp_scope'] ) ? sanitize_key( (string) $settings['smtp_scope'] ) : 'global';
+        if ( $smtp_scope !== 'global' && $smtp_scope !== 'plugin' ) {
+            $smtp_scope = 'global';
+        }
 		echo '<p><strong>' . esc_html__( 'SMTP:', 'ltl-bookings' ) . '</strong> ' . esc_html( $smtp_enabled ? 'Enabled' : 'Disabled' ) . '</p>';
+        if ( $smtp_enabled ) {
+            echo '<p><strong>' . esc_html__( 'SMTP scope:', 'ltl-bookings' ) . '</strong> ' . esc_html( $smtp_scope === 'plugin' ? 'LazyBookings only' : 'Global' ) . '</p>';
+        }
 		if ( $smtp_enabled && $smtp_host !== '' && $smtp_port > 0 ) {
 			echo '<p><strong>' . esc_html__( 'SMTP server:', 'ltl-bookings' ) . '</strong> ' . esc_html( $smtp_host ) . ':' . esc_html( (string) $smtp_port ) . '</p>';
 		}

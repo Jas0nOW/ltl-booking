@@ -33,7 +33,9 @@ class LTLB_Admin_SettingsPage {
 				}
                 $body .= '<p>' . esc_html__( 'Sent at:', 'ltl-bookings' ) . ' ' . esc_html( current_time('Y-m-d H:i:s') ) . '</p>';
 
-				$sent = wp_mail( $test_email, $subject, $body, $headers );
+                $sent = ( class_exists( 'LTLB_Mailer' ) && method_exists( 'LTLB_Mailer', 'wp_mail' ) )
+                    ? LTLB_Mailer::wp_mail( $test_email, $subject, $body, $headers )
+                    : wp_mail( $test_email, $subject, $body, $headers );
 				if ( $sent ) {
                     LTLB_Notices::add( __( 'Test email sent successfully to ', 'ltl-bookings' ) . $test_email, 'success' );
 				} else {
@@ -104,6 +106,7 @@ class LTLB_Admin_SettingsPage {
                 $settings['smtp_encryption'] = in_array( $enc, [ 'none', 'tls', 'ssl' ], true ) ? $enc : 'tls';
                 $settings['smtp_auth'] = isset( $_POST['ltlb_smtp_auth'] ) ? 1 : 0;
                 $settings['smtp_username'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_username'] ?? ( $settings['smtp_username'] ?? '' ) );
+                $settings['smtp_scope'] = isset( $_POST['ltlb_smtp_scope_plugin_only'] ) ? 'plugin' : 'global';
 
                 // Store SMTP password separately (autoload=no). Blank input keeps existing.
                 $mail_keys = get_option( 'lazy_mail_keys', [] );
@@ -200,6 +203,8 @@ class LTLB_Admin_SettingsPage {
             $smtp_encryption = $settings['smtp_encryption'] ?? 'tls';
             $smtp_auth = isset( $settings['smtp_auth'] ) ? (int) $settings['smtp_auth'] : 1;
             $smtp_username = $settings['smtp_username'] ?? '';
+            $smtp_scope = $settings['smtp_scope'] ?? 'global';
+            $smtp_scope = in_array( (string) $smtp_scope, [ 'global', 'plugin' ], true ) ? (string) $smtp_scope : 'global';
             $mail_keys = get_option( 'lazy_mail_keys', [] );
             if ( ! is_array( $mail_keys ) ) {
                 $mail_keys = [];
@@ -453,7 +458,9 @@ class LTLB_Admin_SettingsPage {
                                 <th scope="row"><label for="ltlb_smtp_enabled"><?php echo esc_html__( 'Enable SMTP', 'ltl-bookings' ); ?></label></th>
                                 <td>
                                     <label><input type="checkbox" name="ltlb_smtp_enabled" id="ltlb_smtp_enabled" value="1" <?php checked( $smtp_enabled ); ?>> <?php echo esc_html__( 'Send emails via SMTP instead of the server mail function', 'ltl-bookings' ); ?></label>
-                                    <p class="description"><?php echo esc_html__( 'This configures WordPress wp_mail() globally while enabled.', 'ltl-bookings' ); ?></p>
+                                    <p class="description"><?php echo esc_html__( 'By default this configures WordPress wp_mail() globally while enabled.', 'ltl-bookings' ); ?></p>
+                                    <p style="margin-top:6px;"><label><input type="checkbox" name="ltlb_smtp_scope_plugin_only" value="1" <?php checked( $smtp_scope === 'plugin' ); ?>> <?php echo esc_html__( 'Only apply SMTP to LazyBookings emails', 'ltl-bookings' ); ?></label></p>
+                                    <p class="description"><?php echo esc_html__( 'Enable this to avoid affecting other plugins that also send emails.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
