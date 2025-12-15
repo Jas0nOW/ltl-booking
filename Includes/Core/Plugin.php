@@ -28,6 +28,10 @@ class LTLB_Plugin {
         // Load required classes
         $this->load_classes();
 
+        if ( class_exists( 'LTLB_Mailer' ) && method_exists( 'LTLB_Mailer', 'init' ) ) {
+            LTLB_Mailer::init();
+        }
+
 		if ( class_exists('LTLB_I18n') ) {
 			LTLB_I18n::init();
 		}

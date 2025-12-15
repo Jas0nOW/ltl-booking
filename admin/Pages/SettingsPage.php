@@ -95,6 +95,27 @@ class LTLB_Admin_SettingsPage {
                     $settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? ( $settings['mail_customer_template'] ?? '' ) );
                     $settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? ( $settings['mail_admin_subject'] ?? '' ) );
                     $settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? ( $settings['mail_customer_subject'] ?? '' ) );
+
+                // SMTP (optional)
+                $settings['smtp_enabled'] = isset( $_POST['ltlb_smtp_enabled'] ) ? 1 : 0;
+                $settings['smtp_host'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_host'] ?? ( $settings['smtp_host'] ?? '' ) );
+                $settings['smtp_port'] = max( 0, intval( $_POST['ltlb_smtp_port'] ?? ( $settings['smtp_port'] ?? 587 ) ) );
+                $enc = sanitize_key( (string) ( $_POST['ltlb_smtp_encryption'] ?? ( $settings['smtp_encryption'] ?? 'tls' ) ) );
+                $settings['smtp_encryption'] = in_array( $enc, [ 'none', 'tls', 'ssl' ], true ) ? $enc : 'tls';
+                $settings['smtp_auth'] = isset( $_POST['ltlb_smtp_auth'] ) ? 1 : 0;
+                $settings['smtp_username'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_username'] ?? ( $settings['smtp_username'] ?? '' ) );
+
+                // Store SMTP password separately (autoload=no). Blank input keeps existing.
+                $mail_keys = get_option( 'lazy_mail_keys', [] );
+                if ( ! is_array( $mail_keys ) ) {
+                    $mail_keys = [];
+                }
+                $smtp_password = isset( $_POST['ltlb_smtp_password'] ) ? (string) $_POST['ltlb_smtp_password'] : '';
+                $smtp_password = sanitize_text_field( $smtp_password );
+                if ( $smtp_password !== '' ) {
+                    $mail_keys['smtp_password'] = $smtp_password;
+                    update_option( 'lazy_mail_keys', $mail_keys, false );
+                }
                 }
 
                 if ( $current_tab_save === 'security' ) {
@@ -173,6 +194,17 @@ class LTLB_Admin_SettingsPage {
 			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
 			$mail_admin_subject = $settings['mail_admin_subject'] ?? '';
 			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';
+            $smtp_enabled = isset( $settings['smtp_enabled'] ) ? (int) $settings['smtp_enabled'] : 0;
+            $smtp_host = $settings['smtp_host'] ?? '';
+            $smtp_port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 587;
+            $smtp_encryption = $settings['smtp_encryption'] ?? 'tls';
+            $smtp_auth = isset( $settings['smtp_auth'] ) ? (int) $settings['smtp_auth'] : 1;
+            $smtp_username = $settings['smtp_username'] ?? '';
+            $mail_keys = get_option( 'lazy_mail_keys', [] );
+            if ( ! is_array( $mail_keys ) ) {
+                $mail_keys = [];
+            }
+            $has_smtp_password = ! empty( $mail_keys['smtp_password'] ?? '' );
 			
 			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
 			$log_level = $settings['log_level'] ?? 'error';
@@ -408,6 +440,67 @@ class LTLB_Admin_SettingsPage {
                                     <label><?php echo esc_html__( 'Body:', 'ltl-bookings' ); ?><br>
                                     <textarea name="ltlb_email_customer_body" class="large-text" rows="5" aria-describedby="ltlb-email-customer-placeholders" title="<?php echo esc_attr__( 'You can use tags that will be replaced automatically.', 'ltl-bookings' ); ?>"><?php echo esc_textarea( $mail_customer_template ); ?></textarea></label>
                                     <p class="description" id="ltlb-email-customer-placeholders"><?php echo esc_html__( 'Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <?php LTLB_Admin_Component::card_end(); ?>
+
+                <?php LTLB_Admin_Component::card_start(__( 'SMTP (optional)', 'ltl-bookings' )); ?>
+                    <table class="form-table">
+                        <tbody>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_enabled"><?php echo esc_html__( 'Enable SMTP', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <label><input type="checkbox" name="ltlb_smtp_enabled" id="ltlb_smtp_enabled" value="1" <?php checked( $smtp_enabled ); ?>> <?php echo esc_html__( 'Send emails via SMTP instead of the server mail function', 'ltl-bookings' ); ?></label>
+                                    <p class="description"><?php echo esc_html__( 'This configures WordPress wp_mail() globally while enabled.', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_host"><?php echo esc_html__( 'SMTP Host', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="text" class="regular-text" name="ltlb_smtp_host" id="ltlb_smtp_host" value="<?php echo esc_attr( (string) $smtp_host ); ?>" placeholder="smtp.example.com">
+                                    <p class="description"><?php echo esc_html__( 'Examples: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_port"><?php echo esc_html__( 'SMTP Port', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="number" class="small-text" name="ltlb_smtp_port" id="ltlb_smtp_port" value="<?php echo esc_attr( (string) $smtp_port ); ?>" min="1" max="65535">
+                                    <p class="description"><?php echo esc_html__( 'Common ports: 587 (TLS), 465 (SSL).', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_encryption"><?php echo esc_html__( 'Encryption', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <select name="ltlb_smtp_encryption" id="ltlb_smtp_encryption">
+                                        <option value="none" <?php selected( (string) $smtp_encryption, 'none' ); ?>><?php echo esc_html__( 'None', 'ltl-bookings' ); ?></option>
+                                        <option value="tls" <?php selected( (string) $smtp_encryption, 'tls' ); ?>>TLS</option>
+                                        <option value="ssl" <?php selected( (string) $smtp_encryption, 'ssl' ); ?>>SSL</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_auth"><?php echo esc_html__( 'Authentication', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <label><input type="checkbox" name="ltlb_smtp_auth" id="ltlb_smtp_auth" value="1" <?php checked( $smtp_auth ); ?>> <?php echo esc_html__( 'Use SMTP authentication', 'ltl-bookings' ); ?></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_username"><?php echo esc_html__( 'SMTP Username', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="text" class="regular-text" name="ltlb_smtp_username" id="ltlb_smtp_username" value="<?php echo esc_attr( (string) $smtp_username ); ?>" autocomplete="off">
+                                    <p class="description"><?php echo esc_html__( 'Usually your full email address for Gmail/Hostinger/Strato.', 'ltl-bookings' ); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="ltlb_smtp_password"><?php echo esc_html__( 'SMTP Password', 'ltl-bookings' ); ?></label></th>
+                                <td>
+                                    <input type="password" class="regular-text" name="ltlb_smtp_password" id="ltlb_smtp_password" value="" autocomplete="new-password">
+                                    <p class="description">
+                                        <?php if ( $has_smtp_password ) : ?><?php echo esc_html__( 'A password is stored. Leave blank to keep the existing password.', 'ltl-bookings' ); ?><br><?php endif; ?>
+                                        <?php echo esc_html__( 'For Gmail you must use an App Password (not your normal login password).', 'ltl-bookings' ); ?>
+                                    </p>
                                 </td>
                             </tr>
                         </tbody>
