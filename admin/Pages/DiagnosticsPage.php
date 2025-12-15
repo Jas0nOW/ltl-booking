@@ -3,9 +3,87 @@ if (!defined('ABSPATH')) exit;
 
 class LTLB_DiagnosticsPage {
 
+    private function get_log_dir(): string {
+        $upload_dir = wp_upload_dir();
+        $basedir = is_array( $upload_dir ) && ! empty( $upload_dir['basedir'] ) ? (string) $upload_dir['basedir'] : '';
+        return rtrim( $basedir, '/\\' ) . '/ltlb-logs';
+    }
+
+    private function list_log_files(): array {
+        $dir = $this->get_log_dir();
+        if ( ! $dir || ! is_dir( $dir ) ) {
+            return [];
+        }
+        $files = glob( $dir . '/ltlb-*.log' );
+        if ( ! is_array( $files ) ) {
+            return [];
+        }
+        rsort( $files );
+        return $files;
+    }
+
+    private function safe_pick_log_file( string $requested, array $files ): string {
+        if ( $requested === '' ) {
+            return $files[0] ?? '';
+        }
+        $requested = basename( $requested );
+        foreach ( $files as $path ) {
+            if ( basename( (string) $path ) === $requested ) {
+                return (string) $path;
+            }
+        }
+        return $files[0] ?? '';
+    }
+
+    private function tail_file_lines( string $path, int $max_lines = 200 ): array {
+        $max_lines = max( 1, min( 2000, $max_lines ) );
+        if ( ! $path || ! is_readable( $path ) ) {
+            return [];
+        }
+
+        $lines = [];
+        try {
+            $fh = new SplFileObject( $path, 'r' );
+            while ( ! $fh->eof() ) {
+                $line = (string) $fh->fgets();
+                if ( $line === '' ) {
+                    continue;
+                }
+                $lines[] = rtrim( $line, "\r\n" );
+                if ( count( $lines ) > $max_lines ) {
+                    array_shift( $lines );
+                }
+            }
+        } catch ( Exception $e ) {
+            return [];
+        }
+
+        return $lines;
+    }
+
     public function render(): void {
         if (!current_user_can('manage_options')) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        }
+
+        // Handle log download (read-only).
+        if ( isset( $_GET['ltlb_download_log'] ) && $_GET['ltlb_download_log'] === '1' ) {
+            $files = $this->list_log_files();
+            $requested = isset( $_GET['ltlb_log'] ) ? sanitize_text_field( (string) $_GET['ltlb_log'] ) : '';
+            $picked = $this->safe_pick_log_file( $requested, $files );
+
+            if ( ! $picked ) {
+                wp_die( esc_html__( 'Log file not found.', 'ltl-bookings' ) );
+            }
+            if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( (string) $_GET['_wpnonce'], 'ltlb_download_log' ) ) {
+                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
+            }
+
+            nocache_headers();
+            header( 'Content-Type: text/plain; charset=UTF-8' );
+            header( 'Content-Disposition: attachment; filename=' . basename( $picked ) );
+            @readfile( $picked );
+            exit;
         }
 
         // Handle migration action
@@ -148,6 +226,73 @@ class LTLB_DiagnosticsPage {
 
                 echo '</tbody></table>';
                 ?>
+            </div>
+
+            <div class="ltlb-card">
+                <h2><?php echo esc_html__( 'Logs', 'ltl-bookings' ); ?></h2>
+                <?php
+                $settings = get_option( 'lazy_settings', [] );
+                if ( ! is_array( $settings ) ) {
+                    $settings = [];
+                }
+                $logging_enabled = ! empty( $settings['logging_enabled'] );
+
+                $files = $this->list_log_files();
+                $requested = isset( $_GET['ltlb_log'] ) ? sanitize_text_field( (string) $_GET['ltlb_log'] ) : '';
+                $picked = $this->safe_pick_log_file( $requested, $files );
+                $picked_name = $picked ? basename( $picked ) : '';
+
+                $base_url = admin_url( 'admin.php?page=ltlb_diagnostics' );
+                ?>
+
+                <p class="description" style="margin-top:0;">
+                    <?php
+                    echo esc_html__( 'View recent log entries written by the plugin (uploads/ltlb-logs).', 'ltl-bookings' );
+                    if ( ! $logging_enabled ) {
+                        echo ' ' . esc_html__( 'Logging is currently disabled in Settings.', 'ltl-bookings' );
+                    }
+                    ?>
+                </p>
+
+                <?php if ( empty( $files ) ) : ?>
+                    <p class="ltlb-muted" style="margin:0;">
+                        <?php echo esc_html__( 'No log files found yet.', 'ltl-bookings' ); ?>
+                    </p>
+                <?php else : ?>
+                    <form method="get" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <input type="hidden" name="page" value="ltlb_diagnostics" />
+                        <label for="ltlb_log" class="screen-reader-text"><?php echo esc_html__( 'Select log file', 'ltl-bookings' ); ?></label>
+                        <select name="ltlb_log" id="ltlb_log">
+                            <?php foreach ( $files as $f ) :
+                                $bn = basename( (string) $f );
+                            ?>
+                                <option value="<?php echo esc_attr( $bn ); ?>" <?php selected( $bn, $picked_name ); ?>><?php echo esc_html( $bn ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="submit" class="button"><?php echo esc_html__( 'View', 'ltl-bookings' ); ?></button>
+                        <?php
+                        $dl_url = add_query_arg(
+                            [
+                                'page' => 'ltlb_diagnostics',
+                                'ltlb_log' => $picked_name,
+                                'ltlb_download_log' => '1',
+                                '_wpnonce' => wp_create_nonce( 'ltlb_download_log' ),
+                            ],
+                            $base_url
+                        );
+                        ?>
+                        <a class="button button-secondary" href="<?php echo esc_url( $dl_url ); ?>"><?php echo esc_html__( 'Download', 'ltl-bookings' ); ?></a>
+                    </form>
+
+                    <?php
+                    $lines = $picked ? $this->tail_file_lines( $picked, 200 ) : [];
+                    $content = ! empty( $lines ) ? implode( "\n", $lines ) : '';
+                    ?>
+                    <p style="margin-top:12px;">
+                        <label class="screen-reader-text" for="ltlb-log-preview"><?php echo esc_html__( 'Log preview', 'ltl-bookings' ); ?></label>
+                        <textarea id="ltlb-log-preview" class="large-text code" rows="14" readonly><?php echo esc_textarea( $content !== '' ? $content : __( 'Log file is empty.', 'ltl-bookings' ) ); ?></textarea>
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
         <?php

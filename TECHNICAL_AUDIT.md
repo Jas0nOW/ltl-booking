@@ -2,16 +2,16 @@
 
 ## P0 (Critical)
 
-- None found.
+(Alle P0-Punkte aus dieser Audit-Datei wurden abgearbeitet.)
 
 ## P1 (High)
 
-- None found.
+(Alle P1-Punkte aus dieser Audit-Datei wurden abgearbeitet.)
 
 ## P2 (Medium)
 
-- None found.
+(Alle P2-Punkte aus dieser Audit-Datei wurden abgearbeitet.)
 
 ## P3 (Low)
 
-- None found.
+(Alle P3-Punkte aus dieser Audit-Datei wurden abgearbeitet.)

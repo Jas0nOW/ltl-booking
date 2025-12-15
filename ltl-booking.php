@@ -20,6 +20,10 @@ define( 'LTLB_VERSION', '1.0.1' );
 define( 'LTLB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LTLB_URL', plugin_dir_url( __FILE__ ) );
 
+add_action( 'plugins_loaded', function () {
+    load_plugin_textdomain( 'ltl-bookings', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+} );
+
 require_once LTLB_PATH . 'Includes/DB/Schema.php';
 require_once LTLB_PATH . 'Includes/DB/Migrator.php';
 require_once LTLB_PATH . 'Includes/Core/Activator.php';

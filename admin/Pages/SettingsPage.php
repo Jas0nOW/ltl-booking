@@ -102,6 +102,24 @@ class LTLB_Admin_SettingsPage {
                     $processor = sanitize_key( (string) ( $_POST['payment_processor'] ?? ( $settings['payment_processor'] ?? 'stripe' ) ) );
                     $settings['payment_processor'] = in_array( $processor, [ 'stripe', 'paypal' ], true ) ? $processor : 'stripe';
 
+                    $store_country = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['store_country'] ?? ( $settings['store_country'] ?? '' ) ) ) );
+                    $settings['store_country'] = $store_country !== '' ? substr( $store_country, 0, 2 ) : 'DE';
+                    $currency = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['default_currency'] ?? ( $settings['default_currency'] ?? '' ) ) ) );
+                    $settings['default_currency'] = $currency !== '' ? substr( $currency, 0, 3 ) : 'EUR';
+                    $stripe_flow = sanitize_key( (string) ( $_POST['stripe_flow'] ?? ( $settings['stripe_flow'] ?? 'checkout' ) ) );
+                    $settings['stripe_flow'] = in_array( $stripe_flow, [ 'checkout', 'elements' ], true ) ? $stripe_flow : 'checkout';
+
+                    $allowed_methods = [ 'stripe_card', 'paypal', 'klarna', 'cash', 'pos_card', 'invoice' ];
+                    $methods_in = isset( $_POST['payment_methods'] ) ? (array) $_POST['payment_methods'] : [];
+                    $methods = [];
+                    foreach ( $methods_in as $m ) {
+                        $m = sanitize_key( (string) $m );
+                        if ( in_array( $m, $allowed_methods, true ) ) {
+                            $methods[] = $m;
+                        }
+                    }
+                    $settings['payment_methods'] = array_values( array_unique( $methods ) );
+
                     // Store payment keys separately (autoload=no). Empty inputs keep existing keys.
                     $payment_keys = get_option( 'lazy_payment_keys', [] );
                     if ( ! is_array( $payment_keys ) ) {
@@ -109,6 +127,7 @@ class LTLB_Admin_SettingsPage {
                     }
                     $stripe_public = sanitize_text_field( (string) ( $_POST['stripe_public_key'] ?? '' ) );
                     $stripe_secret = sanitize_text_field( (string) ( $_POST['stripe_secret_key'] ?? '' ) );
+                    $stripe_webhook_secret = sanitize_text_field( (string) ( $_POST['stripe_webhook_secret'] ?? '' ) );
                     $paypal_client_id = sanitize_text_field( (string) ( $_POST['paypal_client_id'] ?? '' ) );
                     $paypal_secret = sanitize_text_field( (string) ( $_POST['paypal_secret'] ?? '' ) );
 
@@ -118,6 +137,9 @@ class LTLB_Admin_SettingsPage {
                     if ( $stripe_secret !== '' ) {
                         $payment_keys['stripe_secret_key'] = $stripe_secret;
                     }
+					if ( $stripe_webhook_secret !== '' ) {
+						$payment_keys['stripe_webhook_secret'] = $stripe_webhook_secret;
+					}
                     if ( $paypal_client_id !== '' ) {
                         $payment_keys['paypal_client_id'] = $paypal_client_id;
                     }
@@ -180,8 +202,14 @@ class LTLB_Admin_SettingsPage {
         }
         $has_stripe_public = ! empty( $payment_keys['stripe_public_key'] ?? ( $settings['stripe_public_key'] ?? '' ) );
         $has_stripe_secret = ! empty( $payment_keys['stripe_secret_key'] ?? ( $settings['stripe_secret_key'] ?? '' ) );
+        $has_stripe_webhook = ! empty( $payment_keys['stripe_webhook_secret'] ?? '' );
         $has_paypal_client = ! empty( $payment_keys['paypal_client_id'] ?? ( $settings['paypal_client_id'] ?? '' ) );
         $has_paypal_secret = ! empty( $payment_keys['paypal_secret'] ?? ( $settings['paypal_secret'] ?? '' ) );
+
+        $store_country = $settings['store_country'] ?? 'DE';
+        $default_currency = $settings['default_currency'] ?? 'EUR';
+        $stripe_flow = $settings['stripe_flow'] ?? 'checkout';
+        $selected_methods = isset( $settings['payment_methods'] ) && is_array( $settings['payment_methods'] ) ? $settings['payment_methods'] : [];
 
 		$business_context = get_option( 'lazy_business_context', [] );
 		if ( ! is_array( $business_context ) ) $business_context = [];
@@ -416,6 +444,44 @@ class LTLB_Admin_SettingsPage {
                                     </select>
                                 </td>
                             </tr>
+                        <tr>
+                            <th scope="row"><label for="store_country"><?php echo esc_html__( 'Store Country', 'ltl-bookings' ); ?></label></th>
+                            <td>
+                                <input type="text" name="store_country" id="store_country" class="small-text" value="<?php echo esc_attr( strtoupper( (string) $store_country ) ); ?>" maxlength="2" autocomplete="off">
+                                <p class="description"><?php echo esc_html__( 'Two-letter country code (e.g. DE, ES). Used to decide which payment methods make sense.', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="default_currency"><?php echo esc_html__( 'Default Currency', 'ltl-bookings' ); ?></label></th>
+                            <td>
+                                <input type="text" name="default_currency" id="default_currency" class="small-text" value="<?php echo esc_attr( strtoupper( (string) $default_currency ) ); ?>" maxlength="3" autocomplete="off">
+                                <p class="description"><?php echo esc_html__( 'Three-letter currency code (e.g. EUR).', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="stripe_flow"><?php echo esc_html__( 'Stripe Flow', 'ltl-bookings' ); ?></label></th>
+                            <td>
+                                <select name="stripe_flow" id="stripe_flow">
+                                    <option value="checkout" <?php selected( (string) $stripe_flow, 'checkout' ); ?>><?php echo esc_html__( 'Checkout (redirect)', 'ltl-bookings' ); ?></option>
+                                    <option value="elements" <?php selected( (string) $stripe_flow, 'elements' ); ?>><?php echo esc_html__( 'Elements (inline)', 'ltl-bookings' ); ?></option>
+                                </select>
+                                <p class="description"><?php echo esc_html__( 'Checkout is recommended for the MVP (SCA/3DS handled by Stripe).', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php echo esc_html__( 'Enabled Methods', 'ltl-bookings' ); ?></th>
+                            <td>
+                                <fieldset>
+                                    <label><input type="checkbox" name="payment_methods[]" value="stripe_card" <?php checked( in_array( 'stripe_card', $selected_methods, true ) ); ?>> <?php echo esc_html__( 'Card (Stripe)', 'ltl-bookings' ); ?></label><br>
+                                    <label><input type="checkbox" name="payment_methods[]" value="paypal" <?php checked( in_array( 'paypal', $selected_methods, true ) ); ?>> PayPal</label><br>
+                                    <label><input type="checkbox" name="payment_methods[]" value="klarna" <?php checked( in_array( 'klarna', $selected_methods, true ) ); ?>> Klarna</label><br>
+                                    <label><input type="checkbox" name="payment_methods[]" value="cash" <?php checked( in_array( 'cash', $selected_methods, true ) ); ?>> <?php echo esc_html__( 'Cash (on site)', 'ltl-bookings' ); ?></label><br>
+                                    <label><input type="checkbox" name="payment_methods[]" value="pos_card" <?php checked( in_array( 'pos_card', $selected_methods, true ) ); ?>> <?php echo esc_html__( 'Card (POS / on site)', 'ltl-bookings' ); ?></label><br>
+                                    <label><input type="checkbox" name="payment_methods[]" value="invoice" <?php checked( in_array( 'invoice', $selected_methods, true ) ); ?>> <?php echo esc_html__( 'Invoice (company)', 'ltl-bookings' ); ?></label>
+                                </fieldset>
+                                <p class="description"><?php echo esc_html__( 'These are used to control which methods can be offered on the booking form (implementation follows in the next steps).', 'ltl-bookings' ); ?></p>
+                            </td>
+                        </tr>
                             <tr>
                                 <th scope="row"><label for="stripe_public_key"><?php echo esc_html__( 'Stripe Public Key', 'ltl-bookings' ); ?></label></th>
                                 <td>
@@ -436,6 +502,16 @@ class LTLB_Admin_SettingsPage {
                                     </p>
                                 </td>
                             </tr>
+						<tr>
+							<th scope="row"><label for="stripe_webhook_secret"><?php echo esc_html__( 'Stripe Webhook Secret', 'ltl-bookings' ); ?></label></th>
+							<td>
+								<input type="password" name="stripe_webhook_secret" id="stripe_webhook_secret" class="regular-text" value="" autocomplete="new-password">
+								<p class="description">
+									<?php if ( $has_stripe_webhook ) : ?><?php echo esc_html__( 'A webhook secret is stored. Leave blank to keep the existing secret.', 'ltl-bookings' ); ?><br><?php endif; ?>
+									<?php echo esc_html__( 'Your Stripe webhook signing secret (whsec_...). Used to verify payment events.', 'ltl-bookings' ); ?>
+								</p>
+							</td>
+						</tr>
                             <tr>
                                 <th scope="row"><label for="paypal_client_id"><?php echo esc_html__( 'PayPal Client ID', 'ltl-bookings' ); ?></label></th>
                                 <td>

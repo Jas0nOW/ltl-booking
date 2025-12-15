@@ -40,6 +40,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
 		}
 		
 		$latest_appointments = $appt_repo->get_all(['limit' => 5]);
+        $can_view_appointment_detail = current_user_can( 'manage_options' );
 
 		?>
         <div class="wrap ltlb-admin ltlb-admin--dashboard">
@@ -90,9 +91,16 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                         $cust = $cust_repo->get_by_id( intval($a['customer_id']) );
                                         $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
                                         $service = $s_repo->get_by_id( intval($a['service_id']) );
+                                        $view_url = admin_url('admin.php?page=ltlb_appointments&action=view&id=' . intval( $a['id'] ?? 0 ) );
                                     ?>
                                         <tr>
-                                            <td><?php echo esc_html( $cust_name ); ?></td>
+                                            <td>
+                                                <?php if ( $can_view_appointment_detail && ! empty( $a['id'] ) ) : ?>
+                                                    <a href="<?php echo esc_url( $view_url ); ?>"><?php echo esc_html( $cust_name ); ?></a>
+                                                <?php else : ?>
+                                                    <?php echo esc_html( $cust_name ); ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
                                             <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $a['start_at'] ) ) ); ?></td>
                                             <td>
@@ -150,6 +158,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
         $recent_ids = get_user_meta(get_current_user_id(), 'ltlb_recently_viewed_appointments', true);
         if (!is_array($recent_ids)) $recent_ids = [];
         $recent_ids = array_slice($recent_ids, 0, 5);
+        $can_view_appointment_detail = current_user_can( 'manage_options' );
         
         ?>
         <?php LTLB_Admin_Component::card_start(__( 'Recently Viewed', 'ltl-bookings' ), ['class' => 'ltlb-card--sidebar']); ?>
@@ -168,7 +177,11 @@ class LTLB_Admin_AppointmentsDashboardPage {
                         $view_url = admin_url('admin.php?page=ltlb_appointments&action=view&id=' . $appt_id);
                     ?>
                         <li class="ltlb-recent-item">
-                            <a href="<?php echo esc_url($view_url); ?>" class="ltlb-recent-item__link">
+                            <?php if ( $can_view_appointment_detail ) : ?>
+                                <a href="<?php echo esc_url($view_url); ?>" class="ltlb-recent-item__link">
+                            <?php else : ?>
+                                <div class="ltlb-recent-item__link">
+                            <?php endif; ?>
                                 <div class="ltlb-recent-item__title">
                                     <?php echo esc_html($cust_name); ?>
                                 </div>
@@ -176,7 +189,11 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                     <span class="dashicons dashicons-clock" aria-hidden="true"></span>
                                     <?php echo esc_html(date_i18n(get_option('time_format'), strtotime($appt['start_at']))); ?>
                                 </div>
-                            </a>
+                            <?php if ( $can_view_appointment_detail ) : ?>
+                                </a>
+                            <?php else : ?>
+                                </div>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>

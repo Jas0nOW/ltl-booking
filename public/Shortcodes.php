@@ -91,53 +91,12 @@ class LTLB_Shortcodes {
 	}
 
 	public static function process_payment( WP_REST_Request $request ): WP_REST_Response {
-		$limited = self::maybe_rate_limit( 'payment' );
-		if ( $limited ) return $limited;
-
-		$appointment_id = intval( $request->get_param( 'appointment_id' ) );
-		$payment_token = sanitize_text_field( $request->get_param( 'payment_token' ) ?? '' );
-
-		if ( $appointment_id <= 0 ) {
-			return new WP_REST_Response( [ 'success' => false, 'error' => 'Invalid appointment ID' ], 400 );
-		}
-
-		$appt_repo = new LTLB_AppointmentRepository();
-		$appointment = $appt_repo->get_by_id( $appointment_id );
-
-		if ( ! $appointment ) {
-			return new WP_REST_Response( [ 'success' => false, 'error' => 'Appointment not found' ], 404 );
-		}
-
-		$amount = floatval( $appointment['price'] ?? 0 );
-		if ( $amount <= 0 && isset( $appointment['amount_cents'] ) ) {
-			$amount = floatval( intval( $appointment['amount_cents'] ) ) / 100;
-		}
-		if ( $amount <= 0 ) {
-			return new WP_REST_Response( [ 'success' => true, 'payment_status' => 'free' ], 200 );
-		}
-
-		$payment_engine = LTLB_PaymentEngine::instance();
-		$result = $payment_engine->process_payment( $appointment, $amount );
-
-		if ( $result['success'] ?? false ) {
-			// Update appointment status to paid/confirmed
-			global $wpdb;
-			$table = $wpdb->prefix . 'lazy_appointments';
-			$wpdb->update(
-				$table,
-				[
-					'status' => 'confirmed',
-					'payment_status' => 'paid',
-					'payment_ref' => sanitize_text_field( (string) ( $result['transaction_id'] ?? '' ) ),
-					'paid_at' => current_time( 'mysql' ),
-				],
-				[ 'id' => $appointment_id ],
-				[ '%s', '%s', '%s', '%s' ],
-				[ '%d' ]
-			);
-		}
-
-		return new WP_REST_Response( $result, $result['success'] ? 200 : 400 );
+		// Legacy endpoint: disabled for security.
+		// Payments are confirmed via provider webhooks (e.g., Stripe Checkout webhook).
+		return new WP_REST_Response( [
+			'success' => false,
+			'error' => 'payment_endpoint_disabled',
+		], 410 );
 	}
 
 	public static function get_time_slots( WP_REST_Request $request ): WP_REST_Response {
@@ -354,6 +313,26 @@ class LTLB_Shortcodes {
 				'resource_number' => __( 'Resource #', 'ltl-bookings' ),
 				'select_room_optional' => __( 'Optional: select a room.', 'ltl-bookings' ),
 				'select_resource_optional' => __( 'Optional: select a resource.', 'ltl-bookings' ),
+				'loading_availability' => __( 'Loading availability…', 'ltl-bookings' ),
+				'loading_resources' => __( 'Loading resources…', 'ltl-bookings' ),
+				'loading_times' => __( 'Loading available times…', 'ltl-bookings' ),
+				'times_still_loading' => __( 'Available times are still loading…', 'ltl-bookings' ),
+				'select_date_first' => __( 'Select a date first', 'ltl-bookings' ),
+				'times_load_failed' => __( 'Times could not be loaded', 'ltl-bookings' ),
+				'times_load_failed_reload' => __( 'Times could not be loaded. Please reload the page.', 'ltl-bookings' ),
+				'times_load_failed_retry' => __( 'Times could not be loaded. Please try again.', 'ltl-bookings' ),
+				'no_times_available' => __( 'No times available', 'ltl-bookings' ),
+				'no_times_available_for_date' => __( 'No times are available for this date.', 'ltl-bookings' ),
+				'select_time' => __( 'Select a time', 'ltl-bookings' ),
+				'validation_select_service' => __( 'Please select a service.', 'ltl-bookings' ),
+				'validation_select_date' => __( 'Please select a date.', 'ltl-bookings' ),
+				'validation_select_time' => __( 'Please select a time.', 'ltl-bookings' ),
+				'validation_select_checkin' => __( 'Please select a check-in date.', 'ltl-bookings' ),
+				'validation_select_checkout' => __( 'Please select a check-out date.', 'ltl-bookings' ),
+				'validation_date_past' => __( 'The date cannot be in the past.', 'ltl-bookings' ),
+				'validation_checkout_after_checkin' => __( 'Check-out must be after check-in.', 'ltl-bookings' ),
+				'validation_enter_email' => __( 'Please enter your email address.', 'ltl-bookings' ),
+				'validation_invalid_email' => __( 'Please enter a valid email address.', 'ltl-bookings' ),
 				'availability_error' => __( 'Availability could not be loaded. Please try again.', 'ltl-bookings' ),
 				'resources_error' => __( 'Resources could not be loaded. Please try again.', 'ltl-bookings' ),
 			] );
@@ -410,6 +389,26 @@ class LTLB_Shortcodes {
 			'resource_number' => __( 'Resource #', 'ltl-bookings' ),
 			'select_room_optional' => __( 'Optional: select a room.', 'ltl-bookings' ),
 			'select_resource_optional' => __( 'Optional: select a resource.', 'ltl-bookings' ),
+			'loading_availability' => __( 'Loading availability…', 'ltl-bookings' ),
+			'loading_resources' => __( 'Loading resources…', 'ltl-bookings' ),
+			'loading_times' => __( 'Loading available times…', 'ltl-bookings' ),
+			'times_still_loading' => __( 'Available times are still loading…', 'ltl-bookings' ),
+			'select_date_first' => __( 'Select a date first', 'ltl-bookings' ),
+			'times_load_failed' => __( 'Times could not be loaded', 'ltl-bookings' ),
+			'times_load_failed_reload' => __( 'Times could not be loaded. Please reload the page.', 'ltl-bookings' ),
+			'times_load_failed_retry' => __( 'Times could not be loaded. Please try again.', 'ltl-bookings' ),
+			'no_times_available' => __( 'No times available', 'ltl-bookings' ),
+			'no_times_available_for_date' => __( 'No times are available for this date.', 'ltl-bookings' ),
+			'select_time' => __( 'Select a time', 'ltl-bookings' ),
+			'validation_select_service' => __( 'Please select a service.', 'ltl-bookings' ),
+			'validation_select_date' => __( 'Please select a date.', 'ltl-bookings' ),
+			'validation_select_time' => __( 'Please select a time.', 'ltl-bookings' ),
+			'validation_select_checkin' => __( 'Please select a check-in date.', 'ltl-bookings' ),
+			'validation_select_checkout' => __( 'Please select a check-out date.', 'ltl-bookings' ),
+			'validation_date_past' => __( 'The date cannot be in the past.', 'ltl-bookings' ),
+			'validation_checkout_after_checkin' => __( 'Check-out must be after check-in.', 'ltl-bookings' ),
+			'validation_enter_email' => __( 'Please enter your email address.', 'ltl-bookings' ),
+			'validation_invalid_email' => __( 'Please enter a valid email address.', 'ltl-bookings' ),
 			'availability_error' => __( 'Availability could not be loaded. Please try again.', 'ltl-bookings' ),
 			'resources_error' => __( 'Resources could not be loaded. Please try again.', 'ltl-bookings' ),
 		] );
@@ -516,6 +515,33 @@ class LTLB_Shortcodes {
 	if ( ! is_array($services) ) {
 		$services = [];
 	}
+
+		// Payments (for UI): show only enabled methods; show online only if configured.
+		$ls_pay = get_option( 'lazy_settings', [] );
+		if ( ! is_array( $ls_pay ) ) $ls_pay = [];
+		$enable_payments_ui = ! empty( $ls_pay['enable_payments'] );
+		$methods = [];
+		if ( $enable_payments_ui && ! empty( $ls_pay['payment_methods'] ) && is_array( $ls_pay['payment_methods'] ) ) {
+			foreach ( $ls_pay['payment_methods'] as $m ) {
+				$m = sanitize_key( (string) $m );
+				if ( $m !== '' ) $methods[] = $m;
+			}
+		}
+		$methods = array_values( array_unique( $methods ) );
+		// Gate online methods behind actual provider configuration.
+		$online_available = class_exists( 'LTLB_PaymentEngine' ) && LTLB_PaymentEngine::instance()->is_enabled();
+		if ( ! $online_available ) {
+			$methods = array_values( array_filter( $methods, function( $m ) {
+				return $m !== 'stripe_card' && $m !== 'paypal' && $m !== 'klarna';
+			} ) );
+		}
+		$ltlb_payment_methods = $methods;
+		$ltlb_default_payment_method = '';
+		if ( in_array( 'stripe_card', $ltlb_payment_methods, true ) ) {
+			$ltlb_default_payment_method = 'stripe_card';
+		} elseif ( ! empty( $ltlb_payment_methods ) ) {
+			$ltlb_default_payment_method = (string) $ltlb_payment_methods[0];
+		}
 	
 	ob_start();
 	$template_path = __DIR__ . '/Templates/wizard.php';
@@ -556,34 +582,107 @@ class LTLB_Shortcodes {
 			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Error:', 'ltl-bookings' ) . '</strong> ' . esc_html( $appointment_id->get_error_message() ) . '</div></div>';
 		}
 
-		// Send email notifications
-		LTLB_EmailNotifications::send_customer_booking_confirmation( intval($appointment_id) );
-		LTLB_EmailNotifications::send_admin_booking_notification( intval($appointment_id) );
+		$appt_repo = new LTLB_AppointmentRepository();
+		$appointment = $appt_repo->get_by_id( intval( $appointment_id ) );
+		$price = is_array( $appointment ) ? floatval( $appointment['price'] ?? 0 ) : 0;
+		if ( $price <= 0 && is_array( $appointment ) && isset( $appointment['amount_cents'] ) ) {
+			$price = floatval( intval( $appointment['amount_cents'] ) ) / 100;
+		}
 
-		// Check if payment is required
-		$payment_engine = LTLB_PaymentEngine::instance();
-		if ( $payment_engine->is_enabled() ) {
-			$appt_repo = new LTLB_AppointmentRepository();
-			$appointment = $appt_repo->get_by_id( intval($appointment_id) );
-			
-			$price = floatval( $appointment['price'] ?? 0 );
-			if ( $price <= 0 && isset( $appointment['amount_cents'] ) ) {
-				$price = floatval( intval( $appointment['amount_cents'] ) ) / 100;
+		// Determine selected payment method (only if a price exists).
+		$ls_pay = get_option( 'lazy_settings', [] );
+		if ( ! is_array( $ls_pay ) ) $ls_pay = [];
+		$enable_payments = ! empty( $ls_pay['enable_payments'] );
+		$enabled_methods = [];
+		if ( $enable_payments && ! empty( $ls_pay['payment_methods'] ) && is_array( $ls_pay['payment_methods'] ) ) {
+			foreach ( $ls_pay['payment_methods'] as $m ) {
+				$m = sanitize_key( (string) $m );
+				if ( $m !== '' ) $enabled_methods[] = $m;
 			}
-			if ( $appointment && $price > 0 ) {
-				// Payment required - return payment form
-				ob_start();
-				?>
-				<div class="ltlb-booking">
-					<div class="ltlb-success">
-						<strong><?php echo esc_html__( 'Almost there!', 'ltl-bookings' ); ?></strong>
-						<?php echo esc_html__( 'Please complete your payment to confirm the booking.', 'ltl-bookings' ); ?>
-					</div>
-					<?php $payment_engine->render_payment_form( $appointment ); ?>
-				</div>
-				<?php
-				return ob_get_clean();
+		}
+		$enabled_methods = array_values( array_unique( $enabled_methods ) );
+		$payment_method = isset( $data['payment_method'] ) ? sanitize_key( (string) $data['payment_method'] ) : '';
+		if ( $payment_method === '' ) {
+			$payment_method = in_array( 'stripe_card', $enabled_methods, true ) ? 'stripe_card' : ( ! empty( $enabled_methods ) ? (string) $enabled_methods[0] : '' );
+		}
+		if ( $payment_method !== '' && ! in_array( $payment_method, $enabled_methods, true ) ) {
+			$payment_method = in_array( 'stripe_card', $enabled_methods, true ) ? 'stripe_card' : ( ! empty( $enabled_methods ) ? (string) $enabled_methods[0] : '' );
+		}
+
+		// Paid flow: Stripe Checkout redirect.
+		$payment_engine = class_exists( 'LTLB_PaymentEngine' ) ? LTLB_PaymentEngine::instance() : null;
+		$online_methods = [ 'stripe_card', 'klarna', 'paypal' ];
+		if ( $price > 0 && $enable_payments && in_array( $payment_method, $online_methods, true ) && $payment_engine ) {
+			$return_base = function_exists( 'get_permalink' ) ? get_permalink() : home_url( '/' );
+			$success_url = add_query_arg(
+				[
+					'ltlb_payment_return' => '1',
+					'provider' => $payment_method === 'paypal' ? 'paypal' : 'stripe',
+					'status' => 'success',
+					'appointment_id' => intval( $appointment_id ),
+				],
+				$return_base
+			);
+			$cancel_url = add_query_arg(
+				[
+					'ltlb_payment_return' => '1',
+					'provider' => $payment_method === 'paypal' ? 'paypal' : 'stripe',
+					'status' => 'cancel',
+					'appointment_id' => intval( $appointment_id ),
+				],
+				$return_base
+			);
+
+			global $wpdb;
+			$table = $wpdb->prefix . 'lazy_appointments';
+
+			if ( $payment_method === 'paypal' && method_exists( $payment_engine, 'create_paypal_redirect' ) && method_exists( $payment_engine, 'is_paypal_enabled' ) && $payment_engine->is_paypal_enabled() ) {
+				$paypal_res = $payment_engine->create_paypal_redirect( is_array( $appointment ) ? $appointment : [], $success_url, $cancel_url );
+				if ( is_array( $paypal_res ) && ! empty( $paypal_res['approve_url'] ) && ! empty( $paypal_res['order_id'] ) ) {
+					$wpdb->update(
+						$table,
+						[ 'payment_method' => 'paypal', 'payment_ref' => (string) $paypal_res['order_id'], 'updated_at' => current_time( 'mysql' ) ],
+						[ 'id' => intval( $appointment_id ) ],
+						[ '%s', '%s', '%s' ],
+						[ '%d' ]
+					);
+					wp_safe_redirect( esc_url_raw( (string) $paypal_res['approve_url'] ) );
+					exit;
+				}
 			}
+
+			if ( $payment_method !== 'paypal' && method_exists( $payment_engine, 'create_checkout_redirect' ) && method_exists( $payment_engine, 'is_stripe_enabled' ) && $payment_engine->is_stripe_enabled() ) {
+				$appointment_for_payment = is_array( $appointment ) ? $appointment : [];
+				$appointment_for_payment['payment_method'] = $payment_method;
+				$redirect = $payment_engine->create_checkout_redirect( $appointment_for_payment, $success_url, $cancel_url );
+				if ( is_array( $redirect ) && ! empty( $redirect['checkout_url'] ) ) {
+					$wpdb->update(
+						$table,
+						[ 'payment_method' => $payment_method, 'updated_at' => current_time( 'mysql' ) ],
+						[ 'id' => intval( $appointment_id ) ],
+						[ '%s', '%s' ],
+						[ '%d' ]
+					);
+					wp_safe_redirect( esc_url_raw( (string) $redirect['checkout_url'] ) );
+					exit;
+				}
+			}
+
+			// If an online method was chosen but we couldn't start checkout, do not fall back to offline flows.
+			return '<div class="ltlb-booking"><div class="ltlb-error"><strong>' . esc_html__( 'Payment error:', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'We could not start the online payment. Please try again or choose a different payment method.', 'ltl-bookings' ) . '</div></div>';
+		}
+
+		// Offline/invoice (or free): send email notifications immediately.
+		if ( class_exists( 'LTLB_EmailNotifications' ) ) {
+			LTLB_EmailNotifications::send_customer_booking_confirmation( intval( $appointment_id ) );
+			LTLB_EmailNotifications::send_admin_booking_notification( intval( $appointment_id ) );
+		}
+
+		if ( $price > 0 && $enable_payments && $payment_method === 'invoice' ) {
+			return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Booking received', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'You selected company invoice. We will contact you with the invoice details. Your booking is awaiting confirmation.', 'ltl-bookings' ) . '</div></div>';
+		}
+		if ( $price > 0 && $enable_payments && ( $payment_method === 'cash' || $payment_method === 'pos_card' ) ) {
+			return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Booking received', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'You selected payment on site. Your booking is awaiting confirmation.', 'ltl-bookings' ) . '</div></div>';
 		}
 
 		return '<div class="ltlb-booking"><div class="ltlb-success"><strong>' . esc_html__( 'Success!', 'ltl-bookings' ) . '</strong> ' . esc_html__( 'Your booking has been received and is awaiting confirmation. Please check your email for details.', 'ltl-bookings' ) . '</div></div>';
@@ -638,6 +737,9 @@ class LTLB_Shortcodes {
 		$first = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
 		$last = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
 		$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
+		$payment_method = isset( $_POST['payment_method'] ) ? sanitize_key( (string) wp_unslash( $_POST['payment_method'] ) ) : '';
+		$company_name = isset( $_POST['company_name'] ) ? LTLB_Sanitizer::text( (string) wp_unslash( $_POST['company_name'] ) ) : '';
+		$company_vat = isset( $_POST['company_vat'] ) ? LTLB_Sanitizer::text( (string) wp_unslash( $_POST['company_vat'] ) ) : '';
 
 		if ( empty( $service_id ) || empty( $date ) || empty( $time ) || empty( $email ) ) {
 			return new WP_Error( 'missing_fields', __( 'Please fill in the required fields.', 'ltl-bookings' ) );
@@ -645,7 +747,11 @@ class LTLB_Shortcodes {
 
 		$resource_id = isset( $_POST['resource_id'] ) ? intval( $_POST['resource_id'] ) : 0;
 
-		return compact( 'service_id', 'date', 'time', 'email', 'first', 'last', 'phone', 'resource_id' );
+		if ( $payment_method === 'invoice' && empty( $company_name ) ) {
+			return new WP_Error( 'missing_company', __( 'Please enter your company name for invoices.', 'ltl-bookings' ) );
+		}
+
+		return compact( 'service_id', 'date', 'time', 'email', 'first', 'last', 'phone', 'resource_id', 'payment_method', 'company_name', 'company_vat' );
 	}
 
 	private static function _get_sanitized_hotel_submission_data(): array|WP_Error {
@@ -658,6 +764,9 @@ class LTLB_Shortcodes {
 		$first = LTLB_Sanitizer::text( $_POST['first_name'] ?? '' );
 		$last = LTLB_Sanitizer::text( $_POST['last_name'] ?? '' );
 		$phone = LTLB_Sanitizer::text( $_POST['phone'] ?? '' );
+		$payment_method = isset( $_POST['payment_method'] ) ? sanitize_key( (string) wp_unslash( $_POST['payment_method'] ) ) : '';
+		$company_name = isset( $_POST['company_name'] ) ? LTLB_Sanitizer::text( (string) wp_unslash( $_POST['company_name'] ) ) : '';
+		$company_vat = isset( $_POST['company_vat'] ) ? LTLB_Sanitizer::text( (string) wp_unslash( $_POST['company_vat'] ) ) : '';
 
 		if ( empty( $service_id ) || empty( $checkin ) || empty( $checkout ) || empty( $email ) || empty( $guests ) ) {
 			return new WP_Error( 'missing_fields', __( 'Please fill in the required fields.', 'ltl-bookings' ) );
@@ -673,7 +782,11 @@ class LTLB_Shortcodes {
 
 		$resource_id = isset( $_POST['resource_id'] ) ? intval( $_POST['resource_id'] ) : 0;
 
-		return compact( 'service_id', 'checkin', 'checkout', 'guests', 'email', 'first', 'last', 'phone', 'resource_id' );
+		if ( $payment_method === 'invoice' && empty( $company_name ) ) {
+			return new WP_Error( 'missing_company', __( 'Please enter your company name for invoices.', 'ltl-bookings' ) );
+		}
+
+		return compact( 'service_id', 'checkin', 'checkout', 'guests', 'email', 'first', 'last', 'phone', 'resource_id', 'payment_method', 'company_name', 'company_vat' );
 	}
 
 	private static function _create_hotel_booking_from_submission( array $data ): int|WP_Error {

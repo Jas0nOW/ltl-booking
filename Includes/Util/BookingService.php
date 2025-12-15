@@ -11,7 +11,7 @@ class LTLB_BookingService {
 		if ( $checkin_dt && class_exists( 'LTLB_Time' ) ) {
 			$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
 			if ( $checkin_dt < $now ) {
-				return new WP_Error( 'past_date', __( 'Das gewählte Anreise-Datum liegt in der Vergangenheit.', 'ltl-bookings' ) );
+				return new WP_Error( 'past_date', __( 'The selected check-in date is in the past.', 'ltl-bookings' ) );
 			}
 		}
 
@@ -33,7 +33,7 @@ class LTLB_BookingService {
 				'checkin' => (string) $data['checkin'],
 				'checkout' => (string) $data['checkout'],
 			] );
-			return new WP_Error( 'lock_timeout', __( 'Eine andere Buchung wird gerade verarbeitet. Bitte versuche es erneut.', 'ltl-bookings' ) );
+			return new WP_Error( 'lock_timeout', __( 'Another booking is currently being processed. Please try again.', 'ltl-bookings' ) );
 		}
 		if ( is_wp_error( $result ) ) {
 			LTLB_Logger::error( 'Hotel booking creation failed: ' . $result->get_error_message(), [
@@ -59,12 +59,12 @@ class LTLB_BookingService {
 
 		$start_dt = LTLB_Time::parse_date_and_time( $data['date'], $data['time'] );
 		if ( ! $start_dt ) {
-			return new WP_Error( 'invalid_date', __( 'Ungültiges Datum/Uhrzeit.', 'ltl-bookings' ) );
+			return new WP_Error( 'invalid_date', __( 'Invalid date/time.', 'ltl-bookings' ) );
 		}
 
 		$now = new DateTimeImmutable( 'now', LTLB_Time::wp_timezone() );
 		if ( $start_dt < $now ) {
-			return new WP_Error( 'past_date', __( 'Die gewählte Zeit liegt in der Vergangenheit.', 'ltl-bookings' ) );
+			return new WP_Error( 'past_date', __( 'The selected time is in the past.', 'ltl-bookings' ) );
 		}
 
 		$end_dt = $start_dt->modify( '+' . intval( $duration ) . ' minutes' );
@@ -78,7 +78,21 @@ class LTLB_BookingService {
 
 		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $appointment_repo, $customer_repo, $data, $start_at_sql, $end_at_sql, $start_dt, $end_dt ) {
 			if ( $appointment_repo->has_conflict( $start_at_sql, $end_at_sql, $data['service_id'], null ) ) {
-				return new WP_Error( 'conflict', __( 'Der gewählte Zeitslot ist bereits belegt.', 'ltl-bookings' ) );
+				return new WP_Error( 'conflict', __( 'The selected time slot is already taken.', 'ltl-bookings' ) );
+			}
+
+			$notes = null;
+			$payment_method = isset( $data['payment_method'] ) ? sanitize_key( (string) $data['payment_method'] ) : '';
+			if ( $payment_method === 'invoice' ) {
+				$existing = $customer_repo->get_by_email( (string) $data['email'] );
+				$existing_notes = is_array( $existing ) ? (string) ( $existing['notes'] ?? '' ) : '';
+				$company_name = isset( $data['company_name'] ) ? sanitize_text_field( (string) $data['company_name'] ) : '';
+				$company_vat = isset( $data['company_vat'] ) ? sanitize_text_field( (string) $data['company_vat'] ) : '';
+				$line = 'Invoice: ' . $company_name;
+				if ( $company_vat !== '' ) {
+					$line .= ' (VAT/Tax ID: ' . $company_vat . ')';
+				}
+				$notes = trim( $existing_notes . "\n" . $line );
 			}
 
 			$customer_id = $customer_repo->upsert_by_email( [
@@ -86,10 +100,11 @@ class LTLB_BookingService {
 				'first_name' => $data['first'],
 				'last_name'  => $data['last'],
 				'phone'      => $data['phone'],
+				'notes'      => $notes,
 			] );
 
 			if ( ! $customer_id ) {
-				return new WP_Error( 'customer_error', __( 'Kunde konnte nicht gespeichert werden.', 'ltl-bookings' ) );
+				return new WP_Error( 'customer_error', __( 'Could not save customer.', 'ltl-bookings' ) );
 			}
 
 			$ls = get_option( 'lazy_settings', [] );
@@ -105,6 +120,8 @@ class LTLB_BookingService {
 				'end_at'      => $end_dt,
 				'status'      => $default_status,
 				'timezone'    => LTLB_Time::get_site_timezone_string(),
+				'payment_method' => isset( $data['payment_method'] ) ? sanitize_key( (string) $data['payment_method'] ) : '',
+				'skip_mailer' => true,
 			] );
 
 			if ( is_wp_error( $appt_id ) ) {
@@ -120,7 +137,7 @@ class LTLB_BookingService {
 
 		if ( $result === false ) {
 			LTLB_Logger::warn( 'Booking lock timeout', [ 'service_id' => $data['service_id'], 'start' => $start_at_sql ] );
-			return new WP_Error( 'lock_timeout', __( 'Eine andere Buchung wird gerade verarbeitet. Bitte versuche es erneut.', 'ltl-bookings' ) );
+			return new WP_Error( 'lock_timeout', __( 'Another booking is currently being processed. Please try again.', 'ltl-bookings' ) );
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -129,7 +146,7 @@ class LTLB_BookingService {
 		}
 
 		if ( ! is_array( $result ) || empty( $result['appointment_id'] ) ) {
-			return new WP_Error( 'booking_failed', __( 'Buchung konnte nicht erstellt werden.', 'ltl-bookings' ) );
+			return new WP_Error( 'booking_failed', __( 'Could not create booking.', 'ltl-bookings' ) );
 		}
 
 		$appt_id = intval( $result['appointment_id'] );
@@ -174,13 +191,6 @@ class LTLB_BookingService {
 					break;
 				}
 			}
-		}
-
-		$service = $service_repo->get_by_id( $data['service_id'] );
-		$customer = $customer_id > 0 ? ( new LTLB_CustomerRepository() )->get_by_id( $customer_id ) : null;
-
-		if ( class_exists( 'LTLB_Mailer' ) ) {
-			LTLB_Mailer::send_booking_notifications( $appt_id, $service ?: [], $customer ?: [], $start_at_sql, $end_at_sql, $default_status );
 		}
 
 		return $appt_id;
