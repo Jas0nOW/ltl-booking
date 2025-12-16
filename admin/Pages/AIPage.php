@@ -33,12 +33,12 @@ class LTLB_Admin_AIPage {
 				if ( $gemini_key ) {
 					// Basic validation: alphanumeric + dashes/underscores
 					if ( preg_match( '/^[a-zA-Z0-9_-]+$/', $gemini_key ) ) {
-						$api_keys['gemini'] = $gemini_key;
+						$api_keys['gemini'] = class_exists( 'LTLB_Crypto' ) ? LTLB_Crypto::encrypt_string( $gemini_key ) : $gemini_key;
 					}
 				}
 
-					// Keep secrets out of autoload.
-					update_option( 'lazy_api_keys', $api_keys, false );
+				// Keep secrets out of autoload.
+				update_option( 'lazy_api_keys', $api_keys, false );
 			}
 
 			// Business Context

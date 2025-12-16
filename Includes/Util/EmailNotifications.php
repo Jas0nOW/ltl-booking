@@ -34,11 +34,15 @@ class LTLB_EmailNotifications {
         $currency = ! empty( $appointment['currency'] ) ? sanitize_text_field( (string) $appointment['currency'] ) : 'EUR';
         $price_label = $amount_cents > 0 ? number_format( $amount_cents / 100, 2 ) . ' ' . $currency : __( 'Free', 'ltl-bookings' );
 
+        $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+        $end_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
+
         $body = self::get_template( 'customer-booking-confirmation', [
             'customer_name' => $appointment['customer_name'] ?? '',
             'service_name' => $service_name,
-            'start_time' => date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime($appointment['start_at']) ),
-            'end_time' => date_i18n( get_option('time_format'), strtotime($appointment['end_at']) ),
+            'start_time' => $start_display,
+            'end_time' => $end_display,
             'status' => $appointment['status'] ?? 'pending',
             'price' => $price_label,
             'appointment_id' => $appointment_id,
@@ -77,6 +81,10 @@ class LTLB_EmailNotifications {
         $currency = ! empty( $appointment['currency'] ) ? sanitize_text_field( (string) $appointment['currency'] ) : 'EUR';
         $price_label = $amount_cents > 0 ? number_format( $amount_cents / 100, 2 ) . ' ' . $currency : __( 'Free', 'ltl-bookings' );
 
+        $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+        $end_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
+
         $admin_url = admin_url( 'admin.php?page=ltlb_appointments&action=view&id=' . $appointment_id );
 
         $body = self::get_template( 'admin-booking-notification', [
@@ -84,8 +92,8 @@ class LTLB_EmailNotifications {
             'customer_email' => $appointment['customer_email'] ?? '',
             'customer_phone' => $appointment['customer_phone'] ?? '',
             'service_name' => $service_name,
-            'start_time' => date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime($appointment['start_at']) ),
-            'end_time' => date_i18n( get_option('time_format'), strtotime($appointment['end_at']) ),
+            'start_time' => $start_display,
+            'end_time' => $end_display,
             'status' => $appointment['status'] ?? 'pending',
             'price' => $price_label,
             'appointment_id' => $appointment_id,
@@ -128,10 +136,13 @@ class LTLB_EmailNotifications {
         $service = $service_repo->get_by_id( intval($appointment['service_id']) );
         $service_name = $service ? $service['name'] : __( 'Service', 'ltl-bookings' );
 
+        $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+
         $body = self::get_template( 'customer-status-change', [
             'customer_name' => $appointment['customer_name'] ?? '',
             'service_name' => $service_name,
-            'start_time' => date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime($appointment['start_at']) ),
+            'start_time' => $start_display,
             'status' => $status_label,
             'new_status' => $new_status,
             'appointment_id' => $appointment_id,

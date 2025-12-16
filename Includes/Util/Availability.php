@@ -208,12 +208,14 @@ class Availability {
                 if ( $slot_start < $window_start ) continue;
                 if ( $slot_end > $window_end ) continue;
 
+                $start_utc = LTLB_Time::format_utc_mysql( $slot_start );
+                $end_utc = LTLB_Time::format_utc_mysql( $slot_end );
                 $start_sql = LTLB_Time::format_wp_datetime( $slot_start );
                 $end_sql = LTLB_Time::format_wp_datetime( $slot_end );
 
                 $blocked = [];
                 if ( method_exists($appt_res_repo, 'get_blocked_resources') ) {
-                    $blocked = $appt_res_repo->get_blocked_resources( $start_sql, $end_sql, $include_pending );
+                    $blocked = $appt_res_repo->get_blocked_resources( $start_utc, $end_utc, $include_pending );
                 }
 
                 $free_ids = [];
@@ -256,13 +258,15 @@ class Availability {
                 continue;
             }
 
+            $start_utc = LTLB_Time::format_utc_mysql( $slot_start );
+            $end_utc = LTLB_Time::format_utc_mysql( $slot_end );
             $start_sql = LTLB_Time::format_wp_datetime( $slot_start );
             $end_sql = LTLB_Time::format_wp_datetime( $slot_end );
 
             // get blocked counts per resource for this interval
             $blocked = [];
             if ( method_exists($appt_res_repo, 'get_blocked_resources') ) {
-                $blocked = $appt_res_repo->get_blocked_resources( $start_sql, $end_sql, $include_pending );
+                $blocked = $appt_res_repo->get_blocked_resources( $start_utc, $end_utc, $include_pending );
             }
 
             // compute free resources from allowed list

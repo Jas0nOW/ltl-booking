@@ -66,6 +66,22 @@ class LTLB_DiagnosticsPage {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
 
+        // Handle debug export
+        if ( isset( $_GET['ltlb_export_debug'] ) && $_GET['ltlb_export_debug'] === '1' ) {
+            if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( (string) $_GET['_wpnonce'], 'ltlb_export_debug' ) ) {
+                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
+            }
+            
+            $bundle = $this->export_debug_bundle();
+            $filename = 'ltlb-debug-' . date('Y-m-d-His') . '.json';
+            
+            nocache_headers();
+            header( 'Content-Type: application/json; charset=UTF-8' );
+            header( 'Content-Disposition: attachment; filename=' . $filename );
+            echo wp_json_encode( $bundle, JSON_PRETTY_PRINT );
+            exit;
+        }
+
         // Handle log download (read-only).
         if ( isset( $_GET['ltlb_download_log'] ) && $_GET['ltlb_download_log'] === '1' ) {
             $files = $this->list_log_files();
@@ -298,6 +314,118 @@ class LTLB_DiagnosticsPage {
         <?php
     }
     
+    /**
+     * Test WP Cron functionality
+     */
+    private function test_wp_cron(): array {
+        $cron_disabled = defined('DISABLE_WP_CRON') && DISABLE_WP_CRON;
+        $schedules = wp_get_schedules();
+        $cron_array = _get_cron_array();
+        
+        $next_ltlb_cron = null;
+        if ( is_array( $cron_array ) ) {
+            foreach ( $cron_array as $timestamp => $hooks ) {
+                foreach ( $hooks as $hook => $info ) {
+                    if ( strpos( $hook, 'ltlb_' ) === 0 ) {
+                        $next_ltlb_cron = $timestamp;
+                        break 2;
+                    }
+                }
+            }
+        }
+        
+        return [
+            'disabled' => $cron_disabled,
+            'schedules_count' => is_array($schedules) ? count($schedules) : 0,
+            'next_run' => $next_ltlb_cron,
+            'status' => $cron_disabled ? 'disabled' : ($next_ltlb_cron ? 'active' : 'no_jobs'),
+        ];
+    }
+    
+    /**
+     * Test email functionality
+     */
+    private function test_email(): array {
+        $settings = get_option('lazy_settings', []);
+        $test_email = get_option('admin_email');
+        
+        $mail_sent = wp_mail(
+            $test_email,
+            'LazyBookings Test Email',
+            'This is a test email from LazyBookings Diagnostics.',
+            ['Content-Type: text/plain; charset=UTF-8']
+        );
+        
+        return [
+            'sent' => $mail_sent,
+            'recipient' => $test_email,
+            'smtp_enabled' => ! empty( $settings['smtp_enabled'] ),
+        ];
+    }
+    
+    /**
+     * Test payment gateway connectivity
+     */
+    private function test_payment_gateways(): array {
+        $results = [];
+        
+        // Test Stripe
+        if ( class_exists('LTLB_PaymentEngine') ) {
+            $engine = LTLB_PaymentEngine::instance();
+            $results['stripe'] = [
+                'enabled' => $engine->is_stripe_enabled(),
+                'status' => $engine->is_stripe_enabled() ? 'configured' : 'not_configured',
+            ];
+            
+            $results['paypal'] = [
+                'enabled' => $engine->is_paypal_enabled(),
+                'status' => $engine->is_paypal_enabled() ? 'configured' : 'not_configured',
+            ];
+        } else {
+            $results['stripe'] = ['enabled' => false, 'status' => 'unavailable'];
+            $results['paypal'] = ['enabled' => false, 'status' => 'unavailable'];
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Export debug bundle as JSON
+     */
+    private function export_debug_bundle(): array {
+        global $wpdb;
+        $settings = get_option('lazy_settings', []);
+        
+        // Sanitize settings (remove sensitive keys)
+        $safe_settings = $settings;
+        $sensitive_keys = ['stripe_secret_key', 'paypal_secret', 'smtp_password', 'gemini_api_key'];
+        foreach ( $sensitive_keys as $key ) {
+            if ( isset( $safe_settings[$key] ) ) {
+                $safe_settings[$key] = '***REDACTED***';
+            }
+        }
+        
+        return [
+            'plugin_version' => defined('LTLB_VERSION') ? LTLB_VERSION : 'unknown',
+            'db_version' => get_option('ltlb_db_version', 'not set'),
+            'wp_version' => get_bloginfo('version'),
+            'php_version' => PHP_VERSION,
+            'mysql_version' => $wpdb->db_version(),
+            'template_mode' => $settings['template_mode'] ?? 'service',
+            'settings' => $safe_settings,
+            'active_plugins' => get_option('active_plugins', []),
+            'theme' => wp_get_theme()->get('Name'),
+            'timezone' => wp_timezone_string(),
+            'locale' => get_locale(),
+            'multisite' => is_multisite(),
+            'services_count' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}lazy_services"),
+            'customers_count' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}lazy_customers"),
+            'appointments_count' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}lazy_appointments"),
+            'cron_test' => $this->test_wp_cron(),
+            'payment_test' => $this->test_payment_gateways(),
+        ];
+    }
+
     private function render_doctor_output(): void {
         global $wpdb;
         $settings = get_option('lazy_settings', []);
@@ -369,6 +497,50 @@ class LTLB_DiagnosticsPage {
         // Last migration
         $last_migration = get_option('ltlb_last_migration_time', 'never');
         echo '<p><strong>' . esc_html__( 'Last Migration:', 'ltl-bookings' ) . '</strong> ' . esc_html($last_migration) . '</p>';
+        
+        // WP Cron Health Check
+        $cron_test = $this->test_wp_cron();
+        echo '<hr style="margin:20px 0;">';
+        echo '<h4>' . esc_html__( 'WP Cron Status', 'ltl-bookings' ) . '</h4>';
+        if ( $cron_test['disabled'] ) {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--warn"><strong>' . esc_html__( '⚠ WP Cron is DISABLED', 'ltl-bookings' ) . '</strong><br>';
+            echo esc_html__( 'Automated tasks (reminders, cleanup, waitlist offers) will not run automatically. You need to set up a system cron job.', 'ltl-bookings' ) . '</p>';
+        } elseif ( $cron_test['status'] === 'active' ) {
+            $next_run_human = $cron_test['next_run'] ? human_time_diff( $cron_test['next_run'], time() ) : 'unknown';
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--ok"><strong>' . esc_html__( '✓ WP Cron is active', 'ltl-bookings' ) . '</strong><br>';
+            echo sprintf( esc_html__( 'Next LazyBookings cron job in: %s', 'ltl-bookings' ), esc_html( $next_run_human ) ) . '</p>';
+        } else {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--info"><strong>' . esc_html__( 'ℹ No scheduled cron jobs yet', 'ltl-bookings' ) . '</strong><br>';
+            echo esc_html__( 'Cron jobs will be scheduled when you enable features like automated reminders or cleanup.', 'ltl-bookings' ) . '</p>';
+        }
+        
+        // Payment Gateways Health Check
+        $payment_test = $this->test_payment_gateways();
+        echo '<hr style="margin:20px 0;">';
+        echo '<h4>' . esc_html__( 'Payment Gateways', 'ltl-bookings' ) . '</h4>';
+        
+        if ( $payment_test['stripe']['enabled'] ) {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--ok"><strong>Stripe:</strong> ' . esc_html__( 'Configured ✓', 'ltl-bookings' ) . '</p>';
+        } else {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--info"><strong>Stripe:</strong> ' . esc_html__( 'Not configured', 'ltl-bookings' ) . '</p>';
+        }
+        
+        if ( $payment_test['paypal']['enabled'] ) {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--ok"><strong>PayPal:</strong> ' . esc_html__( 'Configured ✓', 'ltl-bookings' ) . '</p>';
+        } else {
+            echo '<p class="ltlb-diagnostics-status ltlb-diagnostics-status--info"><strong>PayPal:</strong> ' . esc_html__( 'Not configured', 'ltl-bookings' ) . '</p>';
+        }
+        
+        // Export Debug Bundle Button
+        echo '<hr style="margin:20px 0;">';
+        echo '<h4>' . esc_html__( 'Export Debug Info', 'ltl-bookings' ) . '</h4>';
+        echo '<p class="description">' . esc_html__( 'Download a JSON file with system information for support requests (sensitive data is redacted).', 'ltl-bookings' ) . '</p>';
+        $export_url = add_query_arg([
+            'page' => 'ltlb_diagnostics',
+            'ltlb_export_debug' => '1',
+            '_wpnonce' => wp_create_nonce( 'ltlb_export_debug' ),
+        ], admin_url('admin.php'));
+        echo '<p><a href="' . esc_url($export_url) . '" class="button button-secondary">' . esc_html__( 'Export Debug Bundle', 'ltl-bookings' ) . '</a></p>';
         
         echo '</div>';
     }

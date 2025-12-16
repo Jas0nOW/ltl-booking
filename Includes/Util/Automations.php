@@ -325,10 +325,16 @@ class LTLB_Automations {
 			$currency = ! empty( $appt['currency'] ) ? sanitize_text_field( (string) $appt['currency'] ) : 'EUR';
 			$amount_label = $amount_cents > 0 ? number_format( $amount_cents / 100, 2 ) . ' ' . $currency : '';
 
+			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+			$start_display = (string) ( $appt['start_at'] ?? $from );
+			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			}
+
 			$placeholders = [
 				'{first_name}' => sanitize_text_field( (string) ( $customer['first_name'] ?? '' ) ),
 				'{service_name}' => (string) $service_name,
-				'{start_time}' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( (string) ( $appt['start_at'] ?? $from ) ) ),
+				'{start_time}' => $start_display,
 				'{amount}' => $amount_label,
 			];
 
@@ -414,10 +420,16 @@ class LTLB_Automations {
 			$currency = ! empty( $appt['currency'] ) ? sanitize_text_field( (string) $appt['currency'] ) : 'EUR';
 			$amount_label = number_format( $amount_cents / 100, 2 ) . ' ' . $currency;
 
+			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+			$start_display = (string) ( $appt['start_at'] ?? '' );
+			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			}
+
 			$placeholders = [
 				'{first_name}' => sanitize_text_field( (string) ( $customer['first_name'] ?? '' ) ),
 				'{service_name}' => (string) $service_name,
-				'{start_time}' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( (string) ( $appt['start_at'] ?? '' ) ) ),
+				'{start_time}' => $start_display,
 				'{amount}' => $amount_label,
 				'{booking_id}' => (string) $appt_id,
 			];
@@ -505,10 +517,16 @@ class LTLB_Automations {
 			$currency = ! empty( $appt['currency'] ) ? sanitize_text_field( (string) $appt['currency'] ) : 'EUR';
 			$amount_label = number_format( $amount_cents / 100, 2 ) . ' ' . $currency;
 
+			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+			$start_display = (string) ( $appt['start_at'] ?? '' );
+			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			}
+
 			$placeholders = [
 				'{first_name}' => sanitize_text_field( (string) ( $customer['first_name'] ?? '' ) ),
 				'{service_name}' => (string) $service_name,
-				'{start_time}' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( (string) ( $appt['start_at'] ?? '' ) ) ),
+				'{start_time}' => $start_display,
 				'{amount}' => $amount_label,
 				'{booking_id}' => (string) $appt_id,
 			];

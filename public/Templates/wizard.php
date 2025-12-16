@@ -74,7 +74,14 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                             <option value="<?php echo esc_attr( $sid ); ?>" data-price="<?php echo esc_attr( $s['price_cents'] ?? 0 ); ?>"<?php echo ( $prefill_service_id && $sid === $prefill_service_id ) ? ' selected' : ''; ?>>
                                 <?php echo esc_html( $s['name'] ); ?>
                                 <?php if ( isset($s['price_cents']) && $s['price_cents'] > 0 ) : ?> 
-                                    — <?php echo number_format($s['price_cents']/100, 2) . ' ' . ($s['currency'] ?? 'EUR'); ?>
+                                    <?php
+                                    $price_amount = number_format_i18n( ( (int) $s['price_cents'] ) / 100, 2 );
+                                    $currency = isset( $s['currency'] ) ? strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) $s['currency'] ) ) : 'EUR';
+                                    if ( $currency === '' ) {
+                                        $currency = 'EUR';
+                                    }
+                                    ?>
+                                    — <?php echo esc_html( $price_amount . ' ' . $currency ); ?>
                                 <?php endif; ?>
                             </option>
                         <?php endforeach; ?>

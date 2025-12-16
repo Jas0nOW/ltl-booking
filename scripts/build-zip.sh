@@ -19,7 +19,7 @@ rsync -a --exclude '.git/' \
           --exclude 'docs/' \
           --exclude 'scripts/' \
           --exclude 'node_modules/' \
-          --exclude 'vendor/' \
+          --exclude '/vendor/' \
           --exclude '.env' \
           --exclude '*.log' \
           --exclude '.DS_Store' \

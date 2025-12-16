@@ -4,7 +4,7 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_SettingsPage {
 
 	public function render(): void {
-        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 
 		// Handle test email
 		if ( isset( $_POST['ltlb_send_test_email'] ) ) {
@@ -382,32 +382,43 @@ class LTLB_Admin_SettingsPage {
                         </tbody>
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
-                <!-- LOGGING SETTINGS -->
-                <?php LTLB_Admin_Component::card_start(__( 'Logging', 'ltl-bookings' )); ?>
-                    <table class="form-table">
-                        <tbody>
-                            <tr>
-                                <th><label for="logging_enabled"><?php echo esc_html__( 'Enable Logging', 'ltl-bookings' ); ?></label></th>
-                                <td>
-                                    <label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?> aria-describedby="ltlb-logging-enabled-desc" title="<?php echo esc_attr__( 'Writes events/errors to a log file for diagnostics.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Log errors and events to file', 'ltl-bookings' ); ?></label>
-                                    <p class="description" id="ltlb-logging-enabled-desc"><?php echo esc_html__( 'Enable this only when needed (e.g., for debugging).', 'ltl-bookings' ); ?></p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th><label for="log_level"><?php echo esc_html__( 'Log Level', 'ltl-bookings' ); ?></label></th>
-                                <td>
-                                    <select name="log_level" id="log_level" aria-describedby="ltlb-log-level-desc" title="<?php echo esc_attr__( 'Controls how verbose logging is.', 'ltl-bookings' ); ?>">
-                                        <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__( 'Error', 'ltl-bookings' ); ?></option>
-                                        <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__( 'Warning', 'ltl-bookings' ); ?></option>
-                                        <option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info', 'ltl-bookings'); ?></option>
-                                        <option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug', 'ltl-bookings'); ?></option>
-                                    </select>
-                                    <p class="description" id="ltlb-log-level-desc"><?php echo esc_html__( 'For normal use, "Error" is usually enough. Use "Debug" only temporarily.', 'ltl-bookings' ); ?></p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                <?php LTLB_Admin_Component::card_end(); ?>
+
+                <!-- ADVANCED SETTINGS (Collapsible) -->
+                <div class="ltlb-advanced-settings-toggle" style="margin: 20px 0 10px 0;">
+                    <button type="button" class="button button-secondary ltlb-toggle-advanced" data-target="ltlb-advanced-general">
+                        <span class="dashicons dashicons-arrow-down-alt2"></span>
+                        <?php echo esc_html__( 'Advanced Settings', 'ltl-bookings' ); ?>
+                    </button>
+                </div>
+
+                <div id="ltlb-advanced-general" class="ltlb-advanced-section" style="display: none;">
+                    <!-- LOGGING SETTINGS -->
+                    <?php LTLB_Admin_Component::card_start(__( 'Logging', 'ltl-bookings' )); ?>
+                        <table class="form-table">
+                            <tbody>
+                                <tr>
+                                    <th><label for="logging_enabled"><?php echo esc_html__( 'Enable Logging', 'ltl-bookings' ); ?></label></th>
+                                    <td>
+                                        <label><input name="logging_enabled" id="logging_enabled" type="checkbox" value="1" <?php checked( $logging_enabled ); ?> aria-describedby="ltlb-logging-enabled-desc" title="<?php echo esc_attr__( 'Writes events/errors to a log file for diagnostics.', 'ltl-bookings' ); ?>"> <?php echo esc_html__( 'Log errors and events to file', 'ltl-bookings' ); ?></label>
+                                        <p class="description" id="ltlb-logging-enabled-desc"><?php echo esc_html__( 'Enable this only when needed (e.g., for debugging).', 'ltl-bookings' ); ?></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><label for="log_level"><?php echo esc_html__( 'Log Level', 'ltl-bookings' ); ?></label></th>
+                                    <td>
+                                        <select name="log_level" id="log_level" aria-describedby="ltlb-log-level-desc" title="<?php echo esc_attr__( 'Controls how verbose logging is.', 'ltl-bookings' ); ?>">
+                                            <option value="error" <?php selected( $log_level, 'error' ); ?>><?php echo esc_html__( 'Error', 'ltl-bookings' ); ?></option>
+                                            <option value="warn" <?php selected( $log_level, 'warn' ); ?>><?php echo esc_html__( 'Warning', 'ltl-bookings' ); ?></option>
+                                            <option value="info" <?php selected( $log_level, 'info' ); ?>><?php echo esc_html__('Info', 'ltl-bookings'); ?></option>
+                                            <option value="debug" <?php selected( $log_level, 'debug' ); ?>><?php echo esc_html__('Debug', 'ltl-bookings'); ?></option>
+                                        </select>
+                                        <p class="description" id="ltlb-log-level-desc"><?php echo esc_html__( 'For normal use, "Error" is usually enough. Use "Debug" only temporarily.', 'ltl-bookings' ); ?></p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    <?php LTLB_Admin_Component::card_end(); ?>
+                </div>
                 <?php endif; ?>
 
                 <?php if ( $current_tab === 'email' ) : ?>
@@ -451,7 +462,16 @@ class LTLB_Admin_SettingsPage {
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
 
-                <?php LTLB_Admin_Component::card_start(__( 'SMTP (optional)', 'ltl-bookings' )); ?>
+                <!-- ADVANCED SETTINGS (Collapsible) -->
+                <div class="ltlb-advanced-settings-toggle" style="margin: 20px 0 10px 0;">
+                    <button type="button" class="button button-secondary ltlb-toggle-advanced" data-target="ltlb-advanced-email">
+                        <span class="dashicons dashicons-arrow-down-alt2"></span>
+                        <?php echo esc_html__( 'Advanced Email Settings (SMTP)', 'ltl-bookings' ); ?>
+                    </button>
+                </div>
+
+                <div id="ltlb-advanced-email" class="ltlb-advanced-section" style="display: none;">
+                <?php LTLB_Admin_Component::card_start(__( 'SMTP Configuration', 'ltl-bookings' )); ?>
                     <table class="form-table">
                         <tbody>
                             <tr>
@@ -513,6 +533,7 @@ class LTLB_Admin_SettingsPage {
                         </tbody>
                     </table>
                 <?php LTLB_Admin_Component::card_end(); ?>
+                </div><!-- /.ltlb-advanced-section for email -->
                 <?php endif; ?>
 
                 <?php if ( $current_tab === 'ai' ) : ?>
@@ -641,6 +662,40 @@ class LTLB_Admin_SettingsPage {
                     <?php submit_button( esc_html__( 'Save Settings', 'ltl-bookings' ), 'primary', 'ltlb_settings_save', false ); ?>
                 </p>
             </form>
+
+            <script>
+            (function($) {
+                'use strict';
+                $(document).ready(function() {
+                    // Load saved state from localStorage
+                    $('.ltlb-toggle-advanced').each(function() {
+                        const targetId = $(this).data('target');
+                        const savedState = localStorage.getItem('ltlb_' + targetId);
+                        if (savedState === 'open') {
+                            $('#' + targetId).show();
+                            $(this).find('.dashicons').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+                        }
+                    });
+
+                    // Toggle advanced sections
+                    $('.ltlb-toggle-advanced').on('click', function() {
+                        const targetId = $(this).data('target');
+                        const $target = $('#' + targetId);
+                        const $icon = $(this).find('.dashicons');
+                        
+                        $target.slideToggle(200);
+                        
+                        if ($target.is(':visible')) {
+                            $icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+                            localStorage.setItem('ltlb_' + targetId, 'open');
+                        } else {
+                            $icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
+                            localStorage.setItem('ltlb_' + targetId, 'closed');
+                        }
+                    });
+                });
+            })(jQuery);
+            </script>
 
             <!-- TEST EMAIL -->
             <?php if ( $current_tab === 'email' ) : ?>

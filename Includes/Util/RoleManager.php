@@ -43,8 +43,15 @@ class LTLB_Role_Manager {
 			return; // wp not fully loaded
 		}
 
+		// Cleanup: capability was previously registered but unused.
+		$admin_role = get_role( 'administrator' );
+		if ( $admin_role ) {
+			$admin_role->remove_cap( 'manage_staff_roles' );
+		}
+
 		// Define custom caps
 		$caps = [
+			// AI Capabilities
 			'manage_ai_settings' => [
 				'label' => __('Manage AI Settings', 'ltl-bookings'),
 				'roles' => ['administrator'],
@@ -61,8 +68,70 @@ class LTLB_Role_Manager {
 				'label' => __('Approve AI Actions', 'ltl-bookings'),
 				'roles' => ['administrator'],
 			],
-			'manage_staff_roles' => [
-				'label' => __('Manage Staff Roles', 'ltl-bookings'),
+			// Bookings Capabilities
+			'view_bookings' => [
+				'label' => __('View Bookings', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_staff', 'editor'],
+			],
+			'manage_bookings' => [
+				'label' => __('Create/Edit/Delete Bookings', 'ltl-bookings'),
+				'roles' => ['administrator', 'editor'],
+			],
+			'manage_own_bookings' => [
+				'label' => __('Manage Own Bookings (Staff)', 'ltl-bookings'),
+				'roles' => ['ltlb_staff'],
+			],
+			// Customers Capabilities
+			'view_customers' => [
+				'label' => __('View Customers', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_staff', 'editor'],
+			],
+			'manage_customers' => [
+				'label' => __('Create/Edit/Delete Customers', 'ltl-bookings'),
+				'roles' => ['administrator', 'editor'],
+			],
+			// Services & Resources Capabilities
+			'view_services' => [
+				'label' => __('View Services/Rooms', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_staff', 'editor'],
+			],
+			'manage_services' => [
+				'label' => __('Create/Edit/Delete Services/Rooms', 'ltl-bookings'),
+				'roles' => ['administrator'],
+			],
+			'manage_service_prices' => [
+				'label' => __('Edit Service/Room Prices', 'ltl-bookings'),
+				'roles' => ['administrator'],
+			],
+			// Staff Capabilities
+			'view_staff' => [
+				'label' => __('View Staff', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_staff', 'editor'],
+			],
+			'manage_staff' => [
+				'label' => __('Create/Edit/Delete Staff', 'ltl-bookings'),
+				'roles' => ['administrator'],
+			],
+			'manage_own_availability' => [
+				'label' => __('Manage Own Availability', 'ltl-bookings'),
+				'roles' => ['ltlb_staff', 'editor'],
+			],
+			// Settings Capabilities
+			'manage_booking_settings' => [
+				'label' => __('Manage Booking Settings', 'ltl-bookings'),
+				'roles' => ['administrator'],
+			],
+			'view_reports' => [
+				'label' => __('View Reports & Analytics', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_ceo'],
+			],
+			// Payment Capabilities
+			'view_payments' => [
+				'label' => __('View Payment Information', 'ltl-bookings'),
+				'roles' => ['administrator', 'ltlb_ceo'],
+			],
+			'process_refunds' => [
+				'label' => __('Process Refunds', 'ltl-bookings'),
 				'roles' => ['administrator'],
 			],
 		];

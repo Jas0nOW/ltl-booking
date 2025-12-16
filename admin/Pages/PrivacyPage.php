@@ -62,6 +62,8 @@ class LTLB_PrivacyPage {
             $settings['retention_delete_canceled_days'] = isset($_POST['delete_canceled_days']) ? intval($_POST['delete_canceled_days']) : 0;
             $settings['retention_anonymize_after_days'] = isset($_POST['anonymize_after_days']) ? intval($_POST['anonymize_after_days']) : 0;
 
+            $settings['delete_data_on_uninstall'] = isset($_POST['delete_data_on_uninstall']) ? 1 : 0;
+
             update_option('lazy_settings', $settings);
 
             LTLB_Notices::add(__('Retention settings saved.', 'ltl-bookings'), 'success');
@@ -72,6 +74,7 @@ class LTLB_PrivacyPage {
         $settings = get_option('lazy_settings', []);
         $delete_canceled_days = $settings['retention_delete_canceled_days'] ?? 0;
         $anonymize_after_days = $settings['retention_anonymize_after_days'] ?? 0;
+        $delete_data_on_uninstall = !empty( $settings['delete_data_on_uninstall'] );
 
         ?>
         <div class="wrap ltlb-admin">
@@ -98,6 +101,16 @@ class LTLB_PrivacyPage {
                                 <td>
                                     <input name="anonymize_after_days" id="anonymize_after_days" type="number" value="<?php echo esc_attr($anonymize_after_days); ?>" class="small-text" min="0">
                                     <p class="description"><?php echo esc_html__('Set to 0 to disable automatic anonymization. Appointments older than this will have customer data anonymized (email, name, phone replaced).', 'ltl-bookings'); ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><label for="delete_data_on_uninstall"><?php echo esc_html__('Delete all plugin data on uninstall', 'ltl-bookings'); ?></label></th>
+                                <td>
+                                    <label>
+                                        <input name="delete_data_on_uninstall" id="delete_data_on_uninstall" type="checkbox" value="1" <?php checked( $delete_data_on_uninstall ); ?> />
+                                        <?php echo esc_html__( 'Yes, remove all LazyBookings data when the plugin is uninstalled', 'ltl-bookings' ); ?>
+                                    </label>
+                                    <p class="description"><?php echo esc_html__( 'Warning: This will permanently delete all LazyBookings tables and settings on uninstall. This cannot be undone.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
                         </tbody>

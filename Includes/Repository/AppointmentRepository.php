@@ -268,6 +268,8 @@ class LTLB_AppointmentRepository {
 			$payment_method = $payment_status === 'free' ? 'free' : 'unpaid';
 		}
 
+		$timezone_string = isset( $data['timezone'] ) ? sanitize_text_field( (string) $data['timezone'] ) : LTLB_Time::wp_timezone()->getName();
+
 		$insert = [
 			'service_id' => $service_id,
 			'customer_id' => $customer_id,
@@ -279,7 +281,7 @@ class LTLB_AppointmentRepository {
 			'currency' => $currency,
 			'payment_status' => $payment_status,
 			'payment_method' => $payment_method,
-			'timezone' => isset($data['timezone']) ? sanitize_text_field($data['timezone']) : LTLB_Time::get_site_timezone_string(),
+			'timezone' => $timezone_string,
 			'seats' => $seats,
 			'created_at' => $now,
 			'updated_at' => $now,
@@ -287,20 +289,18 @@ class LTLB_AppointmentRepository {
 		if ( $staff_user_id === null || $staff_user_id <= 0 ) {
 			unset( $insert['staff_user_id'] );
 		}
-		// start_at / end_at may be DateTimeInterface or strings
+		// start_at / end_at may be DateTimeInterface or strings (local); persist in UTC.
 		if ( isset( $data['start_at'] ) ) {
-			if ( $data['start_at'] instanceof DateTimeInterface ) {
-				$insert['start_at'] = LTLB_Time::format_wp_datetime( $data['start_at'] );
-			} else {
-				$insert['start_at'] = sanitize_text_field( $data['start_at'] );
-			}
+			$normalized = class_exists( 'LTLB_DateTime' )
+				? LTLB_DateTime::normalize_to_utc_mysql( $data['start_at'], $timezone_string )
+				: ( $data['start_at'] instanceof DateTimeInterface ? LTLB_Time::format_utc_mysql( $data['start_at'] ) : sanitize_text_field( (string) $data['start_at'] ) );
+			$insert['start_at'] = $normalized ? $normalized : '';
 		}
 		if ( isset( $data['end_at'] ) ) {
-			if ( $data['end_at'] instanceof DateTimeInterface ) {
-				$insert['end_at'] = LTLB_Time::format_wp_datetime( $data['end_at'] );
-			} else {
-				$insert['end_at'] = sanitize_text_field( $data['end_at'] );
-			}
+			$normalized = class_exists( 'LTLB_DateTime' )
+				? LTLB_DateTime::normalize_to_utc_mysql( $data['end_at'], $timezone_string )
+				: ( $data['end_at'] instanceof DateTimeInterface ? LTLB_Time::format_utc_mysql( $data['end_at'] ) : sanitize_text_field( (string) $data['end_at'] ) );
+			$insert['end_at'] = $normalized ? $normalized : '';
 		}
 		// Determine which statuses should block a slot. By default only 'confirmed'.
 		$blocking_statuses = [ 'confirmed' ];
@@ -340,6 +340,18 @@ class LTLB_AppointmentRepository {
 		}
 		$appointment_id = (int) $result;
 
+		// Trigger webhook for new appointment
+		if ( class_exists('LTLB_Webhooks') ) {
+			LTLB_Webhooks::trigger( 'appointment.created', [
+				'appointment_id' => $appointment_id,
+				'customer_id' => $insert['customer_id'],
+				'service_id' => $insert['service_id'],
+				'status' => $insert['status'],
+				'start_at' => $insert['start_at'],
+				'end_at' => $insert['end_at'],
+			]);
+		}
+
 		// Send email notifications
 		if ( ! empty( $data['skip_mailer'] ) ) {
 			return $appointment_id;
@@ -362,15 +374,65 @@ class LTLB_AppointmentRepository {
 
 	/**
 	 * Updates the status of an appointment.
+	 * Now uses LTLB_BookingStatus state machine for validation.
 	 *
 	 * @param int    $id     The appointment ID.
 	 * @param string $status The new status.
+	 * @param string $reason Reason for status change (optional, for audit log).
 	 * @return bool True on success, false on failure.
 	 */
-	public function update_status(int $id, string $status): bool {
-		global $wpdb;
-		$res = $wpdb->update( $this->table_name, [ 'status' => sanitize_text_field($status), 'updated_at' => current_time('mysql') ], [ 'id' => $id ], [ '%s', '%s' ], [ '%d' ] );
-		return $res !== false;
+	public function update_status(int $id, string $status, string $reason = ''): bool {
+		// Get appointment data before update for webhook payload
+		$appointment = $this->get_by_id( $id );
+		$old_status = $appointment ? $appointment['status'] : null;
+
+		// Use state machine if available
+		if ( class_exists( 'LTLB_BookingStatus' ) ) {
+			$result = LTLB_BookingStatus::transition( $id, $status, $reason );
+			$success = $result['success'];
+		} else {
+			// Fallback to direct update (legacy behavior)
+			global $wpdb;
+			$res = $wpdb->update( $this->table_name, [ 'status' => sanitize_text_field($status), 'updated_at' => current_time('mysql') ], [ 'id' => $id ], [ '%s', '%s' ], [ '%d' ] );
+			$success = $res !== false;
+		}
+
+		// Trigger integrations after successful status change
+		if ( $success && $appointment ) {
+			// Trigger webhooks for status changes
+			if ( class_exists('LTLB_Webhooks') ) {
+				$event_map = [
+					'confirmed' => 'appointment.confirmed',
+					'cancelled' => 'appointment.cancelled',
+					'completed' => 'appointment.completed',
+				];
+				if ( isset($event_map[$status]) && $old_status !== $status ) {
+					LTLB_Webhooks::trigger( $event_map[$status], [
+						'appointment_id' => $id,
+						'customer_id' => $appointment['customer_id'],
+						'service_id' => $appointment['service_id'],
+						'status' => $status,
+						'old_status' => $old_status,
+						'start_at' => $appointment['start_at'],
+					]);
+				}
+			}
+
+			// Process waitlist on cancellation
+			if ( $status === 'cancelled' && $old_status === 'confirmed' && class_exists('LTLB_WaitlistEngine') ) {
+				// Extract date and time from start_at
+				if ( ! empty($appointment['start_at']) ) {
+					$dt = new DateTime($appointment['start_at']);
+					LTLB_WaitlistEngine::process_availability(
+						$appointment['service_id'],
+						$dt->format('Y-m-d'),
+						$dt->format('H:i:s')
+					);
+				}
+			}
+		}
+
+		return $success;
 	}
 
 	public function update_status_bulk(array $ids, string $status): bool {
@@ -498,14 +560,23 @@ class LTLB_AppointmentRepository {
 	public function update_times( int $id, string $start_at, string $end_at ): bool {
 		global $wpdb;
 
+		$existing = $this->get_by_id( $id );
+		$timezone_string = is_array( $existing ) && ! empty( $existing['timezone'] ) ? (string) $existing['timezone'] : LTLB_Time::wp_timezone()->getName();
+		$start_utc = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::normalize_to_utc_mysql( $start_at, $timezone_string ) : $start_at;
+		$end_utc = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::normalize_to_utc_mysql( $end_at, $timezone_string ) : $end_at;
+		if ( ! $start_utc || ! $end_utc ) {
+			return false;
+		}
+
 		$result = $wpdb->update(
 			$this->table_name,
 			[
-				'start_at' => $start_at,
-				'end_at' => $end_at,
+				'start_at' => $start_utc,
+				'end_at' => $end_utc,
+				'updated_at' => current_time('mysql'),
 			],
 			[ 'id' => $id ],
-			[ '%s', '%s' ],
+			[ '%s', '%s', '%s' ],
 			[ '%d' ]
 		);
 

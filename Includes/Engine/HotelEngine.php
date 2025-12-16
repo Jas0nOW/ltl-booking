@@ -8,6 +8,7 @@ require_once LTLB_PATH . 'Includes/Repository/ResourceRepository.php';
 require_once LTLB_PATH . 'Includes/Repository/AppointmentResourcesRepository.php';
 require_once LTLB_PATH . 'Includes/Repository/ServiceResourcesRepository.php';
 require_once LTLB_PATH . 'Includes/Util/Time.php';
+require_once LTLB_PATH . 'Includes/Util/DateTime.php';
 
 class HotelEngine implements BookingEngineInterface {
 
@@ -51,8 +52,8 @@ class HotelEngine implements BookingEngineInterface {
             return [ 'error' => 'Invalid date/time format' ];
         }
 
-        $start_at_sql = LTLB_Time::format_wp_datetime( $checkin_dt );
-        $end_at_sql = LTLB_Time::format_wp_datetime( $checkout_dt );
+        $start_at_sql = LTLB_Time::format_utc_mysql( $checkin_dt );
+        $end_at_sql = LTLB_Time::format_utc_mysql( $checkout_dt );
 
         // Get allowed resources (rooms)
         $svc_res_repo = new LTLB_ServiceResourcesRepository();
@@ -170,8 +171,8 @@ class HotelEngine implements BookingEngineInterface {
             return new WP_Error('invalid_date', __('Invalid date/time.', 'ltl-bookings'));
         }
 
-        $start_at_sql = LTLB_Time::format_wp_datetime( $checkin_dt );
-        $end_at_sql = LTLB_Time::format_wp_datetime( $checkout_dt );
+        $start_at_sql = LTLB_Time::format_utc_mysql( $checkin_dt );
+        $end_at_sql = LTLB_Time::format_utc_mysql( $checkout_dt );
 
         // Upsert customer
         $customer_repo = new LTLB_CustomerRepository();
@@ -217,7 +218,7 @@ class HotelEngine implements BookingEngineInterface {
             'start_at'    => $checkin_dt,
             'end_at'      => $checkout_dt,
             'status'      => $default_status,
-            'timezone'    => LTLB_Time::get_site_timezone_string(),
+            'timezone'    => LTLB_Time::wp_timezone()->getName(),
             'seats'       => $guests,
             'amount_cents' => $total_price_cents,
             'currency' => $currency,

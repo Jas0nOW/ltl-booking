@@ -2270,3 +2270,169 @@
         page-break-after: avoid;
     }
 }
+
+/* Progressive Disclosure: Advanced Settings Toggle */
+.ltlb-advanced-settings-toggle {
+    margin: 20px 0 10px 0;
+}
+
+.ltlb-toggle-advanced {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--lazy-border-strong, #ccd0d4);
+    background: var(--lazy-bg-primary, #ffffff);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ltlb-toggle-advanced:hover {
+    background: var(--lazy-bg-secondary, #f9f9f9);
+    border-color: var(--lazy-accent, #2271b1);
+}
+
+.ltlb-toggle-advanced .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.ltlb-advanced-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--lazy-border-medium, rgba(0,0,0,0.1));
+}
+
+/* ==========================================================================
+   UI Polish: Consistent Spacing & Alignment
+   ========================================================================== */
+
+/* Section Headers - Consistent Top Margin */
+.ltlb-admin h2:not(:first-child),
+.ltlb-admin .ltlb-section-header:not(:first-child) {
+    margin-top: var(--lazy-space-24, 24px);
+}
+
+.ltlb-admin h2:first-child,
+.ltlb-admin .ltlb-section-header:first-child {
+    margin-top: 0;
+}
+
+.ltlb-admin h3:not(:first-child) {
+    margin-top: var(--lazy-space-20, 20px);
+}
+
+/* Table Cells - Vertical Centering */
+.ltlb-admin table td,
+.ltlb-admin table th {
+    vertical-align: middle;
+}
+
+/* Card Headers - Consistent Spacing */
+.ltlb-admin .ltlb-card__header,
+.ltlb-admin .ltlb-kpi-card__label {
+    margin-top: 0;
+    margin-bottom: var(--lazy-space-12, 12px);
+}
+
+/* Form Fields - Consistent Vertical Rhythm */
+.ltlb-admin .form-table th,
+.ltlb-admin .form-table td {
+    padding-top: var(--lazy-space-12, 12px);
+    padding-bottom: var(--lazy-space-12, 12px);
+}
+
+/* Button Groups - Consistent Gap */
+.ltlb-admin .button-group {
+    display: flex;
+    gap: var(--lazy-space-8, 8px);
+    align-items: center;
+}
+
+/* Status Badges - Vertical Alignment in Tables */
+.ltlb-admin table .ltlb-status-badge {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+/* Empty State Messages - Centered & Spaced */
+.ltlb-admin .ltlb-empty-state,
+.ltlb-admin .ltlb-no-results {
+    text-align: center;
+    padding: var(--lazy-space-40, 40px) var(--lazy-space-20, 20px);
+    color: var(--lazy-text-secondary, #646970);
+}
+
+/* Action Links in Tables - Consistent Spacing */
+.ltlb-admin table .row-actions {
+    margin-top: var(--lazy-space-4, 4px);
+}
+
+/* Card Footer Actions - Consistent Layout */
+.ltlb-admin .ltlb-card__footer {
+    margin-top: var(--lazy-space-16, 16px);
+    padding-top: var(--lazy-space-16, 16px);
+    border-top: 1px solid var(--lazy-border-light, rgba(0,0,0,0.06));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Dashboard KPI Cards - Consistent Height */
+.ltlb-admin .ltlb-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--lazy-space-16, 16px);
+    align-items: stretch;
+}
+
+.ltlb-admin .ltlb-kpi-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
+}
+
+/* Form Sections - Visual Separation */
+.ltlb-admin .ltlb-form-section + .ltlb-form-section {
+    margin-top: var(--lazy-space-24, 24px);
+    padding-top: var(--lazy-space-24, 24px);
+    border-top: 1px solid var(--lazy-border-light, rgba(0,0,0,0.06));
+}
+
+/* Tab Content - Consistent Padding */
+.ltlb-admin .ltlb-tab-content {
+    padding-top: var(--lazy-space-20, 20px);
+}
+
+/* List Table Pagination - Proper Alignment */
+.ltlb-admin .tablenav {
+    margin-top: var(--lazy-space-12, 12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Icon + Text Alignment */
+.ltlb-admin .dashicons-before::before {
+    vertical-align: middle;
+    margin-right: var(--lazy-space-4, 4px);
+}
+
+/* Responsive Spacing Adjustments */
+@media screen and (max-width: 782px) {
+    .ltlb-admin h2:not(:first-child),
+    .ltlb-admin .ltlb-section-header:not(:first-child) {
+        margin-top: var(--lazy-space-20, 20px);
+    }
+    
+    .ltlb-admin .form-table th,
+    .ltlb-admin .form-table td {
+        padding-top: var(--lazy-space-10, 10px);
+        padding-bottom: var(--lazy-space-10, 10px);
+    }
+}

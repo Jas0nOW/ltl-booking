@@ -120,7 +120,18 @@
             if (!$stepper.length) return;
             var $active = $panels.filter('.is-active');
             if (!$active.length) return;
+            
+            // Force reflow to get accurate height after DOM changes (e.g., invoice fields showing/hiding).
+            $active.get(0).offsetHeight;
+            
             var h = $active.outerHeight(true);
+            if (!h || h <= 0) {
+                // Fallback: calculate from children if outerHeight fails.
+                h = 0;
+                $active.children().each(function() {
+                    h += $(this).outerHeight(true);
+                });
+            }
             if (!h || h <= 0) return;
 
             // Keep layout stable without animating container height (better on mobile).
@@ -244,6 +255,11 @@
                 } else {
                     $invoiceFields.hide();
                 }
+
+                // Recalculate height immediately and after reflow.
+                setTimeout(setStepperHeight, 0);
+                setTimeout(setStepperHeight, 50);
+                setTimeout(setStepperHeight, 150);
             }
             syncInvoiceFields();
             $root.on('change', 'input[name="payment_method"]', syncInvoiceFields);

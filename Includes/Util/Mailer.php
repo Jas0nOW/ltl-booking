@@ -121,10 +121,28 @@ class LTLB_Mailer {
         $customer_subject = $ls['mail_customer_subject'] ?? ($ls['mail_customer_template_subject'] ?? '');
         $customer_body = $ls['mail_customer_template'] ?? '';
 
+        $tz_string = class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC';
+        $date_time_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+        $time_format = get_option( 'time_format' );
+
+        $start_display = $start_at;
+        $end_display = $end_at;
+        if ( class_exists( 'LTLB_DateTime' ) ) {
+            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( $start_at, $date_time_format, $tz_string );
+            // For end, include date if it differs (e.g. hotel stays), otherwise time only.
+            $end_local_dt = LTLB_DateTime::utc_mysql_to_local_dt( $end_at, $tz_string );
+            $start_local_dt = LTLB_DateTime::utc_mysql_to_local_dt( $start_at, $tz_string );
+            if ( $start_local_dt && $end_local_dt && $start_local_dt->format( 'Y-m-d' ) === $end_local_dt->format( 'Y-m-d' ) ) {
+                $end_display = function_exists( 'wp_date' ) ? wp_date( $time_format, $end_local_dt->getTimestamp(), $end_local_dt->getTimezone() ) : $end_local_dt->format( $time_format );
+            } else {
+                $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( $end_at, $date_time_format, $tz_string );
+            }
+        }
+
         $placeholders = [
             'service' => $service['name'] ?? '',
-            'start' => $start_at,
-            'end' => $end_at,
+            'start' => $start_display,
+            'end' => $end_display,
             'name' => trim( ($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '') ),
             'email' => $customer['email'] ?? '',
             'phone' => $customer['phone'] ?? '',

@@ -33,6 +33,9 @@ class LTLB_AI_Factory {
 		switch ( strtolower( $provider ) ) {
 			case 'gemini':
 				$key = $api_keys['gemini'] ?? '';
+				if ( $key && class_exists( 'LTLB_Crypto' ) ) {
+					$key = LTLB_Crypto::decrypt_string( (string) $key );
+				}
 				if ( ! $key ) {
 					return null;
 				}
@@ -59,6 +62,9 @@ class LTLB_AI_Factory {
 		if ( ! $api_key ) {
 			$api_keys = get_option( 'lazy_api_keys', [] );
 			$api_key = $api_keys[ $provider ] ?? '';
+			if ( $api_key && class_exists( 'LTLB_Crypto' ) ) {
+				$api_key = LTLB_Crypto::decrypt_string( (string) $api_key );
+			}
 		}
 
 		if ( ! $api_key ) {
