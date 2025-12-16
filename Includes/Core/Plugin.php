@@ -9,6 +9,7 @@ class LTLB_Plugin {
         // Ensure DB migrations run automatically when plugin version changes
         add_action('plugins_loaded', [ 'LTLB_DB_Migrator', 'maybe_migrate' ]);
         add_action('admin_menu', [ $this, 'register_admin_menu' ]);
+        add_action( 'admin_menu', [ $this, 'maybe_hide_wizard_menu' ], 999 );
         add_action('admin_notices', [ 'LTLB_Notices', 'render' ]);
         add_action('wp_head', [ $this, 'print_design_css_frontend' ]);
         add_action('admin_head', [ $this, 'print_design_css_admin' ]);
@@ -256,27 +257,16 @@ class LTLB_Plugin {
 		$template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
 		$wizard_completed = get_option( 'ltlb_wizard_completed', false );
 
-        // Setup Wizard (only if not completed)
-        if ( ! $wizard_completed && class_exists( 'LTLB_Admin_SetupWizardPage' ) ) {
-            add_menu_page(
-                __( 'Setup Wizard', 'ltl-bookings' ),
-                __( 'Setup Wizard', 'ltl-bookings' ),
-                'manage_options',
-                'ltlb_setup_wizard',
-                [ $this, 'render_setup_wizard_page' ],
-                'dashicons-admin-generic',
-                25
-            );
-            // If wizard not completed, redirect to it on first admin page load
-            if ( ! defined( 'DOING_AJAX' ) && ! isset( $_GET['page'] ) ) {
-                add_action( 'admin_init', function() {
-                    if ( current_user_can( 'manage_options' ) ) {
-                        wp_safe_redirect( admin_url( 'admin.php?page=ltlb_setup_wizard' ) );
-                        exit;
-                    }
-                });
-            }
-        }
+        add_menu_page(
+            __( 'Setup Wizard', 'ltl-bookings' ),
+            __( 'Setup Wizard', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_setup_wizard',
+            [ LTLB_Admin_SetupWizardPage::class, 'render' ],
+            'dashicons-admin-generic',
+            25
+        );
+
         
         add_menu_page(
             __( 'LazyBookings', 'ltl-bookings' ),
@@ -640,15 +630,6 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Branding', 'ltl-bookings' ) . '</h1></div>';
-    }
-
-    public function render_setup_wizard_page(): void {
-        if ( class_exists('LTLB_Admin_SetupWizardPage') ) {
-            $page = new LTLB_Admin_SetupWizardPage();
-            $page->render();
-            return;
-        }
-        echo '<div class="wrap"><h1>' . esc_html__( 'Setup Wizard', 'ltl-bookings' ) . '</h1></div>';
     }
 
     public function register_rest_routes(): void {
@@ -1942,7 +1923,7 @@ class LTLB_Plugin {
             return $this->rest_error( 400, 'not_hotel_mode', 'Room proposals require hotel mode.' );
         }
         if ( ! class_exists( 'LTLB_AIOutbox' ) ) {
-            return $this->rest_error( 500, 'outbox_missing', 'AI Outbox not available.' );
+            return $this->rest_error( 500, 'outbox_missing', 'AI Outbox not available' );
         }
         $id = intval( $request->get_param('id') );
         if ( $id <= 0 ) {
@@ -2369,9 +2350,8 @@ class LTLB_Plugin {
                     'rooms' => __( 'Rooms', 'ltl-bookings' ),
                     'room' => __( 'Room', 'ltl-bookings' ),
                     'room_assignment' => __( 'Room Assignment', 'ltl-bookings' ),
-                    'assigned_room' => __( 'Assigned room', 'ltl-bookings' ),
-                    'unassigned' => __( 'Unassigned', 'ltl-bookings' ),
-					'other' => __( 'Other', 'ltl-bookings' ),
+                    'assigned_room' => __( 'Unassigned', 'ltl-bookings' ),
+                    'other' => __( 'Other', 'ltl-bookings' ),
                     'suggested_room' => __( 'Suggested room', 'ltl-bookings' ),
                     'choose_room' => __( 'Choose room', 'ltl-bookings' ),
                     'assign_room' => __( 'Assign room', 'ltl-bookings' ),
@@ -2739,5 +2719,11 @@ class LTLB_Plugin {
         $result = LTLB_AI_Factory::test_connection( $provider, $api_key, $model );
 
         wp_send_json( $result );
+    }
+
+    public function maybe_hide_wizard_menu(): void {
+        if ( get_option( 'ltlb_wizard_completed', false ) ) {
+            remove_menu_page( 'ltlb_setup_wizard' );
+        }
     }
 }

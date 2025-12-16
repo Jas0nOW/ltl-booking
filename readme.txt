@@ -3,8 +3,8 @@ Contributors: lazytechlab
 Tags: bookings, appointments, services, resources
 Requires at least: 6.0
 Tested up to: 6.6
-Requires PHP: 7.4
-Stable tag: 1.0.1
+Requires PHP: 8.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,10 @@ The REST namespace is `ltlb/v1`.
 4. Booking wizard.
 
 == Changelog ==
+= 1.1.0 =
+- PHP-Minimum auf 8.1 angehoben; Stabilitäts-/Security-Hardening.
+- Version-Bump; Vorbereitungen für neue Payments & UI/UX-Refactor.
+
 = 1.0.1 =
 - Copy/UX: clearer labels and notices across admin + booking wizard.
 - A11y: improved focus styles and required field indicators.
@@ -51,4 +55,4 @@ The REST namespace is `ltlb/v1`.
 - Docs and API behavior aligned to current implementation.
 
 == Upgrade Notice ==
-Version 1.0.1: Database migrations run automatically on activation and when plugin version changes.
+Version 1.1.0: Läuft auf PHP 8.1+. Nach dem Update sicherstellen, dass Cron/Payments korrekt konfiguriert sind; DB-Migrationen laufen automatisch bei Aktivierung oder Versionswechsel.

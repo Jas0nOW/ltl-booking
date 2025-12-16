@@ -1,4 +1,4 @@
-# 📚 LazyBookings Dokumentation (v1.0.1)
+# 📚 LazyBookings Dokumentation (v1.1.0)
 
 Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der Dokumentationsstruktur zurechtzufinden.
 
@@ -43,7 +43,7 @@ Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der
 
 ### Version-Referenzen
 Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
-- Aktuell: **v1.0.1**
+- Aktuell: **v1.1.0**
 - DB-Version: wird über die Option `ltlb_db_version` verfolgt (läuft typischerweise parallel zur Plugin-Version)
 
 ### Update-Policy

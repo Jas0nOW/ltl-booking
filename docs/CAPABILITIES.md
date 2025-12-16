@@ -2,149 +2,74 @@
 
 ## Overview
 
-LazyBookings implements a granular capabilities system that enforces strict permission boundaries for different user roles. All write operations are gated by capabilities + nonces, and REST endpoints use role-specific permission callbacks.
+LazyBookings implementiert ein fein granuliertes Capability-System, das klare Berechtigungsgrenzen für unterschiedliche Rollen durchsetzt. Alle Schreib-Operationen werden durch Capabilities + Nonces abgesichert, REST-Endpunkte nutzen rollen-spezifische Permission-Callbacks.
 
 ## User Roles
 
 ### Administrator (Superadmin)
 - **WordPress Role**: `administrator`
-- **Profile**: `superadmin`
-- **Capabilities**: All capabilities granted
-- **Access**: Full system access including settings, AI configuration, payments, and refunds
+- **Profil**: `superadmin`
+- **Capabilities**: Alle Capabilities
+- **Access**: Vollzugriff inkl. Settings, AI-Konfiguration, Payments und Refunds
 
 ### Manager
 - **WordPress Role**: `editor`
-- **Profile**: `mitarbeiter` (legacy naming)
-- **Capabilities**: 
+- **Profil**: `mitarbeiter` (Legacy-Bezeichnung)
+- **Capabilities**:
   - `view_bookings`, `manage_bookings`
   - `view_customers`, `manage_customers`
   - `view_services`
   - `view_staff`
   - `manage_own_availability`
-- **Access**: Can manage day-to-day operations but cannot change prices, settings, or process refunds
+- **Access**: Operatives Tagesgeschäft, aber keine Preis-/Settings-Änderungen und keine Refund-Freigaben
 
 ### Staff
 - **WordPress Role**: `ltlb_staff`
-- **Profile**: `mitarbeiter`
+- **Profil**: `mitarbeiter`
 - **Capabilities**:
   - `view_bookings`, `manage_own_bookings`
   - `view_customers`
   - `view_services`
   - `view_staff`
   - `manage_own_availability`
-- **Access**: Read-only for most data, can manage own schedule and assigned bookings
+- **Access**: Read-only für die meisten Daten, Verwaltung des eigenen Kalenders und der zugewiesenen Buchungen
 
 ### CEO/Reports Viewer
 - **WordPress Role**: `ltlb_ceo`
-- **Profile**: `ceo`
+- **Profil**: `ceo`
 - **Capabilities**:
   - `view_ai_reports`
   - `view_reports`
   - `view_payments`
-- **Access**: Read-only dashboards, analytics, and financial reports
+- **Access**: Read-only Dashboards, Analytics und Finanzreports
 
 ## Custom Capabilities
 
 ### AI Capabilities
-- `manage_ai_settings` - Manage AI configuration (Administrator only)
-- `manage_ai_secrets` - View/Edit AI API keys (Administrator only)
-- `view_ai_reports` - View AI-generated insights (Administrator, CEO)
-- `approve_ai_drafts` - Approve AI-generated actions (Administrator only)
+- `manage_ai_settings` – AI-Konfiguration (Provider, Keys, Mode)
+- `manage_ai_secrets` – API Keys anzeigen/bearbeiten
+- `view_ai_reports` – AI Insights einsehen (Admin, CEO)
+- `approve_ai_drafts` – AI-generierte Aktionen freigeben
 
-### Bookings Capabilities
-- `view_bookings` - View all bookings (Administrator, Manager, Staff)
-- `manage_bookings` - Create/Edit/Delete bookings (Administrator, Manager)
-- `manage_own_bookings` - Manage only own assigned bookings (Staff)
+### Booking Capabilities
+- `view_bookings` – Alle Buchungen sehen (Admin, Manager, Staff)
+- `manage_bookings` – Buchungen anlegen/bearbeiten/löschen (Admin, Manager)
+- `manage_own_bookings` – Nur eigene Buchungen verwalten (Staff)
 
-### Customers Capabilities
-- `view_customers` - View customer data (Administrator, Manager, Staff)
-- `manage_customers` - Create/Edit/Delete customers (Administrator, Manager)
+### Customer Capabilities
+- `view_customers` – Kundendaten einsehen (Admin, Manager, Staff)
+- `manage_customers` – Kunden anlegen/bearbeiten (Admin, Manager)
 
-### Services & Resources Capabilities
-- `view_services` - View services/rooms (Administrator, Manager, Staff)
-- `manage_services` - Create/Edit/Delete services/rooms (Administrator only)
-- `manage_service_prices` - Edit pricing (Administrator only)
+### Staff & Availability
+- `view_staff` – Staff-Profile sehen
+- `manage_own_availability` – Eigene Verfügbarkeit pflegen
+- `manage_staff_roles` – Rollen zuweisen (Admin)
 
-### Staff Capabilities
-- `view_staff` - View staff list (Administrator, Manager, Staff)
-- `manage_staff` - Create/Edit/Delete staff (Administrator only)
-- `manage_own_availability` - Edit own schedule (Staff, Manager)
+### Payments & Finance
+- `view_payments` – Zahlungsübersicht sehen (Admin, CEO)
+- `manage_refunds` – Refunds auslösen/bestätigen (Admin)
 
-### Settings Capabilities
-- `manage_booking_settings` - Change plugin settings (Administrator only)
-- `view_reports` - View analytics/reports (Administrator, CEO)
+### Reports & Analytics
+- `view_reports` – KPIs, Auslastung, Umsatzberichte sehen
 
-### Payment Capabilities
-- `view_payments` - View payment information (Administrator, CEO)
-- `process_refunds` - Issue refunds (Administrator only)
-
-## REST Endpoint Permissions
-
-All REST endpoints use capability-based permission callbacks:
-
-### Bookings Endpoints
-- `GET /admin/appointments/{id}` - Requires: `view_bookings`
-- `DELETE /admin/appointments/{id}` - Requires: `manage_bookings`
-- `POST /admin/appointments/{id}/move` - Requires: `manage_bookings`
-- `POST /admin/appointments/{id}/status` - Requires: `manage_bookings`
-
-### Customers Endpoints
-- `POST /admin/customers/{id}` - Requires: `manage_customers`
-
-### Refund Endpoint
-- `POST /admin/appointments/{id}/refund` - Requires: `process_refunds`
-
-### Calendar Endpoints
-All calendar endpoints require `view_bookings` capability.
-
-## Admin Page Permissions
-
-Admin pages check capabilities on load and for all write operations:
-
-- **Appointments** - View: `view_bookings`, Edit: `manage_bookings`
-- **Customers** - View: `view_customers`, Edit: `manage_customers`
-- **Services** - View: `view_services`, Edit: `manage_services`
-- **Staff** - View: `view_staff`, Edit: `manage_staff`
-- **Settings** - Requires: `manage_booking_settings` or `manage_options`
-- **Calendar** - View: `view_bookings`, Edit: `manage_bookings`
-
-## Security Checks
-
-All mutating operations enforce:
-
-1. **Nonce Verification** - `check_admin_referer()` or `wp_verify_nonce()`
-2. **Capability Check** - `current_user_can()` with granular capability
-3. **Input Sanitization** - All inputs sanitized via `LTLB_Sanitizer`
-4. **Output Escaping** - All outputs escaped with `esc_html()`, `esc_attr()`, etc.
-
-## Error Responses
-
-- **401 Unauthorized** - User not logged in
-- **403 Forbidden** - User lacks required capability
-- **422 Unprocessable Entity** - Validation failed (invalid input)
-- **400 Bad Request** - Malformed request or missing nonce
-
-## Implementation Notes
-
-### Registration
-Capabilities are registered on plugin activation via `LTLB_Role_Manager::register_capabilities()`.
-
-### Menu Filtering
-Admin menu is filtered based on user profile via `LTLB_Role_Manager::filter_admin_menu()`.
-
-### Future Enhancements
-- **Staff-specific filtering** - Staff should only see their own bookings
-- **Multi-location support** - Location-based access control
-- **Custom role creation UI** - Admin interface to create custom roles
-- **Audit log for permission changes** - Track who gained/lost capabilities
-
-## Testing Checklist
-
-✅ Administrator can access all pages and perform all actions  
-✅ Staff user cannot change prices  
-✅ Staff user cannot access Settings page  
-✅ Staff user cannot process refunds  
-✅ Manager can create/edit bookings but not change settings  
-✅ CEO can view reports but not edit anything  
-✅ All REST endpoints return 403 for unauthorized users  
-✅ Nonce checks prevent CSRF attacks  
+Alle Capabilities werden zentral in `LTLB_RoleManager` registriert und bei Aktivierung/Deaktivierung des Plugins synchronisiert.
