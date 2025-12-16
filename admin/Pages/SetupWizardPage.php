@@ -9,8 +9,15 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_SetupWizardPage {
 
     public static function render(): void {
-        if ( ! current_user_can('manage_options') ) {
+        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) {
             wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        }
+
+        // Handle wizard restart
+        if ( isset( $_GET['restart'] ) && $_GET['restart'] === '1' ) {
+            delete_option( 'ltlb_wizard_completed' );
+            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_setup&step=1' ) );
+            exit;
         }
 
         $step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 1;
@@ -52,10 +59,65 @@ class LTLB_Admin_SetupWizardPage {
         .ltlb-wizard { max-width: 800px; margin: 40px auto; }
         .ltlb-wizard-progress { font-size: 14px; color: #666; margin-bottom: 30px; }
         .ltlb-wizard-container { background: #fff; padding: 40px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .ltlb-wizard h2 { margin-top: 0; }
-        .ltlb-wizard-option { padding: 20px; margin: 10px 0; border: 2px solid #ddd; border-radius: 4px; cursor: pointer; }
-        .ltlb-wizard-option:hover { border-color: #2271b1; }
-        .ltlb-wizard-option input[type="radio"] { margin-right: 10px; }
+        .ltlb-wizard h2 { margin-top: 0; margin-bottom: 20px; font-size: 24px; }
+        .ltlb-wizard p { margin-bottom: 20px; line-height: 1.6; }
+        .ltlb-wizard-option { 
+            display: block; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+        .ltlb-wizard-option:hover { 
+            border-color: #2271b1; 
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(34,113,177,0.1);
+        }
+        .ltlb-wizard-option input[type="radio"],
+        .ltlb-wizard-option input[type="checkbox"] { 
+            margin: 0 10px 0 0; 
+            vertical-align: middle;
+        }
+        .ltlb-wizard-option strong { 
+            display: inline-block;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .ltlb-wizard-option .description { 
+            display: block;
+            margin-top: 8px;
+            margin-left: 24px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .ltlb-wizard .form-table { 
+            margin-top: 20px;
+            width: 100%;
+        }
+        .ltlb-wizard .form-table th { 
+            padding: 15px 0;
+            width: 200px;
+            vertical-align: top;
+            text-align: left;
+        }
+        .ltlb-wizard .form-table td { 
+            padding: 15px 0;
+        }
+        .ltlb-wizard .form-table input[type="text"],
+        .ltlb-wizard .form-table input[type="email"],
+        .ltlb-wizard .form-table select { 
+            width: 100%;
+            max-width: 400px;
+        }
+        .ltlb-wizard .button-primary { 
+            padding: 10px 30px;
+            font-size: 16px;
+            height: auto;
+        }
         </style>
         <?php
     }
@@ -156,24 +218,23 @@ class LTLB_Admin_SetupWizardPage {
             <h2><?php echo esc_html__('Payment Methods', 'ltl-bookings'); ?></h2>
             <p><?php echo esc_html__('Choose how customers can pay. You can configure this later in Settings.', 'ltl-bookings'); ?></p>
 
-            <p>
-                <label>
-                    <input type="checkbox" name="payment_methods[]" value="stripe">
-                    <strong>Stripe</strong> - <?php echo esc_html__('Credit cards, Apple Pay, Google Pay', 'ltl-bookings'); ?>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="checkbox" name="payment_methods[]" value="paypal">
-                    <strong>PayPal</strong> - <?php echo esc_html__('PayPal checkout', 'ltl-bookings'); ?>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="checkbox" name="payment_methods[]" value="onsite" checked>
-                    <strong><?php echo esc_html__('Payment on site', 'ltl-bookings'); ?></strong> - <?php echo esc_html__('Pay in person', 'ltl-bookings'); ?>
-                </label>
-            </p>
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="payment_methods[]" value="stripe">
+                <strong>Stripe</strong>
+                <span class="description"><?php echo esc_html__('Credit cards, Apple Pay, Google Pay', 'ltl-bookings'); ?></span>
+            </label>
+
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="payment_methods[]" value="paypal">
+                <strong>PayPal</strong>
+                <span class="description"><?php echo esc_html__('PayPal checkout', 'ltl-bookings'); ?></span>
+            </label>
+
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="payment_methods[]" value="onsite" checked>
+                <strong><?php echo esc_html__('Payment on site', 'ltl-bookings'); ?></strong>
+                <span class="description"><?php echo esc_html__('Pay in person', 'ltl-bookings'); ?></span>
+            </label>
 
             <p style="margin-top: 30px;">
                 <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
@@ -188,24 +249,20 @@ class LTLB_Admin_SetupWizardPage {
             <?php wp_nonce_field('ltlb_wizard_step', 'ltlb_wizard_nonce'); ?>
             <h2><?php echo esc_html__('Email Notifications', 'ltl-bookings'); ?></h2>
 
-            <p>
-                <label>
-                    <input type="checkbox" name="notifications[]" value="customer_confirmation" checked>
-                    <?php echo esc_html__('Send confirmation emails to customers', 'ltl-bookings'); ?>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="checkbox" name="notifications[]" value="admin_notification" checked>
-                    <?php echo esc_html__('Notify admin on new bookings', 'ltl-bookings'); ?>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="checkbox" name="notifications[]" value="reminders">
-                    <?php echo esc_html__('Send reminders 24h before appointment', 'ltl-bookings'); ?>
-                </label>
-            </p>
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="notifications[]" value="customer_confirmation" checked>
+                <strong><?php echo esc_html__('Send confirmation emails to customers', 'ltl-bookings'); ?></strong>
+            </label>
+
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="notifications[]" value="admin_notification" checked>
+                <strong><?php echo esc_html__('Notify admin on new bookings', 'ltl-bookings'); ?></strong>
+            </label>
+
+            <label class="ltlb-wizard-option">
+                <input type="checkbox" name="notifications[]" value="reminders">
+                <strong><?php echo esc_html__('Send reminders 24h before appointment', 'ltl-bookings'); ?></strong>
+            </label>
 
             <p style="margin-top: 30px;">
                 <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
@@ -221,18 +278,17 @@ class LTLB_Admin_SetupWizardPage {
             <h2><?php echo esc_html__('Demo Data', 'ltl-bookings'); ?></h2>
             <p><?php echo esc_html__('Would you like to import demo data to test the plugin?', 'ltl-bookings'); ?></p>
 
-            <p>
-                <label>
-                    <input type="radio" name="demo_data" value="yes">
-                    <?php echo esc_html__('Yes, import demo data', 'ltl-bookings'); ?>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="radio" name="demo_data" value="no" checked>
-                    <?php echo esc_html__('No, I\'ll add my own services', 'ltl-bookings'); ?>
-                </label>
-            </p>
+            <label class="ltlb-wizard-option">
+                <input type="radio" name="demo_data" value="yes">
+                <strong><?php echo esc_html__('Yes, import demo data', 'ltl-bookings'); ?></strong>
+                <span class="description"><?php echo esc_html__('Sample services, staff, and bookings for testing', 'ltl-bookings'); ?></span>
+            </label>
+
+            <label class="ltlb-wizard-option">
+                <input type="radio" name="demo_data" value="no" checked>
+                <strong><?php echo esc_html__('No, I\'ll add my own services', 'ltl-bookings'); ?></strong>
+                <span class="description"><?php echo esc_html__('Start with an empty setup', 'ltl-bookings'); ?></span>
+            </label>
 
             <p style="margin-top: 30px;">
                 <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>

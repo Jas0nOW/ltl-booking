@@ -65,9 +65,19 @@ class LTLB_I18n {
 		static $dict = null;
 		if ( is_array( $dict ) ) return $dict;
 
+		// Load translations from .po file with simple regex parsing
+		$po_file = dirname( __DIR__, 2 ) . '/languages/de_DE.po';
+		if ( file_exists( $po_file ) ) {
+			$dict = self::parse_po_file( $po_file );
+			if ( ! empty( $dict ) ) {
+				return $dict;
+			}
+		}
+
+		// Fallback to hardcoded dictionary
 		$dict = [
-			'Dashboard' => 'Dashboard',
-			'Appointments' => 'Termine',
+				'Dashboard' => 'Dashboard',
+				'Appointments' => 'Termine',
 			'Calendar' => 'Kalender',
 			'Customers' => 'Kunden',
 			'Services' => 'Services',
@@ -627,5 +637,101 @@ class LTLB_I18n {
 		];
 
 		return $dict;
+	}
+
+	/**
+	 * Parse .po file with simple text processing
+	 * @param string $po_file Path to .po file
+	 * @return array Dictionary of translations
+	 */
+	private static function parse_po_file( string $po_file ): array {
+		$content = @file_get_contents( $po_file );
+		if ( ! $content ) {
+			return [];
+		}
+
+		// Fix encoding issues - convert from UTF-8 to UTF-8 (fixes double-encoding)
+		if ( function_exists( 'mb_convert_encoding' ) ) {
+			$content = mb_convert_encoding( $content, 'UTF-8', 'UTF-8' );
+		}
+
+		// Fix common broken UTF-8 sequences
+		$content = str_replace( 'Ã¤', 'ä', $content );
+		$content = str_replace( 'Ã¶', 'ö', $content );
+		$content = str_replace( 'Ã¼', 'ü', $content );
+		$content = str_replace( 'Ã„', 'Ä', $content );
+		$content = str_replace( 'Ã–', 'Ö', $content );
+		$content = str_replace( 'Ãœ', 'Ü', $content );
+		$content = str_replace( 'ÃŸ', 'ß', $content );
+		$content = str_replace( 'ÃƒÂ¤', 'ä', $content );
+		$content = str_replace( 'ÃƒÂ¶', 'ö', $content );
+		$content = str_replace( 'ÃƒÂ¼', 'ü', $content );
+		$content = str_replace( 'ÃƒÂ„', 'Ä', $content );
+		$content = str_replace( 'ÃƒÂ–', 'Ö', $content );
+		$content = str_replace( 'ÃƒÅ"', 'Ü', $content );
+		$content = str_replace( 'ÃƒÅ¸', 'ß', $content );
+		$content = str_replace( 'Ã©', 'é', $content );
+		$content = str_replace( 'Ã¨', 'è', $content );
+		$content = str_replace( 'Ã ', 'à', $content );
+
+		$translations = [];
+		$lines = explode( "\n", $content );
+		$msgid = '';
+		$msgstr = '';
+		$in_msgid = false;
+		$in_msgstr = false;
+
+		foreach ( $lines as $line ) {
+			$line = trim( $line );
+
+			// Start of msgid
+			if ( strpos( $line, 'msgid "' ) === 0 ) {
+				// Save previous entry
+				if ( $msgid !== '' && $msgstr !== '' ) {
+					$translations[ $msgid ] = $msgstr;
+				}
+				$msgid = substr( $line, 7, -1 );
+				$msgstr = '';
+				$in_msgid = true;
+				$in_msgstr = false;
+			}
+			// Start of msgstr
+			elseif ( strpos( $line, 'msgstr "' ) === 0 ) {
+				$msgstr = substr( $line, 8, -1 );
+				$in_msgid = false;
+				$in_msgstr = true;
+			}
+			// Continuation line
+			elseif ( strpos( $line, '"' ) === 0 && strlen( $line ) > 1 ) {
+				$value = substr( $line, 1, -1 );
+				if ( $in_msgid ) {
+					$msgid .= $value;
+				} elseif ( $in_msgstr ) {
+					$msgstr .= $value;
+				}
+			}
+			// Empty line or comment - reset
+			elseif ( $line === '' || strpos( $line, '#' ) === 0 ) {
+				if ( $msgid !== '' && $msgstr !== '' ) {
+					$translations[ $msgid ] = $msgstr;
+				}
+				$msgid = '';
+				$msgstr = '';
+				$in_msgid = false;
+				$in_msgstr = false;
+			}
+		}
+
+		// Save last entry
+		if ( $msgid !== '' && $msgstr !== '' ) {
+			$translations[ $msgid ] = $msgstr;
+		}
+
+		// Remove escaped characters
+		foreach ( $translations as $key => $value ) {
+			$translations[ $key ] = stripcslashes( $value );
+		}
+
+		return $translations;
 	}
 }

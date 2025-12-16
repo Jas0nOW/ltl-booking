@@ -301,6 +301,8 @@ class LTLB_Plugin {
             [ $this, 'render_dashboard_page' ]
         );
 
+        // --- Main Operations ---
+
         // Appointments / Bookings
 		$appointments_label = $template_mode === 'hotel' ? __( 'Bookings', 'ltl-bookings' ) : __( 'Appointments', 'ltl-bookings' );
         add_submenu_page(
@@ -333,6 +335,7 @@ class LTLB_Plugin {
             [ $this, 'render_customers_page' ]
         );
 
+        // --- Resources ---
 
         // Services (context-aware label)
         $services_label = $template_mode === 'hotel' ? __( 'Room Types', 'ltl-bookings' ) : __( 'Services', 'ltl-bookings' );
@@ -343,6 +346,17 @@ class LTLB_Plugin {
             'manage_options',
             'ltlb_services',
             [ $this, 'render_services_page' ]
+        );
+
+        // Resources (context-aware label)
+        $resources_label = $template_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
+        add_submenu_page(
+            'ltlb_dashboard',
+            $resources_label,
+            $resources_label,
+            'manage_options',
+            'ltlb_resources',
+            [ $this, 'render_resources_page' ]
         );
 
 		if ($template_mode === 'service') {
@@ -357,46 +371,7 @@ class LTLB_Plugin {
 			);
 		}
 
-        // Resources (context-aware label)
-        $resources_label = $template_mode === 'hotel' ? __( 'Rooms', 'ltl-bookings' ) : __( 'Resources', 'ltl-bookings' );
-        add_submenu_page(
-            'ltlb_dashboard',
-            $resources_label,
-            $resources_label,
-            'manage_options',
-            'ltlb_resources',
-            [ $this, 'render_resources_page' ]
-        );
-
-        // Settings
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Settings', 'ltl-bookings' ),
-            __( 'Settings', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_settings',
-            [ $this, 'render_settings_page' ]
-        );
-
-        // Design
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Design', 'ltl-bookings' ),
-            __( 'Design', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_design',
-            [ $this, 'render_design_page' ]
-        );
-
-        // Branding (Design System)
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Branding', 'ltl-bookings' ),
-            __( 'Branding', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_branding',
-            [ $this, 'render_branding_page' ]
-        );
+        // --- AI & Automation ---
 
 		// AI & Automations
 		add_submenu_page(
@@ -450,9 +425,43 @@ class LTLB_Plugin {
             [ $this, 'render_reply_templates_page' ]
         );
 
-		// Diagnostics
+        // --- Design & Settings ---
+
+        // Design
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Design', 'ltl-bookings' ),
+            __( 'Design', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_design',
+            [ $this, 'render_design_page' ]
+        );
+
+        // Settings
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Settings', 'ltl-bookings' ),
+            __( 'Settings', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_settings',
+            [ $this, 'render_settings_page' ]
+        );
+
+        // --- Advanced (collapsed by default in our UI) ---
+
+        // Branding (Design System) - Hidden from menu, accessible via Design page
+        add_submenu_page(
+            null, // parent_slug = null hides from menu
+            __( 'Branding', 'ltl-bookings' ),
+            __( 'Branding', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_branding',
+            [ $this, 'render_branding_page' ]
+        );
+
+		// Diagnostics - Hidden from menu, accessible via Settings
 		add_submenu_page(
-			'ltlb_dashboard',
+			null,
 			__( 'Diagnostics', 'ltl-bookings' ),
 			__( 'Diagnostics', 'ltl-bookings' ),
 			'manage_options',
@@ -460,9 +469,9 @@ class LTLB_Plugin {
 			[ $this, 'render_diagnostics_page' ]
 		);
 
-        // Privacy
+        // Privacy - Hidden from menu, accessible via Settings
         add_submenu_page(
-            'ltlb_dashboard',
+            null,
             __( 'Privacy & GDPR', 'ltl-bookings' ),
             __( 'Privacy', 'ltl-bookings' ),
             'manage_options',
