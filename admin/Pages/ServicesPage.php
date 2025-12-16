@@ -14,7 +14,7 @@ class LTLB_Admin_ServicesPage {
     }
 
     public function render(): void {
-        if ( ! current_user_can('manage_options') ) {
+        if ( ! current_user_can('view_services') && ! current_user_can('manage_services') ) {
             wp_die( esc_html__('You do not have permission to view this page.', 'ltl-bookings') );
         }
         
@@ -43,8 +43,9 @@ class LTLB_Admin_ServicesPage {
         if ( isset( $_POST['ltlb_service_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_service_save_action', 'ltlb_service_nonce' ) ) {
                 wp_die( esc_html__('Security check failed', 'ltl-bookings') );
+            }            if ( ! current_user_can( 'manage_services' ) ) {
+                wp_die( esc_html__( 'You do not have permission to edit services.', 'ltl-bookings' ) );
             }
-
             $id = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : 0;
             $data = [];
             $data['name'] = LTLB_Sanitizer::text( $_POST['name'] ?? '' );

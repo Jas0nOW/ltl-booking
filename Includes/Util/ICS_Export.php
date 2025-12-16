@@ -46,9 +46,9 @@ class LTLB_ICS_Export {
                 LTLB_BookingStatus::get_label( $status )
             );
             
-            $start = self::format_ics_datetime( $appt['start_at'] );
-            $end = self::format_ics_datetime( $appt['end_at'] );
-            $created = self::format_ics_datetime( $appt['created_at'] ?? current_time('mysql') );
+            $start = self::format_ics_datetime( (string) ( $appt['start_at'] ?? '' ) );
+            $end = self::format_ics_datetime( (string) ( $appt['end_at'] ?? '' ) );
+            $created = gmdate( 'Ymd\THis\Z' );
             $uid = 'ltlb-' . $appt['id'] . '@' . parse_url( home_url(), PHP_URL_HOST );
             
             $ics .= "BEGIN:VEVENT\r\n";
@@ -76,9 +76,25 @@ class LTLB_ICS_Export {
      * Format datetime for ICS (YYYYMMDDTHHMMSSZ)
      */
     private static function format_ics_datetime( string $datetime ): string {
-        $dt = new DateTime( $datetime, wp_timezone() );
-        $dt->setTimezone( new DateTimeZone('UTC') );
-        return $dt->format('Ymd\THis\Z');
+        $datetime = trim( $datetime );
+        if ( $datetime === '' ) {
+            return gmdate( 'Ymd\THis\Z' );
+        }
+
+        // Appointment times are stored as UTC MySQL DATETIME.
+        if ( class_exists( 'LTLB_DateTime' ) ) {
+            $dt = LTLB_DateTime::parse_utc_mysql( $datetime );
+            if ( $dt ) {
+                return $dt->format( 'Ymd\THis\Z' );
+            }
+        }
+
+        try {
+            $dt = new DateTimeImmutable( $datetime, new DateTimeZone( 'UTC' ) );
+            return $dt->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Ymd\THis\Z' );
+        } catch ( Exception $e ) {
+            return gmdate( 'Ymd\THis\Z' );
+        }
     }
 
     /**

@@ -107,14 +107,21 @@ class LTLB_Admin_RoomAssistantPage {
 								$guest_name = $customer ? trim( (string) ( $customer['first_name'] ?? '' ) . ' ' . (string) ( $customer['last_name'] ?? '' ) ) : '—';
 								$guests = max( 1, intval( $appt['seats'] ?? 1 ) );
 
+								$appt_tz = (string) ( $appt['timezone'] ?? '' );
+								if ( $appt_tz === '' ) {
+									$appt_tz = LTLB_Time::get_site_timezone_string();
+								}
+								$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+								$end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+
 								$suggestion = $this->suggest_room( $appt, $guests, $include_pending, $svc_res_repo, $resource_repo, $appt_res_repo );
 								$fit_options = $suggestion['options'] ?? [];
 								$suggested_id = isset( $suggestion['resource_id'] ) ? intval( $suggestion['resource_id'] ) : 0;
 								$suggested_name = $suggested_id > 0 ? ( ( $resource_repo->get_by_id( $suggested_id )['name'] ?? '' ) ) : '';
 							?>
 							<tr>
-								<td><?php echo esc_html( $appt['start_at'] ); ?></td>
-								<td><?php echo esc_html( $appt['end_at'] ); ?></td>
+								<td><?php echo esc_html( $start_display ); ?></td>
+								<td><?php echo esc_html( $end_display ); ?></td>
 								<td><?php echo esc_html( $guest_name ?: '—' ); ?></td>
 								<td><?php echo esc_html( $service ? (string) $service['name'] : '—' ); ?></td>
 								<td><?php echo esc_html( (string) $guests ); ?></td>

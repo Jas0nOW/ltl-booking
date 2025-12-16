@@ -1,3 +1,3299 @@
+﻿msgid ""
+msgstr ""
+"Project-Id-Version: LazyBookings 1.0.1\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+#: admin/Pages/ServicesPage.php
+
+msgid "Latest Bookings"
+msgstr "Neueste Buchungen"
+
+
+msgid "Switch between appointment-based booking (services) and date-range booking (hotel/rooms)."
+msgstr "Wechseln Sie zwischen terminbasierter Buchung (Dienstleistungen) und Datumsbereichs-Buchung (Hotel/Zimmer)."
+
+
+msgid "Secondary Hover Color"
+msgstr "SekundÃƒÂ¤r-Hover-Farbe"
+
+
+msgid "Customer created."
+msgstr "Kunde erstellt."
+
+
+msgid "Send confirmation email to customer"
+msgstr "BestÃ¤tigungs-E-Mail an Kunden senden"
+
+
+msgid "of"
+msgstr "von"
+
+
+msgid "Execution Mode"
+msgstr "AusfÃƒÂ¼hrungsmodus"
+
+
+msgid "Conflict detected. The requested action cannot be completed."
+msgstr "Konflikt erkannt. Die angeforderte Aktion kann nicht ausgefÃ¼hrt werden."
+
+
+msgid "Full hair coloring service"
+msgstr "VollstÃ¤ndiger HaarfÃ¤rbe-Service"
+
+
+msgid "Invalid rule type."
+msgstr "UngÃƒÂ¼ltiger Regeltyp."
+
+
+msgid "Ã¢Å“â€” Missing"
+msgstr "âœ— Fehlt"
+
+
+msgid "Buffer Time"
+msgstr "Pufferzeit"
+
+
+msgid "Overview"
+msgstr "ÃƒÅ“bersicht"
+
+
+msgid "Payment Reminder (Default)"
+msgstr "Zahlungserinnerung (Standard)"
+
+
+msgid "Booking Confirmation"
+msgstr "BuchungsbestÃƒÂ¤tigung"
+
+
+msgid "Time (HH:MM)"
+msgstr "Zeit (HH:MM)"
+
+
+msgid "Test a booking to ensure everything works"
+msgstr "Testen Sie eine Buchung, um sicherzustellen, dass alles funktioniert"
+
+
+msgid "Dates"
+msgstr "Daten"
+
+
+msgid "Export"
+msgstr "Exportieren"
+
+
+msgid "Staff updated."
+msgstr "Personal aktualisiert."
+
+
+msgid "Hotel & Accommodation"
+msgstr "Hotel & Unterkunft"
+
+
+msgid "Availability could not be loaded. Please try again."
+msgstr "VerfÃ¼gbarkeit konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Pending"
+msgstr "Ausstehend"
+
+
+msgid "Ocean Teal"
+msgstr "Ozean TÃ¼rkis"
+
+
+msgid "Suggestion"
+msgstr "Vorschlag"
+
+
+msgid "Business: Friendly Concierge"
+msgstr "GeschÃƒÂ¤ftlich: Freundlicher Concierge"
+
+
+msgid "Offer not found or expired"
+msgstr "Angebot nicht gefunden oder abgelaufen"
+
+
+msgid "Run Retention Cleanup"
+msgstr "Aufbewahrungsbereinigung ausfÃƒÂ¼hren"
+
+
+msgid "Booking Spot Available"
+msgstr "Buchungsplatz verfÃ¼gbar"
+
+
+msgid "Executed."
+msgstr "AusgefÃƒÂ¼hrt."
+
+
+msgid "Appointment created."
+msgstr "Termin erstellt."
+
+
+msgid "End:"
+msgstr "Ende:"
+
+
+msgid "Anonymize customer data after (days)"
+msgstr "Kundendaten anonymisieren nach (Tage)"
+
+
+msgid "Your PayPal Secret."
+msgstr "Ihr PayPal Secret."
+
+
+msgid "Template not found."
+msgstr "Vorlage nicht gefunden."
+
+
+msgid "Hotel Fee (Fixed)"
+msgstr "HotelgebÃ¼hr (Fest)"
+
+
+msgid "Customer confirmation emails"
+msgstr "Kunden-BestÃ¤tigungs-E-Mails"
+
+
+msgid "Day"
+msgstr "Tag"
+
+
+msgid "LazyBookings CEO"
+msgstr "LazyBookings CEO"
+
+
+msgid "AI Insights"
+msgstr "KI-Erkenntnisse"
+
+
+msgid "Any"
+msgstr "Beliebig"
+
+
+msgid "Rooms"
+msgstr "Zimmer"
+
+
+msgid "Room Type"
+msgstr "Raumtyp"
+
+
+msgid "No items found."
+msgstr "Keine EintrÃƒÂ¤ge gefunden."
+
+
+msgid "No rooms available for the selected dates."
+msgstr "Keine Zimmer fÃƒÂ¼r die ausgewÃƒÂ¤hlten Daten verfÃƒÂ¼gbar."
+
+
+msgid "Information AI uses to personalize responses. Toggle \"Send to AI\" to control what data is shared."
+msgstr "Informationen, die KI zur Personalisierung von Antworten verwendet. Schalten Sie "An KI senden" um, um zu steuern, welche Daten geteilt werden."
+
+
+msgid "Guests are created automatically from bookings. You can also add them manually."
+msgstr "GÃƒÂ¤ste werden automatisch aus Buchungen erstellt. Sie kÃƒÂ¶nnen sie auch manuell hinzufÃƒÂ¼gen."
+
+
+msgid "Enable"
+msgstr "Aktivieren"
+
+
+msgid "Search"
+msgstr "Suchen"
+
+
+msgid "Hourly"
+msgstr "StÃƒÂ¼ndlich"
+
+
+msgid "Loading availabilityÃ¢â‚¬Â¦"
+msgstr "Lade VerfÃ¼gbarkeitâ€¦"
+
+
+msgid "Overdue reminders (past bookings, unpaid)"
+msgstr "ÃƒÅ“berfÃƒÂ¤llige Erinnerungen (vergangene Buchungen, unbezahlt)"
+
+
+msgid "View, edit, and manage all your bookings in one place."
+msgstr "Alle Buchungen an einem Ort anzeigen, bearbeiten und verwalten."
+
+
+msgid "Used for success messages and confirmations."
+msgstr "Verwendet fÃ¼r Erfolgsmeldungen und BestÃ¤tigungen."
+
+
+msgid "Reusable subjects and bodies for emails (automations, AI drafts, and manual replies)."
+msgstr "Wiederverwendbare Betreffe und Texte fÃƒÂ¼r E-Mails (Automatisierungen, KI-EntwÃƒÂ¼rfe und manuelle Antworten)."
+
+
+msgid "Elements (inline)"
+msgstr "Elemente (inline)"
+
+
+msgid "Common ports: 587 (TLS), 465 (SSL)."
+msgstr "GÃ¤ngige Ports: 587 (TLS), 465 (SSL)."
+
+
+msgid "Reply Templates"
+msgstr "Antwortvorlagen"
+
+
+msgid "Set to 0 to disable automatic deletion. Appointments with status \"cancelled\" older than this will be permanently deleted."
+msgstr "Auf 0 setzen, um automatisches LÃ¶schen zu deaktivieren. Termine mit Status \"storniert\", die Ã¤lter sind, werden dauerhaft gelÃ¶scht."
+
+
+msgid "No room types available."
+msgstr "Keine Raumtypen verfÃƒÂ¼gbar."
+
+
+msgid "There are no appointments matching your current filters."
+msgstr "Es gibt keine Termine, die Ihren aktuellen Filtern entsprechen."
+
+
+msgid "Failed to send test email."
+msgstr "Test-E-Mail konnte nicht gesendet werden."
+
+
+msgid "Add New Guest"
+msgstr "Neuen Gast hinzufÃƒÂ¼gen"
+
+
+msgid "Clear availability"
+msgstr "VerfÃƒÂ¼gbarkeit lÃƒÂ¶schen"
+
+
+msgid "Database Prefix"
+msgstr "DatenbankprÃƒÂ¤fix"
+
+
+msgid "Check-ins Today"
+msgstr "Anreisen heute"
+
+
+msgid "Reason"
+msgstr "Grund"
+
+
+msgid "Send test email to:"
+msgstr "Test-E-Mail senden an:"
+
+
+msgid "Privacy"
+msgstr "Datenschutz"
+
+
+msgid "Team"
+msgstr "Team"
+
+
+msgid "Close"
+msgstr "SchlieÃƒÅ¸en"
+
+
+msgid "Approve & Execute"
+msgstr "Genehmigen & AusfÃƒÂ¼hren"
+
+
+msgid "Authentication failed (invalid API key)"
+msgstr "Authentifizierung fehlgeschlagen (ungÃƒÂ¼ltiger API-SchlÃƒÂ¼ssel)"
+
+
+msgid "Create/Edit/Delete Services/Rooms"
+msgstr "Dienstleistungen/Zimmer erstellen/bearbeiten/lÃƒÂ¶schen"
+
+
+msgid "Verify your API key works."
+msgstr "ÃƒÅ“berprÃƒÂ¼fen Sie, ob Ihr API-SchlÃƒÂ¼ssel funktioniert."
+
+
+msgid "Disable to remove all hover and focus transitions."
+msgstr "Deaktivieren, um alle Hover- und Fokus-ÃƒÅ“bergÃƒÂ¤nge zu entfernen."
+
+
+msgid "Cash"
+msgstr "Bargeld"
+
+
+msgid "Add detailed descriptions for customers"
+msgstr "FÃ¼gen Sie detaillierte Beschreibungen fÃ¼r Kunden hinzu"
+
+
+msgid "These are used to control which methods can be offered on the booking form (implementation follows in the next steps)."
+msgstr "Diese werden verwendet, um zu steuern, welche Methoden im Buchungsformular angeboten werden kÃ¶nnen (Implementierung folgt in den nÃ¤chsten Schritten)."
+
+
+msgid "Review upcoming unassigned bookings and propose room assignments. In Human-in-the-Loop mode, proposals create drafts in the Outbox."
+msgstr "ÃƒÅ“berprÃƒÂ¼fen Sie bevorstehende nicht zugewiesene Buchungen und schlagen Sie Zimmerzuweisungen vor. Im Human-in-the-Loop-Modus erstellen VorschlÃƒÂ¤ge EntwÃƒÂ¼rfe im Postausgang."
+
+
+msgid "Check availability"
+msgstr "VerfÃƒÂ¼gbarkeit prÃƒÂ¼fen"
+
+
+msgid "LazyBookings Setup Wizard"
+msgstr "LazyBookings Setup-Assistent"
+
+
+msgid "Could not load room suggestions."
+msgstr "RaumvorschlÃƒÂ¤ge konnten nicht geladen werden."
+
+
+msgid "Could not create booking."
+msgstr "Buchung konnte nicht erstellt werden."
+
+
+msgid "Restart Setup Wizard"
+msgstr "Setup-Assistent neu starten"
+
+
+msgid "Bunk Beds"
+msgstr "Etagenbetten"
+
+
+msgid "Leave empty if off"
+msgstr "Leer lassen, wenn frei"
+
+
+msgid "Admin Notifications"
+msgstr "Administrator-Benachrichtigungen"
+
+
+msgid "Run system diagnostics (read-only)."
+msgstr "Systemdiagnose ausfÃƒÂ¼hren (nur Lesezugriff)."
+
+
+msgid "Payment"
+msgstr "Zahlung"
+
+
+msgid "Used for estimated profit calculations in dashboards and AI reports."
+msgstr "Wird fÃ¼r geschÃ¤tzte Gewinnberechnungen in Dashboards und KI-Berichten verwendet."
+
+
+msgid "Select log file"
+msgstr "Protokolldatei auswÃƒÂ¤hlen"
+
+
+msgid "Language"
+msgstr "Sprache"
+
+
+msgid "Delete all plugin data on uninstall"
+msgstr "Alle Plugin-Daten bei Deinstallation lÃƒÂ¶schen"
+
+
+msgid "Enable Animations"
+msgstr "Animationen aktivieren"
+
+
+msgid "No available room found"
+msgstr "Kein verfÃƒÂ¼gbares Zimmer gefunden"
+
+
+msgid "No exceptions found."
+msgstr "Keine Ausnahmen gefunden."
+
+
+msgid "Database Maintenance"
+msgstr "Datenbankwartung"
+
+
+msgid "Hotel Booking (Check-in/Check-out)"
+msgstr "Hotelbuchung (Check-in/Check-out)"
+
+
+msgid "Payment Status"
+msgstr "Zahlungsstatus"
+
+
+msgid "e.g., Weekly report"
+msgstr "z.B. WÃƒÂ¶chentlicher Bericht"
+
+
+msgid "No templates yet. Click \"Add New\" to create your first template."
+msgstr "Noch keine Vorlagen. Klicken Sie auf \"Neu hinzufÃ¼gen\", um Ihre erste Vorlage zu erstellen."
+
+
+msgid "Choose a font for your booking interface."
+msgstr "WÃ¤hlen Sie eine Schriftart fÃ¼r Ihre BuchungsoberflÃ¤che."
+
+
+msgid "Unknown provider: %s"
+msgstr "Unbekannter Anbieter: %s"
+
+
+msgid "Tone and style (e.g., \"professional\", \"friendly\", \"luxury\")."
+msgstr "Ton und Stil (z.B. \"professionell\", \"freundlich\", \"luxuriÃ¶s\")."
+
+
+msgid "Which emails should be sent automatically?"
+msgstr "Welche E-Mails sollen automatisch versendet werden?"
+
+
+msgid "Services"
+msgstr "Dienstleistungen"
+
+
+msgid "Reject"
+msgstr "Ablehnen"
+
+
+msgid "Availability Mode"
+msgstr "VerfÃƒÂ¼gbarkeitsmodus"
+
+
+msgid "Email Notifications:"
+msgstr "E-Mail-Benachrichtigungen:"
+
+
+msgid "Error Color"
+msgstr "Fehlerfarbe"
+
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+
+msgid "Set to 0 to disable automatic anonymization. Appointments older than this will have customer data anonymized (email, name, phone replaced)."
+msgstr "Auf 0 setzen, um automatische Anonymisierung zu deaktivieren. Termine, die ÃƒÂ¤lter sind, werden Kundendaten anonymisiert (E-Mail, Name, Telefon ersetzt)."
+
+
+msgid "Open AI Settings"
+msgstr "KI-Einstellungen Ã¶ffnen"
+
+
+msgid "You can use tags that will be replaced automatically."
+msgstr "Sie kÃ¶nnen Tags verwenden, die automatisch ersetzt werden."
+
+
+msgid "Payment processing"
+msgstr "Zahlungsverarbeitung"
+
+
+msgid "You do not have permission to perform this action."
+msgstr "Sie haben keine Berechtigung fÃ¼r diese Aktion."
+
+
+msgid "Sun"
+msgstr "So"
+
+
+msgid "Create new room type"
+msgstr "Neuen Raumtyp erstellen"
+
+
+msgid "Based on confirmed bookings with assigned rooms."
+msgstr "Basierend auf bestÃƒÂ¤tigten Buchungen mit zugewiesenen Zimmern."
+
+
+msgid "Service not found"
+msgstr "Service nicht gefunden"
+
+
+msgid "Invoice (Default)"
+msgstr "Rechnung (Standard)"
+
+
+msgid "No times available"
+msgstr "Keine Zeiten verfÃ¼gbar"
+
+
+msgid "Resource deleted."
+msgstr "Ressource gelÃ¶scht."
+
+
+msgid "Colors"
+msgstr "Farben"
+
+
+msgid "Service Card"
+msgstr "Service-Karte"
+
+
+msgid "{service_name} Ã¢â‚¬â€ booking confirmation"
+msgstr "{service_name} â€“ BuchungsbestÃ¤tigung"
+
+
+msgid "Invalid dates."
+msgstr "UngÃƒÂ¼ltige Daten."
+
+
+msgid "Choose action to apply to selected appointments"
+msgstr "WÃƒÂ¤hlen Sie die Aktion fÃƒÂ¼r ausgewÃƒÂ¤hlte Termine"
+
+
+msgid "Unassigned"
+msgstr "Nicht zugewiesen"
+
+
+msgid "Check the calendar for availability"
+msgstr "PrÃ¼fen Sie die VerfÃ¼gbarkeit im Kalender"
+
+
+msgid "Duration"
+msgstr "Dauer"
+
+
+msgid "Yes, if you enable the customer portal. They can manage their bookings through the [lazy_customer_portal] shortcode."
+msgstr "Ja, wenn Sie das Kundenportal aktivieren. Kunden kÃ¶nnen ihre Buchungen Ã¼ber den Shortcode [lazy_customer_portal] verwalten."
+
+
+msgid "Unable to save customer."
+msgstr "Kunde konnte nicht gespeichert werden."
+
+
+msgid "Confirmed"
+msgstr "BestÃ¤tigt"
+
+
+msgid "Add time"
+msgstr "Zeit hinzufÃƒÂ¼gen"
+
+
+msgid "Selected room is no longer available."
+msgstr "AusgewÃƒÂ¤hltes Zimmer ist nicht mehr verfÃƒÂ¼gbar."
+
+
+msgid "Payment required:"
+msgstr "Zahlung erforderlich:"
+
+
+msgid "Authentication required. Please log in."
+msgstr "Authentifizierung erforderlich. Bitte melden Sie sich an."
+
+
+msgid "Customer updated."
+msgstr "Kunde aktualisiert."
+
+
+msgid "Booking ID"
+msgstr "Buchungs-ID"
+
+
+msgid "Backend"
+msgstr "Backend"
+
+
+msgid "No executor for this action type yet."
+msgstr "Noch kein Executor fÃƒÂ¼r diesen Aktionstyp."
+
+
+msgid "Back"
+msgstr "ZurÃƒÂ¼ck"
+
+
+msgid "Actions"
+msgstr "Aktionen"
+
+
+msgid "Staff member"
+msgstr "Personalmitglied"
+
+
+msgid "Use the shortcode [lazy_book] on any page or post. You can also use Gutenberg blocks or Elementor widgets."
+msgstr "Verwenden Sie den Shortcode [lazy_book] auf jeder Seite oder jedem Beitrag. Sie kÃ¶nnen auch Gutenberg-BlÃ¶cke oder Elementor-Widgets verwenden."
+
+
+msgid "Manage Booking Settings"
+msgstr "Buchungseinstellungen verwalten"
+
+
+msgid "Skip availability conflict check (not recommended)"
+msgstr "VerfÃƒÂ¼gbarkeitskonfliktprÃƒÂ¼fung ÃƒÂ¼berspringen (nicht empfohlen)"
+
+
+msgid "Controls whether services (appointments) or hotel date ranges are bookable."
+msgstr "Steuert, ob Dienstleistungen (Termine) oder Hotel-Datumsbereiche buchbar sind."
+
+
+msgid "You have read-only access. Ask an administrator to generate a new report."
+msgstr "Sie haben nur Lesezugriff. Bitten Sie einen Administrator, einen neuen Bericht zu generieren."
+
+
+msgid "Room Assistant"
+msgstr "Zimmer-Assistent"
+
+
+msgid "Security check failed"
+msgstr "SicherheitsprÃƒÂ¼fung fehlgeschlagen"
+
+
+msgid "Next Run"
+msgstr "NÃƒÂ¤chster Lauf"
+
+
+msgid "Save Draft"
+msgstr "Entwurf speichern"
+
+
+msgid "Credit cards, Apple Pay, Google Pay"
+msgstr "Kreditkarten, Apple Pay, Google Pay"
+
+
+msgid "Add Default Rules"
+msgstr "Standardregeln hinzufÃƒÂ¼gen"
+
+
+msgid "Submit booking form"
+msgstr "Buchungsformular absenden"
+
+
+msgid "Body"
+msgstr "Text"
+
+
+msgid "You do not have permission to edit customers."
+msgstr "Sie haben keine Berechtigung, Kunden zu bearbeiten."
+
+
+msgid "Edit working hours"
+msgstr "Arbeitszeiten bearbeiten"
+
+
+msgid "Color Customization"
+msgstr "Farbanpassung"
+
+
+msgid "Customer Created"
+msgstr "Kunde erstellt"
+
+
+msgid "Add custom CSS for advanced styling."
+msgstr "FÃƒÂ¼gen Sie benutzerdefiniertes CSS fÃƒÂ¼r erweiterte Gestaltung hinzu."
+
+
+msgid "Mode"
+msgstr "Modus"
+
+
+msgid "No staff members found."
+msgstr "Keine Mitarbeiter gefunden."
+
+
+msgid "Status assigned to new bookings."
+msgstr "Status, der neuen Buchungen zugewiesen wird."
+
+
+msgid "Add shadow to input fields (text, select, etc.)"
+msgstr "Schatten zu Eingabefeldern hinzufÃƒÂ¼gen (Text, Auswahl, etc.)"
+
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+
+msgid "Security"
+msgstr "Sicherheit"
+
+
+msgid "Hotel Dashboard"
+msgstr "Hotel-Dashboard"
+
+
+msgid "No access"
+msgstr "Kein Zugriff"
+
+
+msgid "Change color"
+msgstr "Farbe ÃƒÂ¤ndern"
+
+
+msgid "Three-letter currency code (e.g. EUR)."
+msgstr "Dreistelliger WÃ¤hrungscode (z.B. EUR)."
+
+
+msgid "Please enter valid start and end dates."
+msgstr "Bitte geben Sie gÃƒÂ¼ltige Start- und Enddaten ein."
+
+
+msgid "Logging is currently disabled in Settings."
+msgstr "Protokollierung ist derzeit in den Einstellungen deaktiviert."
+
+
+msgid "Fri"
+msgstr "Fr"
+
+
+msgid "Your business name."
+msgstr "Ihr Firmenname."
+
+
+msgid "Your booking was created but payment was cancelled. You can try again."
+msgstr "Ihre Buchung wurde erstellt, aber die Zahlung wurde storniert. Sie kÃƒÂ¶nnen es erneut versuchen."
+
+
+msgid "Logs"
+msgstr "Protokolle"
+
+
+msgid "Card (POS / on site)"
+msgstr "Karte (POS / vor Ort)"
+
+
+msgid "Invalid date/time."
+msgstr "UngÃ¼ltiges Datum/Uhrzeit."
+
+
+msgid "Appointments"
+msgstr "Termine"
+
+
+msgid "WordPress Version"
+msgstr "WordPress-Version"
+
+
+msgid "Description"
+msgstr "Beschreibung"
+
+
+msgid "AI Enabled"
+msgstr "KI aktiviert"
+
+
+msgid "Stripe Webhook Secret"
+msgstr "Stripe Webhook-Secret"
+
+
+msgid "Refunded"
+msgstr "RÃ¼ckerstattet"
+
+
+msgid "e.g. WiFi, TV, Air conditioning, Mini bar, Balcony"
+msgstr "z.B. WLAN, TV, Klimaanlage, Minibar, Balkon"
+
+
+msgid "Add shadow to buttons (submit, primary, etc.)"
+msgstr "Schatten zu Buttons hinzufÃƒÂ¼gen (Absenden, PrimÃƒÂ¤r, etc.)"
+
+
+msgid "Room types define the different accommodation options you offer. Create your first room type to start accepting bookings."
+msgstr "Raumtypen definieren die verschiedenen Unterkunftsoptionen, die Sie anbieten. Erstellen Sie Ihren ersten Raumtyp, um Buchungen anzunehmen."
+
+
+msgid "Used for error messages and required field indicators."
+msgstr "Verwendet fÃ¼r Fehlermeldungen und Pflichtfeld-Indikatoren."
+
+
+msgid "Customer Notifications"
+msgstr "Kunden-Benachrichtigungen"
+
+
+msgid "Primary button hover background and border."
+msgstr "PrimÃƒÂ¤r-Button Hover-Hintergrund und Rand."
+
+
+msgid "Tue"
+msgstr "Di"
+
+
+msgid "Load default templates"
+msgstr "Standard-Vorlagen laden"
+
+
+msgid "WordPress Default"
+msgstr "WordPress-Standard"
+
+
+msgid "Deterministic: gross profit = revenue Ã¢Ë†â€™ fees Ã¢Ë†â€™ room costs (from assigned rooms Ãƒâ€” nights)."
+msgstr "Deterministisch: Bruttogewinn = Umsatz âˆ’ GebÃ¼hren âˆ’ Zimmerkosten (aus zugewiesenen Zimmern Ã— NÃ¤chte)."
+
+
+msgid "Enable this only when needed (e.g., for debugging)."
+msgstr "Aktivieren Sie dies nur bei Bedarf (z.B. fÃ¼r Debugging)."
+
+
+msgid "Return to booking page"
+msgstr "ZurÃƒÂ¼ck zur Buchungsseite"
+
+
+msgid "Setup Wizard"
+msgstr "Setup-Assistent"
+
+
+msgid "Last Name"
+msgstr "Nachname"
+
+
+msgid "An unexpected error occurred. Please try again or contact support."
+msgstr "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support."
+
+
+msgid "Pay on site (cash)"
+msgstr "Vor Ort bezahlen (Bar)"
+
+
+msgid "Define what customers can book. Each service has a name, duration, price, and description."
+msgstr "Definieren Sie, was Kunden buchen kÃ¶nnen. Jeder Service hat einen Namen, eine Dauer, einen Preis und eine Beschreibung."
+
+
+msgid "Could not generate report."
+msgstr "Bericht konnte nicht generiert werden."
+
+
+msgid "From"
+msgstr "Von"
+
+
+msgid "Control which elements should have shadows. Uncheck all for a flat design."
+msgstr "Steuern Sie, welche Elemente Schatten haben sollen. Deaktivieren Sie alle fÃƒÂ¼r ein flaches Design."
+
+
+msgid "Cancelled"
+msgstr "Storniert"
+
+
+msgid "Please enter your email address."
+msgstr "Bitte geben Sie Ihre E-Mail-Adresse ein."
+
+
+msgid "Outline"
+msgstr "Umriss"
+
+
+msgid "Invalid email recipient."
+msgstr "UngÃƒÂ¼ltiger E-Mail-EmpfÃƒÂ¤nger."
+
+
+msgid "Duration (minutes)"
+msgstr "Dauer (Minuten)"
+
+
+msgid "Finance (Last 30 Days)"
+msgstr "Finanzen (letzte 30 Tage)"
+
+
+msgid "Yes, LazyBookings is translation-ready. German translations are included, and you can add more via Loco Translate or Poedit."
+msgstr "Ja, LazyBookings ist Ã¼bersetzungsbereit. Deutsche Ãœbersetzungen sind enthalten, weitere kÃ¶nnen Sie Ã¼ber Loco Translate oder Poedit hinzufÃ¼gen."
+
+
+msgid "Bulk Actions"
+msgstr "Massenaktionen"
+
+
+msgid "Yes, import demo services and bookings"
+msgstr "Ja, Demo-Services und Buchungen importieren"
+
+
+msgid "Business hours"
+msgstr "GeschÃ¤ftszeiten"
+
+
+msgid "New Booking Received - %s"
+msgstr "Neue Buchung eingegangen - %s"
+
+
+msgid "Frontend tab controls the color palette used on the booking widget."
+msgstr "Frontend-Tab steuert die Farbpalette des Buchungs-Widgets."
+
+
+msgid "Use status filters to find pending or confirmed bookings"
+msgstr "Nutzen Sie Statusfilter, um ausstehende oder bestÃ¤tigte Buchungen zu finden"
+
+
+msgid "Check your system health and troubleshoot issues."
+msgstr "ÃœberprÃ¼fen Sie die Systemgesundheit und beheben Sie Probleme."
+
+
+msgid "This booking is temporarily locked while another reservation is being finalized. Please wait a moment and try again."
+msgstr "Diese Buchung ist vorÃƒÂ¼bergehend gesperrt, wÃƒÂ¤hrend eine andere Reservierung abgeschlossen wird. Bitte warten Sie einen Moment und versuchen Sie es erneut."
+
+
+msgid "Customize your booking form design"
+msgstr "Passen Sie Ihr Buchungsformular-Design an"
+
+
+msgid "Body:"
+msgstr "Text:"
+
+
+msgid "Select resources that can perform this service."
+msgstr "WÃƒÂ¤hlen Sie Ressourcen aus, die diese Dienstleistung ausfÃƒÂ¼hren kÃƒÂ¶nnen."
+
+
+msgid "Connection failed: %s"
+msgstr "Verbindung fehlgeschlagen: %s"
+
+
+msgid "Days ahead"
+msgstr "Tage im Voraus"
+
+
+msgid "nights"
+msgstr "NÃ¤chte"
+
+
+msgid "Email delivery (test sends an email to admin)"
+msgstr "E-Mail-Zustellung (Test sendet eine E-Mail an Admin)"
+
+
+msgid "Default templates added."
+msgstr "Standardvorlagen hinzugefÃƒÂ¼gt."
+
+
+msgid "Exception created."
+msgstr "Ausnahme erstellt."
+
+
+msgid "Overdue Reminder (Default)"
+msgstr "ÃƒÅ“berfÃƒÂ¤llige Erinnerung (Standard)"
+
+
+msgid "Secondary button border and text (outline)."
+msgstr "SekundÃƒÂ¤r-Button Rand und Text (Umriss)."
+
+
+msgid "Ghost"
+msgstr "Geist"
+
+
+msgid "Base time slot interval for calendar generation."
+msgstr "Basis-Zeitslot-Intervall fÃ¼r die Kalender-Generierung."
+
+
+msgid "Choose how customers can pay. You can configure this later in Settings."
+msgstr "WÃ¤hlen Sie, wie Kunden bezahlen kÃ¶nnen. Sie kÃ¶nnen dies spÃ¤ter in den Einstellungen konfigurieren."
+
+
+msgid "Table Status"
+msgstr "Tabellenstatus"
+
+
+msgid "Color for input and card borders"
+msgstr "Farbe fÃƒÂ¼r Eingabe- und KartenrÃƒÂ¤nder"
+
+
+msgid "Instant confirmation flow"
+msgstr "SofortbestÃƒÂ¤tigungsablauf"
+
+
+msgid "Interval (min)"
+msgstr "Intervall (Min)"
+
+
+msgid "Accent Color"
+msgstr "Akzentfarbe"
+
+
+msgid "Room assignment dependencies not loaded."
+msgstr "ZimmerzuweisungsabhÃƒÂ¤ngigkeiten nicht geladen."
+
+
+msgid "Customer deleted."
+msgstr "Kunde gelÃ¶scht."
+
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+
+msgid "Rooms are the bookable units (e.g. Room 101, Room 102). Link them to room types to control availability."
+msgstr "Zimmer sind die buchbaren Einheiten (z.B. Zimmer 101, Zimmer 102). VerknÃƒÂ¼pfen Sie sie mit Raumtypen, um die VerfÃƒÂ¼gbarkeit zu steuern."
+
+
+msgid "Pay Now"
+msgstr "Jetzt bezahlen"
+
+
+msgid "Edit Service/Room Prices"
+msgstr "Service-/Zimmerpreise bearbeiten"
+
+
+msgid "View Calendar"
+msgstr "Kalender ansehen"
+
+
+msgid "Unassigned Bookings"
+msgstr "Nicht zugewiesene Buchungen"
+
+
+msgid "Save AI Settings"
+msgstr "KI-Einstellungen speichern"
+
+
+msgid "Enable Stripe, PayPal, or on-site payment"
+msgstr "Aktivieren Sie Stripe, PayPal oder Vor-Ort-Zahlung"
+
+
+msgid "Add New %s"
+msgstr "Neue %s hinzufÃƒÂ¼gen"
+
+
+msgid "Email subject/body missing."
+msgstr "E-Mail-Betreff/Text fehlt."
+
+
+msgid "Event"
+msgstr "Veranstaltung"
+
+
+msgid "Group Booking Confirmation"
+msgstr "Gruppenbuchungs-BestÃ¤tigung"
+
+
+msgid "Design"
+msgstr "Design"
+
+
+msgid "Human-in-the-Loop"
+msgstr "Human-in-the-Loop"
+
+
+msgid "vs last week"
+msgstr "vs. letzte Woche"
+
+
+msgid "Could not reject draft."
+msgstr "Entwurf konnte nicht abgelehnt werden."
+
+
+msgid "Manual Button Text Color"
+msgstr "Manuelle Button-Textfarbe"
+
+
+msgid "Invalid appointment."
+msgstr "UngÃƒÂ¼ltiger Termin."
+
+
+msgid "Add Slot"
+msgstr "Zeitfenster hinzufÃƒÂ¼gen"
+
+
+msgid "Please fill in the required fields."
+msgstr "Bitte fÃƒÂ¼llen Sie die Pflichtfelder aus."
+
+
+msgid "Runs database migrations again. Can be run multiple times (uses dbDelta)."
+msgstr "FÃƒÂ¼hrt Datenbankmigrationen erneut aus. Kann mehrmals ausgefÃƒÂ¼hrt werden (verwendet dbDelta)."
+
+
+msgid "night"
+msgstr "Nacht"
+
+
+msgid "Other"
+msgstr "Andere"
+
+
+msgid "Backend tab controls the color palette used inside WP Admin (LazyBookings pages)."
+msgstr "Backend-Tab steuert die Farbpalette, die im WP-Admin (LazyBookings-Seiten) verwendet wird."
+
+
+msgid "Logging:"
+msgstr "Protokollierung:"
+
+
+msgid "Advanced Email Settings (SMTP)"
+msgstr "Erweiterte E-Mail-Einstellungen (SMTP)"
+
+
+msgid "Suggested room"
+msgstr "Vorgeschlagenes Zimmer"
+
+
+msgid "Room Types"
+msgstr "Raumtypen"
+
+
+msgid "Status Legend"
+msgstr "Statuslegende"
+
+
+msgid "Send Test Email"
+msgstr "Test-E-Mail senden"
+
+
+msgid "&laquo; Prev"
+msgstr "&laquo; ZurÃ¼ck"
+
+
+msgid "Change color for Cancelled"
+msgstr "Farbe fÃƒÂ¼r Storniert ÃƒÂ¤ndern"
+
+
+msgid "Start"
+msgstr "Start"
+
+
+msgid "%s saved successfully."
+msgstr "%s erfolgreich gespeichert."
+
+
+msgid "Queen Bed"
+msgstr "Queen-Bett"
+
+
+msgid "mail@example.com, +1-555-0000"
+msgstr "mail@example.com, +49-555-0000"
+
+
+msgid "AI Settings"
+msgstr "KI-Einstellungen"
+
+
+msgid "Shadow & Effects"
+msgstr "Schatten & Effekte"
+
+
+msgid "Service Booking (Appointments)"
+msgstr "Dienstleistungsbuchung (Termine)"
+
+
+msgid "Change status to cancelled"
+msgstr "Status zu Storniert ÃƒÂ¤ndern"
+
+
+msgid "Number of guests must be at least 1."
+msgstr "Anzahl der GÃƒÂ¤ste muss mindestens 1 sein."
+
+
+msgid "Cost / Night"
+msgstr "Kosten / Nacht"
+
+
+msgid "Amenities"
+msgstr "Ausstattung"
+
+
+msgid "Service saved successfully."
+msgstr "Dienstleistung erfolgreich gespeichert."
+
+
+msgid "Inactive"
+msgstr "Inaktiv"
+
+
+msgid "Could not delete appointments. Please try again."
+msgstr "Termine konnten nicht gelÃƒÂ¶scht werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Your booking has been received and is awaiting confirmation. Please check your email for details."
+msgstr "Ihre Buchung wurde empfangen und wartet auf BestÃƒÂ¤tigung. Bitte prÃƒÂ¼fen Sie Ihre E-Mails fÃƒÂ¼r Details."
+
+
+msgid "Typography & Layout"
+msgstr "Typografie & Layout"
+
+
+msgid "Select a date first"
+msgstr "Bitte zuerst ein Datum auswÃ¤hlen"
+
+
+msgid "Appointments Dashboard"
+msgstr "Termine Dashboard"
+
+
+msgid "Run retention cleanup now?"
+msgstr "Aufbewahrungsbereinigung jetzt ausfÃƒÂ¼hren?"
+
+
+msgid "Create Customer"
+msgstr "Kunde erstellen"
+
+
+msgid "Yin Yoga"
+msgstr "Yin Yoga"
+
+
+msgid "Booking received"
+msgstr "Buchung eingegangen"
+
+
+msgid "For Gmail you must use an App Password (not your normal login password)."
+msgstr "FÃ¼r Gmail mÃ¼ssen Sie ein App-Passwort verwenden (nicht Ihr normales Login-Passwort)."
+
+
+msgid "You do not have permission to view this page."
+msgstr "Sie haben keine Berechtigung, diese Seite anzuzeigen."
+
+
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
+
+
+msgid "Date"
+msgstr "Datum"
+
+
+msgid "Overdue payment for booking #{booking_id}"
+msgstr "ÃƒÅ“berfÃƒÂ¤llige Zahlung fÃƒÂ¼r Buchung #{booking_id}"
+
+
+msgid "Yoga Session"
+msgstr "Yoga-Session"
+
+
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+
+msgid "Show or hide status legend"
+msgstr "Statuslegende anzeigen oder verbergen"
+
+
+msgid "Working hours saved."
+msgstr "Arbeitszeiten gespeichert."
+
+
+msgid "No resources found. Please add resources first."
+msgstr "Keine Ressourcen gefunden. Bitte fÃƒÂ¼gen Sie zuerst Ressourcen hinzu."
+
+
+msgid "Available times load after you select a date"
+msgstr "VerfÃƒÂ¼gbare Zeiten werden nach Datumsauswahl geladen"
+
+
+msgid "Luxury suite with separate living area"
+msgstr "Luxus-Suite mit separatem Wohnbereich"
+
+
+msgid "Invalid rule."
+msgstr "UngÃƒÂ¼ltige Regel."
+
+
+msgid "List amenities, one per line or comma-separated"
+msgstr "Ausstattungsmerkmale auflisten, eines pro Zeile oder kommagetrennt"
+
+
+msgid "Notes"
+msgstr "Notizen"
+
+
+msgid "Font Family"
+msgstr "Schriftart"
+
+
+msgid "Skip to booking form"
+msgstr "Zum Buchungsformular springen"
+
+
+msgid "Never share this key."
+msgstr "Teilen Sie diesen SchlÃƒÂ¼ssel niemals."
+
+
+msgid "Max children: %d"
+msgstr "Max. Kinder: %d"
+
+
+msgid "SMTP server:"
+msgstr "SMTP-Server:"
+
+
+msgid "Next &raquo;"
+msgstr "Weiter &raquo;"
+
+
+msgid "Back to Appointments"
+msgstr "ZurÃƒÂ¼ck zu Terminen"
+
+
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+
+msgid "Resources could not be loaded. Please try again."
+msgstr "Ressourcen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Add First Customer"
+msgstr "Ersten Kunden hinzufÃƒÂ¼gen"
+
+
+msgid "Loading appointment detailsÃ¢â‚¬Â¦"
+msgstr "Lade Termindetailsâ€¦"
+
+
+msgid "Card (POS)"
+msgstr "Karte (POS)"
+
+
+msgid "Exception deleted."
+msgstr "Ausnahme gelÃƒÂ¶scht."
+
+
+msgid "General"
+msgstr "Allgemein"
+
+
+msgid "Company name"
+msgstr "Firmenname"
+
+
+msgid "Room Assignment"
+msgstr "Zimmerzuweisung"
+
+
+msgid "Refund successful! Reloading..."
+msgstr "RÃƒÂ¼ckerstattung erfolgreich! Neu laden..."
+
+
+msgid "You have not created any %s yet. Click the button to get started."
+msgstr "Sie haben noch keine %s erstellt. Klicken Sie auf die SchaltflÃƒÂ¤che, um zu beginnen."
+
+
+msgid "No %s Found"
+msgstr "Keine %s gefunden"
+
+
+msgid "Assigned room"
+msgstr "Zugewiesener Raum"
+
+
+msgid "Stripe Flow"
+msgstr "Stripe-Ablauf"
+
+
+msgid "Invoice Terms"
+msgstr "Rechnungsbedingungen"
+
+
+msgid "Invoices processed."
+msgstr "Rechnungen verarbeitet."
+
+
+msgid "Analytics (Last 30 Days)"
+msgstr "Statistik (letzte 30 Tage)"
+
+
+msgid "No bookings found."
+msgstr "Keine Buchungen gefunden."
+
+
+msgid "Use gradient from Primary to Accent color"
+msgstr "Verlauf von PrimÃƒÂ¤r- zu Akzentfarbe verwenden"
+
+
+msgid "to"
+msgstr "bis"
+
+
+msgid "Managing Appointments"
+msgstr "Termine verwalten"
+
+
+msgid "Booking Template Mode"
+msgstr "Buchungsvorlagen-Modus"
+
+
+msgid "Diagnostics"
+msgstr "Diagnose"
+
+
+msgid "Slow-paced, meditative yoga"
+msgstr "Langsames, meditatives Yoga"
+
+
+msgid "Step %s of %s"
+msgstr "Schritt %s von %s"
+
+
+msgid "This check-in date has already passed. Please select a future date."
+msgstr "Dieses Check-in-Datum liegt in der Vergangenheit. Bitte wÃƒÂ¤hlen Sie ein zukÃƒÂ¼nftiges Datum."
+
+
+msgid "VAT / Tax ID"
+msgstr "USt-ID / Steuernummer"
+
+
+msgid "Report generated."
+msgstr "Bericht generiert."
+
+
+msgid "Database tables (all should show \"âœ“ Present\")"
+msgstr "Datenbanktabellen (alle sollten \"âœ“ Vorhanden\" zeigen)"
+
+
+msgid "Hourly @ :%02d"
+msgstr "StÃƒÂ¼ndlich @ :%02d"
+
+
+msgid "Loading resourcesÃ¢â‚¬Â¦"
+msgstr "Lade Ressourcenâ€¦"
+
+
+msgid "Checkout is recommended for the MVP (SCA/3DS handled by Stripe)."
+msgstr "Checkout wird fÃ¼r das MVP empfohlen (SCA/3DS wird von Stripe verarbeitet)."
+
+
+msgid "Appointment not found."
+msgstr "Termin nicht gefunden."
+
+
+msgid "No times are available for this date."
+msgstr "FÃ¼r dieses Datum sind keine Zeiten verfÃ¼gbar."
+
+
+msgid "Email Settings"
+msgstr "E-Mail-Einstellungen"
+
+
+msgid "Panel Background"
+msgstr "Panel-Hintergrund"
+
+
+msgid "Show/hide columns"
+msgstr "Spalten anzeigen/verbergen"
+
+
+msgid "Tip: %1$s (shortcode: %2$s) and place a test booking to see it working end-to-end."
+msgstr "Tipp: %1$s (Shortcode: %2$s) und platzieren Sie eine Testbuchung, um es durchgÃƒÂ¤ngig zu sehen."
+
+
+msgid "Container Shadow"
+msgstr "Container-Schatten"
+
+
+msgid "Check-in"
+msgstr "Anreise"
+
+
+msgid "Fixed"
+msgstr "Fest"
+
+
+msgid "The selected time is in the past."
+msgstr "Die gewÃ¤hlte Zeit liegt in der Vergangenheit."
+
+
+msgid "Times could not be loaded"
+msgstr "Zeiten konnten nicht geladen werden"
+
+
+msgid "Could not save customer. Please try again."
+msgstr "Kunde konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+
+
+msgid "SMTP Username"
+msgstr "SMTP-Benutzername"
+
+
+msgid "Insights report"
+msgstr "Einblicke-Bericht"
+
+
+msgid "Propose"
+msgstr "Vorschlagen"
+
+
+msgid "Email template not found."
+msgstr "E-Mail-Vorlage nicht gefunden."
+
+
+msgid "Room costs"
+msgstr "Zimmerkosten"
+
+
+msgid "Authentication"
+msgstr "Authentifizierung"
+
+
+msgid "Used for hotel gross profit: fee percent applied to booking amount."
+msgstr "Wird fÃ¼r den Bruttogewinn des Hotels verwendet: GebÃ¼hrenprozentsatz, der auf den Buchungsbetrag angewendet wird."
+
+
+msgid "Warning"
+msgstr "Warnung"
+
+
+msgid "The date cannot be in the past."
+msgstr "Das Datum darf nicht in der Vergangenheit liegen."
+
+
+msgid "Dev Tools:"
+msgstr "Entwicklertools:"
+
+
+msgid "Process Refund"
+msgstr "RÃƒÂ¼ckerstattung verarbeiten"
+
+
+msgid "No Appointments Found"
+msgstr "Keine Termine gefunden"
+
+
+msgid "LazyBookings is now configured. Here are your next steps:"
+msgstr "LazyBookings ist jetzt konfiguriert. Hier sind Ihre nÃ¤chsten Schritte:"
+
+
+msgid "Use SMTP authentication"
+msgstr "SMTP-Authentifizierung verwenden"
+
+
+msgid "Revenue"
+msgstr "Umsatz"
+
+
+msgid "Notes (optional)"
+msgstr "Notizen (optional)"
+
+
+msgid "Log errors and events to file"
+msgstr "Fehler und Ereignisse in Datei protokollieren"
+
+
+msgid "Breadcrumbs"
+msgstr "Brotkrumen"
+
+
+msgid "Multiple resources are available for this time"
+msgstr "Mehrere Ressourcen sind fÃƒÂ¼r diese Zeit verfÃƒÂ¼gbar"
+
+
+msgid "Documentation"
+msgstr "Dokumentation"
+
+
+msgid "View"
+msgstr "Ansehen"
+
+
+msgid "No saved report yet. Generate one to see daily + overall insights."
+msgstr "Noch kein gespeicherter Bericht. Generieren Sie einen, um tÃƒÂ¤gliche und Gesamterkenntnisse zu sehen."
+
+
+msgid "Spacious room with king bed and balcony"
+msgstr "GerÃ¤umiges Zimmer mit King-Bett und Balkon"
+
+
+msgid "No resources found."
+msgstr "Keine Ressourcen gefunden."
+
+
+msgid "Delete this appointment?"
+msgstr "Diesen Termin lÃƒÂ¶schen?"
+
+
+msgid "Button Style"
+msgstr "Button-Stil"
+
+
+msgid "Phone"
+msgstr "Telefon"
+
+
+msgid "Dashboard Overview"
+msgstr "Dashboard-Ãœbersicht"
+
+
+msgid "Thank you! Your payment return was received. We will confirm your booking after the payment is verified."
+msgstr "Vielen Dank! Ihre ZahlungsrÃƒÂ¼ckmeldung wurde empfangen. Wir bestÃƒÂ¤tigen Ihre Buchung, nachdem die Zahlung verifiziert wurde."
+
+
+msgid "Weekly (%s) @ %s"
+msgstr "WÃƒÂ¶chentlich (%s) @ %s"
+
+
+msgid "LazyBookings Working Hours"
+msgstr "LazyBookings Arbeitszeiten"
+
+
+msgid "Autonomous (approve + execute)"
+msgstr "Autonom (genehmigen + ausfÃƒÂ¼hren)"
+
+
+msgid "Off day"
+msgstr "Freier Tag"
+
+
+msgid "Active"
+msgstr "Aktiv"
+
+
+msgid "All Statuses"
+msgstr "Alle Status"
+
+
+msgid "Please enter a valid email address."
+msgstr "Bitte geben Sie eine gÃ¼ltige E-Mail-Adresse ein."
+
+
+msgid "Add New Booking"
+msgstr "Neue Buchung hinzufÃƒÂ¼gen"
+
+
+msgid "Estimated price:"
+msgstr "GeschÃƒÂ¤tzter Preis:"
+
+
+msgid "Select appointments using checkboxes, choose an action, then click Apply"
+msgstr "WÃƒÂ¤hlen Sie Termine ÃƒÂ¼ber KontrollkÃƒÂ¤stchen aus, wÃƒÂ¤hlen Sie eine Aktion und klicken Sie auf Anwenden"
+
+
+msgid "Open Outbox"
+msgstr "Postausgang ÃƒÂ¶ffnen"
+
+
+msgid "Service created."
+msgstr "Dienstleistung erstellt."
+
+
+msgid "View recent log entries written by the plugin (uploads/ltlb-logs)."
+msgstr "Aktuelle ProtokolleintrÃƒÂ¤ge des Plugins ansehen (uploads/ltlb-logs)."
+
+
+msgid "Sunset Orange"
+msgstr "Sonnenuntergang Orange"
+
+
+msgid "You may close this page and try booking again."
+msgstr "Sie kÃƒÂ¶nnen diese Seite schlieÃƒÅ¸en und erneut buchen."
+
+
+msgid "Error"
+msgstr "Fehler"
+
+
+msgid "Please select a check-in date."
+msgstr "Bitte wÃ¤hlen Sie ein Anreise-Datum aus."
+
+
+msgid "Save Customer"
+msgstr "Kunde speichern"
+
+
+msgid "View Customers"
+msgstr "Kunden ansehen"
+
+
+msgid "This time slot is no longer available."
+msgstr "Dieser Zeitslot ist nicht mehr verfÃƒÂ¼gbar."
+
+
+msgid "Book a room"
+msgstr "Ein Zimmer buchen"
+
+
+msgid "No appointments selected."
+msgstr "Keine Termine ausgewÃƒÂ¤hlt."
+
+
+msgid "Bed Type"
+msgstr "Betttyp"
+
+
+msgid "Rule not found."
+msgstr "Regel nicht gefunden."
+
+
+msgid "Professional haircut and styling"
+msgstr "Professioneller Haarschnitt und Styling"
+
+
+msgid "One-on-one yoga instruction"
+msgstr "Eins-zu-eins Yoga-Unterricht"
+
+
+msgid "Outbox draft #%d created."
+msgstr "Postausgang-Entwurf #%d erstellt."
+
+
+msgid "This determines the booking flow and terminology."
+msgstr "Dies bestimmt den Buchungsablauf und die Terminologie."
+
+
+msgid "Create/Edit/Delete Staff"
+msgstr "Personal erstellen/bearbeiten/lÃƒÂ¶schen"
+
+
+msgid "Pay on site (card / POS)"
+msgstr "Vor Ort bezahlen (Karte / POS)"
+
+
+msgid "Schedule"
+msgstr "Zeitplan"
+
+
+msgid "Action not found."
+msgstr "Aktion nicht gefunden."
+
+
+msgid "Save Changes"
+msgstr "Ãƒâ€žnderungen speichern"
+
+
+msgid "Daily @ %s"
+msgstr "TÃƒÂ¤glich @ %s"
+
+
+msgid "Brand Voice"
+msgstr "Markenstimme"
+
+
+msgid "Inherit global setting"
+msgstr "Globale Einstellung ÃƒÂ¼bernehmen"
+
+
+msgid "Edit %s"
+msgstr "%s bearbeiten"
+
+
+msgid "Your registration for %s on %s is confirmed."
+msgstr "Ihre Registrierung fÃ¼r %s am %s ist bestÃ¤tigt."
+
+
+msgid "Border Width (px)"
+msgstr "Rahmenbreite (px)"
+
+
+msgid "Another booking is in progress. Please try again."
+msgstr "Eine andere Buchung wird verarbeitet. Bitte versuchen Sie es erneut."
+
+
+msgid "Plugin Version:"
+msgstr "Plugin-Version:"
+
+
+msgid "Add First Guest"
+msgstr "Ersten Gast hinzufÃƒÂ¼gen"
+
+
+msgid "Please confirm"
+msgstr "Bitte bestÃ¤tigen"
+
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+
+msgid "Suite"
+msgstr "Suite"
+
+
+msgid "Templates"
+msgstr "Vorlagen"
+
+
+msgid "Good news! A spot has opened up for your requested booking on %s at %s. You have 24 hours to accept this offer."
+msgstr "Gute Nachrichten! Ein Platz ist fÃ¼r Ihre gewÃ¼nschte Buchung am %s um %s frei geworden. Sie haben 24 Stunden Zeit, dieses Angebot anzunehmen."
+
+
+msgid "Available only at specific weekly time slots."
+msgstr "Nur zu bestimmten wÃƒÂ¶chentlichen Zeitfenstern verfÃƒÂ¼gbar."
+
+
+msgid "Buttons"
+msgstr "Buttons"
+
+
+msgid ".ltlb-booking .service-card { /* your styles */ }"
+msgstr ".ltlb-booking .service-card { /* Ihre Styles */ }"
+
+
+msgid "Choose how buttons should appear."
+msgstr "WÃ¤hlen Sie, wie Buttons aussehen sollen."
+
+
+msgid "Online payments are enabled, but no payment methods are configured. Please contact us or try again later."
+msgstr "Online-Zahlungen sind aktiviert, aber keine Zahlungsmethoden konfiguriert. Bitte kontaktieren Sie uns oder versuchen Sie es spÃƒÂ¤ter erneut."
+
+
+msgid "Fine-tune your brand colors. Changes apply to all booking forms and buttons."
+msgstr "Verfeinern Sie Ihre Markenfarben. Ã„nderungen gelten fÃ¼r alle Buchungsformulare und Buttons."
+
+
+msgid "AI settings (provider, model, business context, and operating mode) are managed under \"AI & Automations\"."
+msgstr "KI-Einstellungen (Anbieter, Modell, GeschÃ¤ftskontext und Betriebsmodus) werden unter \"KI & Automatisierungen\" verwaltet."
+
+
+msgid "System Check Results"
+msgstr "SystemprÃƒÂ¼fungsergebnisse"
+
+
+msgid "Ã¢Å¡Â  DB version is behind plugin version."
+msgstr "âš  DB-Version liegt hinter Plugin-Version."
+
+
+msgid "Beginner-friendly yoga class"
+msgstr "AnfÃ¤ngerfreundlicher Yoga-Kurs"
+
+
+msgid "Book a service"
+msgstr "Einen Service buchen"
+
+
+msgid "Custom CSS Rules"
+msgstr "Benutzerdefinierte CSS-Regeln"
+
+
+msgid "SearchÃ¢â‚¬Â¦"
+msgstr "Suchenâ€¦"
+
+
+msgid "HITL is safer for production. Autonomous is faster."
+msgstr "HITL ist sicherer fÃƒÂ¼r Produktion. Autonom ist schneller."
+
+
+msgid "Availability"
+msgstr "VerfÃƒÂ¼gbarkeit"
+
+
+msgid "Primary Button"
+msgstr "PrimÃƒÂ¤r-Button"
+
+
+msgid "Server error (HTTP %d)"
+msgstr "Serverfehler (HTTP %d)"
+
+
+msgid "Resource #"
+msgstr "Ressource #"
+
+
+msgid "Invoice"
+msgstr "Rechnung"
+
+
+msgid "Occupied Rooms"
+msgstr "Belegte Zimmer"
+
+
+msgid "Vinyasa Flow"
+msgstr "Vinyasa Flow"
+
+
+msgid "End"
+msgstr "Ende"
+
+
+msgid "You do not have permission to create bookings."
+msgstr "Sie haben keine Berechtigung, Buchungen zu erstellen."
+
+
+msgid "Add Template"
+msgstr "Vorlage hinzufÃƒÂ¼gen"
+
+
+msgid "Run Cleanup Now"
+msgstr "Bereinigung jetzt ausfÃƒÂ¼hren"
+
+
+msgid "PHP Version"
+msgstr "PHP-Version"
+
+
+msgid "Card (Stripe)"
+msgstr "Karte (Stripe)"
+
+
+msgid "Border Radius"
+msgstr "Eckenradius"
+
+
+msgid "The plugin uses database locks to prevent race conditions. Make sure your MySQL version supports named locks (MySQL 5.7.5+)."
+msgstr "Das Plugin verwendet Datenbank-Sperren, um Race-Conditions zu vermeiden. Stellen Sie sicher, dass Ihre MySQL-Version benannte Sperren unterstÃ¼tzt (MySQL 5.7.5+)."
+
+
+msgid "Payment Methods"
+msgstr "Zahlungsmethoden"
+
+
+msgid "Button Preview"
+msgstr "Button-Vorschau"
+
+
+msgid "Rule added."
+msgstr "Regel hinzugefÃƒÂ¼gt."
+
+
+msgid "Retention settings saved."
+msgstr "Aufbewahrungseinstellungen gespeichert."
+
+
+msgid "Log file not found."
+msgstr "Protokolldatei nicht gefunden."
+
+
+msgid "Success Color"
+msgstr "Erfolgsfarbe"
+
+
+msgid "Switch between service appointments and hotel mode"
+msgstr "Wechseln Sie zwischen Service-Terminen und Hotel-Modus"
+
+
+msgid "Accept offer: %s"
+msgstr "Angebot annehmen: %s"
+
+
+msgid "This time slot conflicts with a scheduled break."
+msgstr "Dieser Zeitslot kollidiert mit einer geplanten Pause."
+
+
+msgid "Private Session"
+msgstr "Privat-Session"
+
+
+msgid "Text Color"
+msgstr "Textfarbe"
+
+
+msgid "SMTP:"
+msgstr "SMTP:"
+
+
+msgid "We were unable to save your contact information. Please check your details and try again."
+msgstr "Wir konnten Ihre Kontaktdaten nicht speichern. Bitte ÃƒÂ¼berprÃƒÂ¼fen Sie Ihre Angaben und versuchen Sie es erneut."
+
+
+msgid "Invalid appointment/resource."
+msgstr "UngÃƒÂ¼ltiger Termin/Ressource."
+
+
+msgid "Comfortable room with queen bed"
+msgstr "Komfortables Zimmer mit Queen-Bett"
+
+
+msgid "We could not start the online payment. Please try again or choose a different payment method."
+msgstr "Wir konnten die Online-Zahlung nicht starten. Bitte versuchen Sie es erneut oder wÃƒÂ¤hlen Sie eine andere Zahlungsmethode."
+
+
+msgid "Send to AI"
+msgstr "An KI senden"
+
+
+msgid "Important Settings:"
+msgstr "Wichtige Einstellungen:"
+
+
+msgid "No appointments found."
+msgstr "Keine Termine gefunden."
+
+
+msgid "SMTP Password"
+msgstr "SMTP-Passwort"
+
+
+msgid "Confirm Refund"
+msgstr "RÃƒÂ¼ckerstattung bestÃƒÂ¤tigen"
+
+
+msgid "Capacity"
+msgstr "KapazitÃƒÂ¤t"
+
+
+msgid "10er Card"
+msgstr "10er-Karte"
+
+
+msgid "Week"
+msgstr "Woche"
+
+
+msgid "Rate limited. Try again later."
+msgstr "Rate-Limit erreicht. Versuchen Sie es spÃƒÂ¤ter erneut."
+
+
+msgid "Create/Edit/Delete Bookings"
+msgstr "Buchungen erstellen/bearbeiten/lÃƒÂ¶schen"
+
+
+msgid "Weekly"
+msgstr "WÃƒÂ¶chentlich"
+
+
+msgid "Reminders processed."
+msgstr "Erinnerungen verarbeitet."
+
+
+msgid "Common questions and answers."
+msgstr "HÃƒÂ¤ufige Fragen und Antworten."
+
+
+msgid "Approve AI Actions"
+msgstr "KI-Aktionen genehmigen"
+
+
+msgid "Draft updated."
+msgstr "Entwurf aktualisiert."
+
+
+msgid "Border Radius (px)"
+msgstr "Rahmenradius (px)"
+
+
+msgid "Loading room suggestionsÃ¢â‚¬Â¦"
+msgstr "Lade ZimmervorschlÃ¤geâ€¦"
+
+
+msgid "What do you want to book?"
+msgstr "Was mÃ¶chten Sie buchen?"
+
+
+msgid "Assigned Resources"
+msgstr "Zugewiesene Ressourcen"
+
+
+msgid "Rule saved."
+msgstr "Regel gespeichert."
+
+
+msgid "Stripe Secret Key"
+msgstr "Stripe Geheimer SchlÃ¼ssel"
+
+
+msgid "Export CSV"
+msgstr "CSV exportieren"
+
+
+msgid "Reminder emails (24h before appointment)"
+msgstr "Erinnerungs-E-Mails (24h vor Termin)"
+
+
+msgid "This is a test email from LazyBookings plugin."
+msgstr "Dies ist eine Test-E-Mail vom LazyBookings-Plugin."
+
+
+msgid "Occupancy"
+msgstr "Belegung"
+
+
+msgid "Rule updated."
+msgstr "Regel aktualisiert."
+
+
+msgid "Change color for Pending"
+msgstr "Farbe fÃƒÂ¼r Ausstehend ÃƒÂ¤ndern"
+
+
+msgid "Card Details"
+msgstr "Kartendetails"
+
+
+msgid "Start booking"
+msgstr "Buchung starten"
+
+
+msgid "Hotel Fees (%)"
+msgstr "HotelgebÃ¼hren (%)"
+
+
+msgid "Mon"
+msgstr "Mo"
+
+
+msgid "Data Retention Settings"
+msgstr "Datenaufbewahrungseinstellungen"
+
+
+msgid "Action"
+msgstr "Aktion"
+
+
+msgid "Payment reminder"
+msgstr "Zahlungserinnerung"
+
+
+msgid "SMTP Configuration"
+msgstr "SMTP-Konfiguration"
+
+
+msgid "SMTP scope:"
+msgstr "SMTP-Bereich:"
+
+
+msgid "Reply-To:"
+msgstr "Antwort an:"
+
+
+msgid "View Staff"
+msgstr "Personal ansehen"
+
+
+msgid "Max Occupancy"
+msgstr "Max. Belegung"
+
+
+msgid "Status updated."
+msgstr "Status aktualisiert."
+
+
+msgid "Input field"
+msgstr "Eingabefeld"
+
+
+msgid "Relaxing pedicure"
+msgstr "Entspannende PedikÃ¼re"
+
+
+msgid "Network error"
+msgstr "Netzwerkfehler"
+
+
+msgid "Loading calendarÃ¢â‚¬Â¦ This may take a few seconds."
+msgstr "Lade Kalenderâ€¦ Dies kann einige Sekunden dauern."
+
+
+msgid "Approve & Execute will mark the item approved and run it. Execute runs it as-is (useful for already approved drafts)."
+msgstr "Genehmigen & AusfÃƒÂ¼hren markiert das Element als genehmigt und fÃƒÂ¼hrt es aus. AusfÃƒÂ¼hren fÃƒÂ¼hrt es so aus, wie es ist (nÃƒÂ¼tzlich fÃƒÂ¼r bereits genehmigte EntwÃƒÂ¼rfe)."
+
+
+msgid "Columns"
+msgstr "Spalten"
+
+
+msgid "LazyBookings"
+msgstr "LazyBookings"
+
+
+msgid "Enable AI Features"
+msgstr "KI-Funktionen aktivieren"
+
+
+msgid "Your booking status has been updated to"
+msgstr "Ihr Buchungsstatus wurde aktualisiert auf"
+
+
+msgid "DB Version"
+msgstr "DB-Version"
+
+
+msgid "Appointment updated."
+msgstr "Termin aktualisiert."
+
+
+msgid "Select a time"
+msgstr "Bitte eine Zeit auswÃ¤hlen"
+
+
+msgid "Connection failed."
+msgstr "Verbindung fehlgeschlagen."
+
+
+msgid "Skip wizard and configure manually"
+msgstr "Assistenten Ã¼berspringen und manuell konfigurieren"
+
+
+msgid "No exceptions in the next 30 days."
+msgstr "Keine Ausnahmen in den nÃƒÂ¤chsten 30 Tagen."
+
+
+msgid "Log Level"
+msgstr "Protokollierungsstufe"
+
+
+msgid "SMTP Host"
+msgstr "SMTP-Host"
+
+
+msgid "Services & Room Types"
+msgstr "Dienstleistungen & Zimmertypen"
+
+
+msgid "Room assigned."
+msgstr "Zimmer zugewiesen."
+
+
+msgid "Could not update appointment."
+msgstr "Termin konnte nicht aktualisiert werden."
+
+
+msgid "Subject:"
+msgstr "Betreff:"
+
+
+msgid "Input Shadow"
+msgstr "Eingabe-Schatten"
+
+
+msgid "PayPal checkout"
+msgstr "PayPal-Checkout"
+
+
+msgid "Please run migrations."
+msgstr "Bitte fÃƒÂ¼hren Sie Migrationen aus."
+
+
+msgid "Nature Green"
+msgstr "Natur GrÃ¼n"
+
+
+msgid "Service updated."
+msgstr "Dienstleistung aktualisiert."
+
+
+msgid "AI Input"
+msgstr "KI-Eingabe"
+
+
+msgid "Please select a check-out date."
+msgstr "Bitte wÃ¤hlen Sie ein Abreise-Datum aus."
+
+
+msgid "Dynamic flowing yoga"
+msgstr "Dynamisches flieÃŸendes Yoga"
+
+
+msgid "Cleanup completed. Deleted appointments: %d. Anonymized customers: %d."
+msgstr "Bereinigung abgeschlossen. GelÃƒÂ¶schte Termine: %d. Anonymisierte Kunden: %d."
+
+
+msgid "Design saved."
+msgstr "Design gespeichert."
+
+
+msgid "Customer saved."
+msgstr "Kunde gespeichert."
+
+
+msgid "Manage Own Availability"
+msgstr "Eigene VerfÃƒÂ¼gbarkeit verwalten"
+
+
+msgid "This time has already passed. Please choose a future date and time."
+msgstr "Diese Uhrzeit liegt in der Vergangenheit. Bitte wÃƒÂ¤hlen Sie ein zukÃƒÂ¼nftiges Datum und eine zukÃƒÂ¼nftige Uhrzeit."
+
+
+msgid "Security check failed. Please reload the page and try again."
+msgstr "SicherheitsprÃ¼fung fehlgeschlagen. Bitte laden Sie die Seite neu und versuchen Sie es erneut."
+
+
+msgid "Usually your full email address for Gmail/Hostinger/Strato."
+msgstr "Normalerweise Ihre vollstÃ¤ndige E-Mail-Adresse fÃ¼r Gmail/Hostinger/Strato."
+
+
+msgid "Edit Guest"
+msgstr "Gast bearbeiten"
+
+
+msgid "Monthly Subscription"
+msgstr "Monatsabonnement"
+
+
+msgid "First Name"
+msgstr "Vorname"
+
+
+msgid "Guests are created automatically when bookings are made, or you can add them manually."
+msgstr "GÃƒÂ¤ste werden automatisch erstellt, wenn Buchungen vorgenommen werden, oder Sie kÃƒÂ¶nnen sie manuell hinzufÃƒÂ¼gen."
+
+
+msgid "This time slot has just been booked. Please select a different time."
+msgstr "Dieser Zeitslot wurde gerade gebucht. Bitte wÃƒÂ¤hlen Sie eine andere Zeit."
+
+
+msgid "Required for company invoices."
+msgstr "Erforderlich fÃƒÂ¼r Firmenrechnungen."
+
+
+msgid "Auto Button Text Color"
+msgstr "Automatische Button-Textfarbe"
+
+
+msgid "Days before"
+msgstr "Tage vorher"
+
+
+msgid "Booking form"
+msgstr "Buchungsformular"
+
+
+msgid "Report stored."
+msgstr "Bericht gespeichert."
+
+
+msgid "Run migrations"
+msgstr "Migrationen ausfÃƒÂ¼hren"
+
+
+msgid "No services available."
+msgstr "Keine Dienstleistungen verfÃƒÂ¼gbar."
+
+
+msgid "Please enter a valid customer email."
+msgstr "Bitte geben Sie eine gÃƒÂ¼ltige Kunden-E-Mail ein."
+
+
+msgid "Processing..."
+msgstr "Verarbeitung..."
+
+
+msgid "Email Draft"
+msgstr "E-Mail-Entwurf"
+
+
+msgid "Admin booking notifications"
+msgstr "Admin-Buchungsbenachrichtigungen"
+
+
+msgid "Back to Outbox"
+msgstr "ZurÃƒÂ¼ck zum Postausgang"
+
+
+msgid "Appointments This Week"
+msgstr "Termine diese Woche"
+
+
+msgid "Add New"
+msgstr "Neu hinzufÃ¼gen"
+
+
+msgid "Refund amount"
+msgstr "RÃƒÂ¼ckerstattungsbetrag"
+
+
+msgid "Review, edit, approve, and execute AI-assisted actions."
+msgstr "ÃƒÅ“berprÃƒÂ¼fen, bearbeiten, genehmigen und ausfÃƒÂ¼hren Sie KI-unterstÃƒÂ¼tzte Aktionen."
+
+
+msgid "Payment Processor"
+msgstr "Zahlungsanbieter"
+
+
+msgid "Resource"
+msgstr "Ressource"
+
+
+msgid "Generate Report"
+msgstr "Bericht generieren"
+
+
+msgid "Encryption"
+msgstr "VerschlÃ¼sselung"
+
+
+msgid "All"
+msgstr "Alle"
+
+
+msgid "Yes"
+msgstr "Ja"
+
+
+msgid "Could not create report draft."
+msgstr "Bericht-Entwurf konnte nicht erstellt werden."
+
+
+msgid "No upcoming bookings."
+msgstr "Keine bevorstehenden Buchungen."
+
+
+msgid "Fixed weekly times"
+msgstr "Feste wÃƒÂ¶chentliche Zeiten"
+
+
+msgid "Tip: Click an appointment to view and edit details."
+msgstr "Tipp: Klicken Sie auf einen Termin, um Details anzuzeigen und zu bearbeiten."
+
+
+msgid "Choose a preset to quickly style your booking forms. You can customize colors and styles below."
+msgstr "WÃ¤hlen Sie eine Voreinstellung, um Ihre Buchungsformulare schnell zu gestalten. Sie kÃ¶nnen Farben und Stile unten anpassen."
+
+
+msgid "Default Booking Status"
+msgstr "Standard-Buchungsstatus"
+
+
+msgid "Enabled"
+msgstr "Aktiviert"
+
+
+msgid "Draft rejected."
+msgstr "Entwurf abgelehnt."
+
+
+msgid "For hotels, vacation rentals, B&Bs. Guests book date ranges (check-in/check-out)."
+msgstr "FÃ¼r Hotels, Ferienwohnungen, B&Bs. GÃ¤ste buchen Datumsbereiche (Check-in/Check-out)."
+
+
+msgid "Open Appointments List"
+msgstr "Terminliste ÃƒÂ¶ffnen"
+
+
+msgid "Booking History"
+msgstr "Buchungsverlauf"
+
+
+msgid "A key is stored. Leave blank to keep the existing key."
+msgstr "Ein SchlÃ¼ssel ist gespeichert. Leer lassen, um den vorhandenen SchlÃ¼ssel zu behalten."
+
+
+msgid "Refund reference"
+msgstr "RÃƒÂ¼ckerstattungsreferenz"
+
+
+msgid "Before (min)"
+msgstr "Vorher (Min)"
+
+
+msgid "Sender Info"
+msgstr "Absenderinfo"
+
+
+msgid "No API key available"
+msgstr "Kein API-SchlÃƒÂ¼ssel verfÃƒÂ¼gbar"
+
+
+msgid "Amount"
+msgstr "Betrag"
+
+
+msgid "Clear Filters"
+msgstr "Filter lÃƒÂ¶schen"
+
+
+msgid "Solid"
+msgstr "AusgefÃ¼llt"
+
+
+msgid "Switching modes may hide data specific to the current mode. Continue?"
+msgstr "Der Moduswechsel kann fÃƒÂ¼r den aktuellen Modus spezifische Daten ausblenden. Fortfahren?"
+
+
+msgid "Your request could not be processed. Please try again."
+msgstr "Ihre Anfrage konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Roundness of buttons and inputs"
+msgstr "Rundung von Buttons und Eingabefeldern"
+
+
+msgid "Could not update status."
+msgstr "Status konnte nicht aktualisiert werden."
+
+
+msgid "Contact Info"
+msgstr "Kontaktinformationen"
+
+
+msgid "From Name:"
+msgstr "Von Name:"
+
+
+msgid "No Show"
+msgstr "Nicht erschienen"
+
+
+msgid "Service"
+msgstr "Dienstleistung"
+
+
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+
+msgid "PayPal"
+msgstr "PayPal"
+
+
+msgid "Primary text color for form content."
+msgstr "PrimÃ¤re Textfarbe fÃ¼r Formularinhalte."
+
+
+msgid "After (min)"
+msgstr "Nachher (Min)"
+
+
+msgid "PayPal Client ID"
+msgstr "PayPal Client-ID"
+
+
+msgid "Guest saved."
+msgstr "Gast gespeichert."
+
+
+msgid "Finish Setup"
+msgstr "Setup abschlieÃŸen"
+
+
+msgid "Ã¢Å“â€œ Present"
+msgstr "âœ“ Vorhanden"
+
+
+msgid "Scope"
+msgstr "Bereich"
+
+
+msgid "Checkout (redirect)"
+msgstr "Checkout (Weiterleitung)"
+
+
+msgid "Optional: select a resource."
+msgstr "Optional: WÃ¤hlen Sie eine Ressource aus."
+
+
+msgid "Delete"
+msgstr "LÃ¶schen"
+
+
+msgid "Standard Room"
+msgstr "Standard-Zimmer"
+
+
+msgid "Provider"
+msgstr "Anbieter"
+
+
+msgid "Primary Color"
+msgstr "PrimÃ¤rfarbe"
+
+
+msgid "Execute"
+msgstr "AusfÃƒÂ¼hren"
+
+
+msgid "Resources are rooms, equipment, or capacities. Link them to services to control availability."
+msgstr "Ressourcen sind RÃƒÂ¤ume, Ausstattung oder KapazitÃƒÂ¤ten. VerknÃƒÂ¼pfen Sie sie mit Dienstleistungen, um die VerfÃƒÂ¼gbarkeit zu steuern."
+
+
+msgid "Add shadow to the main booking form container"
+msgstr "Schatten zum Hauptbuchungsformular-Container hinzufÃƒÂ¼gen"
+
+
+msgid "Are you sure you want to delete this item?"
+msgstr "Sind Sie sicher, dass Sie dieses Element lÃƒÂ¶schen mÃƒÂ¶chten?"
+
+
+msgid "Change status to pending"
+msgstr "Status zu Ausstehend ÃƒÂ¤ndern"
+
+
+msgid "View in Admin"
+msgstr "Im Admin ansehen"
+
+
+msgid "No-Show"
+msgstr "Nicht erschienen"
+
+
+msgid "TestingÃ¢â‚¬Â¦"
+msgstr "Testeâ€¦"
+
+
+msgid "Create/Edit/Delete Customers"
+msgstr "Kunden erstellen/bearbeiten/lÃƒÂ¶schen"
+
+
+msgid "Booking form block (LazyBookings plugin required)"
+msgstr "Buchungsformular-Block (LazyBookings-Plugin erforderlich)"
+
+
+msgid "Draft not found."
+msgstr "Entwurf nicht gefunden."
+
+
+msgid "Sent at:"
+msgstr "Gesendet am:"
+
+
+msgid "Configure payments, emails, and booking behavior."
+msgstr "Konfigurieren Sie Zahlungen, E-Mails und Buchungsverhalten."
+
+
+msgid "Loading..."
+msgstr "Laden..."
+
+
+msgid "No permission"
+msgstr "Keine Berechtigung"
+
+
+msgid "Note"
+msgstr "Notiz"
+
+
+msgid "Test Connection"
+msgstr "Verbindung testen"
+
+
+msgid "Staff deleted."
+msgstr "Personal gelÃ¶scht."
+
+
+msgid "PayPal Secret"
+msgstr "PayPal Secret"
+
+
+msgid "Please log in to view your bookings."
+msgstr "Bitte melden Sie sich an, um Ihre Buchungen anzuzeigen."
+
+
+msgid "Process Refunds"
+msgstr "RÃƒÂ¼ckerstattungen verarbeiten"
+
+
+msgid "Could not propose room."
+msgstr "Raum konnte nicht vorgeschlagen werden."
+
+
+msgid "Required"
+msgstr "Erforderlich"
+
+
+msgid "No recently viewed appointments yet."
+msgstr "Noch keine kÃƒÂ¼rzlich angesehenen Termine."
+
+
+msgid "Set accurate durations to avoid overbooking"
+msgstr "Legen Sie genaue Dauern fest, um Ãœberbuchungen zu vermeiden"
+
+
+msgid "Plugin Settings"
+msgstr "Plugin-Einstellungen"
+
+
+msgid "No Customers Yet"
+msgstr "Noch keine Kunden"
+
+
+msgid "Customers"
+msgstr "Kunden"
+
+
+msgid "Only apply SMTP to LazyBookings emails"
+msgstr "SMTP nur auf LazyBookings-E-Mails anwenden"
+
+
+msgid "Available any time within the allowed hours."
+msgstr "VerfÃƒÂ¼gbar zu jeder Zeit innerhalb der erlaubten Stunden."
+
+
+msgid "No, I'll create my own services"
+msgstr "Nein, ich erstelle meine eigenen Services"
+
+
+msgid "Cannot transition from \"%s\" to \"%s\". Invalid state change."
+msgstr "Ãœbergang von \"%s\" zu \"%s\" nicht mÃ¶glich. UngÃ¼ltige StatusÃ¤nderung."
+
+
+msgid "Revenue (gross)"
+msgstr "Umsatz (brutto)"
+
+
+msgid "You do not have permission to edit staff."
+msgstr "Sie haben keine Berechtigung, Personal zu bearbeiten."
+
+
+msgid "Could not save the appointment to the database."
+msgstr "Termin konnte nicht in der Datenbank gespeichert werden."
+
+
+msgid "MySQL Named Locks:"
+msgstr "MySQL Named Locks:"
+
+
+msgid "Optional: select a room."
+msgstr "Optional: WÃ¤hlen Sie ein Zimmer aus."
+
+
+msgid "AI Settings saved."
+msgstr "KI-Einstellungen gespeichert."
+
+
+msgid "Weekly outlook report (next 7 days)"
+msgstr "WÃƒÂ¶chentlicher Ausblicksbericht (nÃƒÂ¤chste 7 Tage)"
+
+
+msgid "Conflict Check"
+msgstr "KonfliktprÃƒÂ¼fung"
+
+
+msgid "Next 7 Days"
+msgstr "NÃƒÂ¤chste 7 Tage"
+
+
+msgid "New Appointment"
+msgstr "Neuer Termin"
+
+
+msgid "Are you sure you want to delete the selected services?"
+msgstr "Sind Sie sicher, dass Sie die ausgewÃƒÂ¤hlten Dienstleistungen lÃƒÂ¶schen mÃƒÂ¶chten?"
+
+
+msgid "Privacy & GDPR"
+msgstr "Datenschutz & DSGVO"
+
+
+msgid "Refund failed"
+msgstr "RÃƒÂ¼ckerstattung fehlgeschlagen"
+
+
+msgid "N/A"
+msgstr "N/V"
+
+
+msgid "appointments updated."
+msgstr "Termine aktualisiert."
+
+
+msgid "No action available"
+msgstr "Keine Aktion verfÃƒÂ¼gbar"
+
+
+msgid "Monthly (%d) @ %s"
+msgstr "Monatlich (%d) @ %s"
+
+
+msgid "Template"
+msgstr "Vorlage"
+
+
+msgid "Availability (optional)"
+msgstr "VerfÃƒÂ¼gbarkeit (optional)"
+
+
+msgid "Invalid token"
+msgstr "UngÃƒÂ¼ltiger Token"
+
+
+msgid "Payment Methods:"
+msgstr "Zahlungsmethoden:"
+
+
+msgid "Ã¢â‚¬â€"
+msgstr "â€“"
+
+
+msgid "Not selected"
+msgstr "Nicht ausgewÃƒÂ¤hlt"
+
+
+msgid "Failed to save working hours. Please check your input and try again."
+msgstr "Arbeitszeiten konnten nicht gespeichert werden. Bitte ÃƒÂ¼berprÃƒÂ¼fen Sie Ihre Eingabe und versuchen Sie es erneut."
+
+
+msgid "Could not save customer."
+msgstr "Kunde konnte nicht gespeichert werden."
+
+
+msgid "Payment gateway configuration"
+msgstr "Zahlungsgateway-Konfiguration"
+
+
+msgid "AI Output"
+msgstr "KI-Ausgabe"
+
+
+msgid "AI Input / Output"
+msgstr "KI-Eingabe / Ausgabe"
+
+
+msgid "Email from:"
+msgstr "E-Mail von:"
+
+
+msgid "Test email sent successfully to "
+msgstr "Test-E-Mail erfolgreich gesendet an "
+
+
+msgid "Appointment Confirmed"
+msgstr "Termin bestÃ¤tigt"
+
+
+msgid "The requested resource was not found."
+msgstr "Die angeforderte Ressource wurde nicht gefunden."
+
+
+msgid "You can use placeholders: {first_name}, {service_name}, {start_time}, {amount}, {booking_id}."
+msgstr "Sie kÃƒÂ¶nnen Platzhalter verwenden: {first_name}, {service_name}, {start_time}, {amount}, {booking_id}."
+
+
+msgid "Book Now"
+msgstr "Jetzt buchen"
+
+
+msgid "Your Stripe webhook signing secret (whsec_...). Used to verify payment events."
+msgstr "Ihr Stripe Webhook-Signing-Secret (whsec_...). Wird verwendet, um Zahlungsereignisse zu verifizieren."
+
+
+msgid "Main background color for booking forms."
+msgstr "Haupthintergrundfarbe fÃ¼r Buchungsformulare."
+
+
+msgid "Free"
+msgstr "Kostenlos"
+
+
+msgid "For salons, studios, consultations, classes. Customers book time slots."
+msgstr "FÃ¼r Salons, Studios, Beratungen, Kurse. Kunden buchen Zeitfenster."
+
+
+msgid "Open calendar view"
+msgstr "Kalenderansicht ÃƒÂ¶ffnen"
+
+
+msgid "Multiple rooms are available for your dates"
+msgstr "Mehrere Zimmer sind fÃƒÂ¼r Ihre Daten verfÃƒÂ¼gbar"
+
+
+msgid "SMTP Port"
+msgstr "SMTP-Port"
+
+
+msgid "Create First Service"
+msgstr "Ersten Service erstellen"
+
+
+msgid "Email Notifications"
+msgstr "E-Mail-Benachrichtigungen"
+
+
+msgid "End date/time must be after start."
+msgstr "Enddatum/-zeit muss nach dem Start liegen."
+
+
+msgid "Color saved."
+msgstr "Farbe gespeichert."
+
+
+msgid "Price per night"
+msgstr "Preis pro Nacht"
+
+
+msgid "No log files found yet."
+msgstr "Noch keine Protokolldateien gefunden."
+
+
+msgid "Add New Appointment"
+msgstr "Neuen Termin hinzufÃƒÂ¼gen"
+
+
+msgid "Deluxe Room"
+msgstr "Deluxe-Zimmer"
+
+
+msgid "Customize the appearance of your booking wizard."
+msgstr "Passen Sie das Aussehen Ihres Buchungs-Assistenten an."
+
+
+msgid "Could not create outbox draft."
+msgstr "Postausgang-Entwurf konnte nicht erstellt werden."
+
+
+msgid "You selected company invoice. We will contact you with the invoice details. Your booking is awaiting confirmation."
+msgstr "Sie haben Firmenrechnung gewÃƒÂ¤hlt. Wir werden Sie mit den Rechnungsdetails kontaktieren. Ihre Buchung wartet auf BestÃƒÂ¤tigung."
+
+
+msgid "This draft must be approved before execution (HITL mode)."
+msgstr "Dieser Entwurf muss vor der AusfÃƒÂ¼hrung genehmigt werden (HITL-Modus)."
+
+
+msgid "Create exception"
+msgstr "Ausnahme erstellen"
+
+
+msgid "Design Settings"
+msgstr "Design-Einstellungen"
+
+
+msgid "Run Diagnostics"
+msgstr "Diagnose ausfÃ¼hren"
+
+
+msgid "Primary Hover Color"
+msgstr "PrimÃƒÂ¤r-Hover-Farbe"
+
+
+msgid "Check-out must be after check-in."
+msgstr "Das Abreise-Datum muss nach dem Anreise-Datum liegen."
+
+
+msgid "Customer Notes"
+msgstr "Kundennotizen"
+
+
+msgid "The selected check-in date is in the past."
+msgstr "Das gewÃ¤hlte Anreise-Datum liegt in der Vergangenheit."
+
+
+msgid "No Services Yet"
+msgstr "Noch keine Dienstleistungen"
+
+
+msgid "%d services deleted successfully."
+msgstr "%d Dienstleistungen erfolgreich gelÃ¶scht."
+
+
+msgid "Services define what you offer to your customers. Create your first service to start accepting appointments."
+msgstr "Dienstleistungen definieren, was Sie Ihren Kunden anbieten. Erstellen Sie Ihre erste Dienstleistung, um Termine anzunehmen."
+
+
+msgid "AI & Automations"
+msgstr "KI & Automatisierungen"
+
+
+msgid "Times could not be loaded. Please reload the page."
+msgstr "Zeiten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
+
+
+msgid "Primary button background."
+msgstr "PrimÃƒÂ¤r-Button-Hintergrund."
+
+
+msgid "Please enter your company name for invoices."
+msgstr "Bitte geben Sie Ihren Firmennamen fÃƒÂ¼r Rechnungen ein."
+
+
+msgid "Filter"
+msgstr "Filtern"
+
+
+msgid "None"
+msgstr "Keine"
+
+
+msgid "Hatha Yoga"
+msgstr "Hatha Yoga"
+
+
+msgid "Today"
+msgstr "Heute"
+
+
+msgid "An error occurred."
+msgstr "Ein Fehler ist aufgetreten."
+
+
+msgid "Yes, remove all LazyBookings data when the plugin is uninstalled"
+msgstr "Ja, alle LazyBookings-Daten beim Deinstallieren des Plugins entfernen"
+
+
+msgid "Gross profit"
+msgstr "Bruttogewinn"
+
+
+msgid "Continue"
+msgstr "Weiter"
+
+
+msgid "The date or time format is not valid. Please check your selection and try again."
+msgstr "Das Datum oder die Uhrzeit ist nicht gÃƒÂ¼ltig. Bitte ÃƒÂ¼berprÃƒÂ¼fen Sie Ihre Eingabe und versuchen Sie es erneut."
+
+
+msgid "View in Outbox: #%d"
+msgstr "Im Postausgang ansehen: #%d"
+
+
+msgid "Anonymizes customer data (email, first name, last name, phone) by replacing with anonymized values. This action cannot be undone."
+msgstr "Anonymisiert Kundendaten (E-Mail, Vorname, Nachname, Telefon) durch Ersetzen mit anonymisierten Werten. Diese Aktion kann nicht rÃƒÂ¼ckgÃƒÂ¤ngig gemacht werden."
+
+
+msgid "Name (optional)"
+msgstr "Name (optional)"
+
+
+msgid "Message"
+msgstr "Nachricht"
+
+
+msgid "Business Context"
+msgstr "GeschÃƒÂ¤ftskontext"
+
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+
+msgid "The selected time slot is already taken."
+msgstr "Der gewÃ¤hlte Zeitslot ist bereits belegt."
+
+
+msgid "Too many requests. Please try again in a few minutes."
+msgstr "Zu viele Anfragen. Bitte versuchen Sie es in ein paar Minuten erneut."
+
+
+msgid "FAQs"
+msgstr "FAQs"
+
+
+msgid "Could not load rooms."
+msgstr "RÃƒÂ¤ume konnten nicht geladen werden."
+
+
+msgid "Save Design"
+msgstr "Design speichern"
+
+
+msgid "Tips:"
+msgstr "Tipps:"
+
+
+msgid "Delete cancelled appointments after (days)"
+msgstr "Stornierte Termine lÃƒÂ¶schen nach (Tage)"
+
+
+msgid "Please select a time."
+msgstr "Bitte wÃ¤hlen Sie eine Zeit aus."
+
+
+msgid "Main text color"
+msgstr "Haupttextfarbe"
+
+
+msgid "LazyBookings Exceptions (next 30 days)"
+msgstr "LazyBookings Ausnahmen (nÃƒÂ¤chste 30 Tage)"
+
+
+msgid "Change status to confirmed"
+msgstr "Status zu BestÃƒÂ¤tigt ÃƒÂ¤ndern"
+
+
+msgid "Could not assign room."
+msgstr "Raum konnte nicht zugewiesen werden."
+
+
+msgid "Apply bulk action to selected appointments"
+msgstr "Massenaktion auf ausgewÃ¤hlte Termine anwenden"
+
+
+msgid "Change color for Confirmed"
+msgstr "Farbe fÃƒÂ¼r BestÃƒÂ¤tigt ÃƒÂ¤ndern"
+
+
+msgid "Refund reason"
+msgstr "RÃƒÂ¼ckerstattungsgrund"
+
+
+msgid "Draft created in Outbox."
+msgstr "Entwurf im Postausgang erstellt."
+
+
+msgid "Pay in person"
+msgstr "PersÃ¶nlich bezahlen"
+
+
+msgid "View Services/Rooms"
+msgstr "Dienstleistungen/Zimmer ansehen"
+
+
+msgid "Profit Margin (%)"
+msgstr "Gewinnspanne (%)"
+
+
+msgid "Add Rule"
+msgstr "Regel hinzufÃƒÂ¼gen"
+
+
+msgid "Can customers cancel their own bookings?"
+msgstr "KÃ¶nnen Kunden ihre eigenen Buchungen stornieren?"
+
+
+msgid "How do I enable online payments?"
+msgstr "Wie aktiviere ich Online-Zahlungen?"
+
+
+msgid "Could not save guest. Please try again."
+msgstr "Gast konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Small highlights (required fields *), and the gradient end color when gradient is enabled."
+msgstr "Kleine Hervorhebungen (Pflichtfelder *) und die Verlaufsendfarbe, wenn Verlauf aktiviert ist."
+
+
+msgid "Overdue reminder"
+msgstr "ÃƒÅ“berfÃƒÂ¤llige Erinnerung"
+
+
+msgid "Are you sure you want to anonymize this customer? This cannot be undone."
+msgstr "Sind Sie sicher, dass Sie diesen Kunden anonymisieren mÃƒÂ¶chten? Dies kann nicht rÃƒÂ¼ckgÃƒÂ¤ngig gemacht werden."
+
+
+msgid "Internal cost per occupied night for gross profit calculations. Stored in cents."
+msgstr "Interne Kosten pro belegter Nacht fÃƒÂ¼r Bruttogewinnberechnungen. Gespeichert in Cent."
+
+
+msgid "Log preview"
+msgstr "Protokollvorschau"
+
+
+msgid "Failed to update appointment status."
+msgstr "Fehler beim Aktualisieren des Terminstatus."
+
+
+msgid "LazyBookings Help"
+msgstr "LazyBookings Hilfe"
+
+
+msgid "Manage Own Bookings (Staff)"
+msgstr "Eigene Buchungen verwalten (Personal)"
+
+
+msgid "Live Preview"
+msgstr "Live-Vorschau"
+
+
+msgid "Twin Beds"
+msgstr "Zwei Einzelbetten"
+
+
+msgid "English"
+msgstr "Englisch"
+
+
+msgid "Last saved:"
+msgstr "Zuletzt gespeichert:"
+
+
+msgid "Shadow Blur (px)"
+msgstr "SchattenunschÃƒÂ¤rfe (px)"
+
+
+msgid "Roundness of buttons and form elements (0 = square, 20 = very round)."
+msgstr "Rundheit von Buttons und Formularelementen (0 = eckig, 20 = sehr rund)."
+
+
+msgid "Save Branding Settings"
+msgstr "Branding-Einstellungen speichern"
+
+
+msgid "Log file is empty."
+msgstr "Protokolldatei ist leer."
+
+
+msgid "End Time"
+msgstr "Endzeit"
+
+
+msgid "Cancellation, refund, and booking policies."
+msgstr "Storno-, RÃƒÂ¼ckerstattungs- und Buchungsrichtlinien."
+
+
+msgid "Limit this class to specific days/times. Choose a window (any time inside) or fixed weekly start times (e.g. Fri 18:00). If left empty, global working hours apply."
+msgstr "Begrenzen Sie diese Klasse auf bestimmte Tage/Zeiten. WÃƒÂ¤hlen Sie ein Zeitfenster (beliebige Zeit innerhalb) oder feste wÃƒÂ¶chentliche Startzeiten (z.B. Fr 18:00). Wenn leer gelassen, gelten globale Arbeitszeiten."
+
+
+msgid "Booking Wizard"
+msgstr "Buchungs-Assistent"
+
+
+msgid "Refund status"
+msgstr "RÃƒÂ¼ckerstattungsstatus"
+
+
+msgid "From Email:"
+msgstr "Von E-Mail:"
+
+
+msgid "Create a booking page"
+msgstr "Eine Buchungsseite erstellen"
+
+
+msgid "Animation Duration (ms)"
+msgstr "Animationsdauer (ms)"
+
+
+msgid "Payment error:"
+msgstr "Zahlungsfehler:"
+
+
+msgid "Secondary"
+msgstr "SekundÃƒÂ¤r"
+
+
+msgid "Bulk actions let you confirm or cancel multiple bookings"
+msgstr "Mit Massenaktionen kÃ¶nnen Sie mehrere Buchungen bestÃ¤tigen oder stornieren"
+
+
+msgid "Accent preview"
+msgstr "Akzentvorschau"
+
+
+msgid "Connection OK."
+msgstr "Verbindung OK."
+
+
+msgid "How far the shadow spreads"
+msgstr "Wie weit sich der Schatten ausbreitet"
+
+
+msgid "Stripe Public Key"
+msgstr "Stripe Ã–ffentlicher SchlÃ¼ssel"
+
+
+msgid "Manicure"
+msgstr "ManikÃ¼re"
+
+
+msgid "Appointment deleted."
+msgstr "Termin gelÃ¶scht."
+
+
+msgid "Could not create exception."
+msgstr "Ausnahme konnte nicht erstellt werden."
+
+
+msgid "Ã¢Å“â€œ DB version matches plugin version."
+msgstr "âœ“ DB-Version entspricht Plugin-Version."
+
+
+msgid "Room #"
+msgstr "Zimmer #"
+
+
+msgid "Fixed fee per booking (e.g., payment processor fixed fee). Stored in cents."
+msgstr "Feste GebÃ¼hr pro Buchung (z.B. feste GebÃ¼hr des Zahlungsanbieters). In Cent gespeichert."
+
+
+msgid "A webhook secret is stored. Leave blank to keep the existing secret."
+msgstr "Ein Webhook-Secret ist gespeichert. Leer lassen, um das vorhandene Secret zu behalten."
+
+
+msgid "Gemini API Key"
+msgstr "Gemini API-SchlÃƒÂ¼ssel"
+
+
+msgid "A password is stored. Leave blank to keep the existing password."
+msgstr "Ein Passwort ist gespeichert. Leer lassen, um das vorhandene Passwort zu behalten."
+
+
+msgid "Add the booking form to a page with [lazy_book]"
+msgstr "FÃ¼gen Sie das Buchungsformular mit [lazy_book] zu einer Seite hinzu"
+
+
+msgid "Used for hover states and highlights."
+msgstr "Verwendet fÃ¼r Hover-ZustÃ¤nde und Hervorhebungen."
+
+
+msgid "Service duration in minutes"
+msgstr "Dienstleistungsdauer in Minuten"
+
+
+msgid "Calendar Feed (iCal)"
+msgstr "Kalender-Feed (iCal)"
+
+
+msgid "Your booking: {service_name}"
+msgstr "Ihre Buchung: {service_name}"
+
+
+msgid "Mobile-first design"
+msgstr "Mobile-First-Design"
+
+
+msgid "Available times are still loadingÃ¢â‚¬Â¦"
+msgstr "VerfÃ¼gbare Zeiten werden noch geladenâ€¦"
+
+
+msgid "Retention policies are automatically applied via scheduled tasks. You can manually trigger cleanup here:"
+msgstr "Aufbewahrungsrichtlinien werden automatisch ÃƒÂ¼ber geplante Aufgaben angewendet. Sie kÃƒÂ¶nnen die Bereinigung hier manuell auslÃƒÂ¶sen:"
+
+
+msgid "Border Color"
+msgstr "Rahmenfarbe"
+
+
+msgid "Window"
+msgstr "Fenster"
+
+
+msgid "Pending Appointments"
+msgstr "Ausstehende Termine"
+
+
+msgid "Create new appointment"
+msgstr "Neuen Termin erstellen"
+
+
+msgid "Template saved."
+msgstr "Vorlage gespeichert."
+
+
 msgid ""
 msgstr ""
 "Project-Id-Version: LazyBookings 1.0.1\n"
@@ -7,116 +3303,1748 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "The selected check-in date is in the past."
-msgstr "Das gewählte Anreise-Datum liegt in der Vergangenheit."
+
+msgid "Add New Customer"
+msgstr "Neuen Kunden hinzufÃƒÂ¼gen"
+
+
+msgid "Legend"
+msgstr "Legende"
+
+
+msgid "Update Guest"
+msgstr "Gast aktualisieren"
+
+
+msgid "For normal use, \"Error\" is usually enough. Use \"Debug\" only temporarily."
+msgstr "FÃ¼r den normalen Gebrauch reicht \"Error\" normalerweise aus. Verwenden Sie \"Debug\" nur vorÃ¼bergehend."
+
+
+msgid "Store Country"
+msgstr "Land des Shops"
+
+
+msgid "Yes, off"
+msgstr "Ja, frei"
+
+
+msgid "Single Bed"
+msgstr "Einzelbett"
+
+
+msgid "Cost per Night"
+msgstr "Kosten pro Nacht"
+
+
+msgid "Loading available timesÃ¢â‚¬Â¦"
+msgstr "Lade verfÃ¼gbare Zeitenâ€¦"
+
+
+msgid "Staff created."
+msgstr "Personal erstellt."
+
+
+msgid "View Reports & Analytics"
+msgstr "Berichte & Analysen ansehen"
+
+
+msgid "Slot Size (minutes)"
+msgstr "Zeitslot-GrÃ¶ÃŸe (Minuten)"
+
+
+msgid "Offer has expired"
+msgstr "Angebot ist abgelaufen"
+
+
+msgid "Debug"
+msgstr "Debug"
+
+
+msgid "Outbox"
+msgstr "Postausgang"
+
+
+msgid "Download"
+msgstr "Herunterladen"
+
+
+msgid "AI drafts appear in Outbox for approval"
+msgstr "KI-EntwÃƒÂ¼rfe erscheinen im Postausgang zur Genehmigung"
+
+
+msgid "Seats"
+msgstr "PlÃƒÂ¤tze"
+
+
+msgid "Global business hours (0-23). Individual staff hours can override this."
+msgstr "Globale GeschÃƒÂ¤ftszeiten (0-23). Individuelle Personalzeiten kÃƒÂ¶nnen dies ÃƒÂ¼berschreiben."
+
+
+msgid "New Room Type"
+msgstr "Neuer Raumtyp"
+
+
+msgid "LazyBookings Staff"
+msgstr "LazyBookings Personal"
+
+
+msgid "Appointment #%d"
+msgstr "Termin #%d"
+
+
+msgid "Step %d of %d"
+msgstr "Schritt %d von %d"
+
+
+msgid "Update Customer"
+msgstr "Kunde aktualisieren"
+
+
+msgid "Weekday"
+msgstr "Wochentag"
+
+
+msgid "Invalid item."
+msgstr "UngÃƒÂ¼ltiges Element."
+
+
+msgid "No past bookings."
+msgstr "Keine vergangenen Buchungen."
+
+
+msgid "Automations"
+msgstr "Automatisierungen"
+
+
+msgid "Name is required."
+msgstr "Name ist erforderlich."
+
+
+msgid "Duration must be between %d and %d minutes."
+msgstr "Die Dauer muss zwischen %d und %d Minuten liegen."
+
+
+msgid "Payment Received"
+msgstr "Zahlung erhalten"
+
+
+msgid "Staff"
+msgstr "Personal"
+
+
+msgid "Used only if Auto Button Text Color is disabled."
+msgstr "Wird nur verwendet, wenn Auto-Button-Textfarbe deaktiviert ist."
+
+
+msgid "Enable Payments"
+msgstr "Zahlungen aktivieren"
+
+
+msgid "Create "
+msgstr "Erstellen "
+
+
+msgid "The dashboard shows your upcoming bookings, revenue, and key metrics at a glance."
+msgstr "Das Dashboard zeigt Ihre bevorstehenden Buchungen, UmsÃ¤tze und wichtige Kennzahlen auf einen Blick."
+
+
+msgid "Outbox not available."
+msgstr "Postausgang nicht verfÃƒÂ¼gbar."
+
+
+msgid "Cash (on site)"
+msgstr "Bargeld (vor Ort)"
+
+
+msgid "We received your return from PayPal, but could not confirm the payment. Your booking is still pending. Please try again or contact us if you were charged."
+msgstr "Wir haben Ihre RÃƒÂ¼ckmeldung von PayPal erhalten, konnten die Zahlung jedoch nicht bestÃƒÂ¤tigen. Ihre Buchung ist noch ausstehend. Bitte versuchen Sie es erneut oder kontaktieren Sie uns, wenn Sie belastet wurden."
+
+
+msgid "Select Service"
+msgstr "Service auswÃƒÂ¤hlen"
+
+
+msgid "Info"
+msgstr "Info"
+
+
+msgid "Best Practices:"
+msgstr "Best Practices:"
+
+
+msgid "Delete Appointment"
+msgstr "Termin lÃƒÂ¶schen"
+
+
+msgid "Available Days & Times"
+msgstr "VerfÃƒÂ¼gbare Tage & Zeiten"
+
+
+msgid "Assign room"
+msgstr "Raum zuweisen"
+
+
+msgid "Business: Short & Professional"
+msgstr "GeschÃƒÂ¤ftlich: Kurz & Professionell"
+
+
+msgid "Use validate_hotel_payload for hotel bookings."
+msgstr "Verwenden Sie validate_hotel_payload fÃƒÂ¼r Hotelbuchungen."
+
+
+msgid "AI settings (provider, model, business context, and operating mode) are managed under Ã¢â‚¬Å“AI & AutomationsÃ¢â‚¬Â."
+msgstr "KI-Einstellungen (Anbieter, Modell, GeschÃ¤ftskontext und Betriebsmodus) werden unter â€žKI & Automatisierungen" verwaltet."
+
+
+msgid "We received your return from PayPal, but could not match the payment to your booking. Please contact us if you were charged."
+msgstr "Wir haben Ihre RÃƒÂ¼ckmeldung von PayPal erhalten, konnten die Zahlung jedoch nicht Ihrer Buchung zuordnen. Bitte kontaktieren Sie uns, wenn Sie belastet wurden."
+
+
+msgid "King Bed"
+msgstr "Kingsize-Bett"
+
+
+msgid "Check-outs Today"
+msgstr "Abreisen heute"
+
+
+msgid "Example Admin Panel"
+msgstr "Beispiel-Admin-Panel"
+
+
+msgid "Manage AI Settings"
+msgstr "KI-Einstellungen verwalten"
+
+
+msgid "Add staff member"
+msgstr "Mitarbeiter hinzufÃƒÂ¼gen"
+
+
+msgid "Preview navigation"
+msgstr "Navigationsvorschau"
+
+
+msgid "Thickness of input and card borders"
+msgstr "Dicke von Eingabe- und KartenrÃƒÂ¤ndern"
+
+
+msgid "Start Time"
+msgstr "Startzeit"
+
+
+msgid "Use hotel-specific endpoint for hotel bookings."
+msgstr "Verwenden Sie hotelspezifischen Endpunkt fÃƒÂ¼r Hotelbuchungen."
+
+
+msgid "Could not load appointment details."
+msgstr "Termindetails konnten nicht geladen werden."
+
+
+msgid "Booking Status Update"
+msgstr "Buchungsstatus-Update"
+
+
+msgid "Type"
+msgstr "Typ"
+
+
+msgid "Children"
+msgstr "Kinder"
+
+
+msgid "Warning: This will permanently delete all LazyBookings tables and settings on uninstall. This cannot be undone."
+msgstr "Warnung: Dies lÃƒÂ¶scht dauerhaft alle LazyBookings-Tabellen und Einstellungen bei der Deinstallation. Dies kann nicht rÃƒÂ¼ckgÃƒÂ¤ngig gemacht werden."
+
+
+msgid "Missing appointment_id/resource_id."
+msgstr "Fehlende appointment_id/resource_id."
+
+
+msgid "Click on any booking to view details"
+msgstr "Klicken Sie auf eine Buchung, um Details anzuzeigen"
+
+
+msgid "Business Name"
+msgstr "GeschÃ¤ftsname"
+
+
+msgid "Manual Anonymization"
+msgstr "Manuelle Anonymisierung"
+
+
+msgid "Allow customers to pay online via Stripe or PayPal."
+msgstr "ErmÃ¶glichen Sie Kunden, online Ã¼ber Stripe oder PayPal zu bezahlen."
+
+
+msgid "Button Shadow"
+msgstr "Button-Schatten"
+
+
+msgid "Select All"
+msgstr "Alle auswÃƒÂ¤hlen"
+
+
+msgid "Limit per run"
+msgstr "Limit pro AusfÃƒÂ¼hrung"
+
+
+msgid "Rate limit exceeded. Maximum %d requests per %d seconds. Please try again in %d seconds."
+msgstr "Ratenlimit Ã¼berschritten. Maximum %d Anfragen pro %d Sekunden. Bitte versuchen Sie es in %d Sekunden erneut."
+
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+
+msgid "Price"
+msgstr "Preis"
+
+
+msgid "Migrations ran successfully."
+msgstr "Migrationen erfolgreich ausgefÃƒÂ¼hrt."
+
+
+msgid "Booking Status Update: %s - %s"
+msgstr "Buchungsstatus-Update: %s - %s"
+
+
+msgid "Items per page:"
+msgstr "Elemente pro Seite:"
+
+
+msgid "Room assignment queued."
+msgstr "Zimmerzuweisung in Warteschlange."
+
+
+msgid "Hair Coloring"
+msgstr "HaarfÃ¤rbung"
+
+
+msgid "From:"
+msgstr "Von:"
+
+
+msgid "Customer data anonymized successfully."
+msgstr "Kundendaten erfolgreich anonymisiert."
+
 
 msgid "Another booking is currently being processed. Please try again."
 msgstr "Eine andere Buchung wird gerade verarbeitet. Bitte versuchen Sie es erneut."
 
-msgid "Invalid date/time."
-msgstr "Ungültiges Datum/Uhrzeit."
 
-msgid "The selected time is in the past."
-msgstr "Die gewählte Zeit liegt in der Vergangenheit."
+msgid "Services & Appointments"
+msgstr "Dienstleistungen & Termine"
 
-msgid "The selected time slot is already taken."
-msgstr "Der gewählte Zeitslot ist bereits belegt."
 
-msgid "Could not save customer."
-msgstr "Kunde konnte nicht gespeichert werden."
+msgid "Configure confirmation and reminder emails"
+msgstr "Konfigurieren Sie BestÃ¤tigungs- und Erinnerungs-E-Mails"
 
-msgid "Could not create booking."
-msgstr "Buchung konnte nicht erstellt werden."
 
-msgid "Step %s of %s"
-msgstr "Schritt %s von %s"
+msgid "Edit Rule"
+msgstr "Regel bearbeiten"
 
-msgid "night"
-msgstr "Nacht"
 
-msgid "nights"
-msgstr "Nächte"
+msgid "Run triggered. Check Outbox for drafts."
+msgstr "AusfÃƒÂ¼hrung ausgelÃƒÂ¶st. PrÃƒÂ¼fen Sie den Postausgang auf EntwÃƒÂ¼rfe."
 
-msgid "Any"
-msgstr "Beliebig"
 
-msgid "Room #"
-msgstr "Zimmer #"
+msgid "Go to Settings â†’ Payments and enter your Stripe or PayPal credentials. Make sure to test in sandbox mode first."
+msgstr "Gehen Sie zu Einstellungen â†’ Zahlungen und geben Sie Ihre Stripe- oder PayPal-Zugangsdaten ein. Testen Sie zuerst im Sandbox-Modus."
 
-msgid "Resource #"
-msgstr "Ressource #"
 
-msgid "Optional: select a room."
-msgstr "Optional: Wählen Sie ein Zimmer aus."
+msgid "Your details"
+msgstr "Ihre Details"
 
-msgid "Optional: select a resource."
-msgstr "Optional: Wählen Sie eine Ressource aus."
 
-msgid "Loading availability…"
-msgstr "Verfügbarkeit wird geladen…"
+msgid "SMTP (optional)"
+msgstr "SMTP (optional)"
 
-msgid "Loading resources…"
-msgstr "Ressourcen werden geladen…"
 
-msgid "Loading available times…"
-msgstr "Verfügbare Zeiten werden geladen…"
+msgid "Guest"
+msgstr "Gast"
 
-msgid "Available times are still loading…"
-msgstr "Verfügbare Zeiten werden noch geladen…"
 
-msgid "Select a date first"
-msgstr "Bitte zuerst ein Datum auswählen"
+msgid "Add shadow to service/room cards"
+msgstr "Schatten zu Service-/Zimmerkarten hinzufÃƒÂ¼gen"
 
-msgid "Times could not be loaded"
-msgstr "Zeiten konnten nicht geladen werden"
 
-msgid "Times could not be loaded. Please reload the page."
-msgstr "Zeiten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
+msgid "No Room Types Yet"
+msgstr "Noch keine Raumtypen"
+
+
+msgid "Use filters to find specific bookings"
+msgstr "Verwenden Sie Filter, um bestimmte Buchungen zu finden"
+
+
+msgid "What to Check:"
+msgstr "Was zu Ã¼berprÃ¼fen ist:"
+
+
+msgid "Could not save %s. Please try again."
+msgstr "%s konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Booking Mode:"
+msgstr "Buchungsmodus:"
+
+
+msgid "Controls how verbose logging is."
+msgstr "Steuert, wie ausfÃ¼hrlich die Protokollierung ist."
+
+
+msgid "Execution failed."
+msgstr "AusfÃƒÂ¼hrung fehlgeschlagen."
+
+
+msgid "Database Statistics"
+msgstr "Datenbankstatistiken"
+
+
+msgid "Model"
+msgstr "Modell"
+
+
+msgid "Payment cancelled"
+msgstr "Zahlung storniert"
+
+
+msgid "AI"
+msgstr "KI"
+
+
+msgid "Today occupancy rate"
+msgstr "Heutige Auslastungsrate"
+
+
+msgid "Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}"
+msgstr "VerfÃ¼gbare Tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}"
+
+
+msgid "Edit Template"
+msgstr "Vorlage bearbeiten"
+
+
+msgid "Payment Method"
+msgstr "Zahlungsmethode"
+
+
+msgid "Advanced: Add custom CSS to override default styles."
+msgstr "Erweitert: FÃ¼gen Sie benutzerdefiniertes CSS hinzu, um Standard-Stile zu Ã¼berschreiben."
+
+
+msgid "If enabled, pending bookings are treated as occupied."
+msgstr "Falls aktiviert, werden ausstehende Buchungen als besetzt behandelt."
+
+
+msgid "Manage AI API Keys"
+msgstr "KI-API-SchlÃƒÂ¼ssel verwalten"
+
+
+msgid "Add one or more weekly start times. Example: Fri 18:00. The customer will only see these times (still respecting staff/global hours and existing bookings)."
+msgstr "FÃƒÂ¼gen Sie einen oder mehrere wÃƒÂ¶chentliche Startzeiten hinzu. Beispiel: Fr 18:00. Der Kunde sieht nur diese Zeiten (unter BerÃƒÂ¼cksichtigung von Personal-/Globalen Zeiten und bestehenden Buchungen)."
+
+
+msgid "Month"
+msgstr "Monat"
+
+
+msgid "Bookings"
+msgstr "Buchungen"
+
+
+msgid "Day (1-28)"
+msgstr "Tag (1-28)"
+
+
+msgid "Are you sure?"
+msgstr "Sind Sie sicher?"
+
+
+msgid "Total Customers"
+msgstr "Gesamt Kunden"
+
+
+msgid "Company invoice"
+msgstr "Firmenrechnung"
+
+
+msgid "Settings saved successfully."
+msgstr "Einstellungen erfolgreich gespeichert."
+
+
+msgid "Not supported (race condition protection disabled)"
+msgstr "Nicht unterstÃƒÂ¼tzt (Race-Condition-Schutz deaktiviert)"
+
+
+msgid "Guests"
+msgstr "GÃƒÂ¤ste"
+
+
+msgid "By default this configures WordPress wp_mail() globally while enabled."
+msgstr "StandardmÃ¤ÃŸig konfiguriert dies WordPress wp_mail() global, wÃ¤hrend es aktiviert ist."
+
+
+msgid "Vibrant Purple"
+msgstr "Lebendiges Lila"
+
+
+msgid "Bulk actions toolbar"
+msgstr "Massenaktionen-Symbolleiste"
+
+
+msgid "Select room type"
+msgstr "Raumtyp auswÃƒÂ¤hlen"
+
+
+msgid "Controls the time grid used to compute available times."
+msgstr "Steuert das Zeitraster, das zur Berechnung verfÃ¼gbarer Zeiten verwendet wird."
+
+
+msgid "Manage %s"
+msgstr "%s verwalten"
+
+
+msgid "This action has already been executed."
+msgstr "Diese Aktion wurde bereits ausgefÃƒÂ¼hrt."
+
+
+msgid "Max adults: %d"
+msgstr "Max. Erwachsene: %d"
+
+
+msgid "Status"
+msgstr "Status"
+
+
+msgid "Save Rule"
+msgstr "Regel speichern"
+
+
+msgid "Outbox Item"
+msgstr "Postausgang-Eintrag"
+
+
+msgid "Booking Mode"
+msgstr "Buchungsmodus"
+
+
+msgid "Pending Blocks Availability"
+msgstr "Ausstehende Buchungen blockieren VerfÃ¼gbarkeit"
+
+
+msgid "Get your key from"
+msgstr "Holen Sie sich Ihren SchlÃƒÂ¼ssel von"
+
+
+msgid "Fixed Weekly Slots"
+msgstr "Feste wÃƒÂ¶chentliche Zeitfenster"
+
+
+msgid "Appointment details loaded."
+msgstr "Termindetails geladen."
+
+
+msgid "Rule deleted."
+msgstr "Regel gelÃƒÂ¶scht."
+
+
+msgid "Invoice details"
+msgstr "Rechnungsdetails"
+
+
+msgid "Customers are created automatically from bookings. You can also add them manually."
+msgstr "Kunden werden automatisch aus Buchungen erstellt. Sie kÃƒÂ¶nnen sie auch manuell hinzufÃƒÂ¼gen."
+
+
+msgid "Card Shadow"
+msgstr "Karten-Schatten"
+
+
+msgid "Useful to avoid double bookings before you confirm."
+msgstr "NÃ¼tzlich, um Doppelbuchungen vor der BestÃ¤tigung zu vermeiden."
+
+
+msgid "Could not update draft."
+msgstr "Entwurf konnte nicht aktualisiert werden."
+
+
+msgid "Remove"
+msgstr "Entfernen"
+
+
+msgid "Room proposal sent to Outbox."
+msgstr "Zimmervorschlag an Postausgang gesendet."
+
+
+msgid "Updated"
+msgstr "Aktualisiert"
+
+
+msgid "Background for inner panels (fieldsets/cards)"
+msgstr "Hintergrund fÃƒÂ¼r innere Panels (Fieldsets/Karten)"
+
+
+msgid "Secondary button hover fill background and border."
+msgstr "SekundÃƒÂ¤r-Button Hover-Hintergrund und Rand."
+
+
+msgid "Select"
+msgstr "AuswÃ¤hlen"
+
+
+msgid "Resource created."
+msgstr "Ressource erstellt."
+
+
+msgid "Spacing & Shapes"
+msgstr "AbstÃƒÂ¤nde & Formen"
+
+
+msgid "Pay online (card)"
+msgstr "Online bezahlen (Karte)"
+
+
+msgid "Add your services or room types"
+msgstr "FÃ¼gen Sie Ihre Dienstleistungen oder Zimmertypen hinzu"
+
+
+msgid "Date & Time"
+msgstr "Datum & Uhrzeit"
+
+
+msgid "Please fill in all required fields."
+msgstr "Bitte fÃƒÂ¼llen Sie alle Pflichtfelder aus."
+
+
+msgid "System Diagnostics"
+msgstr "System-Diagnose"
+
+
+msgid "All rights reserved."
+msgstr "Alle Rechte vorbehalten."
+
+
+msgid "Optimized for phone, tablet, and desktop Ã¢â‚¬â€ without breaking your theme."
+msgstr "KI-Einstellungen (Anbieter, Modell, GeschÃ¤ftskontext und Betriebsmodus) werden unter â€žKI & Automatisierungen" verwaltet."
+
+
+msgid "Calendar block (LazyBookings plugin required)"
+msgstr "Kalender-Block (LazyBookings-Plugin erforderlich)"
+
+
+msgid "Shadow Spread (px)"
+msgstr "Schattenausbreitung (px)"
+
+
+msgid "Support Forum"
+msgstr "Support-Forum"
+
+
+msgid "Klarna"
+msgstr "Klarna"
+
+
+msgid "Too many requests. Please slow down and try again later."
+msgstr "Zu viele Anfragen. Bitte verlangsamen Sie und versuchen Sie es spÃ¤ter erneut."
+
+
+msgid "Default rules added."
+msgstr "Standardregeln hinzugefÃƒÂ¼gt."
+
+
+msgid "Default Blue"
+msgstr "Standard Blau"
+
+
+msgid "This is a live preview of your design settings."
+msgstr "Dies ist eine Live-Vorschau Ihrer Design-Einstellungen."
+
+
+msgid "Paid at"
+msgstr "Bezahlt am"
+
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+
+msgid "Status changed from \"%s\" to \"%s\"."
+msgstr "Status geÃ¤ndert von \"%s\" zu \"%s\"."
+
+
+msgid "Business Information"
+msgstr "GeschÃ¤ftsinformationen"
+
+
+msgid "Propose via Outbox"
+msgstr "Via Postausgang vorschlagen"
+
+
+msgid "Disable to turn off all AI features."
+msgstr "Deaktivieren, um alle KI-Funktionen auszuschalten."
+
+
+msgid "Save"
+msgstr "Speichern"
+
+
+msgid "Jane Doe"
+msgstr "Jane Doe"
+
+
+msgid "You selected payment on site. Your booking is awaiting confirmation."
+msgstr "Sie haben Zahlung vor Ort gewÃƒÂ¤hlt. Ihre Buchung wartet auf BestÃƒÂ¤tigung."
+
+
+msgid "Ã¢â‚¬â€ Select Ã¢â‚¬â€"
+msgstr "â€“ AuswÃ¤hlen â€“"
+
+
+msgid "Draft Center"
+msgstr "Entwurfszentrale"
+
+
+msgid "Minimal Black"
+msgstr "Minimalistisch Schwarz"
+
+
+msgid "Leave this field empty"
+msgstr "Lassen Sie dieses Feld leer"
+
+
+msgid "This time slot is fully booked (%d/%d)."
+msgstr "Dieser Zeitslot ist vollstÃ¤ndig ausgebucht (%d/%d)."
+
+
+msgid "No rooms found."
+msgstr "Keine Zimmer gefunden."
+
+
+msgid "Enabled Methods"
+msgstr "Aktivierte Methoden"
+
+
+msgid "Plugin Version"
+msgstr "Plugin-Version"
+
+
+msgid "Refund amount (cents)"
+msgstr "RÃƒÂ¼ckerstattungsbetrag (Cent)"
+
+
+msgid "This is a live preview of your backend color palette."
+msgstr "Dies ist eine Live-Vorschau Ihrer Backend-Farbpalette."
+
+
+msgid "No candidates."
+msgstr "Keine Kandidaten."
+
+
+msgid "This date is not available for booking (holiday)."
+msgstr "Dieses Datum ist nicht fÃ¼r Buchungen verfÃ¼gbar (Feiertag)."
+
+
+msgid "Select the resources that can be used for this service. If none are selected, all available resources will be considered."
+msgstr "WÃƒÂ¤hlen Sie die Ressourcen aus, die fÃƒÂ¼r diese Dienstleistung verwendet werden kÃƒÂ¶nnen. Wenn keine ausgewÃƒÂ¤hlt sind, werden alle verfÃƒÂ¼gbaren Ressourcen berÃƒÂ¼cksichtigt."
+
+
+msgid "No customer account found for your email."
+msgstr "Kein Kundenkonto fÃ¼r Ihre E-Mail gefunden."
+
+
+msgid "Time"
+msgstr "Uhrzeit"
+
+
+msgid "Run system check"
+msgstr "SystemprÃƒÂ¼fung ausfÃƒÂ¼hren"
+
+
+msgid "Background Color"
+msgstr "Hintergrundfarbe"
+
+
+msgid "API Keys"
+msgstr "API-SchlÃƒÂ¼ssel"
+
+
+msgid "Automatically choose readable text color for the primary button (black/white)."
+msgstr "Automatisch lesbare Textfarbe fÃƒÂ¼r den primÃƒÂ¤ren Button wÃƒÂ¤hlen (schwarz/weiÃƒÅ¸)."
+
+
+msgid "Branding settings saved successfully."
+msgstr "Branding-Einstellungen erfolgreich gespeichert."
+
+
+msgid "No"
+msgstr "Nein"
+
+
+msgid "Enable SMTP"
+msgstr "SMTP aktivieren"
+
+
+msgid "Backend Preview"
+msgstr "Backend-Vorschau"
+
+
+msgid "Email"
+msgstr "E-Mail"
+
+
+msgid "Latest Appointments"
+msgstr "Neueste Termine"
+
+
+msgid "Custom CSS"
+msgstr "Benutzerdefiniertes CSS"
+
+
+msgid "No logs yet for this rule."
+msgstr "Noch keine Protokolle fÃƒÂ¼r diese Regel."
+
+
+msgid "Customer"
+msgstr "Kunde"
+
+
+msgid "Resource updated."
+msgstr "Ressource aktualisiert."
+
+
+msgid "No rooms assigned"
+msgstr "Keine Zimmer zugewiesen"
+
+
+msgid "Minute"
+msgstr "Minute"
+
+
+msgid "No API key provided"
+msgstr "Kein API-SchlÃƒÂ¼ssel bereitgestellt"
+
+
+msgid "DB Version:"
+msgstr "DB-Version:"
+
+
+msgid "Room"
+msgstr "Zimmer"
+
+
+msgid "Enable Gradient Background"
+msgstr "Verlaufshintergrund aktivieren"
+
+
+msgid "Could not save service. Please try again."
+msgstr "Service konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+
+
+msgid "Error:"
+msgstr "Fehler:"
+
+
+msgid "Invalid request. Please check your input and try again."
+msgstr "UngÃ¼ltige Anfrage. Bitte Ã¼berprÃ¼fen Sie Ihre Eingabe und versuchen Sie es erneut."
+
+
+msgid "Your PayPal Client ID."
+msgstr "Ihre PayPal Client-ID."
+
+
+msgid "5er Card"
+msgstr "5er-Karte"
+
+
+msgid "Example service description."
+msgstr "Beispiel-Servicebeschreibung."
+
+
+msgid "Email, phone, or other public contact details."
+msgstr "E-Mail, Telefon oder andere ÃƒÂ¶ffentliche Kontaktdaten."
+
+
+msgid "Create %s"
+msgstr "%s erstellen"
+
+
+msgid "Invoices (unpaid bookings)"
+msgstr "Rechnungen (unbezahlte Buchungen)"
+
+
+msgid "Send emails via SMTP instead of the server mail function"
+msgstr "E-Mails Ã¼ber SMTP statt Ã¼ber die Server-Mail-Funktion senden"
+
+
+msgid "Schedule Details"
+msgstr "Zeitplan-Details"
+
+
+msgid "Overdue reminders processed."
+msgstr "ÃƒÅ“berfÃƒÂ¤llige Erinnerungen verarbeitet."
+
+
+msgid "Inherit from theme"
+msgstr "Vom Theme erben"
+
+
+msgid "Frontend"
+msgstr "Frontend"
+
+
+msgid "View AI Reports & Insights"
+msgstr "KI-Berichte & Einblicke ansehen"
+
+
+msgid "Payment reminder: {service_name}"
+msgstr "Zahlungserinnerung: {service_name}"
+
+
+msgid "Exceptions"
+msgstr "Ausnahmen"
+
+
+msgid "Anonymize Customer"
+msgstr "Kunde anonymisieren"
+
+
+msgid "Customer not found or anonymization failed."
+msgstr "Kunde nicht gefunden oder Anonymisierung fehlgeschlagen."
+
+
+msgid "Payment reminders (unpaid bookings)"
+msgstr "Zahlungserinnerungen (unbezahlte Buchungen)"
+
+
+msgid "Timezone"
+msgstr "Zeitzone"
+
+
+msgid "View Bookings"
+msgstr "Buchungen ansehen"
+
+
+msgid "Template deleted."
+msgstr "Vorlage gelÃƒÂ¶scht."
+
+
+msgid "Examples: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de"
+msgstr "Beispiele: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de"
+
+
+msgid "Hello"
+msgstr "Hallo"
+
+
+msgid "wp_mail failed."
+msgstr "wp_mail fehlgeschlagen."
+
+
+msgid "Enabled (%s)"
+msgstr "Aktiviert (%s)"
+
+
+msgid "Appointment Created"
+msgstr "Termin erstellt"
+
+
+msgid "Customers are created automatically from bookings, or you can add them manually."
+msgstr "Kunden werden automatisch aus Buchungen erstellt, oder Sie kÃƒÂ¶nnen sie manuell hinzufÃƒÂ¼gen."
+
+
+msgid "Occupied"
+msgstr "Belegt"
+
+
+msgid "Manage columns"
+msgstr "Spalten verwalten"
+
+
+msgid "Human-in-the-Loop (draft to Outbox)"
+msgstr "Human-in-the-Loop (Entwurf in Postausgang)"
+
+
+msgid "Create"
+msgstr "Erstellen"
+
+
+msgid "Click \"Edit\" to change booking details"
+msgstr "Klicken Sie auf \"Bearbeiten\", um Buchungsdetails zu Ã¤ndern"
+
+
+msgid "AI service provider for content generation."
+msgstr "KI-Dienstleister fÃƒÂ¼r die Inhaltserstellung."
+
+
+msgid "Validation failed. The provided data is invalid."
+msgstr "Validierung fehlgeschlagen. Die angegebenen Daten sind ungÃ¼ltig."
+
+
+msgid "Calendar"
+msgstr "Kalender"
+
+
+msgid "View Payment Information"
+msgstr "Zahlungsinformationen ansehen"
+
+
+msgid "Minutely (every N minutes)"
+msgstr "MinÃƒÂ¼tlich (alle N Minuten)"
+
+
+msgid "Brand Name"
+msgstr "Markenname"
+
+
+msgid "Would you like to import sample data to explore features?"
+msgstr "MÃ¶chten Sie Beispieldaten importieren, um Funktionen zu erkunden?"
+
+
+msgid "All Set"
+msgstr "Alles erledigt"
+
+
+msgid "Operating Mode"
+msgstr "Betriebsmodus"
+
+
+msgid "Smart Room Assistant"
+msgstr "Intelligenter Zimmer-Assistent"
+
+
+msgid "Check-out"
+msgstr "Abreise"
+
+
+msgid "Apply"
+msgstr "Anwenden"
+
+
+msgid "Send email to admin on new booking"
+msgstr "E-Mail an Administrator bei neuer Buchung senden"
+
 
 msgid "Times could not be loaded. Please try again."
 msgstr "Zeiten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
 
-msgid "No times available"
-msgstr "Keine Zeiten verfügbar"
 
-msgid "No times are available for this date."
-msgstr "Für dieses Datum sind keine Zeiten verfügbar."
+msgid "We were unable to complete your booking. Please try again or contact us for assistance."
+msgstr "Wir konnten Ihre Buchung nicht abschlieÃƒÅ¸en. Bitte versuchen Sie es erneut oder kontaktieren Sie uns fÃƒÂ¼r UnterstÃƒÂ¼tzung."
 
-msgid "Select a time"
-msgstr "Bitte eine Zeit auswählen"
 
-msgid "Please select a service."
-msgstr "Bitte wählen Sie einen Service aus."
+msgid "Softness of the shadow effect"
+msgstr "Weichheit des Schatteneffekts"
+
+
+msgid "LazyBookings Dashboard"
+msgstr "LazyBookings Dashboard"
+
+
+msgid "User"
+msgstr "Benutzer"
+
+
+msgid "Draft"
+msgstr "Entwurf"
+
+
+msgid "Double Bed"
+msgstr "Doppelbett"
+
+
+msgid "Template file not found:"
+msgstr "Vorlagendatei nicht gefunden:"
+
+
+msgid "Unknown rule type."
+msgstr "Unbekannter Regeltyp."
+
+
+msgid "Payment on site"
+msgstr "Zahlung vor Ort"
+
+
+msgid "Table name"
+msgstr "Tabellenname"
+
+
+msgid "Save Retention Settings"
+msgstr "Aufbewahrungseinstellungen speichern"
+
+
+msgid "Price is per night"
+msgstr "Preis ist pro Nacht"
+
+
+msgid "See what is available and pick your preferred time in seconds."
+msgstr "Sehen Sie, was verfÃƒÂ¼gbar ist, und wÃƒÂ¤hlen Sie in Sekunden Ihre bevorzugte Zeit."
+
+
+msgid "Invalid email address."
+msgstr "UngÃƒÂ¼ltige E-Mail-Adresse."
+
+
+msgid "Name"
+msgstr "Name"
+
+
+msgid "Appointment Completed"
+msgstr "Termin abgeschlossen"
+
+
+msgid "Autonomous"
+msgstr "Autonom"
+
+
+msgid "Refunded at"
+msgstr "RÃƒÂ¼ckerstattet am"
+
+
+msgid "Choose room"
+msgstr "Raum wÃƒÂ¤hlen"
+
+
+msgid "Delete this rule?"
+msgstr "Diese Regel lÃƒÂ¶schen?"
+
+
+msgid "LazyBookings Test Email"
+msgstr "LazyBookings Test-E-Mail"
+
+
+msgid "Could not delete exception."
+msgstr "Ausnahme konnte nicht gelÃƒÂ¶scht werden."
+
+
+msgid "Go to Dashboard"
+msgstr "Zum Dashboard"
+
+
+msgid "General Settings"
+msgstr "Allgemeine Einstellungen"
+
+
+msgid "German"
+msgstr "Deutsch"
+
+
+msgid "A new booking has been received and requires your attention."
+msgstr "Eine neue Buchung ist eingegangen und erfordert Ihre Aufmerksamkeit."
+
+
+msgid "Speed of hover animations"
+msgstr "Geschwindigkeit der Hover-Animationen"
+
+
+msgid "Success!"
+msgstr "Erfolg!"
+
+
+msgid "How do I add the booking form to my website?"
+msgstr "Wie fÃ¼ge ich das Buchungsformular zu meiner Website hinzu?"
+
+
+msgid "Connection OK"
+msgstr "Verbindung OK"
+
+
+msgid "Appointment"
+msgstr "Termin"
+
+
+msgid "Used for buttons, links, and active states."
+msgstr "Verwendet fÃ¼r Buttons, Links und aktive ZustÃ¤nde."
+
+
+msgid "Every %d min"
+msgstr "Alle %d Min."
+
+
+msgid "You're All Set!"
+msgstr "Sie sind startklar!"
+
+
+msgid "No Guests Yet"
+msgstr "Noch keine GÃƒÂ¤ste"
+
+
+msgid "Your Stripe secret key (sk_live_... or sk_test_...)."
+msgstr "Ihr Stripe Secret Key (sk_live_... oder sk_test_...)."
+
+
+msgid "Run Now"
+msgstr "Jetzt ausfÃƒÂ¼hren"
+
+
+msgid "Invoice (company)"
+msgstr "Rechnung (Firma)"
+
+
+msgid "Enable Logging"
+msgstr "Protokollierung aktivieren"
+
+
+msgid "Next"
+msgstr "Weiter"
+
+
+msgid "Customer Email"
+msgstr "Kunden-E-Mail"
+
+
+msgid "Could not delete appointment."
+msgstr "Termin konnte nicht gelÃƒÂ¶scht werden."
+
+
+msgid "Supported Ã¢Å“â€œ"
+msgstr "â€“ AuswÃ¤hlen â€“"
+
+
+msgid "A guided booking process that prevents mistakes and keeps everything consistent."
+msgstr "Ein gefÃ¼hrter Buchungsprozess, der Fehler vermeidet und alles konsistent hÃ¤lt."
+
+
+msgid "Fees"
+msgstr "GebÃƒÂ¼hren"
+
+
+msgid "This time slot conflicts with an existing booking."
+msgstr "Dieser Zeitslot kollidiert mit einer bestehenden Buchung."
+
+
+msgid "Classic manicure"
+msgstr "Klassische ManikÃ¼re"
+
+
+msgid "Payment terms, tax ID, legal info."
+msgstr "Zahlungsbedingungen, Steuer-ID, rechtliche Informationen."
+
+
+msgid "Adults"
+msgstr "Erwachsene"
+
+
+msgid "Changes update automatically."
+msgstr "Ãƒâ€žnderungen werden automatisch aktualisiert."
+
+
+msgid "Reset"
+msgstr "ZurÃƒÂ¼cksetzen"
+
+
+msgid "Secondary Color"
+msgstr "SekundÃƒÂ¤rfarbe"
+
+
+msgid "Last Migration:"
+msgstr "Letzte Migration:"
+
+
+msgid "Invoice for booking #{booking_id}"
+msgstr "Rechnung fÃƒÂ¼r Buchung #{booking_id}"
+
+
+msgid "Test Email Configuration"
+msgstr "Test-E-Mail-Konfiguration"
+
+
+msgid "Create Guest"
+msgstr "Gast erstellen"
+
+
+msgid "Quick Actions:"
+msgstr "Schnellaktionen:"
+
+
+msgid "Wed"
+msgstr "Mi"
+
+
+msgid "Flash is faster, Pro is more accurate."
+msgstr "Flash ist schneller, Pro ist genauer."
+
+
+msgid "No rules yet. Click Ã¢â‚¬Å“Add Default RulesÃ¢â‚¬Â to get started."
+msgstr "Noch keine Regeln. Klicken Sie auf â€žStandardregeln hinzufÃ¼gen", um zu beginnen."
+
+
+msgid "Upcoming Bookings"
+msgstr "Bevorstehende Buchungen"
+
+
+msgid "Could not queue room assignment."
+msgstr "Raumzuweisung konnte nicht in Warteschlange gestellt werden."
+
+
+msgid "Save working hours"
+msgstr "Arbeitszeiten speichern"
+
+
+msgid "Edit Customer"
+msgstr "Kunde bearbeiten"
+
+
+msgid "WP Cron status (needed for automated reminders)"
+msgstr "WP Cron-Status (erforderlich fÃ¼r automatische Erinnerungen)"
+
+
+msgid "Created"
+msgstr "Erstellt"
+
+
+msgid "Thank you! Your payment has been confirmed and your booking is confirmed."
+msgstr "Vielen Dank! Ihre Zahlung wurde bestÃƒÂ¤tigt und Ihre Buchung ist bestÃƒÂ¤tigt."
+
+
+msgid "Design Presets"
+msgstr "Design-Voreinstellungen"
+
+
+msgid "Can I translate the plugin to my language?"
+msgstr "Kann ich das Plugin in meine Sprache Ã¼bersetzen?"
+
+
+msgid "Hotel"
+msgstr "Hotel"
+
+
+msgid "For normal use,"
+msgstr "FÃ¼r den normalen Gebrauch"
+
+msgid "Default Currency"
+msgstr "StandardwÃ¤hrung"
+
+
+msgid "Report draft created in Outbox."
+msgstr "Berichtsentwurf im Postausgang erstellt."
+
+
+msgid "Activate AI-powered automations"
+msgstr "KI-gesteuerte Automatisierungen aktivieren"
+
+
+msgid "You do not have permission to edit services."
+msgstr "Sie haben keine Berechtigung, Dienstleistungen zu bearbeiten."
+
+
+msgid "SelectÃ¢â‚¬Â¦"
+msgstr "AuswÃ¤hlenâ€¦"
+
+
+msgid "Resources"
+msgstr "Ressourcen"
+
+
+msgid "Create First Room Type"
+msgstr "Ersten Raumtyp erstellen"
+
+
+msgid "Pedicure"
+msgstr "PedikÃ¼re"
+
 
 msgid "Please select a date."
-msgstr "Bitte wählen Sie ein Datum aus."
+msgstr "Bitte wÃ¤hlen Sie ein Datum aus."
 
-msgid "Please select a time."
-msgstr "Bitte wählen Sie eine Zeit aus."
 
-msgid "Please select a check-in date."
-msgstr "Bitte wählen Sie ein Anreise-Datum aus."
+msgid "How do I prevent double bookings?"
+msgstr "Wie verhindere ich Doppelbuchungen?"
 
-msgid "Please select a check-out date."
-msgstr "Bitte wählen Sie ein Abreise-Datum aus."
 
-msgid "The date cannot be in the past."
-msgstr "Das Datum darf nicht in der Vergangenheit liegen."
+msgid "Invalid amount"
+msgstr "UngÃƒÂ¼ltiger Betrag"
 
-msgid "Check-out must be after check-in."
-msgstr "Das Abreise-Datum muss nach dem Anreise-Datum liegen."
 
-msgid "Please enter your email address."
-msgstr "Bitte geben Sie Ihre E-Mail-Adresse ein."
+msgid "Service deleted."
+msgstr "Dienstleistung gelÃ¶scht."
 
-msgid "Please enter a valid email address."
-msgstr "Bitte geben Sie eine gültige E-Mail-Adresse ein."
 
-msgid "Availability could not be loaded. Please try again."
-msgstr "Verfügbarkeit konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+msgid "Your Stripe publishable key (pk_live_... or pk_test_...)."
+msgstr "Ihr Stripe Publishable Key (pk_live_... oder pk_test_...)."
 
-msgid "Resources could not be loaded. Please try again."
-msgstr "Ressourcen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
 
-msgid "Security check failed. Please reload the page and try again."
-msgstr "Sicherheitsprüfung fehlgeschlagen. Bitte laden Sie die Seite neu und versuchen Sie es erneut."
+msgid "System Information"
+msgstr "Systeminformationen"
+
+
+msgid "Select bulk action"
+msgstr "Massenaktion auswÃƒÂ¤hlen"
+
+
+msgid "Trust & highlights"
+msgstr "Vertrauen & Highlights"
+
+
+msgid "No upcoming unassigned bookings found in the selected range."
+msgstr "Keine bevorstehenden nicht zugewiesenen Buchungen im ausgewÃƒÂ¤hlten Bereich gefunden."
+
+
+msgid "Logging"
+msgstr "Protokollierung"
+
+
+msgid "AI executes actions automatically"
+msgstr "KI fÃƒÂ¼hrt Aktionen automatisch aus"
+
+
+msgid "Yes, pending bookings block the time slot"
+msgstr "Ja, ausstehende Buchungen blockieren den Zeitslot"
+
+
+msgid "Email sent."
+msgstr "E-Mail gesendet."
+
+
+msgid "Demo Data"
+msgstr "Demo-Daten"
+
+
+msgid "Contact Email"
+msgstr "Kontakt-E-Mail"
+
+
+msgid "Could not save color."
+msgstr "Farbe konnte nicht gespeichert werden."
+
+
+msgid "Reference"
+msgstr "Referenz"
+
+
+msgid "Update"
+msgstr "Aktualisieren"
+
+
+msgid "Enable this to avoid affecting other plugins that also send emails."
+msgstr "Aktivieren Sie dies, um zu vermeiden, dass andere Plugins betroffen sind, die ebenfalls E-Mails senden."
+
+
+msgid "None (fallback)"
+msgstr "Keine (Fallback)"
+
+
+msgid "Your payment status is being processed."
+msgstr "Ihr Zahlungsstatus wird verarbeitet."
+
+
+msgid "Use clear, descriptive names (e.g., \"60-Minute Massage\" instead of just \"Massage\")"
+msgstr "Verwenden Sie klare, beschreibende Namen (z.B. \"60-Minuten-Massage\" statt nur \"Massage\")"
+
+
+msgid "Recently Viewed"
+msgstr "KÃƒÂ¼rzlich angesehen"
+
+
+msgid "Thu"
+msgstr "Do"
+
+
+msgid "Start:"
+msgstr "Beginn:"
+
+
+msgid "No customer data."
+msgstr "Keine Kundendaten."
+
+
+msgid "Done."
+msgstr "Fertig."
+
+
+msgid "Haircut"
+msgstr "Haarschnitt"
+
+
+msgid "Import"
+msgstr "Importieren"
+
+
+msgid "Branding & Design"
+msgstr "Branding & Design"
+
+
+msgid "Last Run"
+msgstr "Letzte AusfÃƒÂ¼hrung"
+
+
+msgid "Room preference"
+msgstr "ZimmerprÃƒÂ¤ferenz"
+
+
+msgid "Confirm Booking"
+msgstr "Buchung bestÃƒÂ¤tigen"
+
+
+msgid "More Resources:"
+msgstr "Weitere Ressourcen:"
+
+
+msgid "Configure scheduled automations like reminders and reports. Execution respects the AI Operating Mode (HITL drafts go to Outbox)."
+msgstr "Konfigurieren Sie geplante Automatisierungen wie Erinnerungen und Berichte. Die AusfÃƒÂ¼hrung respektiert den KI-Betriebsmodus (HITL-EntwÃƒÂ¼rfe gehen in den Postausgang)."
+
+
+msgid "Please fill all required fields."
+msgstr "Bitte fÃƒÂ¼llen Sie alle Pflichtfelder aus."
+
+
+msgid "Success"
+msgstr "Erfolg"
+
+
+msgid "Top Services"
+msgstr "Top-Dienstleistungen"
+
+
+msgid "Thank you for your booking! Here are the details:"
+msgstr "Vielen Dank fÃƒÂ¼r Ihre Buchung! Hier sind die Details:"
+
+
+msgid "New Booking Received"
+msgstr "Neue Buchung eingegangen"
+
+
+msgid "ID"
+msgstr "ID"
+
+
+msgid "Run the setup wizard again to reconfigure your basic settings."
+msgstr "FÃ¼hren Sie den Setup-Assistenten erneut aus, um Ihre grundlegenden Einstellungen neu zu konfigurieren."
+
+
+msgid "Sat"
+msgstr "Sa"
+
+
+msgid "Main background color for booking form"
+msgstr "Haupthintergrundfarbe fÃƒÂ¼r Buchungsformular"
+
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+
+msgid "Maximum number of simultaneous bookings this resource can handle (e.g., 1 for exclusive use, 10 for a meeting room)."
+msgstr "Maximale Anzahl gleichzeitiger Buchungen, die diese Ressource bewÃƒÂ¤ltigen kann (z.B. 1 fÃƒÂ¼r exklusive Nutzung, 10 fÃƒÂ¼r einen Besprechungsraum)."
+
+
+msgid "Policies"
+msgstr "Richtlinien"
+
+
+msgid "Automation Rules"
+msgstr "Automatisierungsregeln"
+
+
+msgid "Two-letter country code (e.g. DE, ES). Used to decide which payment methods make sense."
+msgstr "Zweistelliger LÃ¤ndercode (z.B. DE, ES). Wird verwendet, um zu entscheiden, welche Zahlungsmethoden sinnvoll sind."
+
+
+msgid "Branding"
+msgstr "Branding"
+
+
+msgid "Appointment Cancelled"
+msgstr "Termin storniert"
+
+
+msgid "Best fit: %d guests, %d available, %d leftover."
+msgstr "Beste Auswahl: %d GÃƒÂ¤ste, %d verfÃƒÂ¼gbar, %d ÃƒÂ¼brig."
+
+
+msgid "Result"
+msgstr "Ergebnis"
+
+
+msgid "Rows"
+msgstr "Zeilen"
+
+
+msgid "Save Settings"
+msgstr "Einstellungen speichern"
+
+
+msgid "We will send you another email once your booking is confirmed."
+msgstr "Wir senden Ihnen eine weitere E-Mail, sobald Ihre Buchung bestÃƒÂ¤tigt ist."
+
+
+msgid "AI Provider"
+msgstr "KI-Anbieter"
+
+
+msgid "Daily"
+msgstr "TÃƒÂ¤glich"
+
+
+msgid "Please select a service."
+msgstr "Bitte wÃ¤hlen Sie einen Service aus."
+
+
+msgid "Writes events/errors to a log file for diagnostics."
+msgstr "Schreibt Ereignisse/Fehler in eine Protokolldatei fÃ¼r Diagnosezwecke."
+
+
+msgid "Subject"
+msgstr "Betreff"
+
+
+msgid "Booking Confirmation - %s"
+msgstr "BuchungsbestÃƒÂ¤tigung - %s"
+
+
+msgid "Disable"
+msgstr "Deaktivieren"
+
+
+# Additional missing strings that need translation
+
+
+msgid "{service_name}  booking confirmation"
+msgstr "{service_name}  Buchungsbestätigung"
+
+msgid "ℹ No scheduled cron jobs yet"
+msgstr "ℹ Noch keine geplanten Cron-Jobs"
+
+msgid ""
+msgstr ""
+
+msgid " Select "
+msgstr " Auswählen "
+
+msgid "Add booking form to your website"
+msgstr "Buchungsformular zu Ihrer Website hinzufügen"
+
+msgid "Add custom CSS to override or extend the design. Use .ltlb-booking as the wrapper class."
+msgstr "Fügen Sie eigenes CSS hinzu, um das Design zu überschreiben oder zu erweitern. Verwenden Sie .ltlb-booking als Wrapper-Klasse."
+
+msgid "Add Services"
+msgstr "Services hinzufügen"
+
+msgid "Add your first service or room type"
+msgstr "Fügen Sie Ihren ersten Service oder Zimmertyp hinzu"
+
+msgid "AI settings (provider, model, business context, and operating mode) are managed under "AI & Automations"."
+msgstr "KI-Einstellungen (Anbieter, Modell, Geschäftskontext und Betriebsmodus) werden unter KI & Automationen" verwaltet."
+
+msgid " Missing"
+msgstr " Fehlt"
+
+msgid " DB version matches plugin version."
+msgstr " DB-Version stimmt mit Plugin-Version überein."
+
+msgid " Present"
+msgstr " Vorhanden"
+
+msgid " WP Cron is active"
+msgstr " WP Cron ist aktiv"
+
+msgid " DB version is behind plugin version."
+msgstr " DB-Version ist hinter Plugin-Version."
+
+msgid " WP Cron is DISABLED"
+msgstr " WP Cron ist DEAKTIVIERT"
+
+msgid "Automated tasks (reminders, cleanup, waitlist offers) will not run automatically. You need to set up a system cron job."
+msgstr "Automatische Aufgaben (Erinnerungen, Aufräumen, Wartelisten-Angebote) werden nicht automatisch ausgeführt. Sie müssen einen System-Cron-Job einrichten."
+
+msgid "Automatically sort rooms by name"
+msgstr "Zimmer automatisch nach Name sortieren"
+
+msgid "Auto-Sort"
+msgstr "Auto-Sortieren"
+
+msgid "Background color for form containers."
+msgstr "Hintergrundfarbe für Formular-Container."
+
+msgid "Configure payment methods (if enabled)"
+msgstr "Zahlungsmethoden konfigurieren (falls aktiviert)"
+
+msgid "Configured "
+msgstr "Konfiguriert "
+
+msgid "Cron jobs will be scheduled when you enable features like automated reminders or cleanup."
+msgstr "Cron-Jobs werden geplant, wenn Sie Funktionen wie automatische Erinnerungen oder Aufräumen aktivieren."
+
+msgid "Deterministic: gross profit = revenue  fees  room costs (from assigned rooms  nights)."
+msgstr "Deterministisch: Bruttogewinn = Umsatz  Gebühren  Zimmerkosten (aus zugewiesenen Zimmern  Nächte)."
+
+msgid "Download a JSON file with system information for support requests (sensitive data is redacted)."
+msgstr "Laden Sie eine JSON-Datei mit Systeminformationen für Support-Anfragen herunter (sensible Daten werden entfernt)."
+
+msgid "Example:"
+msgstr "Beispiel:"
+
+msgid "Export Debug Bundle"
+msgstr "Debug-Bundle exportieren"
+
+msgid "Export Debug Info"
+msgstr "Debug-Info exportieren"
+
+msgid "For normal use, "Error" is usually enough. Use "Debug" only temporarily."
+msgstr "Für den normalen Gebrauch reicht Fehler" normalerweise aus. Verwenden Sie Debug" nur vorübergehend."
+
+msgid "Information AI uses to personalize responses. Toggle "Send to AI" to control what data is shared."
+msgstr "Informationen, die die KI zur Personalisierung von Antworten verwendet. Schalten Sie An KI senden" um, um zu steuern, welche Daten geteilt werden."
+
+msgid "Loading calendar This may take a few seconds."
+msgstr "Lade Kalender Dies kann einige Sekunden dauern."
+
+msgid "Next LazyBookings cron job in: %s"
+msgstr "Nächster LazyBookings Cron-Job in: %s"
+
+msgid "No rules yet. Click "Add Default Rules" to get started."
+msgstr "Noch keine Regeln. Klicken Sie auf Standardregeln hinzufügen", um zu beginnen."
+
+msgid "No templates yet. Click "Add New" to create your first template."
+msgstr "Noch keine Vorlagen. Klicken Sie auf Neu hinzufügen", um Ihre erste Vorlage zu erstellen."
+
+msgid "Not configured"
+msgstr "Nicht konfiguriert"
+
+msgid "Notify admin on new bookings"
+msgstr "Admin bei neuen Buchungen benachrichtigen"
+
+msgid "Payment Gateways"
+msgstr "Zahlungs-Gateways"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Primary text color."
+msgstr "Primäre Textfarbe."
+
+msgid "Roundness of buttons and inputs (0 = square, 20 = very round)."
+msgstr "Rundung von Buttons und Eingabefeldern (0 = eckig, 20 = sehr rund)."
+
+msgid "Sample services, staff, and bookings for testing"
+msgstr "Beispiel-Services, Mitarbeiter und Buchungen zum Testen"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Select"
+msgstr "Auswählen"
+
+msgid "Send confirmation emails to customers"
+msgstr "Bestätigungs-E-Mails an Kunden senden"
+
+msgid "Send reminders 24h before appointment"
+msgstr "Erinnerungen 24h vor Termin senden"
+
+msgid "Set to 0 to disable automatic deletion. Appointments with status "cancelled" older than this will be permanently deleted."
+msgstr "Auf 0 setzen, um automatisches Löschen zu deaktivieren. Termine mit Status storniert", die älter sind, werden dauerhaft gelöscht."
+
+msgid "Setup Complete!"
+msgstr "Einrichtung abgeschlossen!"
+
+msgid "Start with an empty setup"
+msgstr "Mit leerer Einrichtung beginnen"
+
+msgid "Supported "
+msgstr "Unterstützt "
+
+msgid "Test a booking end-to-end"
+msgstr "Buchung von Anfang bis Ende testen"
+
+msgid "This is how your booking forms will look with the current settings."
+msgstr "So werden Ihre Buchungsformulare mit den aktuellen Einstellungen aussehen."
+

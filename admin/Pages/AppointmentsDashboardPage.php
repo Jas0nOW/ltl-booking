@@ -92,6 +92,12 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                         $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
                                         $service = $s_repo->get_by_id( intval($a['service_id']) );
                                         $view_url = admin_url('admin.php?page=ltlb_appointments&action=view&id=' . intval( $a['id'] ?? 0 ) );
+
+                                        $appt_tz = (string) ( $a['timezone'] ?? '' );
+                                        if ( $appt_tz === '' ) {
+                                            $appt_tz = LTLB_Time::get_site_timezone_string();
+                                        }
+                                        $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $a['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
                                     ?>
                                         <tr>
                                             <td>
@@ -102,7 +108,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                                 <?php endif; ?>
                                             </td>
                                             <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
-                                            <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $a['start_at'] ) ) ); ?></td>
+												<td><?php echo esc_html( $start_display ); ?></td>
                                             <td>
                                                 <?php echo self::render_status_badge( $a['status'] ); ?>
                                             </td>
@@ -175,6 +181,12 @@ class LTLB_Admin_AppointmentsDashboardPage {
                         $cust = $cust_repo->get_by_id(intval($appt['customer_id']));
                         $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
                         $view_url = admin_url('admin.php?page=ltlb_appointments&action=view&id=' . $appt_id);
+
+                        $appt_tz = (string) ( $appt['timezone'] ?? '' );
+                        if ( $appt_tz === '' ) {
+                            $appt_tz = LTLB_Time::get_site_timezone_string();
+                        }
+                        $time_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option('time_format'), $appt_tz );
                     ?>
                         <li class="ltlb-recent-item">
                             <?php if ( $can_view_appointment_detail ) : ?>
@@ -187,7 +199,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                 </div>
                                 <div class="ltlb-recent-item__meta">
                                     <span class="dashicons dashicons-clock" aria-hidden="true"></span>
-                                    <?php echo esc_html(date_i18n(get_option('time_format'), strtotime($appt['start_at']))); ?>
+										<?php echo esc_html( $time_display ); ?>
                                 </div>
                             <?php if ( $can_view_appointment_detail ) : ?>
                                 </a>

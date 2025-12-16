@@ -10,7 +10,7 @@ class LTLB_Admin_CustomersPage {
 	}
 
 	public function render(): void {
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'view_customers' ) && ! current_user_can( 'manage_customers' ) ) {
             wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
         $settings = get_option( 'lazy_settings', [] );
@@ -23,6 +23,9 @@ class LTLB_Admin_CustomersPage {
 		if ( isset( $_POST['ltlb_customer_save'] ) ) {
 			if ( ! check_admin_referer( 'ltlb_customer_save_action', 'ltlb_customer_nonce' ) ) {
                 wp_die( esc_html__('Security check failed', 'ltl-bookings') );
+			}
+			if ( ! current_user_can( 'manage_customers' ) ) {
+				wp_die( esc_html__( 'You do not have permission to edit customers.', 'ltl-bookings' ) );
 			}
 
 			$data = [];

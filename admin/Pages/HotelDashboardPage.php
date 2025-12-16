@@ -87,12 +87,19 @@ class LTLB_Admin_HotelDashboardPage {
                                 $cust = $c_repo->get_by_id( intval($b['customer_id']) );
                                 $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
                                 $service = $s_repo->get_by_id( intval($b['service_id']) );
+
+                                $appt_tz = (string) ( $b['timezone'] ?? '' );
+                                if ( $appt_tz === '' ) {
+                                    $appt_tz = LTLB_Time::get_site_timezone_string();
+                                }
+                                $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
+                                $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['end_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
                             ?>
                                 <tr>
                                     <td><?php echo esc_html( $cust_name ); ?></td>
                                     <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
-                                    <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $b['start_at'] ) ) ); ?></td>
-                                    <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $b['end_at'] ) ) ); ?></td>
+									<td><?php echo esc_html( $start_display ); ?></td>
+									<td><?php echo esc_html( $end_display ); ?></td>
                                     <td>
                                         <?php echo LTLB_Admin_AppointmentsDashboardPage::render_status_badge( $b['status'] ); ?>
                                     </td>

@@ -1441,5 +1441,42 @@
         return;
       }
     });
+
+    // Auto-Sort Rooms Button (Hotel Mode)
+    var autoSortBtn = qs('ltlb-auto-sort-rooms');
+    if (autoSortBtn) {
+      autoSortBtn.addEventListener('click', function() {
+        if (!window.wp || !wp.apiFetch) {
+          alert(t('api_not_available', 'API not available.'));
+          return;
+        }
+
+        autoSortBtn.disabled = true;
+        autoSortBtn.textContent = t('sorting', 'Sorting...');
+
+        wp.apiFetch({
+          path: restPath('/ltlb/v1/admin/rooms/auto-sort'),
+          method: 'POST',
+          data: { sort_by: 'name' }
+        }).then(function(res) {
+          if (res && res.success) {
+            announce(t('rooms_sorted', 'Rooms sorted successfully.'), { assertive: false });
+            // Reload the page to show new order
+            window.location.reload();
+          } else {
+            announce(t('sort_failed', 'Could not sort rooms.'), { assertive: true });
+            alert(t('sort_failed', 'Could not sort rooms.'));
+            autoSortBtn.disabled = false;
+            autoSortBtn.innerHTML = '<span class="dashicons dashicons-sort"></span> ' + t('auto_sort', 'Auto-Sort');
+          }
+        }).catch(function(err) {
+          console.error('Auto-sort error:', err);
+          announce(t('sort_failed', 'Could not sort rooms.'), { assertive: true });
+          alert(t('sort_failed', 'Could not sort rooms.'));
+          autoSortBtn.disabled = false;
+          autoSortBtn.innerHTML = '<span class="dashicons dashicons-sort"></span> ' + t('auto_sort', 'Auto-Sort');
+        });
+      });
+    }
   });
 })();

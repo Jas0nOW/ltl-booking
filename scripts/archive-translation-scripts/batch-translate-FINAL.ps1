@@ -1,0 +1,140 @@
+# FINAL Translation Script - Alle verbleibenden 140 Strings
+$poFile = "c:\Users\janni\Local Sites\yogaibiza\app\public\wp-content\plugins\ltl-bookings\languages\de_DE.po"
+
+$translations = @{
+    'AI' = 'KI'
+    'AI & Automations' = 'KI & Automatisierungen'
+    'Autonomous (approve + execute)' = 'Autonom (genehmigen + ausführen)'
+    'Available any time within the allowed hours.' = 'Verfügbar zu jeder Zeit innerhalb der erlaubten Stunden.'
+    'Available only at specific weekly time slots.' = 'Nur zu bestimmten wöchentlichen Zeitfenstern verfügbar.'
+    'Available tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}' = 'Verfügbare Tags: {customer_name}, {service_name}, {start_time}, {end_time}, {status}'
+    'Available times load after you select a date' = 'Verfügbare Zeiten werden nach Datumsauswahl geladen'
+    'Backend tab controls the color palette used inside WP Admin (LazyBookings pages).' = 'Backend-Tab steuert die Farbpalette, die im WP-Admin (LazyBookings-Seiten) verwendet wird.'
+    'Background for inner panels (fieldsets/cards)' = 'Hintergrund für innere Panels (Fieldsets/Karten)'
+    'Base time slot interval for calendar generation.' = 'Basis-Zeitfensterintervall für die Kalendergenerierung.'
+    'Best fit: %d guests, %d available, %d leftover.' = 'Beste Auswahl: %d Gäste, %d verfügbar, %d übrig.'
+    'Body:' = 'Text:'
+    'By default this configures WordPress wp_mail() globally while enabled.' = 'Standardmäßig konfiguriert dies WordPress wp_mail() global, wenn aktiviert.'
+    'Checkout is recommended for the MVP (SCA/3DS handled by Stripe).' = 'Checkout wird für das MVP empfohlen (SCA/3DS von Stripe verwaltet).'
+    'Customers are created automatically from bookings, or you can add them manually.' = 'Kunden werden automatisch aus Buchungen erstellt, oder Sie können sie manuell hinzufügen.'
+    'Customers are created automatically from bookings. You can also add them manually.' = 'Kunden werden automatisch aus Buchungen erstellt. Sie können sie auch manuell hinzufügen.'
+    'Daily @ %s' = 'Täglich @ %s'
+    'Disable to remove all hover and focus transitions.' = 'Deaktivieren, um alle Hover- und Fokus-Übergänge zu entfernen.'
+    'Disable to turn off all AI features.' = 'Deaktivieren, um alle KI-Funktionen auszuschalten.'
+    'e.g. WiFi, TV, Air conditioning, Mini bar, Balcony' = 'z.B. WLAN, TV, Klimaanlage, Minibar, Balkon'
+    'e.g., Weekly report' = 'z.B. Wöchentlicher Bericht'
+    'Edit %s' = '%s bearbeiten'
+    'Edit Service/Room Prices' = 'Service-/Zimmerpreise bearbeiten'
+    'Elements (inline)' = 'Elemente (inline)'
+    'Email, phone, or other public contact details.' = 'E-Mail, Telefon oder andere öffentliche Kontaktdaten.'
+    'Enable this only when needed (e.g., for debugging).' = 'Aktivieren Sie dies nur bei Bedarf (z.B. zum Debuggen).'
+    'Enable this to avoid affecting other plugins that also send emails.' = 'Aktivieren Sie dies, um andere Plugins, die ebenfalls E-Mails senden, nicht zu beeinträchtigen.'
+    'Examples: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de' = 'Beispiele: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de'
+    'From Email:' = 'Von E-Mail:'
+    'From Name:' = 'Von Name:'
+    'From:' = 'Von:'
+    'Frontend tab controls the color palette used on the booking widget.' = 'Frontend-Tab steuert die Farbpalette des Buchungs-Widgets.'
+    'Generate Report' = 'Bericht generieren'
+    'German' = 'Deutsch'
+    'Get your key from' = 'Holen Sie sich Ihren Schlüssel von'
+    'Global business hours (0-23). Individual staff hours can override this.' = 'Globale Geschäftszeiten (0-23). Individuelle Personalzeiten können dies überschreiben.'
+    'Gross profit' = 'Bruttogewinn'
+    'Guest saved.' = 'Gast gespeichert.'
+    'Guests are created automatically from bookings. You can also add them manually.' = 'Gäste werden automatisch aus Buchungen erstellt. Sie können sie auch manuell hinzufügen.'
+    'Guests are created automatically when bookings are made, or you can add them manually.' = 'Gäste werden automatisch erstellt, wenn Buchungen vorgenommen werden, oder Sie können sie manuell hinzufügen.'
+    'Hello' = 'Hallo'
+    'HITL is safer for production. Autonomous is faster.' = 'HITL ist sicherer für Produktion. Autonom ist schneller.'
+    'Hotel' = 'Hotel'
+    'Hotel Booking (Check-in/Check-out)' = 'Hotelbuchung (Check-in/Check-out)'
+    'Hotel Dashboard' = 'Hotel-Dashboard'
+    'Hotel Fee (Fixed)' = 'Hotelgebühr (fix)'
+    'Hotel Fees (%)' = 'Hotelgebühren (%)'
+    'Hourly' = 'Stündlich'
+    'Hourly @ :%02d' = 'Stündlich @ :%02d'
+    'How far the shadow spreads' = 'Wie weit sich der Schatten ausbreitet'
+    'Human-in-the-Loop' = 'Human-in-the-Loop'
+    'Human-in-the-Loop (draft to Outbox)' = 'Human-in-the-Loop (Entwurf in Postausgang)'
+    'ID' = 'ID'
+    'If enabled, pending bookings are treated as occupied.' = 'Wenn aktiviert, werden ausstehende Buchungen als belegt behandelt.'
+    'Information AI uses to personalize responses. Toggle \"Send to AI\" to control what data is shared.' = 'Informationen, die KI zur Personalisierung von Antworten verwendet. Schalten Sie "An KI senden" um, um zu steuern, welche Daten geteilt werden.'
+    'Inherit global setting' = 'Globale Einstellung übernehmen'
+    'Input field' = 'Eingabefeld'
+    'Input Shadow' = 'Eingabe-Schatten'
+    'Insights report' = 'Einblicke-Bericht'
+    'Instant confirmation flow' = 'Sofortbestätigungsablauf'
+    'Internal cost per occupied night for gross profit calculations. Stored in cents.' = 'Interne Kosten pro belegter Nacht für Bruttogewinnberechnungen. Gespeichert in Cent.'
+    'Interval (min)' = 'Intervall (Min)'
+    'Invalid amount' = 'Ungültiger Betrag'
+    'Invalid appointment.' = 'Ungültiger Termin.'
+    'Invalid appointment/resource.' = 'Ungültiger Termin/Ressource.'
+    'Invalid dates.' = 'Ungültige Daten.'
+    'Invalid email address.' = 'Ungültige E-Mail-Adresse.'
+    'Invalid email recipient.' = 'Ungültiger E-Mail-Empfänger.'
+    'Invalid item.' = 'Ungültiges Element.'
+    'Invalid rule type.' = 'Ungültiger Regeltyp.'
+    'Invalid rule.' = 'Ungültige Regel.'
+    'Invalid token' = 'Ungültiger Token'
+    'Invoice (company)' = 'Rechnung (Firma)'
+    'Invoice (Default)' = 'Rechnung (Standard)'
+    'Invoice details' = 'Rechnungsdetails'
+    'Invoice for booking #{booking_id}' = 'Rechnung für Buchung #{booking_id}'
+    'Invoice Terms' = 'Rechnungsbedingungen'
+    'Invoices (unpaid bookings)' = 'Rechnungen (unbezahlte Buchungen)'
+    'Invoices processed.' = 'Rechnungen verarbeitet.'
+    'Items per page:' = 'Elemente pro Seite:'
+    'Jane Doe' = 'Jane Doe'
+    'King Bed' = 'Kingsize-Bett'
+    'Klarna' = 'Klarna'
+    'Language' = 'Sprache'
+    'Last Migration:' = 'Letzte Migration:'
+    'Last Run' = 'Letzte Ausführung'
+    'Last saved:' = 'Zuletzt gespeichert:'
+    'Latest Appointments' = 'Neueste Termine'
+    'Latest Bookings' = 'Neueste Buchungen'
+    'LazyBookings' = 'LazyBookings'
+    'LazyBookings CEO' = 'LazyBookings CEO'
+    'Logging:' = 'Protokollierung:'
+    'Logs' = 'Protokolle'
+    'mail@example.com, +1-555-0000' = 'mail@example.com, +49-555-0000'
+    'Main background color for booking form' = 'Haupthintergrundfarbe für Buchungsformular'
+    'Main text color' = 'Haupttextfarbe'
+    'Manage %s' = '%s verwalten'
+    'Manage AI API Keys' = 'KI-API-Schlüssel verwalten'
+    'Manage AI Settings' = 'KI-Einstellungen verwalten'
+    'Manage Booking Settings' = 'Buchungseinstellungen verwalten'
+    'Manage columns' = 'Spalten verwalten'
+    'Manage Own Availability' = 'Eigene Verfügbarkeit verwalten'
+    'Manage Own Bookings (Staff)' = 'Eigene Buchungen verwalten (Personal)'
+    'Manual Anonymization' = 'Manuelle Anonymisierung'
+    'Manual Button Text Color' = 'Manuelle Button-Textfarbe'
+    'Max adults: %d' = 'Max. Erwachsene: %d'
+    'Max children: %d' = 'Max. Kinder: %d'
+    'Max Occupancy' = 'Max. Belegung'
+    'Are you sure you want to anonymize this customer? This cannot be undone.' = 'Sind Sie sicher, dass Sie diesen Kunden anonymisieren möchten? Dies kann nicht rückgängig gemacht werden.'
+    'Are you sure you want to delete the selected services?' = 'Sind Sie sicher, dass Sie die ausgewählten Dienstleistungen löschen möchten?'
+    'Are you sure you want to delete this item?' = 'Sind Sie sicher, dass Sie dieses Element löschen möchten?'
+    'Approve & Execute will mark the item approved and run it. Execute runs it as-is (useful for already approved drafts).' = 'Genehmigen & Ausführen markiert das Element als genehmigt und führt es aus. Ausführen führt es so aus, wie es ist (nützlich für bereits genehmigte Entwürfe).'
+    'Queen Bed' = 'Queen-Size-Bett'
+}
+
+$content = Get-Content $poFile -Raw -Encoding UTF8
+$translatedCount = 0
+
+foreach ($english in $translations.Keys) {
+    $german = $translations[$english]
+    $pattern = "msgid `"$([regex]::Escape($english))`"`r?`nmsgstr `"`""
+    $replacement = "msgid `"$english`"`nmsgstr `"$german`""
+    
+    if ($content -match $pattern) {
+        $content = $content -replace $pattern, $replacement
+        $translatedCount++
+        Write-Host "Translated: $english -> $german" -ForegroundColor Green
+    }
+}
+
+$content | Out-File $poFile -Encoding UTF8 -NoNewline
+
+Write-Host ""
+Write-Host "=====================================================" -ForegroundColor Cyan
+Write-Host "FINAL BATCH TRANSLATION COMPLETE: $translatedCount strings" -ForegroundColor Green
+Write-Host "=====================================================" -ForegroundColor Cyan

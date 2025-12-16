@@ -3,6 +3,10 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Time {
 
+    public static function utc_timezone(): DateTimeZone {
+        return new DateTimeZone( 'UTC' );
+    }
+
     public static function wp_timezone(): DateTimeZone {
         // Allow plugin setting to override site timezone for plugin operations
         $ls = get_option( 'lazy_settings', [] );
@@ -75,6 +79,39 @@ class LTLB_Time {
 
     public static function format_wp_datetime( DateTimeInterface $dt ): string {
         return $dt->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Format a DateTimeInterface as a UTC MySQL DATETIME string.
+     */
+    public static function format_utc_mysql( DateTimeInterface $dt ): string {
+        if ( class_exists( 'LTLB_DateTime' ) ) {
+            return LTLB_DateTime::format_utc_mysql( $dt );
+        }
+        $utc = self::utc_timezone();
+        return ( new DateTimeImmutable( $dt->format( DATE_ATOM ) ) )
+            ->setTimezone( $utc )
+            ->format( 'Y-m-d H:i:s' );
+    }
+
+    /**
+     * Parse a UTC MySQL DATETIME string into a DateTimeImmutable (UTC).
+     */
+    public static function create_datetime_immutable_utc( string $datetime ): ?DateTimeImmutable {
+        $datetime = trim( $datetime );
+        if ( $datetime === '' ) return null;
+        if ( class_exists( 'LTLB_DateTime' ) ) {
+            return LTLB_DateTime::parse_utc_mysql( $datetime );
+        }
+        $tz = self::utc_timezone();
+        $dt = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $datetime, $tz );
+        if ( $dt !== false ) return $dt->setTimezone( $tz );
+        try {
+            $dt2 = new DateTimeImmutable( $datetime, $tz );
+            return $dt2->setTimezone( $tz );
+        } catch ( Exception $e ) {
+            return null;
+        }
     }
 
     public static function day_start( DateTimeInterface $dt ): DateTimeImmutable {

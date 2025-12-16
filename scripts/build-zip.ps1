@@ -37,7 +37,8 @@ $Exclude = @(
     'docs',
     'scripts',
     'node_modules',
-    'vendor',
+    'vendor\\',
+    'vendor/',
     '.env',
     '*.log',
     '.DS_Store',
@@ -48,6 +49,9 @@ $Exclude = @(
 # Copy files with exclusions
 Get-ChildItem -Path $RootDir -Recurse | ForEach-Object {
     $relativePath = $_.FullName.Substring($RootDir.Length + 1)
+
+    # Normalize separators for consistent checks
+    $relativePathNorm = $relativePath -replace '\\', '/'
     
     # Check if path matches any exclusion pattern
     $shouldExclude = $false
@@ -55,6 +59,13 @@ Get-ChildItem -Path $RootDir -Recurse | ForEach-Object {
         if ($relativePath -like "*$pattern*") {
             $shouldExclude = $true
             break
+        }
+    }
+
+    # Exclude only a root-level vendor/ directory (keep assets/vendor/** for bundled FullCalendar)
+    if (-not $shouldExclude) {
+        if ($relativePathNorm -like 'vendor/*' -or $relativePathNorm -eq 'vendor') {
+            $shouldExclude = $true
         }
     }
     

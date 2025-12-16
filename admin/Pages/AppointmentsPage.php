@@ -101,6 +101,13 @@ class LTLB_Admin_AppointmentsPage {
         }
 
         $back_url = admin_url( 'admin.php?page=ltlb_appointments' );
+        $appt_tz = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+        $start_display = (string) ( $appt['start_at'] ?? '' );
+        $end_display = (string) ( $appt['end_at'] ?? '' );
+        if ( class_exists( 'LTLB_DateTime' ) ) {
+            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+            $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+        }
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_appointments'); } ?>
@@ -113,12 +120,25 @@ class LTLB_Admin_AppointmentsPage {
                     <tr><th><?php echo esc_html__( 'Customer', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $cust_name !== '' ? $cust_name : '—' ); ?></td></tr>
                     <tr><th><?php echo esc_html__( 'Email', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $cust_email !== '' ? $cust_email : '—' ); ?></td></tr>
                     <tr><th><?php echo esc_html__( 'Service', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $svc_name !== '' ? $svc_name : '—' ); ?></td></tr>
-                    <tr><th><?php echo esc_html__( 'Start', 'ltl-bookings' ); ?></th><td><?php echo esc_html( (string) ( $appt['start_at'] ?? '' ) ); ?></td></tr>
-                    <tr><th><?php echo esc_html__( 'End', 'ltl-bookings' ); ?></th><td><?php echo esc_html( (string) ( $appt['end_at'] ?? '' ) ); ?></td></tr>
+                    <tr><th><?php echo esc_html__( 'Start', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $start_display ); ?></td></tr>
+                    <tr><th><?php echo esc_html__( 'End', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $end_display ); ?></td></tr>
                     <tr><th><?php echo esc_html__( 'Status', 'ltl-bookings' ); ?></th><td><?php echo esc_html( (string) ( $appt['status'] ?? '' ) ); ?></td></tr>
                 </tbody></table>
             <?php LTLB_Admin_Component::card_end(); ?>
 
+            <?php
+            $refund_info = [];
+            $can_refund = false;
+            if ( class_exists( 'LTLB_PaymentStatusSync' ) ) {
+                $refund_info = LTLB_PaymentStatusSync::get_refund_info( $id );
+                $can_refund = LTLB_PaymentStatusSync::can_refund( $id );
+            }
+            $refund_status = (string) ( $refund_info['refund_status'] ?? 'none' );
+            $refund_amount = (int) ( $refund_info['refund_amount_cents'] ?? 0 );
+            $refunded_at = (string) ( $refund_info['refunded_at'] ?? '' );
+            $refund_ref = (string) ( $refund_info['refund_ref'] ?? '' );
+            $refund_reason = (string) ( $refund_info['refund_reason'] ?? '' );
+            ?>
             <?php LTLB_Admin_Component::card_start( __( 'Payment', 'ltl-bookings' ) ); ?>
                 <table class="form-table"><tbody>
                     <tr><th><?php echo esc_html__( 'Amount', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $amount_label ); ?></td></tr>
@@ -129,7 +149,102 @@ class LTLB_Admin_AppointmentsPage {
                     <?php if ( $invoice_line !== '' ) : ?>
                         <tr><th><?php echo esc_html__( 'Invoice details', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $invoice_line ); ?></td></tr>
                     <?php endif; ?>
+                    <?php if ( $refund_status !== 'none' ) : ?>
+                        <tr><th><?php echo esc_html__( 'Refund status', 'ltl-bookings' ); ?></th><td><?php echo esc_html( ucfirst( $refund_status ) ); ?></td></tr>
+                        <tr><th><?php echo esc_html__( 'Refund amount', 'ltl-bookings' ); ?></th><td><?php echo esc_html( self::format_amount( $refund_amount, $appt['currency'] ?? 'EUR' ) ); ?></td></tr>
+                        <?php if ( $refunded_at !== '' ) : ?>
+                            <tr><th><?php echo esc_html__( 'Refunded at', 'ltl-bookings' ); ?></th><td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $refunded_at ) ) ); ?></td></tr>
+                        <?php endif; ?>
+                        <?php if ( $refund_ref !== '' ) : ?>
+                            <tr><th><?php echo esc_html__( 'Refund reference', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $refund_ref ); ?></td></tr>
+                        <?php endif; ?>
+                        <?php if ( $refund_reason !== '' ) : ?>
+                            <tr><th><?php echo esc_html__( 'Refund reason', 'ltl-bookings' ); ?></th><td><?php echo esc_html( $refund_reason ); ?></td></tr>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </tbody></table>
+                <?php if ( $can_refund ) : ?>
+                    <div style="margin-top: 16px;">
+                        <button type="button" class="button button-secondary" id="ltlb-refund-btn"><?php echo esc_html__( 'Process Refund', 'ltl-bookings' ); ?></button>
+                        <div id="ltlb-refund-form" style="display: none; margin-top: 12px;">
+                            <label>
+                                <?php echo esc_html__( 'Refund amount (cents)', 'ltl-bookings' ); ?>:
+                                <input type="number" id="ltlb-refund-amount" value="<?php echo esc_attr( (string) ( $appt['amount_cents'] ?? 0 ) ); ?>" min="1" max="<?php echo esc_attr( (string) ( $appt['amount_cents'] ?? 0 ) ); ?>" style="width: 150px; margin-left: 8px;">
+                            </label>
+                            <label style="margin-left: 16px;">
+                                <?php echo esc_html__( 'Reason', 'ltl-bookings' ); ?>:
+                                <input type="text" id="ltlb-refund-reason" value="requested_by_customer" style="width: 200px; margin-left: 8px;">
+                            </label>
+                            <button type="button" class="button button-primary" id="ltlb-refund-submit" style="margin-left: 16px;"><?php echo esc_html__( 'Confirm Refund', 'ltl-bookings' ); ?></button>
+                            <button type="button" class="button" id="ltlb-refund-cancel" style="margin-left: 8px;"><?php echo esc_html__( 'Cancel', 'ltl-bookings' ); ?></button>
+                            <span id="ltlb-refund-status" style="margin-left: 16px; font-weight: 600;"></span>
+                        </div>
+                    </div>
+                    <script>
+                    (function() {
+                        const btn = document.getElementById('ltlb-refund-btn');
+                        const form = document.getElementById('ltlb-refund-form');
+                        const submit = document.getElementById('ltlb-refund-submit');
+                        const cancel = document.getElementById('ltlb-refund-cancel');
+                        const status = document.getElementById('ltlb-refund-status');
+                        const amountInput = document.getElementById('ltlb-refund-amount');
+                        const reasonInput = document.getElementById('ltlb-refund-reason');
+
+                        if (!btn || !form || !submit || !cancel) return;
+
+                        btn.addEventListener('click', function() {
+                            form.style.display = 'block';
+                            btn.style.display = 'none';
+                        });
+
+                        cancel.addEventListener('click', function() {
+                            form.style.display = 'none';
+                            btn.style.display = 'inline-block';
+                            status.textContent = '';
+                        });
+
+                        submit.addEventListener('click', function() {
+                            const amount = parseInt(amountInput.value, 10);
+                            const reason = reasonInput.value.trim();
+                            if (isNaN(amount) || amount <= 0) {
+                                status.textContent = '<?php echo esc_js( __( 'Invalid amount', 'ltl-bookings' ) ); ?>';
+                                status.style.color = '#dc3232';
+                                return;
+                            }
+
+                            submit.disabled = true;
+                            status.textContent = '<?php echo esc_js( __( 'Processing...', 'ltl-bookings' ) ); ?>';
+                            status.style.color = '#0073aa';
+
+                            fetch('<?php echo esc_url( rest_url( 'ltl-bookings/v1/admin/appointments/' . $id . '/refund' ) ); ?>', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-WP-Nonce': '<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>'
+                                },
+                                body: JSON.stringify({ amount, reason })
+                            })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success) {
+                                    status.textContent = '<?php echo esc_js( __( 'Refund successful! Reloading...', 'ltl-bookings' ) ); ?>';
+                                    status.style.color = '#46b450';
+                                    setTimeout(() => { location.reload(); }, 1500);
+                                } else {
+                                    status.textContent = data.message || '<?php echo esc_js( __( 'Refund failed', 'ltl-bookings' ) ); ?>';
+                                    status.style.color = '#dc3232';
+                                    submit.disabled = false;
+                                }
+                            })
+                            .catch(err => {
+                                status.textContent = '<?php echo esc_js( __( 'Network error', 'ltl-bookings' ) ); ?>';
+                                status.style.color = '#dc3232';
+                                submit.disabled = false;
+                            });
+                        });
+                    })();
+                    </script>
+                <?php endif; ?>
             <?php LTLB_Admin_Component::card_end(); ?>
 
             <?php if ( $notes !== '' ) : ?>
@@ -142,7 +257,9 @@ class LTLB_Admin_AppointmentsPage {
     }
 
 	public function render(): void {
-        if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        if ( ! current_user_can('view_bookings') && ! current_user_can('manage_bookings') ) {
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        }
 
 		$appointment_repo = new LTLB_AppointmentRepository();
 		$service_repo = new LTLB_ServiceRepository();
@@ -165,6 +282,9 @@ class LTLB_Admin_AppointmentsPage {
             if ( isset( $_POST['ltlb_appointment_save'] ) ) {
                 if ( ! check_admin_referer( 'ltlb_appointment_save_action', 'ltlb_appointment_nonce' ) ) {
                     wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
+                }
+                if ( ! current_user_can( 'manage_bookings' ) ) {
+                    wp_die( esc_html__( 'You do not have permission to create bookings.', 'ltl-bookings' ) );
                 }
 
                 $service_id = isset( $_POST['service_id'] ) ? intval( $_POST['service_id'] ) : 0;
@@ -518,6 +638,13 @@ class LTLB_Admin_AppointmentsPage {
                                     $paid_at_raw = (string) ( $appointment['paid_at'] ?? '' );
                                     $paid_at_label = $paid_at_raw ? date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $paid_at_raw ) ) : '—';
                                     $amount_label = self::format_amount( $appointment['amount_cents'] ?? 0, $appointment['currency'] ?? 'EUR' );
+                                    $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
+                                    $start_display = (string) ( $appointment['start_at'] ?? '' );
+                                    $end_display = (string) ( $appointment['end_at'] ?? '' );
+                                    if ( class_exists( 'LTLB_DateTime' ) ) {
+                                        $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+                                        $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+                                    }
                                 ?>
                                     <tr>
                                         <th scope="row" class="check-column">
@@ -525,8 +652,8 @@ class LTLB_Admin_AppointmentsPage {
                                         </th>
                                         <td data-column="customer"><a href="<?php echo esc_url( $view_url ); ?>"><?php echo esc_html( $customer ? ( trim( (string) ( $customer['first_name'] ?? '' ) . ' ' . (string) ( $customer['last_name'] ?? '' ) ) ?: '—' ) : '—' ); ?></a></td>
                                         <td data-column="service"><?php echo esc_html( $service ? ( (string) ( $service['name'] ?? '' ) ?: '—' ) : '—' ); ?></td>
-                                        <td data-column="start"><?php echo esc_html($appointment['start_at']); ?></td>
-                                        <td data-column="end"><?php echo esc_html($appointment['end_at']); ?></td>
+                                        <td data-column="start"><?php echo esc_html( $start_display ); ?></td>
+                                        <td data-column="end"><?php echo esc_html( $end_display ); ?></td>
                                         <td data-column="status"><span class="ltlb-status-badge status-<?php echo esc_attr($appointment['status']); ?>"><?php echo esc_html(ucfirst($appointment['status'])); ?></span></td>
                                         <td data-column="payment"><?php echo esc_html( self::payment_status_label( $payment_status ) . ' • ' . self::payment_method_label( $payment_method ) ); ?></td>
                                         <td data-column="amount"><?php echo esc_html( $amount_label ); ?></td>

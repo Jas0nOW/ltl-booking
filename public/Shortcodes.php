@@ -2,6 +2,56 @@
 if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Shortcodes {
+	private static function enqueue_public_assets(): void {
+		static $done = false;
+		if ( $done ) {
+			return;
+		}
+		$done = true;
+
+		$css_ver = self::asset_version( 'assets/css/public.css' );
+		$js_ver = self::asset_version( 'assets/js/public.js' );
+		wp_enqueue_style( 'ltlb-public', plugins_url( '../assets/css/public.css', __FILE__ ), [], $css_ver );
+		wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), [ 'jquery' ], $js_ver, true );
+
+		wp_localize_script( 'ltlb-public', 'LTLB_PUBLIC', [
+			'restRoot' => esc_url_raw( rest_url( 'ltlb/v1' ) ),
+		] );
+
+		wp_localize_script( 'ltlb-public', 'ltlbI18n', [
+			'step_of' => __( 'Step %s of %s', 'ltl-bookings' ),
+			'night' => __( 'night', 'ltl-bookings' ),
+			'nights' => __( 'nights', 'ltl-bookings' ),
+			'any' => __( 'Any', 'ltl-bookings' ),
+			'room_number' => __( 'Room #', 'ltl-bookings' ),
+			'resource_number' => __( 'Resource #', 'ltl-bookings' ),
+			'select_room_optional' => __( 'Optional: select a room.', 'ltl-bookings' ),
+			'select_resource_optional' => __( 'Optional: select a resource.', 'ltl-bookings' ),
+			'loading_availability' => __( 'Loading availability…', 'ltl-bookings' ),
+			'loading_resources' => __( 'Loading resources…', 'ltl-bookings' ),
+			'loading_times' => __( 'Loading available times…', 'ltl-bookings' ),
+			'times_still_loading' => __( 'Available times are still loading…', 'ltl-bookings' ),
+			'select_date_first' => __( 'Select a date first', 'ltl-bookings' ),
+			'times_load_failed' => __( 'Times could not be loaded', 'ltl-bookings' ),
+			'times_load_failed_reload' => __( 'Times could not be loaded. Please reload the page.', 'ltl-bookings' ),
+			'times_load_failed_retry' => __( 'Times could not be loaded. Please try again.', 'ltl-bookings' ),
+			'no_times_available' => __( 'No times available', 'ltl-bookings' ),
+			'no_times_available_for_date' => __( 'No times are available for this date.', 'ltl-bookings' ),
+			'select_time' => __( 'Select a time', 'ltl-bookings' ),
+			'validation_select_service' => __( 'Please select a service.', 'ltl-bookings' ),
+			'validation_select_date' => __( 'Please select a date.', 'ltl-bookings' ),
+			'validation_select_time' => __( 'Please select a time.', 'ltl-bookings' ),
+			'validation_select_checkin' => __( 'Please select a check-in date.', 'ltl-bookings' ),
+			'validation_select_checkout' => __( 'Please select a check-out date.', 'ltl-bookings' ),
+			'validation_date_past' => __( 'The date cannot be in the past.', 'ltl-bookings' ),
+			'validation_checkout_after_checkin' => __( 'Check-out must be after check-in.', 'ltl-bookings' ),
+			'validation_enter_email' => __( 'Please enter your email address.', 'ltl-bookings' ),
+			'validation_invalid_email' => __( 'Please enter a valid email address.', 'ltl-bookings' ),
+			'availability_error' => __( 'Availability could not be loaded. Please try again.', 'ltl-bookings' ),
+			'resources_error' => __( 'Resources could not be loaded. Please try again.', 'ltl-bookings' ),
+		] );
+	}
+
 	private static function asset_version( string $relative_path ): string {
 		$debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
 		if ( $debug_assets ) {
@@ -237,8 +287,8 @@ class LTLB_Shortcodes {
 			}
 		}
 
-		$start_at_sql = LTLB_Time::format_wp_datetime( $checkin_dt );
-		$end_at_sql = LTLB_Time::format_wp_datetime( $checkout_dt );
+		$start_at_sql = LTLB_Time::format_utc_mysql( $checkin_dt );
+		$end_at_sql = LTLB_Time::format_utc_mysql( $checkout_dt );
 
 		$svc_res_repo = new LTLB_ServiceResourcesRepository();
 		$res_repo = new LTLB_ResourceRepository();
@@ -300,42 +350,7 @@ class LTLB_Shortcodes {
 			has_shortcode( $post->post_content, 'lazy_testimonials' ) ||
 			has_shortcode( $post->post_content, 'lazy_trust' )
 		) {
-			$css_ver = self::asset_version( 'assets/css/public.css' );
-			$js_ver = self::asset_version( 'assets/js/public.js' );
-			wp_enqueue_style( 'ltlb-public', plugins_url( '../assets/css/public.css', __FILE__ ), [], $css_ver );
-			wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), ['jquery'], $js_ver, true );
-			wp_localize_script( 'ltlb-public', 'ltlbI18n', [
-				'step_of' => __( 'Step %s of %s', 'ltl-bookings' ),
-				'night' => __( 'night', 'ltl-bookings' ),
-				'nights' => __( 'nights', 'ltl-bookings' ),
-				'any' => __( 'Any', 'ltl-bookings' ),
-				'room_number' => __( 'Room #', 'ltl-bookings' ),
-				'resource_number' => __( 'Resource #', 'ltl-bookings' ),
-				'select_room_optional' => __( 'Optional: select a room.', 'ltl-bookings' ),
-				'select_resource_optional' => __( 'Optional: select a resource.', 'ltl-bookings' ),
-				'loading_availability' => __( 'Loading availability…', 'ltl-bookings' ),
-				'loading_resources' => __( 'Loading resources…', 'ltl-bookings' ),
-				'loading_times' => __( 'Loading available times…', 'ltl-bookings' ),
-				'times_still_loading' => __( 'Available times are still loading…', 'ltl-bookings' ),
-				'select_date_first' => __( 'Select a date first', 'ltl-bookings' ),
-				'times_load_failed' => __( 'Times could not be loaded', 'ltl-bookings' ),
-				'times_load_failed_reload' => __( 'Times could not be loaded. Please reload the page.', 'ltl-bookings' ),
-				'times_load_failed_retry' => __( 'Times could not be loaded. Please try again.', 'ltl-bookings' ),
-				'no_times_available' => __( 'No times available', 'ltl-bookings' ),
-				'no_times_available_for_date' => __( 'No times are available for this date.', 'ltl-bookings' ),
-				'select_time' => __( 'Select a time', 'ltl-bookings' ),
-				'validation_select_service' => __( 'Please select a service.', 'ltl-bookings' ),
-				'validation_select_date' => __( 'Please select a date.', 'ltl-bookings' ),
-				'validation_select_time' => __( 'Please select a time.', 'ltl-bookings' ),
-				'validation_select_checkin' => __( 'Please select a check-in date.', 'ltl-bookings' ),
-				'validation_select_checkout' => __( 'Please select a check-out date.', 'ltl-bookings' ),
-				'validation_date_past' => __( 'The date cannot be in the past.', 'ltl-bookings' ),
-				'validation_checkout_after_checkin' => __( 'Check-out must be after check-in.', 'ltl-bookings' ),
-				'validation_enter_email' => __( 'Please enter your email address.', 'ltl-bookings' ),
-				'validation_invalid_email' => __( 'Please enter a valid email address.', 'ltl-bookings' ),
-				'availability_error' => __( 'Availability could not be loaded. Please try again.', 'ltl-bookings' ),
-				'resources_error' => __( 'Resources could not be loaded. Please try again.', 'ltl-bookings' ),
-			] );
+			self::enqueue_public_assets();
 		}
 	}
 
@@ -373,45 +388,7 @@ class LTLB_Shortcodes {
 		}
 
 		// Always enqueue assets when the shortcode is actually rendered.
-		$css_ver = self::asset_version( 'assets/css/public.css' );
-		$js_ver = self::asset_version( 'assets/js/public.js' );
-		wp_enqueue_style( 'ltlb-public', plugins_url( '../assets/css/public.css', __FILE__ ), [], $css_ver );
-		wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), ['jquery'], $js_ver, true );
-		wp_localize_script( 'ltlb-public', 'LTLB_PUBLIC', [
-			'restRoot' => esc_url_raw( rest_url( 'ltlb/v1' ) ),
-		] );
-		wp_localize_script( 'ltlb-public', 'ltlbI18n', [
-			'step_of' => __( 'Step %s of %s', 'ltl-bookings' ),
-			'night' => __( 'night', 'ltl-bookings' ),
-			'nights' => __( 'nights', 'ltl-bookings' ),
-			'any' => __( 'Any', 'ltl-bookings' ),
-			'room_number' => __( 'Room #', 'ltl-bookings' ),
-			'resource_number' => __( 'Resource #', 'ltl-bookings' ),
-			'select_room_optional' => __( 'Optional: select a room.', 'ltl-bookings' ),
-			'select_resource_optional' => __( 'Optional: select a resource.', 'ltl-bookings' ),
-			'loading_availability' => __( 'Loading availability…', 'ltl-bookings' ),
-			'loading_resources' => __( 'Loading resources…', 'ltl-bookings' ),
-			'loading_times' => __( 'Loading available times…', 'ltl-bookings' ),
-			'times_still_loading' => __( 'Available times are still loading…', 'ltl-bookings' ),
-			'select_date_first' => __( 'Select a date first', 'ltl-bookings' ),
-			'times_load_failed' => __( 'Times could not be loaded', 'ltl-bookings' ),
-			'times_load_failed_reload' => __( 'Times could not be loaded. Please reload the page.', 'ltl-bookings' ),
-			'times_load_failed_retry' => __( 'Times could not be loaded. Please try again.', 'ltl-bookings' ),
-			'no_times_available' => __( 'No times available', 'ltl-bookings' ),
-			'no_times_available_for_date' => __( 'No times are available for this date.', 'ltl-bookings' ),
-			'select_time' => __( 'Select a time', 'ltl-bookings' ),
-			'validation_select_service' => __( 'Please select a service.', 'ltl-bookings' ),
-			'validation_select_date' => __( 'Please select a date.', 'ltl-bookings' ),
-			'validation_select_time' => __( 'Please select a time.', 'ltl-bookings' ),
-			'validation_select_checkin' => __( 'Please select a check-in date.', 'ltl-bookings' ),
-			'validation_select_checkout' => __( 'Please select a check-out date.', 'ltl-bookings' ),
-			'validation_date_past' => __( 'The date cannot be in the past.', 'ltl-bookings' ),
-			'validation_checkout_after_checkin' => __( 'Check-out must be after check-in.', 'ltl-bookings' ),
-			'validation_enter_email' => __( 'Please enter your email address.', 'ltl-bookings' ),
-			'validation_invalid_email' => __( 'Please enter a valid email address.', 'ltl-bookings' ),
-			'availability_error' => __( 'Availability could not be loaded. Please try again.', 'ltl-bookings' ),
-			'resources_error' => __( 'Resources could not be loaded. Please try again.', 'ltl-bookings' ),
-		] );
+		self::enqueue_public_assets();
 
 		// Add design variables as inline CSS, scoped to the booking widget.
 		$design = get_option( 'lazy_design', [] );

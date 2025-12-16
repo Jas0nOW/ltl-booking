@@ -124,15 +124,19 @@ class LTLB_PaymentEngine {
      * Process payment (called after booking form submission)
      */
     public function process_payment( array $appointment, float $amount ): array {
-        if ( ! $this->is_enabled() ) {
-            return ['success' => true, 'payment_status' => 'free'];
-        }
+        // Legacy flow: this plugin confirms online payments via provider redirects + webhooks.
+        // - Stripe: Checkout redirect + webhook `checkout.session.completed`
+        // - PayPal: order approval redirect + server-side capture on return
+        // Direct “process_payment” calls (token/charge) are intentionally unsupported.
 
         if ( $amount <= 0 ) {
-            return ['success' => true, 'payment_status' => 'free'];
+            return [ 'success' => true, 'payment_status' => 'free' ];
         }
 
-        return $this->processor->process_payment($appointment, $amount);
+        return [
+            'success' => false,
+            'error' => 'unsupported_payment_flow',
+        ];
     }
 
     /**
@@ -353,6 +357,57 @@ class LTLB_PaymentEngine {
         }
         return [ 'success' => true, 'order_id' => $order_id, 'capture_id' => $capture_id ];
     }
+
+    /**
+     * Process a refund for an appointment (Stripe or PayPal)
+     * 
+     * @param int $appointment_id Appointment ID to refund
+     * @param int|null $amount_cents Amount to refund in cents (null = full refund)
+     * @param string $reason Optional refund reason
+     * @return array ['success' => bool, 'refund_id' => string, 'amount' => int, 'error' => string]
+     */
+    public function refund_payment( int $appointment_id, ?int $amount_cents = null, string $reason = '' ): array {
+        if ( ! $this->enabled ) {
+            return [ 'success' => false, 'error' => 'Payments not enabled' ];
+        }
+
+        // Load appointment
+        $repo = class_exists( 'LTLB_AppointmentRepository' ) ? new LTLB_AppointmentRepository() : null;
+        if ( ! $repo ) {
+            return [ 'success' => false, 'error' => 'Repository not available' ];
+        }
+
+        $appointment = $repo->get_by_id( $appointment_id );
+        if ( ! $appointment ) {
+            return [ 'success' => false, 'error' => 'Appointment not found' ];
+        }
+
+        $payment_status = (string) ( $appointment['payment_status'] ?? '' );
+        if ( $payment_status !== 'paid' ) {
+            return [ 'success' => false, 'error' => 'Appointment is not paid' ];
+        }
+
+        $payment_method = sanitize_key( (string) ( $appointment['payment_method'] ?? '' ) );
+        $payment_ref = (string) ( $appointment['payment_ref'] ?? '' );
+        if ( $payment_ref === '' ) {
+            return [ 'success' => false, 'error' => 'No payment reference found' ];
+        }
+
+        $original_amount = intval( $appointment['amount_cents'] ?? 0 );
+        $refund_amount = $amount_cents ?? $original_amount;
+        if ( $refund_amount <= 0 || $refund_amount > $original_amount ) {
+            return [ 'success' => false, 'error' => 'Invalid refund amount' ];
+        }
+
+        // Delegate to processor
+        if ( $payment_method === 'stripe_card' && $this->processor instanceof LTLB_StripeProcessor ) {
+            return $this->processor->refund( $payment_ref, $refund_amount, $reason );
+        } elseif ( $payment_method === 'paypal' && $this->processor instanceof LTLB_PayPalProcessor ) {
+            return $this->processor->refund( $payment_ref, $refund_amount, $reason );
+        }
+
+        return [ 'success' => false, 'error' => 'Refund not supported for this payment method' ];
+    }
 }
 
 /**
@@ -402,22 +457,14 @@ class LTLB_StripeProcessor implements LTLB_PaymentProcessorInterface {
     }
 
     public function process_payment( array $appointment, float $amount ): array {
-        // Mock implementation - real Stripe integration would verify token here
-        $settings = $this->get_settings();
-        if ( empty($settings['secret_key']) ) {
-            return [
-                'success' => false,
-                'error' => 'Stripe not properly configured'
-            ];
+        if ( $amount <= 0 ) {
+            return [ 'success' => true, 'payment_status' => 'free' ];
         }
 
-        // In production: verify Stripe token, create charge, handle response
-        // For now: simulate successful payment
+        // Unsupported legacy flow; use Stripe Checkout + webhook confirmation.
         return [
-            'success' => true,
-            'payment_status' => 'paid',
-            'transaction_id' => 'stripe_' . uniqid(),
-            'amount' => $amount,
+            'success' => false,
+            'error' => 'unsupported_payment_flow',
         ];
     }
 
@@ -502,6 +549,73 @@ class LTLB_StripeProcessor implements LTLB_PaymentProcessorInterface {
             'session_id' => $session_id,
         ];
     }
+
+    /**
+     * Refund a Stripe payment
+     * 
+     * @param string $payment_intent_id Stripe PaymentIntent ID (from checkout.session.completed)
+     * @param int $amount_cents Amount to refund in cents
+     * @param string $reason Refund reason
+     * @return array ['success' => bool, 'refund_id' => string, 'amount' => int, 'error' => string]
+     */
+    public function refund( string $payment_intent_id, int $amount_cents, string $reason = '' ): array {
+        $settings = $this->get_settings();
+        $secret_key = (string) ( $settings['secret_key'] ?? '' );
+        if ( $secret_key === '' ) {
+            return [ 'success' => false, 'error' => 'Stripe not properly configured' ];
+        }
+
+        if ( $payment_intent_id === '' || $amount_cents <= 0 ) {
+            return [ 'success' => false, 'error' => 'Invalid refund parameters' ];
+        }
+
+        $params = [
+            'payment_intent' => $payment_intent_id,
+            'amount' => (string) $amount_cents,
+        ];
+
+        if ( $reason !== '' ) {
+            $params['reason'] = $reason; // Stripe reasons: 'duplicate', 'fraudulent', 'requested_by_customer'
+        }
+
+        $response = wp_remote_post( self::API_BASE . '/refunds', [
+            'timeout' => 20,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $secret_key,
+            ],
+            'body' => $params,
+        ] );
+
+        if ( is_wp_error( $response ) ) {
+            return [ 'success' => false, 'error' => $response->get_error_message() ];
+        }
+
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        $body = (string) wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( $code < 200 || $code >= 300 || ! is_array( $data ) ) {
+            $err = 'Stripe refund failed';
+            if ( is_array( $data ) && isset( $data['error']['message'] ) ) {
+                $err = (string) $data['error']['message'];
+            }
+            return [ 'success' => false, 'error' => $err ];
+        }
+
+        $refund_id = isset( $data['id'] ) ? (string) $data['id'] : '';
+        $refund_status = isset( $data['status'] ) ? (string) $data['status'] : '';
+
+        if ( $refund_id === '' ) {
+            return [ 'success' => false, 'error' => 'Stripe did not return a refund ID' ];
+        }
+
+        return [
+            'success' => true,
+            'refund_id' => $refund_id,
+            'amount' => $amount_cents,
+            'status' => $refund_status,
+        ];
+    }
 }
 
 /**
@@ -547,21 +661,87 @@ class LTLB_PayPalProcessor implements LTLB_PaymentProcessorInterface {
     }
 
     public function process_payment( array $appointment, float $amount ): array {
-        // Mock implementation - real PayPal integration would verify transaction here
-        $settings = $this->get_settings();
-        if ( empty($settings['secret']) ) {
-            return [
-                'success' => false,
-                'error' => 'PayPal not properly configured'
-            ];
+        if ( $amount <= 0 ) {
+            return [ 'success' => true, 'payment_status' => 'free' ];
         }
 
-        // In production: verify PayPal transaction ID, capture payment, handle response
+        // Unsupported legacy flow; use PayPal approval redirect + server-side capture.
+        return [
+            'success' => false,
+            'error' => 'unsupported_payment_flow',
+        ];
+    }
+
+    /**
+     * Refund a PayPal payment
+     * 
+     * @param string $capture_id PayPal Capture ID (from order capture response)
+     * @param int $amount_cents Amount to refund in cents
+     * @param string $reason Refund reason (note for PayPal)
+     * @return array ['success' => bool, 'refund_id' => string, 'amount' => int, 'error' => string]
+     */
+    public function refund( string $capture_id, int $amount_cents, string $reason = '' ): array {
+        if ( $capture_id === '' || $amount_cents <= 0 ) {
+            return [ 'success' => false, 'error' => 'Invalid refund parameters' ];
+        }
+
+        $token_res = LTLB_PaymentEngine::paypal_get_access_token();
+        if ( empty( $token_res['success'] ) ) {
+            return [ 'success' => false, 'error' => (string) ( $token_res['error'] ?? 'PayPal auth failed' ) ];
+        }
+        $access_token = (string) $token_res['access_token'];
+
+        // PayPal refunds require currency + value
+        $value = number_format( $amount_cents / 100, 2, '.', '' );
+        $payload = [
+            'amount' => [
+                'value' => $value,
+                'currency_code' => 'EUR', // TODO: Get from appointment currency
+            ],
+        ];
+
+        if ( $reason !== '' ) {
+            $payload['note_to_payer'] = $reason;
+        }
+
+        $response = wp_remote_post( LTLB_PaymentEngine::paypal_api_base() . '/v2/payments/captures/' . rawurlencode( $capture_id ) . '/refund', [
+            'timeout' => 20,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $access_token,
+                'Content-Type' => 'application/json',
+            ],
+            'body' => wp_json_encode( $payload ),
+        ] );
+
+        if ( is_wp_error( $response ) ) {
+            return [ 'success' => false, 'error' => $response->get_error_message() ];
+        }
+
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        $body = (string) wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( $code < 200 || $code >= 300 || ! is_array( $data ) ) {
+            $err = 'PayPal refund failed';
+            if ( is_array( $data ) && isset( $data['message'] ) ) {
+                $err = (string) $data['message'];
+            }
+            return [ 'success' => false, 'error' => $err ];
+        }
+
+        $refund_id = isset( $data['id'] ) ? (string) $data['id'] : '';
+        $refund_status = isset( $data['status'] ) ? (string) $data['status'] : '';
+
+        if ( $refund_id === '' ) {
+            return [ 'success' => false, 'error' => 'PayPal did not return a refund ID' ];
+        }
+
         return [
             'success' => true,
-            'payment_status' => 'paid',
-            'transaction_id' => 'paypal_' . uniqid(),
-            'amount' => $amount,
+            'refund_id' => $refund_id,
+            'amount' => $amount_cents,
+            'status' => $refund_status,
         ];
     }
 }
+

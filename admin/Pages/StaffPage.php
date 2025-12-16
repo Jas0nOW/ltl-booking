@@ -11,7 +11,7 @@ class LTLB_Admin_StaffPage {
     }
 
     public function render(): void {
-        if ( ! current_user_can('manage_options') ) {
+        if ( ! current_user_can('view_staff') && ! current_user_can('manage_staff') ) {
             wp_die( esc_html__('You do not have permission to view this page.', 'ltl-bookings') );
         }
 
@@ -19,8 +19,9 @@ class LTLB_Admin_StaffPage {
         if ( isset( $_POST['ltlb_staff_save'] ) ) {
             if ( ! check_admin_referer( 'ltlb_staff_save_action', 'ltlb_staff_nonce' ) ) {
                 wp_die( esc_html__('Security check failed', 'ltl-bookings') );
+            }            if ( ! current_user_can( 'manage_staff' ) ) {
+                wp_die( esc_html__( 'You do not have permission to edit staff.', 'ltl-bookings' ) );
             }
-
             $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
             $hours = $_POST['hours'] ?? [];
 
