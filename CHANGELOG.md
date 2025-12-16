@@ -1,5 +1,10 @@
 # LazyBookings Changelog
 
+## 1.1.0
+- Version bump to 1.1.0; Mindest-PHP 8.1.
+- Vorbereitung für Stripe/PayPal-Flow-Hardening, Admin/Frontend-UI-Refresh und Performance/Asset-Bündelung.
+- Changelog/Readmes aktualisiert; Plugin-Header angehoben.
+
 ## 1.0.1
 - Release: version bump to 1.0.1
 - Copy/UX: clearer labels, notices, and required indicators

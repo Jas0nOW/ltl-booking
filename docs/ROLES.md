@@ -1,99 +1,62 @@
-# LazyBookings – Role Profiles & Capabilities
+# LazyBookings – Role Profiles & Capabilities (v1.1.0)
 
-**Ziel:** Klare Rollen‑Hierarchie mit Capabilities‑basierter AC.
+**Ziel:** Klare Rollen-Hierarchie mit Capability-basierter Access Control.
 
 ---
 
-## Rollen‑Modell
+## Rollen-Modell
 
 ### 1) SuperAdmin (Owner / System Admin)
-**Caps:**
-- `manage_options` (WP standard – plugin config)
-- `manage_ai_settings` (AI Provider, Keys, Mode)
-- `manage_ai_secrets` (API Keys anzeigen/editieren)
-- `view_ai_reports` (AI Insights Dashboard)
-- `approve_ai_drafts` (Outbox Approve/Reject)
-- `manage_staff_roles` (Rollen zuweisen)
+**Caps (Auszug):**
+- `manage_options` (WP-Standard – Plugin-Konfiguration)
+- `manage_ai_settings`, `manage_ai_secrets`
+- `view_ai_reports`, `approve_ai_drafts`
+- `manage_staff_roles`
+- `manage_bookings`, `manage_customers`, `view_payments`, `view_reports`
 
 **Sicht:**
-- Alle Settings (Email, AI, Automation, Security)
-- All Reports & Analytics
-- Audit Logs (voll)
-- Secrets Reveal Button
+- Alle Settings (E-Mail, AI, Automation, Security)
+- Alle Reports & Analytics
+- Audit Logs (voll), Secrets Reveal Button
 
 ---
 
 ### 2) CEO (Manager / Business Owner)
-**Caps:**
-- `view_ai_reports` (AI Insights Dashboard, Daily/Overall)
-- `approve_ai_drafts` (Outbox Actions)
-- `read_appointments` / `read_bookings` (Dashboard data)
+**Caps (Auszug):**
+- `view_ai_reports`
+- `approve_ai_drafts`
+- `view_bookings` / Reports-Read-Caps
 
 **Sicht:**
 - Dashboard + AI Insights
-- Outbox (Approve only, no Reject)
+- Outbox (Approve only)
 - Reports: Revenue, Occupancy, KPIs
-- **Nicht:** Settings, Keys, Secrets, Staff Roles
+- **Nicht:** Settings, Keys, Secrets, Staff-Rollen
 
 ---
 
 ### 3) Mitarbeiter (Staff / Team Member)
-**Caps:**
-- `view_ai_reports` (Personal Reports only)
-- `read_own_appointments` (only own assignments)
+**Caps (Auszug):**
+- `view_bookings`, `manage_own_bookings`
+- `view_customers`
+- `manage_own_availability`
 
 **Sicht:**
-- Dashboard (personalized: own tasks, own revenue)
-- My Appointments / Bookings (filter by assigned staff)
-- **Nicht:** Settings, AI, Reports (only own), Outbox
+- Persönliches Dashboard (eigene Termine)
+- "My Appointments" / Buchungen nach zugewiesenem Staff gefiltert
+- **Nicht:** globale Settings, AI, Gesamt-Reports
 
 ---
 
 ### 4) Gast (Customer / Booking Visitor)
-**Caps:** None (public form only)
+**Caps:** None (nur öffentliches Buchungs-Formular)
 
-**Sicht:** Booking widget (frontend)
-
----
-
-## Capabilities (WP Custom)
-
-### AI-Related
-- `manage_ai_settings` — Edit AI Provider/Model/Mode
-- `manage_ai_secrets` — View/Edit API Keys
-- `view_ai_reports` — Access AI Insights Dashboard
-- `approve_ai_drafts` — Approve/Reject Outbox Actions
-
-### Business-Related
-- `manage_staff_roles` — Assign roles to team members
-- `view_financial_reports` — Revenue/Profit dashboard
-
-### Data-Related
-- `read_appointments` — View all appointments
-- `edit_appointments` — Modify appointments
-- `read_own_appointments` — View only own assignments
-- `read_bookings` — View all hotel bookings
-- `edit_bookings` — Modify bookings
+**Sicht:**
+- Booking Wizard (Frontend)
 
 ---
 
-## Registration (in Activator / Plugin.php)
+## Implementierung
 
-```php
-register_cap('manage_ai_settings', ['superadmin']);
-register_cap('manage_ai_secrets', ['superadmin']);
-register_cap('view_ai_reports', ['superadmin', 'ceo', 'mitarbeiter']);
-register_cap('approve_ai_drafts', ['superadmin', 'ceo']);
-register_cap('manage_staff_roles', ['superadmin']);
-```
-
----
-
-## Implementation Strategy
-
-1. **Aktivator:** Caps registrieren beim Plugin activate
-2. **Role Mapper:** `LTLB_Role_Manager` Klasse für Cap‑Checks
-3. **Settings Page:** Tabs sichtbar nur mit Cap
-4. **Dashboard:** Widget filtering nach Cap
-5. **Outbox:** approve/reject buttons basierend auf Cap
-
+- Rollen werden über `LTLB_RoleManager` registriert/synchronisiert.
+- Cap-Checks erfolgen konsistent über `current_user_can()` + Nonce-Validierung in Admin-Actions und REST-Endpunkten.

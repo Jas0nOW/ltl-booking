@@ -9,14 +9,14 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Admin_SetupWizardPage {
 
     public static function render(): void {
-        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) {
+        if ( ! current_user_can('manage_options') ) {
             wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
 
         // Handle wizard restart
         if ( isset( $_GET['restart'] ) && $_GET['restart'] === '1' ) {
             delete_option( 'ltlb_wizard_completed' );
-            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_setup&step=1' ) );
+            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_setup_wizard&step=1' ) );
             exit;
         }
 

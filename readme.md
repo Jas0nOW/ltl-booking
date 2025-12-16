@@ -1,6 +1,6 @@
 # Lazy Bookings Plugin
 
-**Version:** 1.0.1 
+**Version:** 1.1.0 
 **Author:** LazyTechLab  
 **License:** GPLv2 or later
 
@@ -71,8 +71,8 @@ Calendar-first variant:
 ## Requirements
 
 - WordPress 6.0+
-- PHP 7.4+
-- MySQL 5.7+ recommended. Concurrency protection prefers `GET_LOCK`, but falls back to an option-based mutex if unavailable.
+- PHP 8.1+
+- MySQL 5.7+ recommended. Concurrency protection prefers `GET_LOCK`, aber fällt zurück auf eine option-basierte Mutex, falls nicht verfügbar.
 
 ## Documentation
 
@@ -85,6 +85,9 @@ See `/docs` folder:
 For issues and feature requests, please check the documentation first.
 
 ## Changelog
+
+### 1.1.0
+- Version-Bump, Mindest-PHP 8.1, Vorbereitungen für Stripe/PayPal-Flow, UI/UX-Refresh und Performance-Optimierungen.
 
 ### 0.4.4
 - Admin calendar management (drag & drop rescheduling)

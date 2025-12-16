@@ -1,7 +1,7 @@
-# LazyBookings DB Schema (v0.4.4)
+# LazyBookings DB Schema (v1.1.0)
 
 Alle Custom Tables nutzen Prefix: `$wpdb->prefix . 'lazy_' . <name>`.
-Schema wird per `dbDelta()` gepflegt und bei Versionswechsel automatisch migriert.
+Schema wird per `dbDelta()` gepflegt und bei Versionswechsel automatisch migriert (siehe `LTLB_DB_Migrator`).
 
 Hinweis: WordPress entfernt via `dbDelta()` keine alten Spalten automatisch. Neue Spalten werden hinzugefügt.
 
@@ -25,11 +25,11 @@ Service/Kurs bzw. (semantisch) Room Type.
 - `max_seats_per_booking` SMALLINT UNSIGNED NOT NULL DEFAULT 1
 
 Service Availability:
-- `availability_mode` VARCHAR(20) NOT NULL DEFAULT 'window'  (`window` | `fixed`)
-- `available_weekdays` VARCHAR(20) NULL  (CSV: `0..6`, 0=Sun)
+- `availability_mode` VARCHAR(20) NOT NULL DEFAULT 'window' (`window` | `fixed`)
+- `available_weekdays` VARCHAR(20) NULL (CSV: `0..6`, 0=Sun)
 - `available_start_time` TIME NULL
 - `available_end_time` TIME NULL
-- `fixed_weekly_slots` LONGTEXT NULL (JSON array, z.B. `[{"weekday":5,"time":"18:00"}]`)
+- `fixed_weekly_slots` LONGTEXT NULL (JSON: z.B. `[{"weekday":5,"time":"18:00"}]`)
 
 Timestamps:
 - `created_at` DATETIME NOT NULL
@@ -65,6 +65,12 @@ Ein Appointment ist eine Buchung mit Zeitspanne.
 - `start_at` DATETIME NOT NULL
 - `end_at` DATETIME NOT NULL
 - `status` VARCHAR(20) NOT NULL DEFAULT 'pending'
+- `amount_cents` INT UNSIGNED NOT NULL DEFAULT 0
+- `currency` CHAR(3) NOT NULL DEFAULT 'EUR'
+- `payment_status` VARCHAR(20) NOT NULL DEFAULT 'free'
+- `payment_method` VARCHAR(32) NOT NULL DEFAULT 'none'
+- `payment_ref` VARCHAR(190) NULL
+- `paid_at` DATETIME NULL
 - `timezone` VARCHAR(64) NOT NULL DEFAULT 'Europe/Berlin'
 - `seats` SMALLINT UNSIGNED NOT NULL DEFAULT 1
 - `created_at` DATETIME NOT NULL
@@ -81,67 +87,4 @@ Indexes:
 
 ---
 
-## `lazy_resources`
-
-Resource = Raum/Studio/Equipment/Hotelzimmer.
-
-- `id` BIGINT UNSIGNED PK AI
-- `name` VARCHAR(190) NOT NULL
-- `description` LONGTEXT NULL
-- `capacity` INT UNSIGNED NOT NULL DEFAULT 1
-- `cost_per_night_cents` INT UNSIGNED NOT NULL DEFAULT 0
-- `is_active` TINYINT(1) NOT NULL DEFAULT 1
-- `created_at` DATETIME NOT NULL
-- `updated_at` DATETIME NOT NULL
-
-Indexes:
-- `KEY is_active (is_active)`
-
----
-
-## Junction Tables
-
-### `lazy_service_resources`
-- `service_id` BIGINT UNSIGNED NOT NULL
-- `resource_id` BIGINT UNSIGNED NOT NULL
-- PRIMARY KEY (`service_id`,`resource_id`)
-- KEY `resource_id` (`resource_id`)
-
-### `lazy_appointment_resources`
-- `appointment_id` BIGINT UNSIGNED NOT NULL
-- `resource_id` BIGINT UNSIGNED NOT NULL
-- PRIMARY KEY (`appointment_id`,`resource_id`)
-- KEY `resource_id` (`resource_id`)
-
----
-
-## Staff Tables
-
-### `lazy_staff_hours`
-- `id` BIGINT UNSIGNED PK AI
-- `user_id` BIGINT UNSIGNED NOT NULL
-- `weekday` TINYINT NOT NULL (0=Sun..6=Sat)
-- `start_time` TIME NOT NULL
-- `end_time` TIME NOT NULL
-- `is_active` TINYINT(1) NOT NULL
-- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-
-Indexes:
-- `KEY user_id (user_id)`
-- `KEY user_weekday (user_id, weekday)`
-
-### `lazy_staff_exceptions`
-- `id` BIGINT UNSIGNED PK AI
-- `user_id` BIGINT UNSIGNED NOT NULL
-- `date` DATE NOT NULL
-- `is_off_day` TINYINT(1) NOT NULL
-- `start_time` TIME NULL
-- `end_time` TIME NULL
-- `note` TEXT NULL
-- `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-- `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-
-Indexes:
-- `KEY user_id (user_id)`
-- `KEY user_date (user_id, date)`
+Weitere Tabellen (`lazy_staff_hours`, `lazy_staff_exceptions`, `lazy_resources`, Junction-Tabellen, AI-/Coupons-/Payment-Schedule- und Log-Tabellen) entsprechen dem in `LTLB_DB_Schema` generierten Schema und sind dort technisch dokumentiert.

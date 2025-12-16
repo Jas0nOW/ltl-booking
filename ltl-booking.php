@@ -3,20 +3,20 @@
  * Plugin Name: LazyBookings
  * Plugin URI: https://lazytechnologylab.com/lazybookings
  * Description: Professional booking system with dual-mode functionality: Appointments & Hotel/PMS management with premium admin UI.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: Lazy Technology Lab
  * Author URI: https://lazytechnologylab.com
  * Text Domain: ltl-bookings
  * Domain Path: /languages
  * Requires at least: 5.8
- * Requires PHP: 7.4
+ * Requires PHP: 8.1
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'LTLB_VERSION', '1.0.1' );
+define( 'LTLB_VERSION', '1.1.0' );
 define( 'LTLB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LTLB_URL', plugin_dir_url( __FILE__ ) );
 
