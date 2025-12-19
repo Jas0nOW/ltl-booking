@@ -12,7 +12,7 @@ class LTLB_Admin_HotelDashboardPage {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
 
-        // Handle AI insights generation.
+        // Handle AI insights generation
         if ( class_exists( 'LTLB_Automations' ) ) {
             LTLB_Automations::maybe_handle_generate_ai_insights_post( admin_url( 'admin.php?page=ltlb_dashboard' ) );
         }
@@ -30,181 +30,246 @@ class LTLB_Admin_HotelDashboardPage {
                 $total_rooms++;
             }
         }
+        
+        $occupancy_rate = $total_rooms > 0 ? round( ( $occupied_rooms / $total_rooms ) * 100 ) : 0;
+		$latest_bookings = $appt_repo->get_all(['limit' => 8]);
 
-		$latest_bookings = $appt_repo->get_all(['limit' => 5]);
 		?>
         <div class="wrap ltlb-admin ltlb-admin--dashboard">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_dashboard'); } ?>
-
-            <div class="ltlb-dashboard-header">
-                <h1 class="wp-heading-inline"><?php echo esc_html__('Hotel Dashboard', 'ltl-bookings'); ?></h1>
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title"><?php echo esc_html__('Hotel Dashboard', 'ltl-bookings'); ?></h1>
+                    <p class="ltlb-page-header__subtitle"><?php echo esc_html__('Room bookings and occupancy overview', 'ltl-bookings'); ?></p>
+                </div>
 				<?php if ( $can_manage ) : ?>
-				<div class="ltlb-quick-actions">
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="ltlb-btn ltlb-btn--primary" aria-label="<?php echo esc_attr__('Create new room type', 'ltl-bookings'); ?>">
-						<span class="dashicons dashicons-plus" aria-hidden="true"></span>
+				<div class="ltlb-page-header__actions">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="ltlb-btn ltlb-btn--primary">
+						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
 						<?php echo esc_html__('New Room Type', 'ltl-bookings'); ?>
 					</a>
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="ltlb-btn ltlb-btn--secondary" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="ltlb-btn ltlb-btn--secondary">
 						<span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
-						<?php echo esc_html__('View Calendar', 'ltl-bookings'); ?>
+						<?php echo esc_html__('Calendar', 'ltl-bookings'); ?>
 					</a>
 				</div>
 				<?php endif; ?>
             </div>
-            <hr class="wp-header-end">
 
-            <div class="ltlb-kpi-grid">
-                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__( 'Check-ins Today', 'ltl-bookings' ), $check_ins_today, 'dashicons-arrow-right-alt'); ?>
-                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__( 'Check-outs Today', 'ltl-bookings' ), $check_outs_today, 'dashicons-arrow-left-alt'); ?>
-                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__( 'Occupied Rooms', 'ltl-bookings' ), $occupied_rooms, 'dashicons-building'); ?>
+            <!-- KPI Cards Row -->
+            <div class="ltlb-kpi-grid ltlb-kpi-grid--4col">
+                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__('Check-ins Today', 'ltl-bookings'), $check_ins_today, 'dashicons-arrow-right-alt', null, 'success'); ?>
+                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__('Check-outs Today', 'ltl-bookings'), $check_outs_today, 'dashicons-arrow-left-alt', null, 'warning'); ?>
+                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__('Occupied Rooms', 'ltl-bookings'), $occupied_rooms . '/' . $total_rooms, 'dashicons-building', null, 'primary'); ?>
+                <?php LTLB_Admin_AppointmentsDashboardPage::render_kpi_card(__('Occupancy Rate', 'ltl-bookings'), $occupancy_rate . '%', 'dashicons-chart-pie', null, 'info'); ?>
             </div>
 
-            <?php $this->render_ai_insights_card( $can_manage ); ?>
+            <!-- Main Content Grid: 2 Column Layout -->
+            <div class="ltlb-dashboard-layout">
+                
+                <!-- LEFT COLUMN: Main Content -->
+                <div class="ltlb-dashboard-layout__main">
+                    
+                    <!-- Occupancy Forecast -->
+                    <?php $this->render_occupancy_card( $appt_repo, $occupied_rooms, $total_rooms ); ?>
 
-            <?php $this->render_occupancy_card( $appt_repo, $occupied_rooms, $total_rooms ); ?>
+                    <!-- Latest Bookings -->
+                    <div class="ltlb-card">
+                        <div class="ltlb-card__header">
+                            <div class="ltlb-card__header-content">
+                                <span class="dashicons dashicons-calendar"></span>
+                                <h3 class="ltlb-card__title"><?php echo esc_html__('Latest Bookings', 'ltl-bookings'); ?></h3>
+                            </div>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments')); ?>" class="ltlb-card__link">
+                                <?php echo esc_html__('View All', 'ltl-bookings'); ?> →
+                            </a>
+                        </div>
+                        <div class="ltlb-card__body ltlb-card__body--flush">
+                            <?php if ( empty($latest_bookings) ) : ?>
+                                <div class="ltlb-empty-state">
+                                    <span class="dashicons dashicons-building"></span>
+                                    <p><?php echo esc_html__('No bookings yet', 'ltl-bookings'); ?></p>
+                                </div>
+                            <?php else : ?>
+                                <table class="ltlb-table ltlb-table--dashboard">
+                                    <thead>
+                                        <tr>
+                                            <th><?php echo esc_html__('Guest', 'ltl-bookings'); ?></th>
+                                            <th><?php echo esc_html__('Room Type', 'ltl-bookings'); ?></th>
+                                            <th><?php echo esc_html__('Check-in', 'ltl-bookings'); ?></th>
+                                            <th><?php echo esc_html__('Check-out', 'ltl-bookings'); ?></th>
+                                            <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                        $s_repo = new LTLB_ServiceRepository();
+                                        $c_repo = new LTLB_CustomerRepository();
+                                        foreach ( $latest_bookings as $b ): 
+                                            $cust = $c_repo->get_by_id( intval($b['customer_id']) );
+                                            $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
+                                            $service = $s_repo->get_by_id( intval($b['service_id']) );
 
-			<?php $this->render_finance_card(); ?>
+                                            $appt_tz = (string) ( $b['timezone'] ?? '' );
+                                            if ( $appt_tz === '' ) {
+                                                $appt_tz = LTLB_Time::get_site_timezone_string();
+                                            }
+                                            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['start_at'] ?? '' ), get_option('date_format'), $appt_tz );
+                                            $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['end_at'] ?? '' ), get_option('date_format'), $appt_tz );
+                                        ?>
+                                            <tr>
+                                                <td><?php echo esc_html( $cust_name ); ?></td>
+                                                <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
+                                                <td class="ltlb-text-muted"><?php echo esc_html( $start_display ); ?></td>
+                                                <td class="ltlb-text-muted"><?php echo esc_html( $end_display ); ?></td>
+                                                <td><?php echo LTLB_Admin_AppointmentsDashboardPage::render_status_badge( $b['status'] ); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+                        </div>
+                    </div>
 
-            <?php LTLB_Admin_Component::card_start(__( 'Latest Bookings', 'ltl-bookings' )); ?>
-                <?php if ( empty($latest_bookings) ) : ?>
-                    <p><?php echo esc_html__('No bookings found.', 'ltl-bookings'); ?></p>
-                <?php else : ?>
-                    <table class="ltlb-table ltlb-table--hoverable">
-                        <thead>
-                            <tr>
-                                <th><?php echo esc_html__('Customer', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Room Type', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Check-in', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Check-out', 'ltl-bookings'); ?></th>
-                                <th><?php echo esc_html__('Status', 'ltl-bookings'); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $s_repo = new LTLB_ServiceRepository();
-                            $c_repo = new LTLB_CustomerRepository();
-                            foreach ( $latest_bookings as $b ): 
-                                $cust = $c_repo->get_by_id( intval($b['customer_id']) );
-                                $cust_name = $cust ? $cust['first_name'] . ' ' . $cust['last_name'] : '—';
-                                $service = $s_repo->get_by_id( intval($b['service_id']) );
+                </div>
 
-                                $appt_tz = (string) ( $b['timezone'] ?? '' );
-                                if ( $appt_tz === '' ) {
-                                    $appt_tz = LTLB_Time::get_site_timezone_string();
-                                }
-                                $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
-                                $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['end_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
-                            ?>
-                                <tr>
-                                    <td><?php echo esc_html( $cust_name ); ?></td>
-                                    <td><?php echo esc_html( $service ? $service['name'] : '—' ); ?></td>
-									<td><?php echo esc_html( $start_display ); ?></td>
-									<td><?php echo esc_html( $end_display ); ?></td>
-                                    <td>
-                                        <?php echo LTLB_Admin_AppointmentsDashboardPage::render_status_badge( $b['status'] ); ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            <?php LTLB_Admin_Component::card_end(); ?>
+                <!-- RIGHT COLUMN: Sidebar -->
+                <div class="ltlb-dashboard-layout__sidebar">
+                    
+                    <!-- Quick Actions -->
+                    <?php if ( $can_manage ) : ?>
+                    <div class="ltlb-card">
+                        <div class="ltlb-card__header">
+                            <div class="ltlb-card__header-content">
+                                <span class="dashicons dashicons-admin-tools"></span>
+                                <h3 class="ltlb-card__title"><?php echo esc_html__('Quick Actions', 'ltl-bookings'); ?></h3>
+                            </div>
+                        </div>
+                        <div class="ltlb-card__body">
+                            <div class="ltlb-quick-actions">
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments&action=add')); ?>" class="ltlb-quick-action">
+                                    <span class="ltlb-quick-action__icon"><span class="dashicons dashicons-plus-alt2"></span></span>
+                                    <span class="ltlb-quick-action__label"><?php echo esc_html__('New Booking', 'ltl-bookings'); ?></span>
+                                </a>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_resources')); ?>" class="ltlb-quick-action">
+                                    <span class="ltlb-quick-action__icon"><span class="dashicons dashicons-building"></span></span>
+                                    <span class="ltlb-quick-action__label"><?php echo esc_html__('Manage Rooms', 'ltl-bookings'); ?></span>
+                                </a>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_customers')); ?>" class="ltlb-quick-action">
+                                    <span class="ltlb-quick-action__icon"><span class="dashicons dashicons-admin-users"></span></span>
+                                    <span class="ltlb-quick-action__label"><?php echo esc_html__('Guest List', 'ltl-bookings'); ?></span>
+                                </a>
+                                <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_settings')); ?>" class="ltlb-quick-action">
+                                    <span class="ltlb-quick-action__icon"><span class="dashicons dashicons-admin-generic"></span></span>
+                                    <span class="ltlb-quick-action__label"><?php echo esc_html__('Settings', 'ltl-bookings'); ?></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Finance Card -->
+                    <?php $this->render_finance_card(); ?>
+
+                    <!-- AI Insights -->
+                    <?php LTLB_Admin_AppointmentsDashboardPage::render_ai_insights_card( $can_manage ); ?>
+
+                </div>
+            </div>
 		</div>
 		<?php
 	}
 
+    /**
+     * Render Occupancy Card with forecast
+     */
     private function render_occupancy_card( LTLB_AppointmentRepository $appt_repo, int $occupied_today, int $total_rooms ): void {
         $rate = $total_rooms > 0 ? round( ( $occupied_today / $total_rooms ) * 100 ) : 0;
         $rate = max( 0, min( 100, (int) $rate ) );
         ?>
-        <?php LTLB_Admin_Component::card_start( __( 'Occupancy', 'ltl-bookings' ) ); ?>
-            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                <div class="ltlb-donut" style="--ltlb-donut-pct: <?php echo esc_attr( (string) $rate ); ?>;" aria-label="<?php echo esc_attr__( 'Today occupancy rate', 'ltl-bookings' ); ?>">
-                    <div class="ltlb-donut__inner">
-                        <div class="ltlb-donut__value"><?php echo esc_html( (string) $rate ); ?>%</div>
-                        <div class="ltlb-donut__label"><?php echo esc_html__( 'Today', 'ltl-bookings' ); ?></div>
-                    </div>
-                </div>
-                <div>
-                    <div style="font-size:14px;">
-                        <strong><?php echo esc_html( (string) $occupied_today ); ?></strong>
-                        <?php echo esc_html__( 'occupied', 'ltl-bookings' ); ?>
-                        <?php echo esc_html__( 'of', 'ltl-bookings' ); ?>
-                        <strong><?php echo esc_html( (string) $total_rooms ); ?></strong>
-                        <?php echo esc_html__( 'rooms', 'ltl-bookings' ); ?>
-                    </div>
-                    <p class="description" style="margin:6px 0 0;">
-                        <?php echo esc_html__( 'Based on confirmed bookings with assigned rooms.', 'ltl-bookings' ); ?>
-                    </p>
+        <div class="ltlb-card">
+            <div class="ltlb-card__header">
+                <div class="ltlb-card__header-content">
+                    <span class="dashicons dashicons-chart-bar"></span>
+                    <h3 class="ltlb-card__title"><?php echo esc_html__('Occupancy Forecast', 'ltl-bookings'); ?></h3>
+                    <span class="ltlb-badge ltlb-badge--info"><?php echo esc_html__('Next 7 Days', 'ltl-bookings'); ?></span>
                 </div>
             </div>
+            <div class="ltlb-card__body">
+                <!-- Today's Occupancy Highlight -->
+                <div class="ltlb-occupancy-today">
+                    <div class="ltlb-occupancy-donut" style="--occupancy-pct: <?php echo esc_attr( (string) $rate ); ?>;">
+                        <div class="ltlb-occupancy-donut__inner">
+                            <span class="ltlb-occupancy-donut__value"><?php echo esc_html( (string) $rate ); ?>%</span>
+                            <span class="ltlb-occupancy-donut__label"><?php echo esc_html__('Today', 'ltl-bookings'); ?></span>
+                        </div>
+                    </div>
+                    <div class="ltlb-occupancy-info">
+                        <div class="ltlb-occupancy-stat">
+                            <strong><?php echo esc_html( (string) $occupied_today ); ?></strong>
+                            <span><?php echo esc_html__('occupied', 'ltl-bookings'); ?></span>
+                        </div>
+                        <div class="ltlb-occupancy-stat">
+                            <strong><?php echo esc_html( (string) max(0, $total_rooms - $occupied_today) ); ?></strong>
+                            <span><?php echo esc_html__('available', 'ltl-bookings'); ?></span>
+                        </div>
+                        <div class="ltlb-occupancy-stat">
+                            <strong><?php echo esc_html( (string) $total_rooms ); ?></strong>
+                            <span><?php echo esc_html__('total rooms', 'ltl-bookings'); ?></span>
+                        </div>
+                    </div>
+                </div>
 
-            <h4 style="margin-top:16px;"><?php echo esc_html__( 'Next 7 Days', 'ltl-bookings' ); ?></h4>
-            <table class="ltlb-table">
-                <thead>
-                    <tr>
-                        <th><?php echo esc_html__( 'Date', 'ltl-bookings' ); ?></th>
-                        <th><?php echo esc_html__( 'Occupied Rooms', 'ltl-bookings' ); ?></th>
-                        <th><?php echo esc_html__( 'Occupancy', 'ltl-bookings' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php for ( $i = 0; $i < 7; $i++ ) :
-                        $date = date( 'Y-m-d', strtotime( '+' . $i . ' day' ) );
-                        $occupied = $appt_repo->get_count_occupied_rooms_on_date( $date );
-                        $day_rate = $total_rooms > 0 ? round( ( $occupied / $total_rooms ) * 100 ) : 0;
-                    ?>
-                    <tr>
-                        <td><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $date ) ) ); ?></td>
-                        <td><?php echo esc_html( (string) $occupied ); ?> / <?php echo esc_html( (string) $total_rooms ); ?></td>
-                        <td><?php echo esc_html( (string) max( 0, min( 100, (int) $day_rate ) ) ); ?>%</td>
-                    </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
-        <?php LTLB_Admin_Component::card_end(); ?>
+                <!-- 7 Day Forecast Table -->
+                <table class="ltlb-table ltlb-table--compact">
+                    <thead>
+                        <tr>
+                            <th><?php echo esc_html__('Date', 'ltl-bookings'); ?></th>
+                            <th><?php echo esc_html__('Rooms', 'ltl-bookings'); ?></th>
+                            <th><?php echo esc_html__('Occupancy', 'ltl-bookings'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php for ( $i = 0; $i < 7; $i++ ) :
+                            $date = date( 'Y-m-d', strtotime( '+' . $i . ' day' ) );
+                            $occupied = $appt_repo->get_count_occupied_rooms_on_date( $date );
+                            $day_rate = $total_rooms > 0 ? round( ( $occupied / $total_rooms ) * 100 ) : 0;
+                            $day_rate = max( 0, min( 100, (int) $day_rate ) );
+                            
+                            // Color class based on occupancy
+                            $color_class = $day_rate >= 80 ? 'ltlb-text-success' : ($day_rate >= 50 ? 'ltlb-text-warning' : 'ltlb-text-muted');
+                        ?>
+                        <tr>
+                            <td>
+                                <?php if ($i === 0): ?>
+                                    <strong><?php echo esc_html__('Today', 'ltl-bookings'); ?></strong>
+                                <?php elseif ($i === 1): ?>
+                                    <?php echo esc_html__('Tomorrow', 'ltl-bookings'); ?>
+                                <?php else: ?>
+                                    <?php echo esc_html( date_i18n( 'D, M j', strtotime( $date ) ) ); ?>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo esc_html( (string) $occupied ); ?> / <?php echo esc_html( (string) $total_rooms ); ?></td>
+                            <td>
+                                <div class="ltlb-occupancy-bar">
+                                    <div class="ltlb-occupancy-bar__fill" style="width: <?php echo esc_attr($day_rate); ?>%"></div>
+                                    <span class="ltlb-occupancy-bar__label <?php echo esc_attr($color_class); ?>"><?php echo esc_html( (string) $day_rate ); ?>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endfor; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <?php
     }
 
-    private function render_ai_insights_card( bool $can_generate = false ): void {
-        $last = get_option( 'lazy_ai_last_report', [] );
-        if ( ! is_array( $last ) ) $last = [];
-        $report = isset( $last['report'] ) ? (string) $last['report'] : '';
-        $created_at = isset( $last['created_at'] ) ? (string) $last['created_at'] : '';
-        $preview = '';
-        if ( $report !== '' ) {
-            $lines = preg_split( '/\r\n|\r|\n/', $report );
-            $lines = is_array( $lines ) ? array_slice( $lines, 0, 8 ) : [];
-            $preview = implode( "\n", $lines );
-        }
-        $outbox_url = admin_url( 'admin.php?page=ltlb_outbox&status=all' );
-        ?>
-        <?php LTLB_Admin_Component::card_start( __( 'AI Insights', 'ltl-bookings' ) ); ?>
-            <?php if ( $preview === '' ) : ?>
-                <p class="ltlb-muted" style="margin-top:0;"><?php echo esc_html__( 'No saved report yet. Generate one to see daily + overall insights.', 'ltl-bookings' ); ?></p>
-            <?php else : ?>
-                <?php if ( $created_at ) : ?>
-                    <p class="ltlb-muted" style="margin-top:0;"><?php echo esc_html__( 'Last saved:', 'ltl-bookings' ) . ' ' . esc_html( $created_at ); ?></p>
-                <?php endif; ?>
-                <textarea class="large-text code" rows="8" readonly><?php echo esc_textarea( $preview ); ?></textarea>
-            <?php endif; ?>
-
-            <?php if ( $can_generate ) : ?>
-                <form method="post" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-                    <?php wp_nonce_field( 'ltlb_generate_ai_insights_action', 'ltlb_generate_ai_insights_nonce' ); ?>
-                    <input type="hidden" name="ltlb_generate_ai_insights" value="1" />
-                    <button type="submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--small"><?php echo esc_html__( 'Generate Report', 'ltl-bookings' ); ?></button>
-                    <a class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" href="<?php echo esc_url( $outbox_url ); ?>"><?php echo esc_html__( 'Open Outbox', 'ltl-bookings' ); ?></a>
-                </form>
-            <?php else : ?>
-                <p class="description" style="margin-top:10px;">
-                    <?php echo esc_html__( 'You have read-only access. Ask an administrator to generate a new report.', 'ltl-bookings' ); ?>
-                </p>
-            <?php endif; ?>
-        <?php LTLB_Admin_Component::card_end(); ?>
-        <?php
-    }
-
+    /**
+     * Render Finance Card
+     */
     private function render_finance_card(): void {
         if ( ! class_exists( 'LTLB_Finance' ) ) {
             return;
@@ -219,30 +284,35 @@ class LTLB_Admin_HotelDashboardPage {
         $room_costs = intval( $fin['room_costs_cents'] ?? 0 );
         $gross_profit = intval( $fin['gross_profit_cents'] ?? 0 );
         ?>
-        <?php LTLB_Admin_Component::card_start( __( 'Finance (Last 30 Days)', 'ltl-bookings' ) ); ?>
-            <div class="ltlb-analytics-grid">
-                <div class="ltlb-analytics-stat">
-                    <div class="ltlb-analytics-stat__value"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $revenue ) ); ?></div>
-                    <div class="ltlb-analytics-stat__label"><?php echo esc_html__( 'Revenue (gross)', 'ltl-bookings' ); ?></div>
-                </div>
-                <div class="ltlb-analytics-stat">
-                    <div class="ltlb-analytics-stat__value"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $fees ) ); ?></div>
-                    <div class="ltlb-analytics-stat__label"><?php echo esc_html__( 'Fees', 'ltl-bookings' ); ?></div>
-                </div>
-                <div class="ltlb-analytics-stat">
-                    <div class="ltlb-analytics-stat__value"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $room_costs ) ); ?></div>
-                    <div class="ltlb-analytics-stat__label"><?php echo esc_html__( 'Room costs', 'ltl-bookings' ); ?></div>
-                </div>
-                <div class="ltlb-analytics-stat">
-                    <div class="ltlb-analytics-stat__value"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $gross_profit ) ); ?></div>
-                    <div class="ltlb-analytics-stat__label"><?php echo esc_html__( 'Gross profit', 'ltl-bookings' ); ?></div>
+        <div class="ltlb-card">
+            <div class="ltlb-card__header">
+                <div class="ltlb-card__header-content">
+                    <span class="dashicons dashicons-chart-area"></span>
+                    <h3 class="ltlb-card__title"><?php echo esc_html__('Finance', 'ltl-bookings'); ?></h3>
+                    <span class="ltlb-badge ltlb-badge--info"><?php echo esc_html__('30 Days', 'ltl-bookings'); ?></span>
                 </div>
             </div>
-            <p class="description" style="margin:10px 0 0;">
-                <?php echo esc_html__( 'Deterministic: gross profit = revenue − fees − room costs (from assigned rooms × nights).', 'ltl-bookings' ); ?>
-            </p>
-        <?php LTLB_Admin_Component::card_end(); ?>
+            <div class="ltlb-card__body">
+                <div class="ltlb-finance-grid">
+                    <div class="ltlb-finance-item">
+                        <span class="ltlb-finance-item__label"><?php echo esc_html__('Revenue', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-finance-item__value ltlb-text-success"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $revenue ) ); ?></span>
+                    </div>
+                    <div class="ltlb-finance-item">
+                        <span class="ltlb-finance-item__label"><?php echo esc_html__('Fees', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-finance-item__value ltlb-text-muted"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $fees ) ); ?></span>
+                    </div>
+                    <div class="ltlb-finance-item">
+                        <span class="ltlb-finance-item__label"><?php echo esc_html__('Room Costs', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-finance-item__value ltlb-text-muted"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $room_costs ) ); ?></span>
+                    </div>
+                    <div class="ltlb-finance-item ltlb-finance-item--highlight">
+                        <span class="ltlb-finance-item__label"><?php echo esc_html__('Gross Profit', 'ltl-bookings'); ?></span>
+                        <span class="ltlb-finance-item__value"><?php echo esc_html( LTLB_Finance::format_money_from_cents( $gross_profit ) ); ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php
     }
 }
-

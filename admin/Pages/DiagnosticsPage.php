@@ -122,8 +122,18 @@ class LTLB_DiagnosticsPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_diagnostics'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Diagnostics', 'ltl-bookings'); ?></h1>
-            <hr class="wp-header-end">
+
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__('Diagnostics', 'ltl-bookings'); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__('System information, database status, and debug tools.', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+            </div>
 
             <div class="ltlb-card">
                 <h2><?php echo esc_html__('System Information', 'ltl-bookings'); ?></h2>
@@ -179,6 +189,63 @@ class LTLB_DiagnosticsPage {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- CSS Debug Section -->
+            <div class="ltlb-card">
+                <h2><?php echo esc_html__('CSS Debug', 'ltl-bookings'); ?></h2>
+                <table class="widefat striped" style="border:none; box-shadow:none;">
+                    <tbody>
+                        <tr>
+                            <td><strong>WP_DEBUG</strong></td>
+                            <td><?php echo defined('WP_DEBUG') && WP_DEBUG ? '✓ Enabled' : '✗ Disabled'; ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SCRIPT_DEBUG</strong></td>
+                            <td><?php echo defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '✓ Enabled' : '✗ Disabled'; ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LTLB_PATH</strong></td>
+                            <td><?php echo esc_html( defined('LTLB_PATH') ? LTLB_PATH : 'Not defined' ); ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LTLB_URL</strong></td>
+                            <td><?php echo esc_html( defined('LTLB_URL') ? LTLB_URL : 'Not defined' ); ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>admin.css exists</strong></td>
+                            <td><?php echo file_exists( LTLB_PATH . 'assets/css/admin.css' ) ? '✓ Yes' : '✗ No'; ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>admin.css size</strong></td>
+                            <td><?php echo file_exists( LTLB_PATH . 'assets/css/admin.css' ) ? number_format(filesize( LTLB_PATH . 'assets/css/admin.css' ) / 1024, 2) . ' KB' : 'N/A'; ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>admin.min.css exists</strong></td>
+                            <td><?php echo file_exists( LTLB_PATH . 'assets/css/dist/admin.min.css' ) ? '✓ Yes' : '✗ No'; ?></td>
+                        </tr>
+                        <tr>
+                            <td><strong>CSS URL (admin.css)</strong></td>
+                            <td><a href="<?php echo esc_url( LTLB_URL . 'assets/css/admin.css' ); ?>" target="_blank"><?php echo esc_html( LTLB_URL . 'assets/css/admin.css' ); ?></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 20px;"><?php echo esc_html__('Loaded Styles Test', 'ltl-bookings'); ?></h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
+                    <button class="ltlb-btn ltlb-btn--primary">Primary Button</button>
+                    <button class="ltlb-btn ltlb-btn--secondary">Secondary Button</button>
+                    <span class="ltlb-status-badge" style="background: var(--lazy-success-bg, #ecfdf5); color: var(--lazy-success, #10b981);">Active</span>
+                    <span class="ltlb-status-badge" style="background: var(--lazy-warning-bg, #fffbeb); color: var(--lazy-warning, #f59e0b);">Pending</span>
+                </div>
+                
+                <h3 style="margin-top: 20px;"><?php echo esc_html__('CSS Variable Test', 'ltl-bookings'); ?></h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 12px;">
+                    <div style="padding: 12px; background: var(--lazy-accent, #3b82f6); color: white; border-radius: 8px;">--lazy-accent</div>
+                    <div style="padding: 12px; background: var(--lazy-bg-secondary, #f8fafc); border-radius: 8px;">--lazy-bg-secondary</div>
+                    <div style="padding: 12px; background: var(--lazy-success, #10b981); color: white; border-radius: 8px;">--lazy-success</div>
+                    <div style="padding: 12px; background: var(--lazy-warning, #f59e0b); color: white; border-radius: 8px;">--lazy-warning</div>
+                </div>
             </div>
 
             <div class="ltlb-card">

@@ -1,9 +1,130 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
+/**
+ * Premium Agency-Level Admin Header
+ * 
+ * Renders the main navigation header with:
+ * - Brand identity with logo
+ * - Mode switcher (Appointments/Hotel)
+ * - Primary navigation tabs
+ * - Language selector
+ * - User quick actions
+ * 
+ * @since 1.0.0
+ * @since 3.0.0 Agency-level redesign with premium styling
+ */
 class LTLB_Admin_Header {
+
+	/**
+	 * Navigation icons mapping for each page
+	 */
+	private static array $nav_icons = [
+		'ltlb_dashboard'    => 'dashicons-analytics',
+		'ltlb_appointments' => 'dashicons-calendar',
+		'ltlb_bookings'     => 'dashicons-calendar',
+		'ltlb_calendar'     => 'dashicons-calendar-alt',
+		'ltlb_customers'    => 'dashicons-groups',
+		'ltlb_services'     => 'dashicons-clipboard',
+		'ltlb_resources'    => 'dashicons-building',
+		'ltlb_staff'        => 'dashicons-id',
+		'ltlb_settings'     => 'dashicons-admin-settings',
+		'ltlb_design'       => 'dashicons-art',
+		'ltlb_diagnostics'  => 'dashicons-sos',
+		'ltlb_ai'           => 'dashicons-admin-generic',
+	];
+
+	/**
+	 * Get the navigation tabs based on template mode
+	 */
+	private static function get_navigation_tabs( string $template_mode ): array {
+		$base_tabs = [];
+
+		if ( $template_mode === 'service' ) {
+			$base_tabs = [
+				'ltlb_dashboard' => [
+					'label' => __( 'Dashboard', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_dashboard'),
+					'group' => 'main',
+				],
+				'ltlb_appointments' => [
+					'label' => __( 'Appointments', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_appointments'),
+					'group' => 'main',
+				],
+				'ltlb_calendar' => [
+					'label' => __( 'Calendar', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_calendar'),
+					'group' => 'main',
+				],
+				'ltlb_customers' => [
+					'label' => __( 'Customers', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_customers'),
+					'group' => 'main',
+				],
+				'ltlb_services' => [
+					'label' => __( 'Services', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_services'),
+					'group' => 'resources',
+				],
+				'ltlb_resources' => [
+					'label' => __( 'Resources', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_resources'),
+					'group' => 'resources',
+				],
+				'ltlb_staff' => [
+					'label' => __( 'Staff', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_staff'),
+					'group' => 'resources',
+				],
+			];
+		} else {
+			$base_tabs = [
+				'ltlb_dashboard' => [
+					'label' => __( 'Dashboard', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_dashboard'),
+					'group' => 'main',
+				],
+				'ltlb_bookings' => [
+					'label' => __( 'Bookings', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_appointments'),
+					'group' => 'main',
+				],
+				'ltlb_calendar' => [
+					'label' => __( 'Calendar', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_calendar'),
+					'group' => 'main',
+				],
+				'ltlb_services' => [
+					'label' => __( 'Room Types', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_services'),
+					'group' => 'resources',
+				],
+				'ltlb_resources' => [
+					'label' => __( 'Rooms', 'ltl-bookings' ),
+					'url'   => admin_url('admin.php?page=ltlb_resources'),
+					'group' => 'resources',
+				],
+			];
+		}
+
+		// Settings tab (always present)
+		$base_tabs['ltlb_settings'] = [
+			'label' => __( 'Settings', 'ltl-bookings' ),
+			'url'   => admin_url('admin.php?page=ltlb_settings'),
+			'group' => 'system',
+		];
+
+		return $base_tabs;
+	}
+
+	/**
+	 * Render the premium admin header
+	 */
 	public static function render( string $active_page = '' ): void {
-		if ( ! current_user_can('manage_options') ) return;
+		if ( ! current_user_can('manage_options') && ! current_user_can('view_ai_reports') ) {
+			return;
+		}
 
 		$current_lang = 'en_US';
 		if ( class_exists('LTLB_I18n') ) {
@@ -12,165 +133,186 @@ class LTLB_Admin_Header {
 
 		$settings = get_option('lazy_settings', []);
 		$template_mode = is_array($settings) && isset($settings['template_mode']) ? $settings['template_mode'] : 'service';
-		$is_hotel_mode = $template_mode === 'hotel';
+		$tabs = self::get_navigation_tabs( $template_mode );
 
-		$tabs = [];
+		// Get current user for avatar
+		$current_user = wp_get_current_user();
+		$avatar_url = get_avatar_url( $current_user->ID, [ 'size' => 32 ] );
 
-        if ($template_mode === 'service') {
-            $tabs = [
-                'ltlb_dashboard' => [
-                    'label' => __( 'Dashboard', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_dashboard'),
-                ],
-                'ltlb_appointments' => [
-                    'label' => __( 'Appointments', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_appointments'),
-                ],
-                'ltlb_calendar' => [
-                    'label' => __( 'Calendar', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_calendar'),
-                ],
-                'ltlb_customers' => [
-                    'label' => __( 'Customers', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_customers'),
-                ],
-                'ltlb_services' => [
-                    'label' => __( 'Services', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_services'),
-                ],
-                'ltlb_resources' => [
-                    'label' => __( 'Resources', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_resources'),
-                ],
-                'ltlb_staff' => [
-                    'label' => __( 'Staff', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_staff'),
-                ],
-                'ltlb_settings' => [
-                    'label' => __( 'Settings', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_settings'),
-                ],
-            ];
-        } else { // hotel mode
-            $tabs = [
-                'ltlb_dashboard' => [
-                    'label' => __( 'Dashboard', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_dashboard'),
-                ],
-                'ltlb_bookings' => [
-                    'label' => __( 'Bookings', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_appointments'), // reusing appointments page
-                ],
-                'ltlb_calendar' => [
-                    'label' => __( 'Calendar', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_calendar'),
-                ],
-                'ltlb_services' => [
-                    'label' => __( 'Room Types', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_services'),
-                ],
-                'ltlb_resources' => [
-                    'label' => __( 'Rooms', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_resources'),
-                ],
-                'ltlb_settings' => [
-                    'label' => __( 'Settings', 'ltl-bookings' ),
-                    'url' => admin_url('admin.php?page=ltlb_settings'),
-                ],
-            ];
-        }
-
-		// Always add design and diagnostics
-		$tabs['ltlb_design'] = [
-			'label' => __( 'Design', 'ltl-bookings' ),
-			'url' => admin_url('admin.php?page=ltlb_design'),
-		];
-		$tabs['ltlb_diagnostics'] = [
-			'label' => __( 'Diagnostics', 'ltl-bookings' ),
-			'url' => admin_url('admin.php?page=ltlb_diagnostics'),
-		];
-
-
+		// Safe page retrieval
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : 'ltlb_dashboard';
 		?>
-		<div class="ltlb-admin-header">
-			<div class="ltlb-admin-header__brand">
-				<span class="dashicons dashicons-calendar-alt ltlb-admin-header__icon"></span>
-				<div class="ltlb-admin-header__titles">
-					<div class="ltlb-admin-header__title"><?php echo esc_html__('LazyBookings', 'ltl-bookings'); ?></div>
-					<div class="ltlb-admin-header__subtitle">v<?php echo esc_html(LTLB_VERSION); ?></div>
+		<header class="ltlb-header" role="banner">
+			<!-- Top Bar with Brand and Actions -->
+			<div class="ltlb-header__top">
+				<div class="ltlb-header__brand">
+					<div class="ltlb-header__logo">
+						<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<rect width="28" height="28" rx="6" fill="currentColor" class="ltlb-logo-bg"/>
+							<path d="M7 9h14M7 14h10M7 19h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+							<circle cx="21" cy="14" r="3" fill="#FFD700"/>
+						</svg>
+					</div>
+					<div class="ltlb-header__brand-text">
+						<span class="ltlb-header__title">LazyBookings</span>
+						<span class="ltlb-header__version"><?php echo esc_html__( 'Pro', 'ltl-bookings' ); ?> v<?php echo esc_html(LTLB_VERSION); ?></span>
+					</div>
 				</div>
-				<?php if ( ! empty( $active_page ) && isset( $tabs[ $active_page ] ) ): ?>
-					<nav class="ltlb-breadcrumbs" aria-label="<?php echo esc_attr__('Breadcrumbs', 'ltl-bookings'); ?>">
-						<a href="<?php echo esc_url( admin_url('admin.php') ); ?>"><?php echo esc_html__('Dashboard', 'ltl-bookings'); ?></a>
-						<span class="ltlb-breadcrumbs__sep" aria-hidden="true">/</span>
-						<span class="ltlb-breadcrumbs__current"><?php echo esc_html( $tabs[ $active_page ]['label'] ); ?></span>
-					</nav>
-				<?php endif; ?>
-			</div>
-			<div class="ltlb-admin-header__main">
-				<div class="ltlb-mode-switcher">
-				<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_template_mode' => 'service'])); ?>" class="ltlb-mode-switcher__button <?php echo $template_mode === 'service' ? 'is-active' : ''; ?>">
-					<?php echo esc_html__('Appointments', 'ltl-bookings'); ?>
-				</a>
-				<a href="<?php echo esc_url(add_query_arg(['page' => $_GET['page'], 'ltlb_template_mode' => 'hotel'])); ?>" class="ltlb-mode-switcher__button <?php echo $template_mode === 'hotel' ? 'is-active' : ''; ?>">
+
+				<!-- Mode Switcher -->
+				<div class="ltlb-header__mode-switch" role="tablist" aria-label="<?php echo esc_attr__( 'Booking Mode', 'ltl-bookings' ); ?>">
+					<a href="<?php echo esc_url(add_query_arg(['page' => $current_page, 'ltlb_template_mode' => 'service'])); ?>" 
+					   class="ltlb-mode-switch__btn <?php echo $template_mode === 'service' ? 'is-active' : ''; ?>"
+					   role="tab"
+					   aria-selected="<?php echo $template_mode === 'service' ? 'true' : 'false'; ?>">
+						<span class="dashicons dashicons-clock" aria-hidden="true"></span>
+						<?php echo esc_html__('Appointments', 'ltl-bookings'); ?>
+					</a>
+					<a href="<?php echo esc_url(add_query_arg(['page' => $current_page, 'ltlb_template_mode' => 'hotel'])); ?>" 
+					   class="ltlb-mode-switch__btn <?php echo $template_mode === 'hotel' ? 'is-active' : ''; ?>"
+					   role="tab"
+					   aria-selected="<?php echo $template_mode === 'hotel' ? 'true' : 'false'; ?>">
+						<span class="dashicons dashicons-building" aria-hidden="true"></span>
 						<?php echo esc_html__('Hotel', 'ltl-bookings'); ?>
 					</a>
 				</div>
-				<nav class="ltlb-admin-header__nav">
-					<?php foreach ( $tabs as $page_slug => $tab ): ?>
-						<a  href="<?php echo esc_url($tab['url']); ?>"
-							class="ltlb-admin-header__tab <?php echo $active_page === $page_slug ? 'is-active' : ''; ?>">
-							<?php echo esc_html($tab['label']); ?>
-						</a>
-					<?php endforeach; ?>
-				</nav>
+
+				<!-- Actions Bar -->
+				<div class="ltlb-header__actions">
+					<!-- Quick Add Button -->
+					<?php if ( current_user_can('manage_options') ): ?>
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments&action=add')); ?>" 
+					   class="ltlb-header__quick-add"
+					   title="<?php echo esc_attr__( 'Quick Add', 'ltl-bookings' ); ?>">
+						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+						<span class="screen-reader-text"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></span>
+					</a>
+					<?php endif; ?>
+
+					<!-- Language Selector -->
+					<form method="post" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" class="ltlb-header__lang">
+						<input type="hidden" name="action" value="ltlb_set_admin_lang" />
+						<?php wp_nonce_field( 'ltlb_set_admin_lang' ); ?>
+						<label for="ltlb_admin_lang" class="screen-reader-text"><?php echo esc_html__( 'Language', 'ltl-bookings' ); ?></label>
+						<select name="ltlb_admin_lang" id="ltlb_admin_lang" class="ltlb-header__lang-select" onchange="this.form.submit()">
+							<option value="en_US" <?php selected( $current_lang, 'en_US' ); ?>>🇬🇧 EN</option>
+							<option value="de_DE" <?php selected( $current_lang, 'de_DE' ); ?>>🇩🇪 DE</option>
+						</select>
+					</form>
+
+					<!-- User Menu -->
+					<div class="ltlb-header__user">
+						<button type="button" class="ltlb-header__user-btn" aria-expanded="false" aria-haspopup="true">
+							<img src="<?php echo esc_url($avatar_url); ?>" alt="" class="ltlb-header__avatar" />
+							<span class="ltlb-header__user-name"><?php echo esc_html($current_user->display_name); ?></span>
+							<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
+						</button>
+						<div class="ltlb-header__user-dropdown" role="menu" hidden>
+							<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_settings')); ?>" class="ltlb-header__dropdown-item" role="menuitem">
+								<span class="dashicons dashicons-admin-settings" aria-hidden="true"></span>
+								<?php echo esc_html__( 'Settings', 'ltl-bookings' ); ?>
+							</a>
+							<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_diagnostics')); ?>" class="ltlb-header__dropdown-item" role="menuitem">
+								<span class="dashicons dashicons-sos" aria-hidden="true"></span>
+								<?php echo esc_html__( 'Diagnostics', 'ltl-bookings' ); ?>
+							</a>
+							<hr class="ltlb-header__dropdown-sep" />
+							<a href="https://docs.lazybookings.com" target="_blank" rel="noopener" class="ltlb-header__dropdown-item" role="menuitem">
+								<span class="dashicons dashicons-book" aria-hidden="true"></span>
+								<?php echo esc_html__( 'Documentation', 'ltl-bookings' ); ?>
+							</a>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="ltlb-admin-header__actions">
-				<form method="post" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" class="ltlb-admin-lang">
-					<input type="hidden" name="action" value="ltlb_set_admin_lang" />
-					<?php wp_nonce_field( 'ltlb_set_admin_lang' ); ?>
-					<label for="ltlb_admin_lang" class="screen-reader-text"><?php echo esc_html__( 'Language', 'ltl-bookings' ); ?></label>
-					<select name="ltlb_admin_lang" id="ltlb_admin_lang">
-						<option value="en_US" <?php selected( $current_lang, 'en_US' ); ?>><?php echo esc_html__( 'English', 'ltl-bookings' ); ?></option>
-						<option value="de_DE" <?php selected( $current_lang, 'de_DE' ); ?>><?php echo esc_html__( 'German', 'ltl-bookings' ); ?></option>
-					</select>
-					<button type="submit" class="ltlb-btn ltlb-btn--small"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
-				</form>
-				<script>
-				(function(){
-					var modeLinks = document.querySelectorAll('.ltlb-admin-header__mode a');
-					for (var i = 0; i < modeLinks.length; i++) {
-						modeLinks[i].addEventListener('click', function(e) {
-							if (this.classList.contains('active')) return;
-							if (!confirm(<?php echo wp_json_encode( __( 'Switching modes may hide data specific to the current mode. Continue?', 'ltl-bookings' ) ); ?>)) {
-								e.preventDefault();
-							}
-						});
-					}
-				})();
-				// Global keyboard shortcuts
-				document.addEventListener('keydown', function(e) {
-					if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-					// S: Focus search if available
-					if (e.key === 's' || e.key === 'S') {
-						var searchInput = document.querySelector('.ltlb-admin input[type="search"], .ltlb-admin .search-box');
-						if (searchInput) {
-							e.preventDefault();
-							searchInput.focus();
-						}
-					}
-					// N: Click "Add New" button if available
-					if (e.key === 'n' || e.key === 'N') {
-						var newBtn = document.querySelector('.ltlb-admin .page-title-action');
-						if (newBtn) {
-							e.preventDefault();
-							newBtn.click();
-						}
+
+			<!-- Primary Navigation -->
+			<nav class="ltlb-header__nav" role="navigation" aria-label="<?php echo esc_attr__( 'Primary Navigation', 'ltl-bookings' ); ?>">
+				<ul class="ltlb-nav" role="menubar">
+					<?php foreach ( $tabs as $page_slug => $tab ): 
+						$is_active = ( $active_page === $page_slug ) || 
+						             ( $page_slug === 'ltlb_bookings' && $active_page === 'ltlb_appointments' );
+						$icon = self::$nav_icons[$page_slug] ?? 'dashicons-admin-page';
+					?>
+					<li class="ltlb-nav__item" role="none">
+						<a href="<?php echo esc_url($tab['url']); ?>"
+						   class="ltlb-nav__link <?php echo $is_active ? 'is-active' : ''; ?>"
+						   role="menuitem"
+						   <?php echo $is_active ? 'aria-current="page"' : ''; ?>>
+							<span class="dashicons <?php echo esc_attr($icon); ?> ltlb-nav__icon" aria-hidden="true"></span>
+							<span class="ltlb-nav__label"><?php echo esc_html($tab['label']); ?></span>
+							<?php if ( $is_active ): ?>
+							<span class="ltlb-nav__indicator" aria-hidden="true"></span>
+							<?php endif; ?>
+						</a>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+			</nav>
+		</header>
+
+		<script>
+		(function() {
+			'use strict';
+			
+			// User dropdown toggle
+			var userBtn = document.querySelector('.ltlb-header__user-btn');
+			var userDropdown = document.querySelector('.ltlb-header__user-dropdown');
+			
+			if (userBtn && userDropdown) {
+				userBtn.addEventListener('click', function(e) {
+					e.stopPropagation();
+					var isExpanded = this.getAttribute('aria-expanded') === 'true';
+					this.setAttribute('aria-expanded', !isExpanded);
+					userDropdown.hidden = isExpanded;
+				});
+				
+				document.addEventListener('click', function(e) {
+					if (!e.target.closest('.ltlb-header__user')) {
+						userBtn.setAttribute('aria-expanded', 'false');
+						userDropdown.hidden = true;
 					}
 				});
-				</script>
-			</div>
-		</div>
+				
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape' && userBtn.getAttribute('aria-expanded') === 'true') {
+						userBtn.setAttribute('aria-expanded', 'false');
+						userDropdown.hidden = true;
+						userBtn.focus();
+					}
+				});
+			}
+
+			// Keyboard shortcuts
+			document.addEventListener('keydown', function(e) {
+				if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+				
+				// S: Focus search
+				if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey) {
+					var searchInput = document.querySelector('.ltlb-admin input[type="search"], .ltlb-admin .search-box input');
+					if (searchInput) {
+						e.preventDefault();
+						searchInput.focus();
+					}
+				}
+				
+				// N: New appointment/booking
+				if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) {
+					var addBtn = document.querySelector('.ltlb-header__quick-add');
+					if (addBtn) {
+						e.preventDefault();
+						addBtn.click();
+					}
+				}
+				
+				// ?: Show keyboard shortcuts
+				if (e.key === '?' && e.shiftKey) {
+					e.preventDefault();
+					alert(<?php echo wp_json_encode( __( "Keyboard Shortcuts:\n\nS - Focus search\nN - New appointment\n? - Show this help", 'ltl-bookings' ) ); ?>);
+				}
+			});
+		})();
+		</script>
 		<?php
 	}
 }

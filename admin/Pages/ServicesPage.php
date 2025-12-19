@@ -137,11 +137,26 @@ class LTLB_Admin_ServicesPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
-            <?php if ( $action !== 'add' && ! $editing ) : ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
-            <?php endif; ?>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html($label_plural); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo $is_hotel ? esc_html__('Configure room types and their availability settings', 'ltl-bookings') : esc_html__('Configure your bookable services and their availability settings', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+                <?php if ( $action !== 'add' && ! $editing ) : ?>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__('Add New', 'ltl-bookings'); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+            </div>
 
             <?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 

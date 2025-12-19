@@ -253,22 +253,67 @@ class LTLB_Plugin {
         }
     }
 
+    /**
+     * Register all admin menu pages
+     * 
+     * Menu structure (Agency-Level Organization):
+     * 
+     * MAIN OPERATIONS
+     * ├── Dashboard (Overview & KPIs)
+     * ├── Appointments/Bookings (Core transactions)
+     * ├── Calendar (Visual scheduling)
+     * └── Customers/Guests (CRM)
+     * 
+     * RESOURCES
+     * ├── Services/Room Types
+     * ├── Resources/Rooms
+     * └── Staff (Service mode only)
+     * 
+     * AI & AUTOMATION
+     * ├── AI Settings
+     * ├── Outbox (Draft center)
+     * ├── Automations (Rules)
+     * └── Templates (Reply templates)
+     * 
+     * SETTINGS
+     * ├── Design
+     * └── Settings
+     * 
+     * HIDDEN (Accessible via links)
+     * ├── Diagnostics
+     * ├── Privacy
+     * ├── Branding
+     * └── Style Guide
+     */
     public function register_admin_menu(): void {
         $settings = get_option( 'lazy_settings', [] );
 		$template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
 		$wizard_completed = get_option( 'ltlb_wizard_completed', false );
 
-        add_menu_page(
-            __( 'Setup Wizard', 'ltl-bookings' ),
-            __( 'Setup Wizard', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_setup_wizard',
-            [ LTLB_Admin_SetupWizardPage::class, 'render' ],
-            'dashicons-admin-generic',
-            25
-        );
+        // Setup Wizard - Only show if not completed
+        if ( ! $wizard_completed ) {
+            add_menu_page(
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                '⚡ ' . __( 'Quick Setup', 'ltl-bookings' ),
+                'manage_options',
+                'ltlb_setup_wizard',
+                [ LTLB_Admin_SetupWizardPage::class, 'render' ],
+                'dashicons-admin-generic',
+                25
+            );
+        } else {
+            // Still register the page but don't add menu item (accessible via direct URL)
+            add_submenu_page(
+                null, // Hidden
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                'manage_options',
+                'ltlb_setup_wizard',
+                [ LTLB_Admin_SetupWizardPage::class, 'render' ]
+            );
+        }
 
-        
+        // Main Menu - LazyBookings
         add_menu_page(
             __( 'LazyBookings', 'ltl-bookings' ),
             __( 'LazyBookings', 'ltl-bookings' ),
@@ -439,7 +484,7 @@ class LTLB_Plugin {
         );
 
         // Settings
-        add_submenu_page(
+        $settings_hook = add_submenu_page(
             'ltlb_dashboard',
             __( 'Settings', 'ltl-bookings' ),
             __( 'Settings', 'ltl-bookings' ),
@@ -447,12 +492,15 @@ class LTLB_Plugin {
             'ltlb_settings',
             [ $this, 'render_settings_page' ]
         );
+        if ( $settings_hook ) {
+            add_action( "load-$settings_hook", [ $this, 'handle_settings_save' ] );
+        }
 
         // --- Advanced (collapsed by default in our UI) ---
 
         // Branding (Design System) - Hidden from menu, accessible via Design page
         add_submenu_page(
-            null, // parent_slug = null hides from menu
+            'ltlb_dashboard',
             __( 'Branding', 'ltl-bookings' ),
             __( 'Branding', 'ltl-bookings' ),
             'manage_options',
@@ -462,7 +510,7 @@ class LTLB_Plugin {
 
 		// Diagnostics - Hidden from menu, accessible via Settings
 		add_submenu_page(
-			null,
+			'ltlb_dashboard',
 			__( 'Diagnostics', 'ltl-bookings' ),
 			__( 'Diagnostics', 'ltl-bookings' ),
 			'manage_options',
@@ -472,13 +520,18 @@ class LTLB_Plugin {
 
         // Privacy - Hidden from menu, accessible via Settings
         add_submenu_page(
-            null,
+            'ltlb_dashboard',
             __( 'Privacy & GDPR', 'ltl-bookings' ),
             __( 'Privacy', 'ltl-bookings' ),
             'manage_options',
             'ltlb_privacy',
             [ $this, 'render_privacy_page' ]
         );
+
+        // Hide internal pages from the visible submenu while keeping routes available.
+        remove_submenu_page( 'ltlb_dashboard', 'ltlb_branding' );
+        remove_submenu_page( 'ltlb_dashboard', 'ltlb_diagnostics' );
+        remove_submenu_page( 'ltlb_dashboard', 'ltlb_privacy' );
     }
 
     public function render_dashboard_page(): void {
@@ -587,6 +640,15 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Settings', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function handle_settings_save(): void {
+        if ( class_exists('LTLB_Admin_SettingsPage') ) {
+            $page = new LTLB_Admin_SettingsPage();
+            if ( method_exists( $page, 'handle_post' ) ) {
+                $page->handle_post();
+            }
+        }
     }
 
     public function render_design_page(): void {
@@ -2236,22 +2298,26 @@ class LTLB_Plugin {
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
         if ( ! $page || strpos( (string) $page, 'ltlb_' ) !== 0 ) return;
 
-        $debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
+        // Force non-minified source files for development - ensures latest styles
+        // Production: Use minified files from dist/ folder
+        $use_source_files = true; // Set to false for production with minified files
         
-        // Helper function for versioning
-        $get_version = function( $file ) use ( $debug_assets ) {
-            if ( $debug_assets ) {
-                $mtime = @filemtime( LTLB_PATH . $file );
-                if ( $mtime ) {
-                    return (string) $mtime;
-                }
-            }
-            return LTLB_VERSION;
+        // Helper function for versioning with cache-busting
+        $get_version = function( $file ) {
+            $mtime = @filemtime( LTLB_PATH . $file );
+            return $mtime ? (string) $mtime : LTLB_VERSION . '.' . time();
         };
 
-        // Determine if we should use minified files
-        $min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-        $css_dir = $debug_assets ? 'assets/css/' : 'assets/css/dist/';
+        // Always use source files for now to ensure styles load correctly
+        $css_dir = 'assets/css/';
+        $min = '';
+        
+        // Fallback check for file existence
+        if ( ! @file_exists( LTLB_PATH . $css_dir . 'admin.css' ) ) {
+            // Try dist folder with minified files
+            $css_dir = 'assets/css/dist/';
+            $min = '.min';
+        }
 
         // Design System CSS (in dependency order)
         wp_enqueue_style( 'ltlb-tokens', LTLB_URL . $css_dir . "tokens{$min}.css", [], $get_version( $css_dir . "tokens{$min}.css" ) );

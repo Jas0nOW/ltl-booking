@@ -87,8 +87,18 @@ class LTLB_Admin_AIPage {
 
 		<div class="wrap ltlb-admin">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_ai'); } ?>
-			<h1 class="wp-heading-inline"><?php echo esc_html__('AI & Automations', 'ltl-bookings'); ?></h1>
-			<hr class="wp-header-end">
+			
+			<!-- Page Header -->
+			<div class="ltlb-page-header">
+				<div class="ltlb-page-header__content">
+					<h1 class="ltlb-page-header__title">
+						<?php echo esc_html__('AI & Automations', 'ltl-bookings'); ?>
+					</h1>
+					<p class="ltlb-page-header__subtitle">
+						<?php echo esc_html__('Configure AI-powered features and automated workflows', 'ltl-bookings'); ?>
+					</p>
+				</div>
+			</div>
 
 			<?php if ( isset( $_GET['message'] ) && $_GET['message'] === 'saved' ): ?>
 				<div class="notice notice-success is-dismissible">

@@ -50,8 +50,18 @@ class LTLB_Admin_BrandingPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_branding'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Branding & Design', 'ltl-bookings'); ?></h1>
-            <hr class="wp-header-end">
+
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__('Branding & Design', 'ltl-bookings'); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__('Customize colors, typography, and design tokens for your booking forms.', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+            </div>
 
             <form method="post" class="ltlb-branding-form">
                 <?php wp_nonce_field('ltlb_save_branding', 'ltlb_branding_nonce'); ?>

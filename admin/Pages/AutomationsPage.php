@@ -15,8 +15,18 @@ class LTLB_Admin_AutomationsPage {
 		?>
 		<div class="wrap ltlb-admin">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_automations'); } ?>
-			<h1 class="wp-heading-inline"><?php echo esc_html__( 'Automations', 'ltl-bookings' ); ?></h1>
-			<hr class="wp-header-end">
+			
+			<!-- Page Header -->
+			<div class="ltlb-page-header">
+				<div class="ltlb-page-header__content">
+					<h1 class="ltlb-page-header__title">
+						<?php echo esc_html__( 'Automations', 'ltl-bookings' ); ?>
+					</h1>
+					<p class="ltlb-page-header__subtitle">
+						<?php echo esc_html__( 'Configure scheduled automations like reminders and reports', 'ltl-bookings' ); ?>
+					</p>
+				</div>
+			</div>
 
 			<?php
 				if ( $action === 'edit' && $active_rule_id !== '' ) {

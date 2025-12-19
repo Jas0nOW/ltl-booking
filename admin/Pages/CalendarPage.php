@@ -17,8 +17,24 @@ class LTLB_Admin_CalendarPage {
 		?>
 		<div class="wrap ltlb-admin<?php echo $is_hotel_mode ? ' ltlb-admin--hotel' : ''; ?>">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_calendar'); } ?>
-			<h1 class="wp-heading-inline"><?php echo esc_html__( 'Calendar', 'ltl-bookings' ); ?></h1>
-			<hr class="wp-header-end">
+			
+			<!-- Page Header -->
+			<div class="ltlb-page-header">
+				<div class="ltlb-page-header__content">
+					<h1 class="ltlb-page-header__title">
+						<?php echo esc_html__( 'Calendar', 'ltl-bookings' ); ?>
+					</h1>
+					<p class="ltlb-page-header__subtitle">
+						<?php echo esc_html__( 'Visual overview of all your bookings', 'ltl-bookings' ); ?>
+					</p>
+				</div>
+				<div class="ltlb-page-header__actions">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments&action=add' ) ); ?>" class="ltlb-btn ltlb-btn--primary">
+						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+						<?php echo esc_html__( 'New Appointment', 'ltl-bookings' ); ?>
+					</a>
+				</div>
+			</div>
 
 			<div class="ltlb-card">
 				<div class="ltlb-calendar-layout">

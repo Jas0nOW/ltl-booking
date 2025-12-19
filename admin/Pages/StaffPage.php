@@ -96,8 +96,24 @@ class LTLB_Admin_StaffPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_staff'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Staff', 'ltl-bookings'); ?></h1>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__('Staff', 'ltl-bookings'); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__('Manage your team members and their working hours', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_url( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__( 'Add Staff', 'ltl-bookings' ); ?>
+                    </a>
+                </div>
+            </div>
 
             <div class="ltlb-card" style="margin-top:20px;">
                 <h2><?php echo esc_html__('Team', 'ltl-bookings'); ?></h2>

@@ -3,240 +3,238 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_SettingsPage {
 
-	public function render(): void {
-        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+    public function handle_post(): void {
+        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) {
+            return;
+        }
 
-		// Handle test email
-		if ( isset( $_POST['ltlb_send_test_email'] ) ) {
-			if ( ! check_admin_referer( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ) ) {
+        // Handle test email early to avoid rendering output before redirects.
+        if ( isset( $_POST['ltlb_send_test_email'] ) ) {
+            if ( ! check_admin_referer( 'ltlb_test_email_action', 'ltlb_test_email_nonce' ) ) {
                 wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
-			}
-			$test_email = sanitize_email( $_POST['test_email_address'] ?? '' );
-			if ( ! empty( $test_email ) && is_email( $test_email ) ) {
-				$settings = get_option( 'lazy_settings', [] );
-				$from_name = $settings['mail_from_name'] ?? get_bloginfo('name');
-				$from_email = $settings['mail_from_email'] ?? get_option('admin_email');
-				$reply_to = $settings['mail_reply_to'] ?? '';
-				
-				$headers = [];
-				$headers[] = 'Content-Type: text/html; charset=UTF-8';
-				$headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
-				if ( ! empty( $reply_to ) && is_email( $reply_to ) ) {
-					$headers[] = 'Reply-To: ' . $reply_to;
-				}
+            }
+
+            $test_email = sanitize_email( $_POST['test_email_address'] ?? '' );
+            if ( ! empty( $test_email ) && is_email( $test_email ) ) {
+                $settings = get_option( 'lazy_settings', [] );
+                if ( ! is_array( $settings ) ) { $settings = []; }
+
+                $from_name = $settings['mail_from_name'] ?? get_bloginfo('name');
+                $from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+                $reply_to = $settings['mail_reply_to'] ?? '';
+
+                $headers = [];
+                $headers[] = 'Content-Type: text/html; charset=UTF-8';
+                $headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
+                if ( ! empty( $reply_to ) && is_email( $reply_to ) ) {
+                    $headers[] = 'Reply-To: ' . $reply_to;
+                }
 
                 $subject = __( 'LazyBookings Test Email', 'ltl-bookings' );
                 $body = '<p>' . esc_html__( 'This is a test email from LazyBookings plugin.', 'ltl-bookings' ) . '</p>';
                 $body .= '<p>' . esc_html__( 'From:', 'ltl-bookings' ) . ' ' . esc_html($from_name) . ' &lt;' . esc_html($from_email) . '&gt;</p>';
-				if ( ! empty( $reply_to ) ) {
+                if ( ! empty( $reply_to ) ) {
                     $body .= '<p>' . esc_html__( 'Reply-To:', 'ltl-bookings' ) . ' ' . esc_html($reply_to) . '</p>';
-				}
+                }
                 $body .= '<p>' . esc_html__( 'Sent at:', 'ltl-bookings' ) . ' ' . esc_html( current_time('Y-m-d H:i:s') ) . '</p>';
 
                 $sent = ( class_exists( 'LTLB_Mailer' ) && method_exists( 'LTLB_Mailer', 'wp_mail' ) )
                     ? LTLB_Mailer::wp_mail( $test_email, $subject, $body, $headers )
                     : wp_mail( $test_email, $subject, $body, $headers );
-				if ( $sent ) {
+
+                if ( $sent ) {
                     LTLB_Notices::add( __( 'Test email sent successfully to ', 'ltl-bookings' ) . $test_email, 'success' );
-				} else {
+                } else {
                     LTLB_Notices::add( __( 'Failed to send test email.', 'ltl-bookings' ), 'error' );
-				}
-			} else {
+                }
+            } else {
                 LTLB_Notices::add( __( 'Invalid email address.', 'ltl-bookings' ), 'error' );
-			}
-			wp_safe_redirect( admin_url( 'admin.php?page=ltlb_settings' ) );
-			exit;
-		}
-
-		// Handle save
-            if ( isset( $_POST['ltlb_settings_save'] ) ) {
-            if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
-                wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
-			}
-                $current_tab_save = sanitize_key( (string) ( $_POST['ltlb_settings_tab'] ?? 'general' ) );
-                if ( ! in_array( $current_tab_save, [ 'general', 'email', 'ai', 'security' ], true ) ) {
-                    $current_tab_save = 'general';
-                }
-
-                // Collect and sanitize into a single lazy_settings option
-				$settings = get_option( 'lazy_settings', [] );
-				if ( ! is_array( $settings ) ) $settings = [];
-
-                if ( $current_tab_save === 'general' ) {
-                    $settings['working_hours_start'] = LTLB_Sanitizer::int( $_POST['working_hours_start'] ?? ( $settings['working_hours_start'] ?? 9 ) );
-                    $settings['working_hours_end'] = LTLB_Sanitizer::int( $_POST['working_hours_end'] ?? ( $settings['working_hours_end'] ?? 17 ) );
-                    $settings['slot_size_minutes'] = LTLB_Sanitizer::int( $_POST['slot_size_minutes'] ?? ( $settings['slot_size_minutes'] ?? 60 ) );
-                    $settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? ( $settings['timezone'] ?? '' ) );
-                    $settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? ( $settings['default_status'] ?? 'pending' ) );
-                    $settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
-
-                    // Logging settings
-                    $settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
-                    $settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? ( $settings['log_level'] ?? 'error' ) );
-
-                    // Template Mode
-                    $settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? ( $settings['template_mode'] ?? 'service' ) );
-
-                    // Profit model (simple margin)
-                    $profit_margin = LTLB_Sanitizer::int( $_POST['profit_margin_percent'] ?? ( $settings['profit_margin_percent'] ?? 100 ) );
-                    $settings['profit_margin_percent'] = max( 0, min( 100, (int) $profit_margin ) );
-
-                    // Hotel fees (used for gross profit)
-                    $hotel_fee_percent = LTLB_Sanitizer::int( $_POST['hotel_fee_percent'] ?? ( $settings['hotel_fee_percent'] ?? 0 ) );
-                    $settings['hotel_fee_percent'] = max( 0, min( 100, (int) $hotel_fee_percent ) );
-                    $settings['hotel_fee_fixed_cents'] = max( 0, LTLB_Sanitizer::money_cents( $_POST['hotel_fee_fixed'] ?? ( $settings['hotel_fee_fixed_cents'] ?? 0 ) ) );
-                }
-
-                if ( $current_tab_save === 'email' ) {
-                    $settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
-                    $settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
-                    $settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? ( $settings['mail_from_name'] ?? '' ) );
-                    $settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? ( $settings['mail_from_email'] ?? '' ) );
-                    $settings['mail_reply_to'] = LTLB_Sanitizer::email( $_POST['ltlb_email_reply_to'] ?? ( $settings['mail_reply_to'] ?? '' ) );
-                    $settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? ( $settings['mail_admin_template'] ?? '' ) );
-                    $settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? ( $settings['mail_customer_template'] ?? '' ) );
-                    $settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? ( $settings['mail_admin_subject'] ?? '' ) );
-                    $settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? ( $settings['mail_customer_subject'] ?? '' ) );
-
-                // SMTP (optional)
-                $settings['smtp_enabled'] = isset( $_POST['ltlb_smtp_enabled'] ) ? 1 : 0;
-                $settings['smtp_host'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_host'] ?? ( $settings['smtp_host'] ?? '' ) );
-                $settings['smtp_port'] = max( 0, intval( $_POST['ltlb_smtp_port'] ?? ( $settings['smtp_port'] ?? 587 ) ) );
-                $enc = sanitize_key( (string) ( $_POST['ltlb_smtp_encryption'] ?? ( $settings['smtp_encryption'] ?? 'tls' ) ) );
-                $settings['smtp_encryption'] = in_array( $enc, [ 'none', 'tls', 'ssl' ], true ) ? $enc : 'tls';
-                $settings['smtp_auth'] = isset( $_POST['ltlb_smtp_auth'] ) ? 1 : 0;
-                $settings['smtp_username'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_username'] ?? ( $settings['smtp_username'] ?? '' ) );
-                $settings['smtp_scope'] = isset( $_POST['ltlb_smtp_scope_plugin_only'] ) ? 'plugin' : 'global';
-
-                // Store SMTP password separately (autoload=no). Blank input keeps existing.
-                $mail_keys = get_option( 'lazy_mail_keys', [] );
-                if ( ! is_array( $mail_keys ) ) {
-                    $mail_keys = [];
-                }
-                $smtp_password = isset( $_POST['ltlb_smtp_password'] ) ? (string) $_POST['ltlb_smtp_password'] : '';
-                $smtp_password = sanitize_text_field( $smtp_password );
-                if ( $smtp_password !== '' ) {
-                    $mail_keys['smtp_password'] = $smtp_password;
-                    update_option( 'lazy_mail_keys', $mail_keys, false );
-                }
-                }
-
-                if ( $current_tab_save === 'security' ) {
-                    $settings['enable_payments'] = isset( $_POST['enable_payments'] ) ? 1 : 0;
-                    $processor = sanitize_key( (string) ( $_POST['payment_processor'] ?? ( $settings['payment_processor'] ?? 'stripe' ) ) );
-                    $settings['payment_processor'] = in_array( $processor, [ 'stripe', 'paypal' ], true ) ? $processor : 'stripe';
-
-                    $store_country = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['store_country'] ?? ( $settings['store_country'] ?? '' ) ) ) );
-                    $settings['store_country'] = $store_country !== '' ? substr( $store_country, 0, 2 ) : 'DE';
-                    $currency = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['default_currency'] ?? ( $settings['default_currency'] ?? '' ) ) ) );
-                    $settings['default_currency'] = $currency !== '' ? substr( $currency, 0, 3 ) : 'EUR';
-                    $stripe_flow = sanitize_key( (string) ( $_POST['stripe_flow'] ?? ( $settings['stripe_flow'] ?? 'checkout' ) ) );
-                    $settings['stripe_flow'] = in_array( $stripe_flow, [ 'checkout', 'elements' ], true ) ? $stripe_flow : 'checkout';
-
-                    $allowed_methods = [ 'stripe_card', 'paypal', 'klarna', 'cash', 'pos_card', 'invoice' ];
-                    $methods_in = isset( $_POST['payment_methods'] ) ? (array) $_POST['payment_methods'] : [];
-                    $methods = [];
-                    foreach ( $methods_in as $m ) {
-                        $m = sanitize_key( (string) $m );
-                        if ( in_array( $m, $allowed_methods, true ) ) {
-                            $methods[] = $m;
-                        }
-                    }
-                    $settings['payment_methods'] = array_values( array_unique( $methods ) );
-
-                    // Store payment keys separately (autoload=no). Empty inputs keep existing keys.
-                    $payment_keys = get_option( 'lazy_payment_keys', [] );
-                    if ( ! is_array( $payment_keys ) ) {
-                        $payment_keys = [];
-                    }
-                    $stripe_public = sanitize_text_field( (string) ( $_POST['stripe_public_key'] ?? '' ) );
-                    $stripe_secret = sanitize_text_field( (string) ( $_POST['stripe_secret_key'] ?? '' ) );
-                    $stripe_webhook_secret = sanitize_text_field( (string) ( $_POST['stripe_webhook_secret'] ?? '' ) );
-                    $paypal_client_id = sanitize_text_field( (string) ( $_POST['paypal_client_id'] ?? '' ) );
-                    $paypal_secret = sanitize_text_field( (string) ( $_POST['paypal_secret'] ?? '' ) );
-
-                    if ( $stripe_public !== '' ) {
-                        $payment_keys['stripe_public_key'] = $stripe_public;
-                    }
-                    if ( $stripe_secret !== '' ) {
-                        $payment_keys['stripe_secret_key'] = $stripe_secret;
-                    }
-					if ( $stripe_webhook_secret !== '' ) {
-						$payment_keys['stripe_webhook_secret'] = $stripe_webhook_secret;
-					}
-                    if ( $paypal_client_id !== '' ) {
-                        $payment_keys['paypal_client_id'] = $paypal_client_id;
-                    }
-                    if ( $paypal_secret !== '' ) {
-                        $payment_keys['paypal_secret'] = $paypal_secret;
-                    }
-
-                    update_option( 'lazy_payment_keys', $payment_keys, false );
-                }
-
-                update_option( 'lazy_settings', $settings );
-
-			$redirect = admin_url( 'admin.php?page=ltlb_settings&settings_updated=1' );
-			wp_safe_redirect( $redirect );
-			exit;
-		}
-            $settings = get_option( 'lazy_settings', [] );
-			if ( ! is_array( $settings ) ) $settings = [];
-			$start = (int) ( $settings['working_hours_start'] ?? 9 );
-			$end = (int) ( $settings['working_hours_end'] ?? 17 );
-			$slot = (int) ( $settings['slot_size_minutes'] ?? 60 );
-			$tz = $settings['timezone'] ?? '';
-			$default_status = $settings['default_status'] ?? 'pending';
-			$pending_blocks = $settings['pending_blocks'] ?? 0;
-			$mail_from_name = $settings['mail_from_name'] ?? '';
-			$mail_from_email = $settings['mail_from_email'] ?? get_option('admin_email');
-			$mail_reply_to = $settings['mail_reply_to'] ?? '';
-			$mail_admin_template = $settings['mail_admin_template'] ?? '';
-			$mail_customer_template = $settings['mail_customer_template'] ?? '';
-			$mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
-			$mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
-			$mail_admin_subject = $settings['mail_admin_subject'] ?? '';
-			$mail_customer_subject = $settings['mail_customer_subject'] ?? '';
-            $smtp_enabled = isset( $settings['smtp_enabled'] ) ? (int) $settings['smtp_enabled'] : 0;
-            $smtp_host = $settings['smtp_host'] ?? '';
-            $smtp_port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 587;
-            $smtp_encryption = $settings['smtp_encryption'] ?? 'tls';
-            $smtp_auth = isset( $settings['smtp_auth'] ) ? (int) $settings['smtp_auth'] : 1;
-            $smtp_username = $settings['smtp_username'] ?? '';
-            $smtp_scope = $settings['smtp_scope'] ?? 'global';
-            $smtp_scope = in_array( (string) $smtp_scope, [ 'global', 'plugin' ], true ) ? (string) $smtp_scope : 'global';
-            $mail_keys = get_option( 'lazy_mail_keys', [] );
-            if ( ! is_array( $mail_keys ) ) {
-                $mail_keys = [];
             }
-            $has_smtp_password = ! empty( $mail_keys['smtp_password'] ?? '' );
-			
-			$logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
-			$log_level = $settings['log_level'] ?? 'error';
-			$template_mode = $settings['template_mode'] ?? 'service';
-            $profit_margin_percent = isset( $settings['profit_margin_percent'] ) ? max( 0, min( 100, (int) $settings['profit_margin_percent'] ) ) : 100;
-            $hotel_fee_percent = isset( $settings['hotel_fee_percent'] ) ? max( 0, min( 100, (int) $settings['hotel_fee_percent'] ) ) : 0;
-            $hotel_fee_fixed_cents = isset( $settings['hotel_fee_fixed_cents'] ) ? max( 0, (int) $settings['hotel_fee_fixed_cents'] ) : 0;
-            $hotel_fee_fixed = number_format( $hotel_fee_fixed_cents / 100, 2, '.', '' );
 
-		$timezones = timezone_identifiers_list();
+            wp_safe_redirect( admin_url( 'admin.php?page=ltlb_settings' ) );
+            exit;
+        }
 
-		// Get AI config and business context
-		$ai_config = get_option( 'lazy_ai_config', [] );
-		if ( ! is_array( $ai_config ) ) $ai_config = [];
-		$ai_enabled = $ai_config['enabled'] ?? 0;
-		$ai_provider = $ai_config['provider'] ?? 'gemini';
-		$ai_model = $ai_config['model'] ?? 'gemini-2.5-flash';
-		$ai_mode = $ai_config['operating_mode'] ?? 'human-in-the-loop';
+        if ( ! isset( $_POST['ltlb_settings_save'] ) ) {
+            return;
+        }
+
+        if ( ! check_admin_referer( 'ltlb_settings_save_action', 'ltlb_settings_nonce' ) ) {
+            wp_die( esc_html__( 'Security check failed', 'ltl-bookings' ) );
+        }
+
+        $current_tab_save = sanitize_key( (string) ( $_POST['ltlb_settings_tab'] ?? 'general' ) );
+        if ( ! in_array( $current_tab_save, [ 'general', 'email', 'ai', 'security' ], true ) ) {
+            $current_tab_save = 'general';
+        }
+
+        $settings = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $settings ) ) { $settings = []; }
+
+        if ( $current_tab_save === 'general' ) {
+            $settings['working_hours_start'] = LTLB_Sanitizer::int( $_POST['working_hours_start'] ?? ( $settings['working_hours_start'] ?? 9 ) );
+            $settings['working_hours_end'] = LTLB_Sanitizer::int( $_POST['working_hours_end'] ?? ( $settings['working_hours_end'] ?? 17 ) );
+            $settings['slot_size_minutes'] = LTLB_Sanitizer::int( $_POST['slot_size_minutes'] ?? ( $settings['slot_size_minutes'] ?? 60 ) );
+            $settings['timezone'] = LTLB_Sanitizer::text( $_POST['ltlb_timezone'] ?? ( $settings['timezone'] ?? '' ) );
+            $settings['default_status'] = LTLB_Sanitizer::text( $_POST['default_status'] ?? ( $settings['default_status'] ?? 'pending' ) );
+            $settings['pending_blocks'] = isset( $_POST['pending_blocks'] ) ? 1 : 0;
+
+            $settings['logging_enabled'] = isset( $_POST['logging_enabled'] ) ? 1 : 0;
+            $settings['log_level'] = LTLB_Sanitizer::text( $_POST['log_level'] ?? ( $settings['log_level'] ?? 'error' ) );
+            $settings['template_mode'] = LTLB_Sanitizer::text( $_POST['template_mode'] ?? ( $settings['template_mode'] ?? 'service' ) );
+
+            $profit_margin = LTLB_Sanitizer::int( $_POST['profit_margin_percent'] ?? ( $settings['profit_margin_percent'] ?? 100 ) );
+            $settings['profit_margin_percent'] = max( 0, min( 100, (int) $profit_margin ) );
+
+            $hotel_fee_percent = LTLB_Sanitizer::int( $_POST['hotel_fee_percent'] ?? ( $settings['hotel_fee_percent'] ?? 0 ) );
+            $settings['hotel_fee_percent'] = max( 0, min( 100, (int) $hotel_fee_percent ) );
+            $settings['hotel_fee_fixed_cents'] = max( 0, LTLB_Sanitizer::money_cents( $_POST['hotel_fee_fixed'] ?? ( $settings['hotel_fee_fixed_cents'] ?? 0 ) ) );
+        }
+
+        if ( $current_tab_save === 'email' ) {
+            $settings['mail_admin_enabled'] = isset( $_POST['ltlb_email_send_admin'] ) ? 1 : 0;
+            $settings['mail_customer_enabled'] = isset( $_POST['ltlb_email_send_customer'] ) ? 1 : 0;
+            $settings['mail_from_name'] = LTLB_Sanitizer::text( $_POST['ltlb_email_from_name'] ?? ( $settings['mail_from_name'] ?? '' ) );
+            $settings['mail_from_email'] = LTLB_Sanitizer::email( $_POST['ltlb_email_from_address'] ?? ( $settings['mail_from_email'] ?? '' ) );
+            $settings['mail_reply_to'] = LTLB_Sanitizer::email( $_POST['ltlb_email_reply_to'] ?? ( $settings['mail_reply_to'] ?? '' ) );
+            $settings['mail_admin_template'] = wp_kses_post( $_POST['ltlb_email_admin_body'] ?? ( $settings['mail_admin_template'] ?? '' ) );
+            $settings['mail_customer_template'] = wp_kses_post( $_POST['ltlb_email_customer_body'] ?? ( $settings['mail_customer_template'] ?? '' ) );
+            $settings['mail_admin_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_admin_subject'] ?? ( $settings['mail_admin_subject'] ?? '' ) );
+            $settings['mail_customer_subject'] = LTLB_Sanitizer::text( $_POST['ltlb_email_customer_subject'] ?? ( $settings['mail_customer_subject'] ?? '' ) );
+
+            $settings['smtp_enabled'] = isset( $_POST['ltlb_smtp_enabled'] ) ? 1 : 0;
+            $settings['smtp_host'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_host'] ?? ( $settings['smtp_host'] ?? '' ) );
+            $settings['smtp_port'] = max( 0, intval( $_POST['ltlb_smtp_port'] ?? ( $settings['smtp_port'] ?? 587 ) ) );
+            $enc = sanitize_key( (string) ( $_POST['ltlb_smtp_encryption'] ?? ( $settings['smtp_encryption'] ?? 'tls' ) ) );
+            $settings['smtp_encryption'] = in_array( $enc, [ 'none', 'tls', 'ssl' ], true ) ? $enc : 'tls';
+            $settings['smtp_auth'] = isset( $_POST['ltlb_smtp_auth'] ) ? 1 : 0;
+            $settings['smtp_username'] = LTLB_Sanitizer::text( $_POST['ltlb_smtp_username'] ?? ( $settings['smtp_username'] ?? '' ) );
+            $settings['smtp_scope'] = isset( $_POST['ltlb_smtp_scope_plugin_only'] ) ? 'plugin' : 'global';
+
+            $mail_keys = get_option( 'lazy_mail_keys', [] );
+            if ( ! is_array( $mail_keys ) ) { $mail_keys = []; }
+            $smtp_password = isset( $_POST['ltlb_smtp_password'] ) ? (string) $_POST['ltlb_smtp_password'] : '';
+            $smtp_password = sanitize_text_field( $smtp_password );
+            if ( $smtp_password !== '' ) {
+                $mail_keys['smtp_password'] = $smtp_password;
+                update_option( 'lazy_mail_keys', $mail_keys, false );
+            }
+        }
+
+        if ( $current_tab_save === 'security' ) {
+            $settings['enable_payments'] = isset( $_POST['enable_payments'] ) ? 1 : 0;
+            $processor = sanitize_key( (string) ( $_POST['payment_processor'] ?? ( $settings['payment_processor'] ?? 'stripe' ) ) );
+            $settings['payment_processor'] = in_array( $processor, [ 'stripe', 'paypal' ], true ) ? $processor : 'stripe';
+
+            $store_country = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['store_country'] ?? ( $settings['store_country'] ?? '' ) ) ) );
+            $settings['store_country'] = $store_country !== '' ? substr( $store_country, 0, 2 ) : 'DE';
+            $currency = strtoupper( preg_replace( '/[^A-Za-z]/', '', (string) ( $_POST['default_currency'] ?? ( $settings['default_currency'] ?? '' ) ) ) );
+            $settings['default_currency'] = $currency !== '' ? substr( $currency, 0, 3 ) : 'EUR';
+            $stripe_flow = sanitize_key( (string) ( $_POST['stripe_flow'] ?? ( $settings['stripe_flow'] ?? 'checkout' ) ) );
+            $settings['stripe_flow'] = in_array( $stripe_flow, [ 'checkout', 'elements' ], true ) ? $stripe_flow : 'checkout';
+
+            $allowed_methods = [ 'stripe_card', 'paypal', 'klarna', 'cash', 'pos_card', 'invoice' ];
+            $methods_in = isset( $_POST['payment_methods'] ) ? (array) $_POST['payment_methods'] : [];
+            $methods = [];
+            foreach ( $methods_in as $m ) {
+                $m = sanitize_key( (string) $m );
+                if ( in_array( $m, $allowed_methods, true ) ) {
+                    $methods[] = $m;
+                }
+            }
+            $settings['payment_methods'] = array_values( array_unique( $methods ) );
+
+            $payment_keys = get_option( 'lazy_payment_keys', [] );
+            if ( ! is_array( $payment_keys ) ) { $payment_keys = []; }
+            $stripe_public = sanitize_text_field( (string) ( $_POST['stripe_public_key'] ?? '' ) );
+            $stripe_secret = sanitize_text_field( (string) ( $_POST['stripe_secret_key'] ?? '' ) );
+            $stripe_webhook_secret = sanitize_text_field( (string) ( $_POST['stripe_webhook_secret'] ?? '' ) );
+            $paypal_client_id = sanitize_text_field( (string) ( $_POST['paypal_client_id'] ?? '' ) );
+            $paypal_secret = sanitize_text_field( (string) ( $_POST['paypal_secret'] ?? '' ) );
+
+            if ( $stripe_public !== '' ) {
+                $payment_keys['stripe_public_key'] = $stripe_public;
+            }
+            if ( $stripe_secret !== '' ) {
+                $payment_keys['stripe_secret_key'] = $stripe_secret;
+            }
+            if ( $stripe_webhook_secret !== '' ) {
+                $payment_keys['stripe_webhook_secret'] = $stripe_webhook_secret;
+            }
+            if ( $paypal_client_id !== '' ) {
+                $payment_keys['paypal_client_id'] = $paypal_client_id;
+            }
+            if ( $paypal_secret !== '' ) {
+                $payment_keys['paypal_secret'] = $paypal_secret;
+            }
+
+            update_option( 'lazy_payment_keys', $payment_keys, false );
+        }
+
+        update_option( 'lazy_settings', $settings );
+
+        $redirect = admin_url( 'admin.php?page=ltlb_settings&settings_updated=1' );
+        wp_safe_redirect( $redirect );
+        exit;
+    }
+
+    public function render(): void {
+        if ( ! current_user_can('manage_booking_settings') && ! current_user_can('manage_options') ) {
+            wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
+        }
+
+        $settings = get_option( 'lazy_settings', [] );
+        if ( ! is_array( $settings ) ) { $settings = []; }
+        $start = (int) ( $settings['working_hours_start'] ?? 9 );
+        $end = (int) ( $settings['working_hours_end'] ?? 17 );
+        $slot = (int) ( $settings['slot_size_minutes'] ?? 60 );
+        $tz = $settings['timezone'] ?? '';
+        $default_status = $settings['default_status'] ?? 'pending';
+        $pending_blocks = $settings['pending_blocks'] ?? 0;
+        $mail_from_name = $settings['mail_from_name'] ?? '';
+        $mail_from_email = $settings['mail_from_email'] ?? get_option('admin_email');
+        $mail_reply_to = $settings['mail_reply_to'] ?? '';
+        $mail_admin_template = $settings['mail_admin_template'] ?? '';
+        $mail_customer_template = $settings['mail_customer_template'] ?? '';
+        $mail_customer_enabled = isset( $settings['mail_customer_enabled'] ) ? (int)$settings['mail_customer_enabled'] : 1;
+        $mail_admin_enabled = isset( $settings['mail_admin_enabled'] ) ? (int)$settings['mail_admin_enabled'] : 0;
+        $mail_admin_subject = $settings['mail_admin_subject'] ?? '';
+        $mail_customer_subject = $settings['mail_customer_subject'] ?? '';
+        $smtp_enabled = isset( $settings['smtp_enabled'] ) ? (int) $settings['smtp_enabled'] : 0;
+        $smtp_host = $settings['smtp_host'] ?? '';
+        $smtp_port = isset( $settings['smtp_port'] ) ? intval( $settings['smtp_port'] ) : 587;
+        $smtp_encryption = $settings['smtp_encryption'] ?? 'tls';
+        $smtp_auth = isset( $settings['smtp_auth'] ) ? (int) $settings['smtp_auth'] : 1;
+        $smtp_username = $settings['smtp_username'] ?? '';
+        $smtp_scope = $settings['smtp_scope'] ?? 'global';
+        $smtp_scope = in_array( (string) $smtp_scope, [ 'global', 'plugin' ], true ) ? (string) $smtp_scope : 'global';
+        $mail_keys = get_option( 'lazy_mail_keys', [] );
+        if ( ! is_array( $mail_keys ) ) { $mail_keys = []; }
+        $has_smtp_password = ! empty( $mail_keys['smtp_password'] ?? '' );
+
+        $logging_enabled = isset( $settings['logging_enabled'] ) ? (int)$settings['logging_enabled'] : 0;
+        $log_level = $settings['log_level'] ?? 'error';
+        $template_mode = $settings['template_mode'] ?? 'service';
+        $profit_margin_percent = isset( $settings['profit_margin_percent'] ) ? max( 0, min( 100, (int) $settings['profit_margin_percent'] ) ) : 100;
+        $hotel_fee_percent = isset( $settings['hotel_fee_percent'] ) ? max( 0, min( 100, (int) $settings['hotel_fee_percent'] ) ) : 0;
+        $hotel_fee_fixed_cents = isset( $settings['hotel_fee_fixed_cents'] ) ? max( 0, (int) $settings['hotel_fee_fixed_cents'] ) : 0;
+        $hotel_fee_fixed = number_format( $hotel_fee_fixed_cents / 100, 2, '.', '' );
+
+        $timezones = timezone_identifiers_list();
+
+        $ai_config = get_option( 'lazy_ai_config', [] );
+        if ( ! is_array( $ai_config ) ) $ai_config = [];
+        $ai_enabled = $ai_config['enabled'] ?? 0;
+        $ai_provider = $ai_config['provider'] ?? 'gemini';
+        $ai_model = $ai_config['model'] ?? 'gemini-2.5-flash';
+        $ai_mode = $ai_config['operating_mode'] ?? 'human-in-the-loop';
 
         $api_keys = get_option( 'lazy_api_keys', [] );
         if ( ! is_array( $api_keys ) ) $api_keys = [];
         $gemini_key = $api_keys['gemini'] ?? '';
 
         $payment_keys = get_option( 'lazy_payment_keys', [] );
-        if ( ! is_array( $payment_keys ) ) {
-            $payment_keys = [];
-        }
+        if ( ! is_array( $payment_keys ) ) { $payment_keys = []; }
         $has_stripe_public = ! empty( $payment_keys['stripe_public_key'] ?? ( $settings['stripe_public_key'] ?? '' ) );
         $has_stripe_secret = ! empty( $payment_keys['stripe_secret_key'] ?? ( $settings['stripe_secret_key'] ?? '' ) );
         $has_stripe_webhook = ! empty( $payment_keys['stripe_webhook_secret'] ?? '' );
@@ -248,19 +246,28 @@ class LTLB_Admin_SettingsPage {
         $stripe_flow = $settings['stripe_flow'] ?? 'checkout';
         $selected_methods = isset( $settings['payment_methods'] ) && is_array( $settings['payment_methods'] ) ? $settings['payment_methods'] : [];
 
-		$business_context = get_option( 'lazy_business_context', [] );
-		if ( ! is_array( $business_context ) ) $business_context = [];
+        $business_context = get_option( 'lazy_business_context', [] );
+        if ( ! is_array( $business_context ) ) $business_context = [];
 
-		// Determine current tab
-		$current_tab = sanitize_text_field( $_GET['tab'] ?? 'general' );
-		if ( ! in_array( $current_tab, [ 'general', 'email', 'ai', 'security' ], true ) ) {
-			$current_tab = 'general';
-		}
+        $current_tab = sanitize_text_field( $_GET['tab'] ?? 'general' );
+        if ( ! in_array( $current_tab, [ 'general', 'email', 'ai', 'security' ], true ) ) {
+            $current_tab = 'general';
+        }
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_settings'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__( 'Settings', 'ltl-bookings' ); ?></h1>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__( 'Settings', 'ltl-bookings' ); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__( 'Configure your booking system preferences', 'ltl-bookings' ); ?>
+                    </p>
+                </div>
+            </div>
             
             <?php if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === '1' ): ?>
                 <div class="notice notice-success is-dismissible">

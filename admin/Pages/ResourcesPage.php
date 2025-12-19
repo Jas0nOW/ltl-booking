@@ -63,16 +63,27 @@ class LTLB_Admin_ResourcesPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_resources'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
-            <?php if ( $action !== 'add' && ! $editing ) : ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
-            <?php endif; ?>
-            <hr class="wp-header-end">
             
-            <p class="description" style="margin-bottom:20px;">
-                <?php echo $is_hotel ? esc_html__('Rooms are the bookable units (e.g. Room 101, Room 102). Link them to room types to control availability.', 'ltl-bookings') : esc_html__('Resources are rooms, equipment, or capacities. Link them to services to control availability.', 'ltl-bookings'); ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services') ); ?>"><?php echo esc_html( sprintf( __( 'Manage %s', 'ltl-bookings' ), $services_label ) ); ?></a>
-            </p>
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html($label_plural); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo $is_hotel ? esc_html__('Rooms are the bookable units (e.g. Room 101, Room 102). Link them to room types to control availability.', 'ltl-bookings') : esc_html__('Resources are rooms, equipment, or capacities. Link them to services to control availability.', 'ltl-bookings'); ?>
+                        <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services') ); ?>" style="color: var(--lazy-accent);"><?php echo esc_html( sprintf( __( 'Manage %s →', 'ltl-bookings' ), $services_label ) ); ?></a>
+                    </p>
+                </div>
+                <?php if ( $action !== 'add' && ! $editing ) : ?>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__('Add New', 'ltl-bookings'); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+            </div>
 
             <?php if ( $action === 'add' || $editing ) :
                 $form_id = $editing ? intval( $resource['id'] ) : 0;

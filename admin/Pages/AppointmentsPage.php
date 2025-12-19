@@ -547,9 +547,28 @@ class LTLB_Admin_AppointmentsPage {
 		?>
         <div class="wrap ltlb-admin">
             <?php LTLB_Admin_Header::render('ltlb_appointments'); ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__( 'Appointments', 'ltl-bookings' ); ?></h1>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments&action=add' ) ); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></a>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header with Actions -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__( 'Appointments', 'ltl-bookings' ); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__( 'Manage all your bookings and appointments', 'ltl-bookings' ); ?>
+                    </p>
+                </div>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments&action=add' ) ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?>
+                    </a>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_calendar' ) ); ?>" class="ltlb-btn ltlb-btn--secondary">
+                        <span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
+                        <?php echo esc_html__( 'Calendar', 'ltl-bookings' ); ?>
+                    </a>
+                </div>
+            </div>
             
             <form method="post">
                 <?php LTLB_Admin_Component::card_start(''); ?>

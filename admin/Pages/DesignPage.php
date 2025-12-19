@@ -3,6 +3,93 @@ if ( ! defined('ABSPATH') ) exit;
 
 class LTLB_Admin_DesignPage {
 
+    /**
+     * Handle form save and redirect BEFORE any output
+     */
+    private function maybe_handle_save(): void {
+        if ( ! isset( $_POST['ltlb_design_save'] ) ) {
+            return;
+        }
+
+        if ( ! check_admin_referer( 'ltlb_design_save_action', 'ltlb_design_nonce' ) ) {
+            wp_die( esc_html__( 'Security check failed. Please reload the page and try again.', 'ltl-bookings' ) );
+        }
+
+        $scope = $this->get_scope();
+
+        $design = get_option( 'lazy_design', [] );
+        if ( ! is_array( $design ) ) $design = [];
+
+        $design_backend = get_option( 'lazy_design_backend', [] );
+        if ( ! is_array( $design_backend ) ) {
+            $design_backend = [];
+        }
+
+        // Sanitize color fields (hex colors)
+        $color_fields = [
+            'background',
+            'primary',
+            'primary_hover',
+            'secondary',
+            'secondary_hover',
+            'text',
+            'accent',
+            'border_color',
+            'panel_background',
+            'button_text',
+            'gradient_from',
+            'gradient_to',
+        ];
+        foreach ( $color_fields as $f ) {
+            $val = LTLB_Sanitizer::text( $_POST[ $f ] ?? '' );
+            $val = trim( (string) $val );
+            if ( preg_match( '/^#?[0-9A-Fa-f]{6}$/', (string) $val ) ) {
+                if ( strpos( (string) $val, '#' ) !== 0 ) {
+                    $val = '#' . $val;
+                }
+                if ( $scope === 'backend' ) {
+                    $design_backend[ $f ] = strtolower( $val );
+                } else {
+                    $design[ $f ] = strtolower( $val );
+                }
+            } else {
+                if ( $scope === 'backend' ) {
+                    $design_backend[ $f ] = $design_backend[ $f ] ?? '';
+                } else {
+                    $design[ $f ] = $design[ $f ] ?? '';
+                }
+            }
+        }
+
+        // Sanitize numeric fields (pixels) - shared across frontend/backend
+        $numeric_fields = [ 'border_width', 'border_radius', 'box_shadow_blur', 'box_shadow_spread', 'transition_duration' ];
+        foreach ( $numeric_fields as $f ) {
+            $val = isset( $_POST[ $f ] ) ? intval( $_POST[ $f ] ) : 0;
+            $design[ $f ] = max( 0, $val );
+        }
+
+        // Custom CSS (shared)
+        $custom_css = isset( $_POST['custom_css'] ) ? sanitize_textarea_field( wp_unslash( $_POST['custom_css'] ) ) : '';
+        $design['custom_css'] = $custom_css;
+
+        // Boolean fields (shared)
+        $design['use_gradient'] = isset( $_POST['use_gradient'] ) ? 1 : 0;
+        $design['enable_animations'] = isset( $_POST['enable_animations'] ) ? 1 : 0;
+        $design['auto_button_text'] = isset( $_POST['auto_button_text'] ) ? 1 : 0;
+
+        // Separate shadow controls for different elements (shared)
+        $design['shadow_container'] = isset( $_POST['shadow_container'] ) ? 1 : 0;
+        $design['shadow_button'] = isset( $_POST['shadow_button'] ) ? 1 : 0;
+        $design['shadow_input'] = isset( $_POST['shadow_input'] ) ? 1 : 0;
+        $design['shadow_card'] = isset( $_POST['shadow_card'] ) ? 1 : 0;
+
+        update_option( 'lazy_design', $design );
+        update_option( 'lazy_design_backend', $design_backend );
+        LTLB_Notices::add( __( 'Design saved.', 'ltl-bookings' ), 'success' );
+        wp_safe_redirect( admin_url('admin.php?page=ltlb_design&scope=' . rawurlencode( $scope ) ) );
+        exit;
+    }
+
     private function get_contrast_text_color( $hex_color ): string {
         $hex_color = is_string( $hex_color ) ? trim( $hex_color ) : '';
         if ( ! preg_match( '/^#?[0-9A-Fa-f]{6}$/', $hex_color ) ) {
@@ -42,85 +129,10 @@ class LTLB_Admin_DesignPage {
     public function render(): void {
         if ( ! current_user_can('manage_options') ) wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
 
+        // Handle form submission and redirect BEFORE any output
+        $this->maybe_handle_save();
+
         $scope = $this->get_scope();
-
-        if ( isset( $_POST['ltlb_design_save'] ) ) {
-            if ( ! check_admin_referer( 'ltlb_design_save_action', 'ltlb_design_nonce' ) ) {
-                wp_die( esc_html__( 'Security check failed. Please reload the page and try again.', 'ltl-bookings' ) );
-            }
-
-            $design = get_option( 'lazy_design', [] );
-            if ( ! is_array( $design ) ) $design = [];
-
-            $design_backend = get_option( 'lazy_design_backend', [] );
-            if ( ! is_array( $design_backend ) ) {
-                $design_backend = [];
-            }
-
-            // Sanitize color fields (hex colors)
-            $color_fields = [
-                'background',
-                'primary',
-                'primary_hover',
-                'secondary',
-                'secondary_hover',
-                'text',
-                'accent',
-                'border_color',
-                'panel_background',
-                'button_text',
-                'gradient_from',
-                'gradient_to',
-            ];
-            foreach ( $color_fields as $f ) {
-                $val = LTLB_Sanitizer::text( $_POST[ $f ] ?? '' );
-                $val = trim( (string) $val );
-                if ( preg_match( '/^#?[0-9A-Fa-f]{6}$/', (string) $val ) ) {
-                    if ( strpos( (string) $val, '#' ) !== 0 ) {
-                        $val = '#' . $val;
-                    }
-                    if ( $scope === 'backend' ) {
-                        $design_backend[ $f ] = strtolower( $val );
-                    } else {
-                        $design[ $f ] = strtolower( $val );
-                    }
-                } else {
-                    if ( $scope === 'backend' ) {
-                        $design_backend[ $f ] = $design_backend[ $f ] ?? '';
-                    } else {
-                        $design[ $f ] = $design[ $f ] ?? '';
-                    }
-                }
-            }
-
-            // Sanitize numeric fields (pixels) - shared across frontend/backend
-            $numeric_fields = [ 'border_width', 'border_radius', 'box_shadow_blur', 'box_shadow_spread', 'transition_duration' ];
-            foreach ( $numeric_fields as $f ) {
-                $val = isset( $_POST[ $f ] ) ? intval( $_POST[ $f ] ) : 0;
-                $design[ $f ] = max( 0, $val );
-            }
-
-            // Custom CSS (shared)
-            $custom_css = isset( $_POST['custom_css'] ) ? sanitize_textarea_field( wp_unslash( $_POST['custom_css'] ) ) : '';
-            $design['custom_css'] = $custom_css;
-
-            // Boolean fields (shared)
-            $design['use_gradient'] = isset( $_POST['use_gradient'] ) ? 1 : 0;
-            $design['enable_animations'] = isset( $_POST['enable_animations'] ) ? 1 : 0;
-            $design['auto_button_text'] = isset( $_POST['auto_button_text'] ) ? 1 : 0;
-
-            // Separate shadow controls for different elements (shared)
-            $design['shadow_container'] = isset( $_POST['shadow_container'] ) ? 1 : 0;
-            $design['shadow_button'] = isset( $_POST['shadow_button'] ) ? 1 : 0;
-            $design['shadow_input'] = isset( $_POST['shadow_input'] ) ? 1 : 0;
-            $design['shadow_card'] = isset( $_POST['shadow_card'] ) ? 1 : 0;
-
-            update_option( 'lazy_design', $design );
-            update_option( 'lazy_design_backend', $design_backend );
-            LTLB_Notices::add( __( 'Design saved.', 'ltl-bookings' ), 'success' );
-            wp_safe_redirect( admin_url('admin.php?page=ltlb_design&scope=' . rawurlencode( $scope ) ) );
-            exit;
-        }
 
         $design = get_option( 'lazy_design', [] );
         if ( ! is_array( $design ) ) $design = [];
@@ -190,10 +202,20 @@ class LTLB_Admin_DesignPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_design'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Design Settings', 'ltl-bookings'); ?></h1>
-            <hr class="wp-header-end">
+
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__('Design Settings', 'ltl-bookings'); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__('Customize the appearance of your booking wizard.', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+            </div>
+
             <p>
-                <?php echo esc_html__('Customize the appearance of your booking wizard.', 'ltl-bookings'); ?>
                 <?php if ( $scope === 'backend' ) : ?>
                     <br><span class="description"><?php echo esc_html__('Backend tab controls the color palette used inside WP Admin (LazyBookings pages).', 'ltl-bookings'); ?></span>
                 <?php else : ?>
