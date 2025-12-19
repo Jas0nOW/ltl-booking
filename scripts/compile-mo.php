@@ -23,7 +23,7 @@ $currentMsgstr = null;
 $inMsgid = false;
 $inMsgstr = false;
 
-$lines = explode("\n", $poContent);
+$lines = explode("\n", (string) $poContent);
 foreach ($lines as $line) {
     $line = trim($line);
     
@@ -33,7 +33,7 @@ foreach ($lines as $line) {
     }
     
     // Start of msgid
-    if (strpos($line, 'msgid "') === 0) {
+    if (strpos((string) $line, 'msgid "') === 0) {
         // Save previous translation
         if ($currentMsgid !== null && $currentMsgstr !== null) {
             $translations[$currentMsgid] = $currentMsgstr;
@@ -47,7 +47,7 @@ foreach ($lines as $line) {
     }
     
     // Start of msgstr
-    if (strpos($line, 'msgstr "') === 0) {
+    if (strpos((string) $line, 'msgstr "') === 0) {
         $currentMsgstr = substr($line, 8, -1); // Remove 'msgstr "' and '"'
         $inMsgid = false;
         $inMsgstr = true;

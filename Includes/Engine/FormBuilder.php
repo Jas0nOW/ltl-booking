@@ -457,7 +457,7 @@ class LTLB_Form_Builder {
      */
     private function generate_field_key( string $label ): string {
         $key = sanitize_title( $label );
-        $key = str_replace( '-', '_', $key );
+        $key = str_replace( '-', '_', (string) $key );
         
         // Ensure uniqueness
         global $wpdb;
@@ -503,7 +503,7 @@ class LTLB_Form_Builder {
                     $match = $current_value !== $compare_value;
                     break;
                 case 'contains':
-                    $match = strpos( $current_value, $compare_value ) !== false;
+                    $match = strpos( (string) $current_value, (string) $compare_value ) !== false;
                     break;
                 case 'empty':
                     $match = empty( $current_value );

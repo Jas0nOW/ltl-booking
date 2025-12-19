@@ -924,7 +924,7 @@ class LTLB_Plugin {
         $timestamp = 0;
         $v1_sigs = [];
         foreach ( $parts as $p ) {
-            if ( strpos( $p, '=' ) === false ) continue;
+            if ( strpos( (string) $p, '=' ) === false ) continue;
             list( $k, $v ) = array_map( 'trim', explode( '=', $p, 2 ) );
             if ( $k === 't' ) {
                 $timestamp = (int) $v;
@@ -2234,7 +2234,7 @@ class LTLB_Plugin {
     public function enqueue_admin_assets(): void {
         if ( ! is_admin() ) return;
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+        if ( ! $page || strpos( (string) $page, 'ltlb_' ) !== 0 ) return;
 
         $debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
         
@@ -2438,7 +2438,7 @@ class LTLB_Plugin {
         }
 
         // Remove # if present
-        $hex = str_replace( '#', '', $hex_color );
+        $hex = str_replace( '#', '', (string) $hex_color );
 
         // Convert to RGB
         $r = hexdec( substr( $hex, 0, 2 ) );
@@ -2577,7 +2577,7 @@ class LTLB_Plugin {
     public function print_design_css_admin(): void {
         if ( ! is_admin() ) return;
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+        if ( ! $page || strpos( (string) $page, 'ltlb_' ) !== 0 ) return;
 
         $design = get_option( 'lazy_design', [] );
         if ( ! is_array( $design ) ) $design = [];

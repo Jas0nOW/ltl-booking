@@ -133,7 +133,7 @@ class LTLB_Automations {
 		if ( ! preg_match( '/^\d{2}:\d{2}$/', $hhmm ) ) {
 			$hhmm = '09:00';
 		}
-		[ $hh, $mm ] = array_map( 'intval', explode( ':', $hhmm ) );
+		[ $hh, $mm ] = array_map( 'intval', explode( ':', (string) $hhmm ) );
 
 		if ( $schedule === 'weekly' ) {
 			$weekday = isset( $rule['weekday'] ) ? intval( $rule['weekday'] ) : 1; // 1=Mon .. 7=Sun

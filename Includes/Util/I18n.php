@@ -675,7 +675,7 @@ class LTLB_I18n {
 		$content = str_replace( 'Ã ', 'à', (string) $content );
 
 		$translations = [];
-		$lines = explode( "\n", $content );
+		$lines = explode( "\n", (string) $content );
 		$msgid = '';
 		$msgstr = '';
 		$in_msgid = false;

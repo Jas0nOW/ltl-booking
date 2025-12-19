@@ -92,7 +92,7 @@ class LTLB_Admin_AppointmentsPage {
             if ( is_array( $lines ) ) {
                 foreach ( $lines as $line ) {
                     $line = trim( (string) $line );
-                    if ( stripos( $line, 'Invoice:' ) === 0 ) {
+                    if ( stripos( (string) $line, 'Invoice:' ) === 0 ) {
                         $invoice_line = $line;
                         break;
                     }

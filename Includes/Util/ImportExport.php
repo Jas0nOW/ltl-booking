@@ -511,7 +511,7 @@ class LTLB_Import_Export {
      */
     private function parse_csv( string $csv_content ): array {
         $rows = [];
-        $lines = explode( "\n", $csv_content );
+        $lines = explode( "\n", (string) $csv_content );
 
         foreach ( $lines as $line ) {
             if ( empty( trim( $line ) ) ) continue;

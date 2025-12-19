@@ -28,7 +28,7 @@ class PoToMo {
     
     private static function parse_po( string $content ): array {
         $entries = [];
-        $lines = explode( "\n", $content );
+        $lines = explode( "\n", (string) $content );
         $msgid = '';
         $msgstr = '';
         $in_msgid = false;
@@ -48,7 +48,7 @@ class PoToMo {
                 continue;
             }
             
-            if ( strpos( $line, 'msgid' ) === 0 ) {
+            if ( strpos( (string) $line, 'msgid' ) === 0 ) {
                 if ( ! empty( $msgid ) && ! empty( $msgstr ) ) {
                     $entries[ $msgid ] = $msgstr;
                     $msgstr = '';
@@ -57,7 +57,7 @@ class PoToMo {
                 $msgid = $matches[1] ?? '';
                 $in_msgid = true;
                 $in_msgstr = false;
-            } elseif ( strpos( $line, 'msgstr' ) === 0 ) {
+            } elseif ( strpos( (string) $line, 'msgstr' ) === 0 ) {
                 preg_match( '/msgstr\s+"(.*)"/U', $line, $matches );
                 $msgstr = $matches[1] ?? '';
                 $in_msgid = false;

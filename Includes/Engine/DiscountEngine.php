@@ -109,14 +109,14 @@ class LTLB_Discount_Engine {
         $room_id = intval( $booking_data['room_id'] ?? 0 );
         
         if ( ! empty( $coupon['service_ids'] ) ) {
-            $allowed_services = array_map( 'intval', explode( ',', $coupon['service_ids'] ) );
+            $allowed_services = array_map( 'intval', explode( ',', (string) ( $coupon['service_ids'] ?? '' ) ) );
             if ( ! in_array( $service_id, $allowed_services, true ) ) {
                 return new WP_Error( 'coupon_not_applicable', __( 'This coupon is not valid for the selected service', 'ltl-bookings' ) );
             }
         }
         
         if ( ! empty( $coupon['room_ids'] ) ) {
-            $allowed_rooms = array_map( 'intval', explode( ',', $coupon['room_ids'] ) );
+            $allowed_rooms = array_map( 'intval', explode( ',', (string) ( $coupon['room_ids'] ?? '' ) ) );
             if ( ! in_array( $room_id, $allowed_rooms, true ) ) {
                 return new WP_Error( 'coupon_not_applicable', __( 'This coupon is not valid for the selected room', 'ltl-bookings' ) );
             }

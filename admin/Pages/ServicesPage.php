@@ -766,8 +766,8 @@ class LTLB_Admin_ServicesPage {
         $fixed_weekly_slots_json = $service['fixed_weekly_slots'] ?? '[]';
         $availability_mode = $service['availability_mode'] ?? 'window';
 
-        $available_weekdays_arr = !empty($available_weekdays) ? explode(',', $available_weekdays) : [];
-        $fixed_weekly_slots = json_decode($fixed_weekly_slots_json, true);
+        $available_weekdays_arr = !empty($available_weekdays) ? explode(',', (string) $available_weekdays) : [];
+        $fixed_weekly_slots = json_decode((string) $fixed_weekly_slots_json, true);
 
         $repo = new LTLB_ServiceRepository();
         $selected_resources = $is_edit ? $repo->get_assigned_resource_ids($service['id']) : [];

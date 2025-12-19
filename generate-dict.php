@@ -11,7 +11,7 @@ if (!file_exists($po_file)) {
 }
 
 $content = file_get_contents($po_file);
-$lines = explode("\n", $content);
+$lines = explode("\n", (string) $content);
 
 $translations = [];
 $msgid = null;
@@ -21,23 +21,23 @@ foreach ($lines as $line) {
     $line = trim($line);
     
     // Start of msgid
-    if (strpos($line, 'msgid "') === 0) {
+    if (strpos((string) $line, 'msgid "') === 0) {
         $msgid = substr($line, 7, -1); // Remove 'msgid "' and trailing '"'
     }
     // Continuation of msgid
-    elseif ($msgid !== null && $msgstr === null && strpos($line, '"') === 0) {
+    elseif ($msgid !== null && $msgstr === null && strpos((string) $line, '"') === 0) {
         $msgid .= substr($line, 1, -1);
     }
     // Start of msgstr
-    elseif (strpos($line, 'msgstr "') === 0) {
+    elseif (strpos((string) $line, 'msgstr "') === 0) {
         $msgstr = substr($line, 8, -1); // Remove 'msgstr "' and trailing '"'
     }
     // Continuation of msgstr
-    elseif ($msgstr !== null && strpos($line, '"') === 0) {
+    elseif ($msgstr !== null && strpos((string) $line, '"') === 0) {
         $msgstr .= substr($line, 1, -1);
     }
     // Empty line or new entry - save current translation
-    elseif (($line === '' || strpos($line, '#') === 0 || strpos($line, 'msgid') === 0) && $msgid !== null && $msgstr !== null) {
+    elseif (($line === '' || strpos((string) $line, '#') === 0 || strpos((string) $line, 'msgid') === 0) && $msgid !== null && $msgstr !== null) {
         // Skip empty msgid (header) and empty translations
         if ($msgid !== '' && $msgstr !== '') {
             // Unescape
@@ -49,7 +49,7 @@ foreach ($lines as $line) {
         $msgstr = null;
         
         // If this line starts a new msgid, process it
-        if (strpos($line, 'msgid "') === 0) {
+        if (strpos((string) $line, 'msgid "') === 0) {
             $msgid = substr($line, 7, -1);
         }
     }

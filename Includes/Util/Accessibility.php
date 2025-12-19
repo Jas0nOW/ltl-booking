@@ -32,7 +32,7 @@ class LTLB_Accessibility {
      */
     public static function enqueue_admin_a11y(): void {
         $page = isset( $_GET['page'] ) ? (string) $_GET['page'] : '';
-        if ( $page === '' || strpos( $page, 'ltlb_' ) !== 0 ) {
+        if ( $page === '' || strpos( (string) $page, 'ltlb_' ) !== 0 ) {
             return;
         }
         
@@ -622,7 +622,7 @@ JS;
      */
     public static function enhance_calendar_aria( string $html, array $dates ): string {
         // Add role="grid" to table
-        $html = str_replace( '<table class="ltlb-calendar"', '<table class="ltlb-calendar" role="grid" aria-label="' . esc_attr__( 'Select booking date', 'ltl-bookings' ) . '"', $html );
+        $html = str_replace( '<table class="ltlb-calendar"', '<table class="ltlb-calendar" role="grid" aria-label="' . esc_attr__( 'Select booking date', 'ltl-bookings' ) . '"', (string) $html );
         
         // Add role="row" to tr
         $html = preg_replace( '/<tr(?![^>]*role)/', '<tr role="row"', $html );

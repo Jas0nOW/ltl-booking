@@ -223,6 +223,11 @@ class LTLB_Email_Templates {
             '{{support_email}}' => get_option( 'admin_email' ),
         ];
         
+        // Ensure all replacement values are strings to prevent PHP 8.1+ deprecation warnings
+        $replacements = array_map( function( $val ) {
+            return (string) $val;
+        }, $replacements );
+        
         return str_replace( array_keys( $replacements ), array_values( $replacements ), (string) $content );
     }
     

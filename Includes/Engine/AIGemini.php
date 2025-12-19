@@ -179,7 +179,7 @@ class LTLB_AI_Gemini implements LTLB_AI_Provider {
 	 * Private: Build API endpoint URL with key
 	 */
 	private function get_endpoint_url( string $method ): string {
-		$model = str_replace( 'gemini-', '', $this->model );
+		$model = str_replace( 'gemini-', '', (string) $this->model );
 		return sprintf(
 			'%s/models/%s:%s?key=%s',
 			self::API_BASE,
