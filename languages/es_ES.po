@@ -146,7 +146,7 @@ msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Access denied"
-msgstr ""
+msgstr "Acceso denegado"
 
 #: public/Pages/StaffPortal.php
 msgid "Access denied. Staff members only."
@@ -202,11 +202,11 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Add First Customer"
-msgstr ""
+msgstr "Agregar primer cliente"
 
 #: admin/Pages/CustomersPage.php
 msgid "Add First Guest"
-msgstr ""
+msgstr "Agregar primer huésped"
 
 #: admin/Components/AdminHeader.php
 msgid "Add New"
@@ -290,7 +290,7 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Add staff member"
-msgstr ""
+msgstr "Agregar miembro del personal"
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Add Template"
@@ -514,7 +514,7 @@ msgstr ""
 
 #: Includes/Util/RoomSorter.php
 msgid "Apply"
-msgstr ""
+msgstr "Aplicar"
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Apply bulk action to selected appointments"
@@ -890,7 +890,7 @@ msgstr ""
 
 #: public/Integrations/Elementor/BookingFormWidget.php
 msgid "Booking Form"
-msgstr ""
+msgstr "Formulario de reserva"
 
 #: public/Blocks/GutenbergBlocks.php
 msgid "Booking form block (LazyBookings plugin required)"
@@ -1570,7 +1570,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: admin/Pages/ServicesPage.php
 msgid "Create "
@@ -1590,23 +1590,23 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Create exception"
-msgstr ""
+msgstr "Crear excepción"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Create First Appointment"
-msgstr ""
+msgstr "Crear primera cita"
 
 #: admin/Pages/ServicesPage.php
 msgid "Create First Room Type"
-msgstr ""
+msgstr "Crear primer tipo de habitación"
 
 #: admin/Pages/ServicesPage.php
 msgid "Create First Service"
-msgstr ""
+msgstr "Crear primer servicio"
 
 #: admin/Pages/CustomersPage.php
 msgid "Create Guest"
-msgstr ""
+msgstr "Crear huésped"
 
 #: Includes/Engine/PackageEngine.php
 msgid "Create Package"
@@ -1678,7 +1678,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Customer Email"
-msgstr ""
+msgstr "Correo del cliente"
 
 #: admin/Pages/PrivacyPage.php
 msgid "Customer not found or anonymization failed."
@@ -1770,11 +1770,11 @@ msgstr "Fecha"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Date & Time"
-msgstr ""
+msgstr "Fecha y hora"
 
 #: public/Pages/CustomerPortal.php
 msgid "Date & Time:"
-msgstr ""
+msgstr "Fecha y hora:"
 
 #: Includes/Engine/InvoiceEngine.php
 msgid "Date:"
@@ -1942,7 +1942,7 @@ msgstr "Diagnósticos"
 
 #: admin/Pages/AutomationsPage.php
 msgid "Disable"
-msgstr ""
+msgstr "Deshabilitar"
 
 #: admin/Pages/DesignPage.php
 msgid "Disable to remove all hover and focus transitions."
@@ -2154,7 +2154,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Enable"
-msgstr ""
+msgstr "Habilitar"
 
 #: admin/Pages/AIPage.php
 msgid "Enable AI Features"
@@ -2462,7 +2462,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "First name"
-msgstr ""
+msgstr "Nombre"
 
 #: admin/Pages/ServicesPage.php
 msgid "Fixed"
@@ -2574,11 +2574,11 @@ msgstr "General"
 
 #: admin/Pages/SettingsPage.php
 msgid "General Settings"
-msgstr ""
+msgstr "Configuración general"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Generate"
-msgstr ""
+msgstr "Generar"
 
 #: Includes/Util/Money.php
 msgid "Get a free API key from %s"
@@ -2958,19 +2958,19 @@ msgstr "Idioma"
 
 #: Includes/Util/EmailTemplates.php
 msgid "Language:"
-msgstr ""
+msgstr "Idioma:"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Last 30 Days"
-msgstr ""
+msgstr "Últimos 30 días"
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Last Migration:"
-msgstr ""
+msgstr "Última migración:"
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Last name"
-msgstr ""
+msgstr "Apellido"
 
 #: admin/Pages/AutomationsPage.php
 msgid "Last Run"
@@ -3362,7 +3362,7 @@ msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Name is required."
-msgstr ""
+msgstr "El nombre es requerido."
 
 #: admin/Pages/BrandingPage.php
 msgid "Nature Green"
@@ -3390,11 +3390,11 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "New Appointment"
-msgstr ""
+msgstr "Nueva cita"
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "New Booking"
-msgstr ""
+msgstr "Nueva reserva"
 
 #: Includes/Util/EmailNotifications.php
 msgid "New Booking Received"
@@ -3414,7 +3414,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "New Service"
-msgstr ""
+msgstr "Nuevo servicio"
 
 #: public/Templates/wizard.php
 msgid "Next"
@@ -3506,7 +3506,7 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "No Customers Yet"
-msgstr ""
+msgstr "Sin clientes aún"
 
 #: Includes/Domain/Location.php
 msgid "No data to update"
@@ -3530,11 +3530,11 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "No Guests Yet"
-msgstr ""
+msgstr "Sin huéspedes aún"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "No insights generated yet"
-msgstr ""
+msgstr "Sin análisis generados aún"
 
 #: admin/Pages/OutboxPage.php
 msgid "No items found."
@@ -3578,7 +3578,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "No recently viewed"
-msgstr ""
+msgstr "Sin vistas recientes"
 
 #: Includes/Integrations/GoogleCalendar.php
 msgid "No refresh token available"
@@ -3594,11 +3594,11 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "No room types available."
-msgstr ""
+msgstr "Sin tipos de habitación disponibles."
 
 #: admin/Pages/ServicesPage.php
 msgid "No Room Types Yet"
-msgstr ""
+msgstr "Sin tipos de habitación aún"
 
 #: admin/Pages/ServicesPage.php
 msgid "No rooms assigned"
@@ -3622,7 +3622,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "No Services Yet"
-msgstr ""
+msgstr "Sin servicios aún"
 
 #: admin/Pages/StaffPage.php
 msgid "No staff members found."
@@ -3826,7 +3826,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Outbox"
@@ -4094,7 +4094,7 @@ msgstr ""
 
 #: Includes/Engine/HotelEngine.php
 msgid "Please fill all required fields."
-msgstr ""
+msgstr "Por favor complete todos los campos requeridos."
 
 #: admin/Pages/ServicesPage.php
 msgid "Please fill in all required fields."
@@ -4146,7 +4146,7 @@ msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Plugin Version"
-msgstr ""
+msgstr "Versión del plugin"
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Plugin Version:"
@@ -4294,7 +4294,7 @@ msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Quick Actions"
-msgstr ""
+msgstr "Acciones rápidas"
 
 #: admin/Components/HelpPanel.php
 msgid "Quick Actions:"
@@ -4326,7 +4326,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Recent Appointments"
-msgstr ""
+msgstr "Citas recientes"
 
 #: Includes/REST/Webhooks.php
 msgid "Recent Deliveries"
@@ -4398,7 +4398,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Remove"
-msgstr ""
+msgstr "Eliminar"
 
 #: Includes/Domain/GroupBooking.php
 msgid "Remove this participant?"
@@ -5662,7 +5662,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "This Week"
-msgstr ""
+msgstr "Esta semana"
 
 #: admin/Pages/SettingsPage.php
 msgid "Three-letter currency code (e.g. EUR)."
@@ -6310,7 +6310,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Your business at a glance"
-msgstr ""
+msgstr "Tu negocio de un vistazo"
 
 #: admin/Pages/AIPage.php
 msgid "Your business name."
