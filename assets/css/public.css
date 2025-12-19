@@ -1253,5 +1253,144 @@
     padding: var(--lazy-space-20, 20px) 0;
 }
 
+/* =============================================================================
+   Language Switcher Component
+   ============================================================================= */
+.ltlb-lang-switcher {
+    position: relative;
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
 
+/* Dropdown Style Toggle */
+.ltlb-lang-switcher__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    min-width: 70px;
+}
 
+.ltlb-lang-switcher__flag {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.ltlb-lang-switcher__current {
+    font-weight: 500;
+}
+
+.ltlb-lang-switcher__arrow {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ltlb-lang-switcher__toggle[aria-expanded="true"] .ltlb-lang-switcher__arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.ltlb-lang-switcher__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: auto;
+    z-index: 1000;
+    min-width: 140px;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    background: var(--lazy-bg, #fff);
+    border: 1px solid var(--lazy-border-color, #e5e7eb);
+    border-radius: var(--lazy-border-radius, 8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.ltlb-lang-switcher__dropdown--open,
+.ltlb-lang-switcher__dropdown:not([hidden]) {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.ltlb-lang-switcher__dropdown li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Dropdown Option */
+.ltlb-lang-switcher__option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    color: var(--lazy-text, #111);
+    transition: background 0.15s ease;
+}
+
+.ltlb-lang-switcher__option:hover {
+    background: var(--lazy-bg-hover, #f5f5f5);
+}
+
+.ltlb-lang-switcher__option--active {
+    font-weight: 600;
+    color: var(--lazy-primary, #2563eb);
+}
+
+.ltlb-lang-switcher__option--active::after {
+    content: '✓';
+    margin-left: auto;
+    font-size: 0.75rem;
+}
+
+.ltlb-lang-switcher__name {
+    flex: 1;
+}
+
+/* Button Style */
+.ltlb-lang-switcher--buttons .ltlb-lang-switcher__buttons {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.ltlb-lang-switcher__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    min-width: auto;
+}
+
+.ltlb-lang-switcher__short {
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .ltlb-lang-switcher__toggle {
+        padding: 0.375rem 0.5rem;
+        min-width: auto;
+    }
+
+    .ltlb-lang-switcher__name {
+        display: none;
+    }
+
+    .ltlb-lang-switcher__dropdown {
+        min-width: 100px;
+    }
+}
