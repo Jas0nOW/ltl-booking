@@ -128,7 +128,7 @@ class LTLB_Admin_Header {
 
 		$current_lang = 'en_US';
 		if ( class_exists('LTLB_I18n') ) {
-			$current_lang = LTLB_I18n::get_user_admin_locale();
+			$current_lang = LTLB_I18n::get_user_admin_locale() ?? LTLB_I18n::get_current_locale();
 		}
 
 		$settings = get_option('lazy_settings', []);
@@ -190,15 +190,14 @@ class LTLB_Admin_Header {
 					<?php endif; ?>
 
 					<!-- Language Selector -->
-					<form method="post" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" class="ltlb-header__lang">
-						<input type="hidden" name="action" value="ltlb_set_admin_lang" />
-						<?php wp_nonce_field( 'ltlb_set_admin_lang' ); ?>
+					<div class="ltlb-header__lang">
 						<label for="ltlb_admin_lang" class="screen-reader-text"><?php echo esc_html__( 'Language', 'ltl-bookings' ); ?></label>
-						<select name="ltlb_admin_lang" id="ltlb_admin_lang" class="ltlb-header__lang-select" onchange="this.form.submit()">
+						<select name="ltlb_admin_lang" id="ltlb_admin_lang" class="ltlb-header__lang-select" data-ltlb-admin-lang>
 							<option value="en_US" <?php selected( $current_lang, 'en_US' ); ?>>🇬🇧 EN</option>
 							<option value="de_DE" <?php selected( $current_lang, 'de_DE' ); ?>>🇩🇪 DE</option>
+							<option value="es_ES" <?php selected( $current_lang, 'es_ES' ); ?>>🇪🇸 ES</option>
 						</select>
-					</form>
+					</div>
 
 					<!-- User Menu -->
 					<div class="ltlb-header__user">
@@ -283,11 +282,46 @@ class LTLB_Admin_Header {
 				});
 			}
 
+			// Admin Language Selector
+			var langSelect = document.querySelector('[data-ltlb-admin-lang]');
+			if (langSelect) {
+				var adminAjax = (typeof ajaxurl !== 'undefined' && ajaxurl)
+					? ajaxurl
+					: '<?php echo esc_js( admin_url('admin-ajax.php') ); ?>';
+
+				console.log('[LTLB] Language selector found, AJAX URL:', adminAjax);
+
+				langSelect.addEventListener('change', function() {
+					var locale = this.value;
+					console.log('[LTLB] Changing language to:', locale);
+					
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', adminAjax, true);
+					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+					xhr.onload = function() {
+						console.log('[LTLB] AJAX response:', xhr.status, xhr.responseText);
+						// Reload to apply new language on any 2xx
+						if (xhr.status >= 200 && xhr.status < 300) {
+							window.location.reload();
+						} else {
+							console.error('Language change failed:', xhr.status, xhr.responseText);
+							alert('<?php echo esc_js( __( 'Could not change language. Please try again.', 'ltl-bookings' ) ); ?>');
+						}
+					};
+					xhr.onerror = function() {
+						console.error('AJAX error changing language');
+						alert('<?php echo esc_js( __( 'Network error. Please try again.', 'ltl-bookings' ) ); ?>');
+					};
+					xhr.send('action=ltlb_set_admin_lang&locale=' + encodeURIComponent(locale));
+				});
+			} else {
+				console.warn('[LTLB] Language selector not found!');
+			}
+
 			// Keyboard shortcuts
 			document.addEventListener('keydown', function(e) {
 				if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
 				
-				// S: Focus search
 				if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey) {
 					var searchInput = document.querySelector('.ltlb-admin input[type="search"], .ltlb-admin .search-box input');
 					if (searchInput) {

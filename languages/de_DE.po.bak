@@ -126,11 +126,11 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Accent Color"
-msgstr "Akzentfarbe"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Accent preview"
-msgstr "Akzentvorschau"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Accept"
@@ -154,7 +154,7 @@ msgstr "Zugriff verweigert. Nur für Mitarbeiter."
 
 #: admin/Pages/RoomAssistantPage.php
 msgid "Action"
-msgstr "Aktion"
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Action not found."
@@ -162,7 +162,7 @@ msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Actions"
-msgstr "Aktionen"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Activate AI-powered automations"
@@ -194,7 +194,7 @@ msgstr "Kunde hinzufügen"
 
 #: admin/Pages/AutomationsPage.php
 msgid "Add Default Rules"
-msgstr "Standardregeln hinzufügen"
+msgstr ""
 
 #: admin/Components/HelpPanel.php
 msgid "Add detailed descriptions for customers"
@@ -202,15 +202,15 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Add First Customer"
-msgstr "Ersten Kunden hinzufügen"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Add First Guest"
-msgstr "Ersten Gast hinzufügen"
+msgstr ""
 
 #: admin/Components/AdminHeader.php
 msgid "Add New"
-msgstr "Neu hinzufügen"
+msgstr ""
 
 #: admin/Pages/ResourcesPage.php
 msgid "Add New %s"
@@ -218,19 +218,19 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Add New Appointment"
-msgstr "Neuen Termin hinzufügen"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Add New Booking"
-msgstr "Neue Buchung hinzufügen"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Add New Customer"
-msgstr "Neuen Kunden hinzufügen"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Add New Guest"
-msgstr "Neuen Gast hinzufügen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Add one or more weekly start times. Example: Fri 18:00. The customer will only see these times (still respecting staff/global hours and existing bookings)."
@@ -254,7 +254,7 @@ msgstr "Zimmer hinzufügen"
 
 #: admin/Pages/AutomationsPage.php
 msgid "Add Rule"
-msgstr "Regel hinzufügen"
+msgstr ""
 
 #: Includes/Util/ModeManager.php
 msgid "Add Service"
@@ -262,7 +262,7 @@ msgstr "Dienstleistung hinzufügen"
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Add Services"
-msgstr "Dienstleistungen hinzufügen"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Add shadow to buttons (submit, primary, etc.)"
@@ -282,7 +282,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Add Slot"
-msgstr "Zeitfenster hinzufügen"
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Add Staff"
@@ -290,15 +290,15 @@ msgstr "Mitarbeiter hinzufügen"
 
 #: admin/Pages/StaffPage.php
 msgid "Add staff member"
-msgstr "Mitarbeiter hinzufügen"
+msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Add Template"
-msgstr "Vorlage hinzufügen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Add time"
-msgstr "Zeit hinzufügen"
+msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "Add Webhook"
@@ -318,11 +318,11 @@ msgstr "Zusätzliche Personen (%d)"
 
 #: admin/Pages/SettingsPage.php
 msgid "Admin Notifications"
-msgstr "Admin-Benachrichtigungen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Adults"
-msgstr "Erwachsene"
+msgstr ""
 
 #: Includes/Util/ProgressiveUI.php
 msgid "Advanced"
@@ -334,7 +334,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Advanced Settings"
-msgstr "Erweiterte Einstellungen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "After (min)"
@@ -346,11 +346,11 @@ msgstr "Alter"
 
 #: Includes/Core/Plugin.php
 msgid "AI"
-msgstr "KI"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI & Automations"
-msgstr "KI & Automatisierungen"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI drafts appear in Outbox for approval"
@@ -358,7 +358,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI Enabled"
-msgstr "KI aktiviert"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI executes actions automatically"
@@ -366,23 +366,23 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "AI Input"
-msgstr "KI-Eingabe"
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "AI Input / Output"
-msgstr "KI-Eingabe / -Ausgabe"
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "AI Insights"
-msgstr "KI-Einblicke"
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "AI Output"
-msgstr "KI-Ausgabe"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI Provider"
-msgstr "KI-Anbieter"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI service provider for content generation."
@@ -390,7 +390,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "AI Settings"
-msgstr "KI-Einstellungen"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "AI settings (provider, model, business context, and operating mode) are managed under â€œAI & Automationsâ€."
@@ -398,7 +398,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "AI Settings saved."
-msgstr "KI-Einstellungen gespeichert."
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Alerts"
@@ -406,7 +406,7 @@ msgstr "Benachrichtigungen"
 
 #: Includes/Util/AdminFilters.php
 msgid "All"
-msgstr "Alle"
+msgstr ""
 
 #: Includes/Util/EmailNotifications.php
 msgid "All rights reserved."
@@ -438,11 +438,11 @@ msgstr "Immer"
 
 #: admin/Pages/ServicesPage.php
 msgid "Amenities"
-msgstr "Ausstattung"
+msgstr ""
 
 #: Includes/Engine/InvoiceEngine.php
 msgid "Amount"
-msgstr "Betrag"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Amount:"
@@ -454,11 +454,11 @@ msgstr "Ein Fehler ist aufgetreten"
 
 #: Includes/Core/Plugin.php
 msgid "An error occurred."
-msgstr "Ein Fehler ist aufgetreten."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "An unexpected error occurred. Please try again or contact support."
-msgstr "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support."
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Analytics"
@@ -482,11 +482,11 @@ msgstr ""
 
 #: Includes/Repository/AppointmentRepository.php
 msgid "Another booking is in progress. Please try again."
-msgstr "Eine andere Buchung ist in Bearbeitung. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Any"
-msgstr "Beliebig"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "âœ— Missing"
@@ -506,7 +506,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "API Keys"
-msgstr "API-Schlüssel"
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Applies To"
@@ -514,7 +514,7 @@ msgstr ""
 
 #: Includes/Util/RoomSorter.php
 msgid "Apply"
-msgstr "Anwenden"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Apply bulk action to selected appointments"
@@ -546,11 +546,11 @@ msgstr ""
 
 #: Includes/Util/Webhooks.php
 msgid "Appointment Created"
-msgstr "Termin erstellt"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Appointment created."
-msgstr "Termin erstellt."
+msgstr ""
 
 #: Includes/Integrations/WooCommerce.php
 msgid "Appointment Date"
@@ -558,7 +558,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Appointment deleted."
-msgstr "Termin gelöscht."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Appointment details loaded."
@@ -622,7 +622,7 @@ msgstr "Möchten Sie diese Regel wirklich löschen?"
 
 #: admin/Pages/StaffPage.php
 msgid "Are you sure?"
-msgstr "Sind Sie sicher?"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "âš  DB version is behind plugin version."
@@ -650,15 +650,15 @@ msgstr "Versuch"
 
 #: admin/Pages/SettingsPage.php
 msgid "Authentication"
-msgstr "Authentifizierung"
+msgstr ""
 
 #: Includes/Engine/AIGemini.php
 msgid "Authentication failed (invalid API key)"
-msgstr "Authentifizierung fehlgeschlagen (ungültiger API-Schlüssel)"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Authentication required. Please log in."
-msgstr "Authentifizierung erforderlich. Bitte melden Sie sich an."
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Auto Button Text Color"
@@ -682,7 +682,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Automations"
-msgstr "Automatisierungen"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Autonomous"
@@ -694,7 +694,7 @@ msgstr ""
 
 #: admin/Pages/CalendarPage.php
 msgid "Auto-Sort"
-msgstr "Automatisch sortieren"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Availability"
@@ -706,11 +706,11 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Availability could not be loaded. Please try again."
-msgstr "Verfügbarkeit konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Availability Mode"
-msgstr "Verfügbarkeitsmodus"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Availability updated"
@@ -762,7 +762,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Backend"
-msgstr "Backend"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Backend Preview"
@@ -774,7 +774,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Background Color"
-msgstr "Hintergrundfarbe"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Background color for form containers."
@@ -810,7 +810,7 @@ msgstr "Einfache Tabelle"
 
 #: admin/Pages/ServicesPage.php
 msgid "Bed Type"
-msgstr "Bettentyp"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Before (min)"
@@ -834,11 +834,11 @@ msgstr "Rechnung an:"
 
 #: admin/Pages/OutboxPage.php
 msgid "Body"
-msgstr "Inhalt"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Body:"
-msgstr "Inhalt:"
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Book a room"
@@ -850,7 +850,7 @@ msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Book Now"
-msgstr "Jetzt buchen"
+msgstr ""
 
 #: Includes/Util/BookingMode.php
 msgid "Booking"
@@ -890,7 +890,7 @@ msgstr "Buchung abgelehnt"
 
 #: public/Integrations/Elementor/BookingFormWidget.php
 msgid "Booking Form"
-msgstr "Buchungsformular"
+msgstr ""
 
 #: public/Blocks/GutenbergBlocks.php
 msgid "Booking form block (LazyBookings plugin required)"
@@ -902,11 +902,11 @@ msgstr ""
 
 #: Includes/Util/EmailNotifications.php
 msgid "Booking ID"
-msgstr "Buchungs-ID"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Booking Mode"
-msgstr "Buchungsmodus"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Booking Mode:"
@@ -950,7 +950,7 @@ msgstr "Buchungen"
 
 #: admin/Pages/DesignPage.php
 msgid "Border Color"
-msgstr "Rahmenfarbe"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Border Radius (px)"
@@ -974,7 +974,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Branding"
-msgstr "Branding"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Branding & Design"
@@ -982,11 +982,11 @@ msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Branding settings saved successfully."
-msgstr "Branding-Einstellungen erfolgreich gespeichert."
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Buffer Time"
-msgstr "Pufferzeit"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Bulk Actions"
@@ -1006,7 +1006,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Business Context"
-msgstr "Geschäftskontext"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Business hours"
@@ -1102,7 +1102,7 @@ msgstr ""
 
 #: admin/Pages/ResourcesPage.php
 msgid "Capacity"
-msgstr "Kapazität"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Card (POS / on site)"
@@ -1122,7 +1122,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Card Shadow"
-msgstr "Kartenschatten"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Cards"
@@ -1130,7 +1130,7 @@ msgstr "Karten"
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Cash"
-msgstr "Bargeld"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Cash (on site)"
@@ -1190,7 +1190,7 @@ msgstr ""
 
 #: admin/Pages/RoomAssistantPage.php
 msgid "Check-in"
-msgstr "Check-in"
+msgstr ""
 
 #: Includes/Domain/GroupBooking.php
 msgid "Check-In List"
@@ -1202,7 +1202,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Check-out"
-msgstr "Check-out"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Checkout (redirect)"
@@ -1214,7 +1214,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Check-out must be after check-in."
-msgstr "Check-out muss nach Check-in sein."
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Check-outs Today"
@@ -1222,7 +1222,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Children"
-msgstr "Kinder"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Choose a preset to quickly style your booking forms. You can customize colors and styles below."
@@ -1294,7 +1294,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Color saved."
-msgstr "Farbe gespeichert."
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Color Tokens"
@@ -1306,7 +1306,7 @@ msgstr "Farben"
 
 #: admin/Pages/ServicesPage.php
 msgid "Columns"
-msgstr "Spalten"
+msgstr ""
 
 #: Includes/Util/DemoSeeder.php
 msgid "Comfortable room with queen bed"
@@ -1406,7 +1406,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Connection failed."
-msgstr "Verbindung fehlgeschlagen."
+msgstr ""
 
 #: Includes/Engine/AIGemini.php
 msgid "Connection failed: %s"
@@ -1430,11 +1430,11 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Container Shadow"
-msgstr "Container-Schatten"
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Continue"
-msgstr "Fortfahren"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Control which elements should have shadows. Uncheck all for a flat design."
@@ -1462,15 +1462,15 @@ msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Could not assign room."
-msgstr "Zimmer konnte nicht zugewiesen werden."
+msgstr ""
 
 #: Includes/Engine/DiscountEngine.php
 msgid "Could not create coupon"
-msgstr "Gutschein konnte nicht erstellt werden"
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Could not create exception."
-msgstr "Ausnahme konnte nicht erstellt werden."
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Could not create outbox draft."
@@ -1482,31 +1482,31 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not delete appointment."
-msgstr "Termin konnte nicht gelöscht werden."
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Could not delete appointments. Please try again."
-msgstr "Termine konnten nicht gelöscht werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Could not delete exception."
-msgstr "Ausnahme konnte nicht gelöscht werden."
+msgstr ""
 
 #: Includes/Util/Automations.php
 msgid "Could not generate report."
-msgstr "Bericht konnte nicht erstellt werden."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not load appointment details."
-msgstr "Termindetails konnten nicht geladen werden."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not load room suggestions."
-msgstr "Zimmervorschläge konnten nicht geladen werden."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not load rooms."
-msgstr "Zimmer konnten nicht geladen werden."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not propose room."
@@ -1530,27 +1530,27 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not save customer."
-msgstr "Kunde konnte nicht gespeichert werden."
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Could not save customer. Please try again."
-msgstr "Kunde konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Could not save guest. Please try again."
-msgstr "Gast konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Could not save service. Please try again."
-msgstr "Dienstleistung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: Includes/Repository/AppointmentRepository.php
 msgid "Could not save the appointment to the database."
-msgstr "Der Termin konnte nicht in der Datenbank gespeichert werden."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not update appointment."
-msgstr "Termin konnte nicht aktualisiert werden."
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Could not update draft."
@@ -1558,7 +1558,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Could not update status."
-msgstr "Status konnte nicht aktualisiert werden."
+msgstr ""
 
 #: Includes/Engine/DiscountEngine.php
 msgid "Coupon code already exists"
@@ -1566,11 +1566,11 @@ msgstr ""
 
 #: Includes/Engine/DiscountEngine.php
 msgid "Coupon code is required"
-msgstr "Gutscheincode ist erforderlich"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Create"
-msgstr "Erstellen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Create "
@@ -1590,23 +1590,23 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Create exception"
-msgstr "Ausnahme erstellen"
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Create First Appointment"
-msgstr "Ersten Termin erstellen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Create First Room Type"
-msgstr "Ersten Zimmertyp erstellen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Create First Service"
-msgstr "Erste Dienstleistung erstellen"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Create Guest"
-msgstr "Gast erstellen"
+msgstr ""
 
 #: Includes/Engine/PackageEngine.php
 msgid "Create Package"
@@ -1630,7 +1630,7 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Created"
-msgstr "Erstellt"
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Credit cards, Apple Pay, Google Pay"
@@ -1638,7 +1638,7 @@ msgstr ""
 
 #: Includes/Engine/PackageEngine.php
 msgid "Credits"
-msgstr "Guthaben"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Cron jobs will be scheduled when you enable features like automated reminders or cleanup."
@@ -1658,7 +1658,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Custom CSS"
-msgstr "Benutzerdefiniertes CSS"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Custom CSS Rules"
@@ -1670,11 +1670,11 @@ msgstr "Kunde"
 
 #: Includes/Util/Webhooks.php
 msgid "Customer Created"
-msgstr "Kunde erstellt"
+msgstr ""
 
 #: admin/Pages/PrivacyPage.php
 msgid "Customer data anonymized successfully."
-msgstr "Kundendaten erfolgreich anonymisiert."
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Customer Email"
@@ -1694,11 +1694,11 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Customer saved."
-msgstr "Kunde gespeichert."
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Customer:"
-msgstr "Kunde:"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Customers"
@@ -1726,7 +1726,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Daily"
-msgstr "Täglich"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Daily @ %s"
@@ -1734,7 +1734,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Danger"
-msgstr "Gefahr"
+msgstr ""
 
 #: admin/Components/AdminHeader.php
 msgid "Dashboard"
@@ -1770,27 +1770,27 @@ msgstr "Datum"
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Date & Time"
-msgstr "Datum & Zeit"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Date & Time:"
-msgstr "Datum & Zeit:"
+msgstr ""
 
 #: Includes/Engine/InvoiceEngine.php
 msgid "Date:"
-msgstr "Datum:"
+msgstr ""
 
 #: Includes/Integrations/WooCommerce.php
 msgid "Date: %s"
-msgstr "Datum: %s"
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Dates"
-msgstr "Daten"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Day"
-msgstr "Tag"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Day (1-28)"
@@ -1814,7 +1814,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Debug"
-msgstr "Debug"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Decline"
@@ -1826,7 +1826,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Default"
-msgstr "Standard"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Default Blue"
@@ -1862,7 +1862,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Delete Appointment"
-msgstr "Termin löschen"
+msgstr ""
 
 #: admin/Pages/PrivacyPage.php
 msgid "Delete cancelled appointments after (days)"
@@ -1898,7 +1898,7 @@ msgstr "Absteigend"
 
 #: admin/Pages/ServicesPage.php
 msgid "Description"
-msgstr "Beschreibung"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Design"
@@ -1910,11 +1910,11 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Design saved."
-msgstr "Design gespeichert."
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Design Settings"
-msgstr "Designeinstellungen"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Design System Components"
@@ -1942,7 +1942,7 @@ msgstr "Diagnose"
 
 #: admin/Pages/AutomationsPage.php
 msgid "Disable"
-msgstr "Deaktivieren"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Disable to remove all hover and focus transitions."
@@ -1954,7 +1954,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Disabled"
-msgstr "Deaktiviert"
+msgstr ""
 
 #: Includes/Engine/InvoiceEngine.php
 msgid "Discount:"
@@ -1962,19 +1962,19 @@ msgstr ""
 
 #: admin/Components/Component.php
 msgid "Dismiss"
-msgstr "Verwerfen"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Documentation"
-msgstr "Dokumentation"
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Done."
-msgstr "Fertig."
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Double Bed"
-msgstr "Doppelbett"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Download"
@@ -1990,7 +1990,7 @@ msgstr ""
 
 #: Includes/Domain/BookingStatus.php
 msgid "Draft"
-msgstr "Entwurf"
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Draft Center"
@@ -2018,7 +2018,7 @@ msgstr "Dauer"
 
 #: admin/Pages/ServicesPage.php
 msgid "Duration (minutes)"
-msgstr "Dauer (Minuten)"
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Duration Discount"
@@ -2054,7 +2054,7 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Edit Customer"
-msgstr "Kunden bearbeiten"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Edit Guest"
@@ -2074,7 +2074,7 @@ msgstr ""
 
 #: Includes/Util/ModeManager.php
 msgid "Edit Service"
-msgstr "Dienstleistung bearbeiten"
+msgstr ""
 
 #: Includes/Util/RoleManager.php
 msgid "Edit Service/Room Prices"
@@ -2114,7 +2114,7 @@ msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Email Notifications"
-msgstr "E-Mail-Benachrichtigungen"
+msgstr ""
 
 #: admin/Components/HelpPanel.php
 msgid "Email Notifications:"
@@ -2126,7 +2126,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Email Settings"
-msgstr "E-Mail-Einstellungen"
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Email subject/body missing."
@@ -2146,7 +2146,7 @@ msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "Email:"
-msgstr "E-Mail:"
+msgstr ""
 
 #: Includes/Util/ImportExport.php
 msgid "Empty CSV file"
@@ -2154,7 +2154,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Enable"
-msgstr "Aktivieren"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Enable AI Features"
@@ -2198,7 +2198,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Enabled"
-msgstr "Aktiviert"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Enabled (%s)"
@@ -2210,7 +2210,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Encryption"
-msgstr "Verschlüsselung"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "End"
@@ -2218,7 +2218,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "End date/time must be after start."
-msgstr "Enddatum/-zeit muss nach dem Start liegen."
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "End time"
@@ -2226,7 +2226,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "End:"
-msgstr "Ende:"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Enter message"
@@ -2254,15 +2254,15 @@ msgstr "Fehler"
 
 #: admin/Pages/BrandingPage.php
 msgid "Error Color"
-msgstr "Fehlerfarbe"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Error state"
-msgstr "Fehlerzustand"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Error:"
-msgstr "Fehler:"
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Estimated price:"
@@ -2270,11 +2270,11 @@ msgstr ""
 
 #: Includes/Util/GroupBooking.php
 msgid "Event"
-msgstr "Ereignis"
+msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "Events"
-msgstr "Ereignisse"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Every %d min"
@@ -2294,7 +2294,7 @@ msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Example:"
-msgstr "Beispiel:"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Examples: smtp.gmail.com, smtp.hostinger.com, smtp.strato.de"
@@ -2302,15 +2302,15 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Exception created."
-msgstr "Ausnahme erstellt."
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Exception deleted."
-msgstr "Ausnahme gelöscht."
+msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Exceptions"
-msgstr "Ausnahmen"
+msgstr ""
 
 #: Includes/Util/Money.php
 msgid "Exchange Rates API Key"
@@ -2318,15 +2318,15 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Execute"
-msgstr "Ausführen"
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Executed."
-msgstr "Ausgeführt."
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Execution failed."
-msgstr "Ausführung fehlgeschlagen."
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Execution Mode"
@@ -2358,11 +2358,11 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Failed"
-msgstr "Fehlgeschlagen"
+msgstr ""
 
 #: Includes/Integrations/WooCommerce.php
 msgid "Failed to add booking to cart"
-msgstr "Buchung konnte nicht zum Warenkorb hinzugefügt werden"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Failed to cancel booking"
@@ -2398,7 +2398,7 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Failed to save working hours. Please check your input and try again."
-msgstr "Arbeitszeiten konnten nicht gespeichert werden. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut."
+msgstr ""
 
 #: Includes/Util/EmailTemplates.php
 msgid "Failed to send test email"
@@ -2490,7 +2490,7 @@ msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Font Family"
-msgstr "Schriftfamilie"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "For complete documentation including all component variants, accessibility guidelines, and implementation notes, see %s"
@@ -2526,7 +2526,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Free"
-msgstr "Frei"
+msgstr ""
 
 #: Includes/Engine/PolicyEngine.php
 msgid "Free cancellation up to %d hours before. After that, %d%% cancellation fee applies. No-show: %d%% fee."
@@ -2534,11 +2534,11 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Fri"
-msgstr "Fr"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "From"
-msgstr "Von"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "From Email:"
@@ -2554,7 +2554,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Frontend"
-msgstr "Frontend"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Frontend tab controls the color palette used on the booking widget."
@@ -2570,15 +2570,15 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "General"
-msgstr "Allgemein"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "General Settings"
-msgstr "Allgemeine Einstellungen"
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Generate"
-msgstr "Generieren"
+msgstr ""
 
 #: Includes/Util/Money.php
 msgid "Get a free API key from %s"
@@ -2630,7 +2630,7 @@ msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Guest"
-msgstr "Gast"
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Guest List"
@@ -2638,11 +2638,11 @@ msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Guest saved."
-msgstr "Gast gespeichert."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Guests"
-msgstr "Gäste"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Guests are created automatically from bookings. You can also add them manually."
@@ -2690,7 +2690,7 @@ msgstr ""
 
 #: admin/Components/AdminHeader.php
 msgid "Hotel"
-msgstr "Hotel"
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Hotel & Accommodation"
@@ -2698,7 +2698,7 @@ msgstr ""
 
 #: Includes/Util/ProgressiveUI.php
 msgid "Hotel Booking"
-msgstr "Hotelbuchung"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Hotel Booking (Check-in/Check-out)"
@@ -2754,7 +2754,7 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "If enabled, pending bookings are treated as occupied."
@@ -2774,7 +2774,7 @@ msgstr "Inaktiv"
 
 #: admin/Pages/SettingsPage.php
 msgid "Info"
-msgstr "Info"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Info:"
@@ -2798,7 +2798,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Input Shadow"
-msgstr "Eingabefeld-Schatten"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Input States"
@@ -2854,7 +2854,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Invalid email address."
-msgstr "Ungültige E-Mail-Adresse."
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Invalid email recipient."
@@ -2878,7 +2878,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Invalid request. Please check your input and try again."
-msgstr "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Invalid rule type."
@@ -2894,7 +2894,7 @@ msgstr ""
 
 #: Includes/Engine/InvoiceEngine.php
 msgid "Invoice"
-msgstr "Rechnung"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Invoice (company)"
@@ -2942,7 +2942,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "King Bed"
-msgstr "Kingsize-Bett"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Klarna"
@@ -2950,11 +2950,11 @@ msgstr ""
 
 #: Includes/Engine/FormBuilder.php
 msgid "Label and type are required"
-msgstr "Bezeichnung und Typ sind erforderlich"
+msgstr ""
 
 #: admin/Components/AdminHeader.php
 msgid "Language"
-msgstr "Sprache"
+msgstr ""
 
 #: Includes/Util/EmailTemplates.php
 msgid "Language:"
@@ -2974,7 +2974,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Last Run"
-msgstr "Letzte Ausführung"
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Latest Bookings"
@@ -3030,7 +3030,7 @@ msgstr ""
 
 #: admin/Pages/CalendarPage.php
 msgid "Legend"
-msgstr "Legende"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Limit per run"
@@ -3042,7 +3042,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Link"
-msgstr "Link"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "List amenities, one per line or comma-separated"
@@ -3066,7 +3066,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Loading"
-msgstr "Lädt"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Loading appointment detailsâ€¦"
@@ -3094,7 +3094,7 @@ msgstr ""
 
 #: Includes/Domain/Location.php
 msgid "Location name is required"
-msgstr "Standortname ist erforderlich"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Location:"
@@ -3142,7 +3142,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Logs"
-msgstr "Protokolle"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Lost Password?"
@@ -3250,11 +3250,11 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Message"
-msgstr "Nachricht"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Migrations ran successfully."
-msgstr "Migrationen erfolgreich ausgeführt."
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Minimal Black"
@@ -3266,7 +3266,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Minute"
-msgstr "Minute"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Minutely (every N minutes)"
@@ -3282,7 +3282,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Mode"
-msgstr "Modus"
+msgstr ""
 
 #: Includes/Util/EmailTemplates.php
 msgid "Mode:"
@@ -3298,19 +3298,19 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Mon"
-msgstr "Mo"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Month"
-msgstr "Monat"
+msgstr ""
 
 #: public/Integrations/Elementor/CalendarWidget.php
 msgid "Month View"
-msgstr "Monatsansicht"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Monthly"
-msgstr "Monatlich"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Monthly (%d) @ %s"
@@ -3362,7 +3362,7 @@ msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Name is required."
-msgstr "Name ist erforderlich."
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Nature Green"
@@ -3386,7 +3386,7 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "New"
-msgstr "Neu"
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "New Appointment"
@@ -3434,15 +3434,15 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Next Run"
-msgstr "Nächste Ausführung"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "night"
-msgstr "Nacht"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "nights"
-msgstr "Nächte"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "No"
@@ -3538,7 +3538,7 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "No items found."
-msgstr "Keine Einträge gefunden."
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "No log files found yet."
@@ -3590,7 +3590,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "No resources found. Please add resources first."
-msgstr "Keine Ressourcen gefunden. Bitte fügen Sie zuerst Ressourcen hinzu."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "No room types available."
@@ -3626,7 +3626,7 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "No staff members found."
-msgstr "Keine Mitarbeiter gefunden."
+msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "No templates yet. Click \"Add New\" to create your first template."
@@ -3634,11 +3634,11 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "No times are available for this date."
-msgstr "Für dieses Datum sind keine Zeiten verfügbar."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "No times available"
-msgstr "Keine Zeiten verfügbar"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "No upcoming appointments"
@@ -3658,7 +3658,7 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "None"
-msgstr "Keine"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "None (fallback)"
@@ -3702,7 +3702,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Notes"
-msgstr "Notizen"
+msgstr ""
 
 #: admin/Pages/RoomAssistantPage.php
 msgid "Notes (optional)"
@@ -3722,11 +3722,11 @@ msgstr ""
 
 #: Includes/Engine/HotelEngine.php
 msgid "Number of guests must be at least 1."
-msgstr "Anzahl der Gäste muss mindestens 1 sein."
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Occupancy"
-msgstr "Belegung"
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Occupancy Forecast"
@@ -3790,7 +3790,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Operating Mode"
-msgstr "Betriebsmodus"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Optimized for phone, tablet, and desktop â€” without breaking your theme."
@@ -3818,11 +3818,11 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Optional: select a resource."
-msgstr "Optional: Wählen Sie eine Ressource."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Optional: select a room."
-msgstr "Optional: Wählen Sie ein Zimmer."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Other"
@@ -3830,7 +3830,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Outbox"
-msgstr "Postausgang"
+msgstr ""
 
 #: Includes/Util/Automations.php
 msgid "Outbox draft #%d created."
@@ -3870,11 +3870,11 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Overview"
-msgstr "Übersicht"
+msgstr ""
 
 #: Includes/Engine/PackageEngine.php
 msgid "Package purchased successfully!"
-msgstr "Paket erfolgreich gekauft!"
+msgstr ""
 
 #: Includes/Engine/PackageEngine.php
 msgid "Packages"
@@ -3886,7 +3886,7 @@ msgstr ""
 
 #: Includes/Domain/BookingStatus.php
 msgid "Paid"
-msgstr "Bezahlt"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Paid at"
@@ -3902,7 +3902,7 @@ msgstr ""
 
 #: Includes/Domain/GroupBooking.php
 msgid "Participants"
-msgstr "Teilnehmer"
+msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Past"
@@ -3930,7 +3930,7 @@ msgstr ""
 
 #: Includes/Engine/PaymentEngine.php
 msgid "Payment"
-msgstr "Zahlung"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Payment cancelled"
@@ -3942,7 +3942,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Payment failed. Please try again."
-msgstr "Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Components/HelpPanel.php
 msgid "Payment gateway configuration"
@@ -4006,7 +4006,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Payment required:"
-msgstr "Zahlung erforderlich:"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Payment status"
@@ -4066,7 +4066,7 @@ msgstr "Telefon"
 
 #: public/Pages/StaffPortal.php
 msgid "Phone:"
-msgstr "Telefon:"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "PHP Version"
@@ -4074,15 +4074,15 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Please enter a valid customer email."
-msgstr "Bitte geben Sie eine gültige Kunden-E-Mail-Adresse ein."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please enter a valid email address."
-msgstr "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Please enter valid start and end dates."
-msgstr "Bitte geben Sie gültige Start- und Enddaten ein."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please enter your company name for invoices."
@@ -4090,7 +4090,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please enter your email address."
-msgstr "Bitte geben Sie Ihre E-Mail-Adresse ein."
+msgstr ""
 
 #: Includes/Engine/HotelEngine.php
 msgid "Please fill all required fields."
@@ -4122,23 +4122,23 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please select a check-in date."
-msgstr "Bitte wählen Sie ein Check-in Datum."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please select a check-out date."
-msgstr "Bitte wählen Sie ein Check-out Datum."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please select a date."
-msgstr "Bitte wählen Sie ein Datum."
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Please select a service."
-msgstr "Bitte wählen Sie eine Dienstleistung."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Please select a time."
-msgstr "Bitte wählen Sie eine Zeit."
+msgstr ""
 
 #: admin/Components/HelpPanel.php
 msgid "Plugin Settings"
@@ -4146,7 +4146,7 @@ msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Plugin Version"
-msgstr "Plugin-Version"
+msgstr ""
 
 #: admin/Pages/DiagnosticsPage.php
 msgid "Plugin Version:"
@@ -4162,7 +4162,7 @@ msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Preview"
-msgstr "Vorschau"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Preview navigation"
@@ -4194,11 +4194,11 @@ msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Pricing rule deleted"
-msgstr "Preisregel gelöscht"
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Pricing rule saved"
-msgstr "Preisregel gespeichert"
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Pricing Rules"
@@ -4222,7 +4222,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Primary Color"
-msgstr "Primärfarbe"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Primary Hover Color"
@@ -4238,7 +4238,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Privacy"
-msgstr "Datenschutz"
+msgstr ""
 
 #: admin/Pages/PrivacyPage.php
 msgid "Privacy & GDPR"
@@ -4262,7 +4262,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Processing..."
-msgstr "Verarbeite..."
+msgstr ""
 
 #: Includes/Util/DemoSeeder.php
 msgid "Professional haircut and styling"
@@ -4282,7 +4282,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Provider"
-msgstr "Anbieter"
+msgstr ""
 
 #: Includes/Engine/PackageEngine.php
 msgid "Purchase"
@@ -4290,7 +4290,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Queen Bed"
-msgstr "Queensize-Bett"
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Quick Actions"
@@ -4326,7 +4326,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Recent Appointments"
-msgstr "Aktuelle Termine"
+msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "Recent Deliveries"
@@ -4398,7 +4398,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Remove"
-msgstr "Entfernen"
+msgstr ""
 
 #: Includes/Domain/GroupBooking.php
 msgid "Remove this participant?"
@@ -4406,7 +4406,7 @@ msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Reply Templates"
-msgstr "Antwortvorlagen"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Reply-To:"
@@ -4458,11 +4458,11 @@ msgstr ""
 
 #: Includes/Util/ModeManager.php
 msgid "Reservation"
-msgstr "Reservierung"
+msgstr ""
 
 #: Includes/Util/ModeManager.php
 msgid "Reservations"
-msgstr "Reservierungen"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Reset"
@@ -4470,7 +4470,7 @@ msgstr "Zurücksetzen"
 
 #: public/Templates/wizard.php
 msgid "Resource"
-msgstr "Ressource"
+msgstr ""
 
 #: Includes/Domain/StaffCapacity.php
 msgid "Resource \"%s\" is not available at this time"
@@ -4478,11 +4478,11 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Resource #"
-msgstr "Ressource #"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Resources"
-msgstr "Ressourcen"
+msgstr ""
 
 #: admin/Pages/ResourcesPage.php
 msgid "Resources are rooms, equipment, or capacities. Link them to services to control availability."
@@ -4490,7 +4490,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Resources could not be loaded. Please try again."
-msgstr "Ressourcen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Responsive grid classes:"
@@ -4510,7 +4510,7 @@ msgstr ""
 
 #: admin/Pages/PrivacyPage.php
 msgid "Retention settings saved."
-msgstr "Aufbewahrungseinstellungen gespeichert."
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Return to booking page"
@@ -4538,7 +4538,7 @@ msgstr "Zimmer"
 
 #: public/Shortcodes.php
 msgid "Room #"
-msgstr "Zimmer #"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Room assigned."
@@ -4546,7 +4546,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Room Assignment"
-msgstr "Zimmerzuweisung"
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "Room assignment dependencies not loaded."
@@ -4558,7 +4558,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Room Assistant"
-msgstr "Zimmer-Assistent"
+msgstr ""
 
 #: admin/Pages/HotelDashboardPage.php
 msgid "Room bookings and occupancy overview"
@@ -4586,7 +4586,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Room Types"
-msgstr "Zimmertypen"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Room types define the different accommodation options you offer. Create your first room type to start accepting bookings."
@@ -4602,7 +4602,7 @@ msgstr ""
 
 #: Includes/Util/RoomSorter.php
 msgid "Rooms sorted successfully"
-msgstr "Zimmer erfolgreich sortiert"
+msgstr ""
 
 #: Includes/Util/ProgressiveUI.php
 msgid "Rooms, accommodations, rentals"
@@ -4654,7 +4654,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Rule deleted."
-msgstr "Regel gelöscht."
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Rule Name"
@@ -4666,7 +4666,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Rule saved."
-msgstr "Regel gespeichert."
+msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Rule Type"
@@ -4726,7 +4726,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Sat"
-msgstr "Sa"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Save"
@@ -4746,7 +4746,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Save Changes"
-msgstr "Änderungen speichern"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Save Customer"
@@ -4790,7 +4790,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Schedule"
-msgstr "Zeitplan"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Schedule Details"
@@ -4854,15 +4854,15 @@ msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Select"
-msgstr "Auswählen"
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Select a date first"
-msgstr "Wählen Sie zuerst ein Datum"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Select a time"
-msgstr "Zeit auswählen"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Select All"
@@ -5046,7 +5046,7 @@ msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Settings saved."
-msgstr "Einstellungen gespeichert."
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Setup Complete!"
@@ -5058,7 +5058,7 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Setup Wizard"
-msgstr "Einrichtungsassistent"
+msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Shadow & Effects"
@@ -5094,7 +5094,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Single Bed"
-msgstr "Einzelbett"
+msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Skip availability conflict check (not recommended)"
@@ -5222,7 +5222,7 @@ msgstr ""
 
 #: public/Pages/CustomerPortal.php
 msgid "Staff:"
-msgstr "Mitarbeiter:"
+msgstr ""
 
 #: Includes/Util/DemoSeeder.php
 msgid "Standard Room"
@@ -5230,7 +5230,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Start"
-msgstr "Start"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Start booking"
@@ -5246,11 +5246,11 @@ msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Start:"
-msgstr "Start:"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Status"
-msgstr "Status"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Status assigned to new bookings."
@@ -5298,7 +5298,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Step %s of %s"
-msgstr "Schritt %s von %s"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Store Country"
@@ -5322,15 +5322,15 @@ msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Style Guide"
-msgstr "Stil-Guide"
+msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Subject"
-msgstr "Betreff"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Subject:"
-msgstr "Betreff:"
+msgstr ""
 
 #: public/Templates/wizard.php
 msgid "Submit booking form"
@@ -5346,7 +5346,7 @@ msgstr "Erfolg"
 
 #: admin/Pages/BrandingPage.php
 msgid "Success Color"
-msgstr "Erfolgsfarbe"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Success!"
@@ -5370,7 +5370,7 @@ msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Sun"
-msgstr "So"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Sunset Orange"
@@ -5438,7 +5438,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Template"
-msgstr "Vorlage"
+msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Template deleted."
@@ -5466,11 +5466,11 @@ msgstr ""
 
 #: admin/Pages/ReplyTemplatesPage.php
 msgid "Templates"
-msgstr "Vorlagen"
+msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "Test"
-msgstr "Test"
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Test a booking end-to-end"
@@ -5502,7 +5502,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "Text Color"
-msgstr "Textfarbe"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Text Input"
@@ -5530,7 +5530,7 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "The date cannot be in the past."
-msgstr "Das Datum darf nicht in der Vergangenheit liegen."
+msgstr ""
 
 #: Includes/Util/BookingService.php
 msgid "The date or time format is not valid. Please check your selection and try again."
@@ -5570,7 +5570,7 @@ msgstr ""
 
 #: admin/Pages/DesignPage.php
 msgid "This action cannot be undone."
-msgstr "Diese Aktion kann nicht rückgängig gemacht werden."
+msgstr ""
 
 #: Includes/Util/AIOutbox.php
 msgid "This action has already been executed."
@@ -5670,7 +5670,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Thu"
-msgstr "Do"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Time"
@@ -5682,19 +5682,19 @@ msgstr ""
 
 #: public/Shortcodes.php
 msgid "Times could not be loaded"
-msgstr "Zeiten konnten nicht geladen werden"
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Times could not be loaded. Please reload the page."
-msgstr "Zeiten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
+msgstr ""
 
 #: public/Shortcodes.php
 msgid "Times could not be loaded. Please try again."
-msgstr "Zeiten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Timezone"
-msgstr "Zeitzone"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Tip: %1$s (shortcode: %2$s) and place a test booking to see it working end-to-end."
@@ -5702,7 +5702,7 @@ msgstr ""
 
 #: admin/Pages/CalendarPage.php
 msgid "Tip: Click an appointment to view and edit details."
-msgstr "Tipp: Klicken Sie auf einen Termin, um Details anzusehen und zu bearbeiten."
+msgstr ""
 
 #: admin/Components/HelpPanel.php
 msgid "Tips:"
@@ -5710,11 +5710,11 @@ msgstr ""
 
 #: public/Integrations/Elementor/BookingFormWidget.php
 msgid "Title"
-msgstr "Titel"
+msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "To"
-msgstr "Bis"
+msgstr ""
 
 #: public/Pages/StaffPortal.php
 msgid "To:"
@@ -5758,11 +5758,11 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Tue"
-msgstr "Di"
+msgstr ""
 
 #: admin/Pages/ServicesPage.php
 msgid "Twin Beds"
-msgstr "Zwei Einzelbetten"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Two-letter country code (e.g. DE, ES). Used to decide which payment methods make sense."
@@ -5770,7 +5770,7 @@ msgstr ""
 
 #: Includes/Engine/PricingIntegration.php
 msgid "Type"
-msgstr "Typ"
+msgstr ""
 
 #: admin/Pages/BrandingPage.php
 msgid "Typography & Style"
@@ -5802,7 +5802,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsPage.php
 msgid "Unpaid"
-msgstr "Unbezahlt"
+msgstr ""
 
 #: Includes/Engine/PolicyEngine.php
 msgid "Up to %d reschedules allowed. Minimum %d hours notice required."
@@ -5818,11 +5818,11 @@ msgstr ""
 
 #: admin/Pages/ResourcesPage.php
 msgid "Update"
-msgstr "Aktualisieren"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Update Customer"
-msgstr "Kunden aktualisieren"
+msgstr ""
 
 #: admin/Pages/CustomersPage.php
 msgid "Update Guest"
@@ -5830,7 +5830,7 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "Updated"
-msgstr "Aktualisiert"
+msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Updated:"
@@ -5838,7 +5838,7 @@ msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "URL"
-msgstr "URL"
+msgstr ""
 
 #: admin/Pages/StyleGuidePage.php
 msgid "Usage Examples"
@@ -5918,7 +5918,7 @@ msgstr ""
 
 #: admin/Pages/OutboxPage.php
 msgid "User"
-msgstr "Benutzer"
+msgstr ""
 
 #: admin/Pages/SettingsPage.php
 msgid "Usually your full email address for Gmail/Hostinger/Strato."
@@ -6078,19 +6078,19 @@ msgstr ""
 
 #: Includes/REST/Webhooks.php
 msgid "Webhooks"
-msgstr "Webhooks"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Wed"
-msgstr "Mi"
+msgstr ""
 
 #: Includes/Core/Plugin.php
 msgid "Week"
-msgstr "Woche"
+msgstr ""
 
 #: public/Integrations/Elementor/CalendarWidget.php
 msgid "Week View"
-msgstr "Wochenansicht"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Weekday"
@@ -6106,7 +6106,7 @@ msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Weekly"
-msgstr "Wöchentlich"
+msgstr ""
 
 #: admin/Pages/AutomationsPage.php
 msgid "Weekly (%s) @ %s"
@@ -6150,7 +6150,7 @@ msgstr ""
 
 #: admin/Pages/StaffPage.php
 msgid "Working hours saved."
-msgstr "Arbeitszeiten gespeichert."
+msgstr ""
 
 #: admin/Pages/SetupWizardPage.php
 msgid "Would you like to import demo data to test the plugin?"
@@ -6310,7 +6310,7 @@ msgstr ""
 
 #: admin/Pages/AppointmentsDashboardPage.php
 msgid "Your business at a glance"
-msgstr "Ihr Geschäft auf einen Blick"
+msgstr ""
 
 #: admin/Pages/AIPage.php
 msgid "Your business name."

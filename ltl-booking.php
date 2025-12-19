@@ -56,7 +56,13 @@ if ( defined( 'LTLB_DEBUG_DEPRECATIONS' ) && LTLB_DEBUG_DEPRECATIONS ) {
 
 add_action( 'plugins_loaded', function () {
     load_plugin_textdomain( 'ltl-bookings', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-} );
+}, 1 ); // Priority 1 to load early
+
+// Initialize I18n early (before textdomain is loaded)
+require_once LTLB_PATH . 'Includes/Util/I18n.php';
+if ( class_exists( 'LTLB_I18n' ) ) {
+    LTLB_I18n::init();
+}
 
 require_once LTLB_PATH . 'Includes/DB/Schema.php';
 require_once LTLB_PATH . 'Includes/DB/Migrator.php';

@@ -39,9 +39,7 @@ class LTLB_Plugin {
             LTLB_Mailer::init();
         }
 
-		if ( class_exists('LTLB_I18n') ) {
-			LTLB_I18n::init();
-		}
+		// I18n is now initialized early in ltl-booking.php
     }
 
     private function ensure_retention_cron(): void {

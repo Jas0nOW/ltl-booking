@@ -2,13 +2,30 @@
 /**
  * Simple .po to .mo compiler
  * Run with: php compile-mo.php
+ * 
+ * Compiles all .po files in the languages folder
  */
 
-$poFile = __DIR__ . '/../languages/de_DE.po';
-$moFile = __DIR__ . '/../languages/de_DE.mo';
+// Find all .po files
+$langDir = __DIR__ . '/../languages/';
+$poFiles = glob($langDir . '*.po');
 
+if (empty($poFiles)) {
+    die("Error: No .po files found in $langDir\n");
+}
+
+foreach ($poFiles as $poFile) {
+    $moFile = preg_replace('/\.po$/', '.mo', $poFile);
+    compilePo($poFile, $moFile);
+}
+
+echo "\n✅ All translations compiled!\n";
+exit(0);
+
+function compilePo($poFile, $moFile) {
 if (!file_exists($poFile)) {
-    die("Error: $poFile not found\n");
+    echo "⚠️ Skipping: $poFile not found\n";
+    return;
 }
 
 echo "Compiling $poFile to $moFile...\n";
@@ -138,6 +155,6 @@ $data .= $transStrings;
 // Write .mo file
 file_put_contents($moFile, $data);
 
-echo "Successfully compiled to $moFile\n";
-echo "File size: " . filesize($moFile) . " bytes\n";
-echo "Done!\n";
+$basename = basename($moFile);
+echo "✅ $basename - " . count($translations) . " entries, " . filesize($moFile) . " bytes\n";
+}
