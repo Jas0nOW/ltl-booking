@@ -145,19 +145,19 @@ class LTLB_Admin_Header {
 		<header class="ltlb-header" role="banner">
 			<!-- Top Bar with Brand and Actions -->
 			<div class="ltlb-header__top">
-				<div class="ltlb-header__brand">
+				<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_dashboard')); ?>" class="ltlb-header__brand" title="<?php echo esc_attr__('Back to Dashboard', 'ltl-bookings'); ?>">
 					<div class="ltlb-header__logo">
 						<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 							<rect width="28" height="28" rx="6" fill="currentColor" class="ltlb-logo-bg"/>
-							<path d="M7 9h14M7 14h10M7 19h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
-							<circle cx="21" cy="14" r="3" fill="#FFD700"/>
+							<path d="M9 8h10M9 14h10M9 20h10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+							<circle cx="21" cy="8" r="2.5" fill="#FFD700"/>
 						</svg>
 					</div>
 					<div class="ltlb-header__brand-text">
 						<span class="ltlb-header__title">LazyBookings</span>
 						<span class="ltlb-header__version"><?php echo esc_html__( 'Pro', 'ltl-bookings' ); ?> v<?php echo esc_html(LTLB_VERSION); ?></span>
 					</div>
-				</div>
+				</a>
 
 				<!-- Mode Switcher -->
 				<div class="ltlb-header__mode-switch" role="tablist" aria-label="<?php echo esc_attr__( 'Booking Mode', 'ltl-bookings' ); ?>">

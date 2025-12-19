@@ -141,6 +141,7 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
         require_once LTLB_PATH . 'admin/Pages/StyleGuidePage.php';
+        require_once LTLB_PATH . 'admin/Pages/ShortcodesPage.php';
         require_once LTLB_PATH . 'admin/Pages/AIPage.php';
         require_once LTLB_PATH . 'admin/Pages/OutboxPage.php';
         require_once LTLB_PATH . 'admin/Pages/RoomAssistantPage.php';
@@ -168,10 +169,8 @@ class LTLB_Plugin {
         // Public: Gutenberg Blocks
         require_once LTLB_PATH . 'public/Blocks/GutenbergBlocks.php';
         
-        // Public: Elementor Integration
-        if ( did_action( 'elementor/loaded' ) ) {
-            require_once LTLB_PATH . 'public/Integrations/Elementor/ElementorIntegration.php';
-        }
+        // Public: Elementor Integration (always load, class handles Elementor check internally)
+        require_once LTLB_PATH . 'public/Integrations/Elementor/ElementorIntegration.php';
         
         // WP-CLI commands
         if ( defined('WP_CLI') && WP_CLI ) {
@@ -190,8 +189,8 @@ class LTLB_Plugin {
             LTLB_Gutenberg_Blocks::init();
         }
         
-        // Initialize Elementor Integration
-        if ( class_exists( 'LTLB_Elementor_Integration' ) && did_action( 'elementor/loaded' ) ) {
+        // Initialize Elementor Integration (class handles Elementor availability check internally)
+        if ( class_exists( 'LTLB_Elementor_Integration' ) ) {
             LTLB_Elementor_Integration::init();
         }
         
@@ -481,6 +480,16 @@ class LTLB_Plugin {
             [ $this, 'render_styleguide_page' ]
         );
 
+        // Shortcodes Reference
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Shortcodes', 'ltl-bookings' ),
+            '<span class="dashicons dashicons-shortcode" style="font-size: 17px; vertical-align: middle; margin-right: 4px;"></span>' . __( 'Shortcodes', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_shortcodes',
+            [ $this, 'render_shortcodes_page' ]
+        );
+
         // Settings
         $settings_hook = add_submenu_page(
             'ltlb_dashboard',
@@ -665,6 +674,15 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Style Guide', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_shortcodes_page(): void {
+        if ( class_exists('LTLB_Admin_ShortcodesPage') ) {
+            $page = new LTLB_Admin_ShortcodesPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Shortcodes', 'ltl-bookings' ) . '</h1></div>';
     }
 
     public function render_staff_page(): void {

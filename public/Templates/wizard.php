@@ -241,7 +241,9 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
 
                 <div class="ltlb-step-nav">
                     <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                    <?php submit_button( esc_html__( 'Confirm booking', 'ltl-bookings' ), 'primary', 'ltlb_book_submit', false, [ 'aria-label' => esc_attr__( 'Submit booking form', 'ltl-bookings' ) ] ); ?>
+                    <button type="submit" name="ltlb_book_submit" class="ltlb-btn ltlb-btn--primary" aria-label="<?php echo esc_attr__( 'Submit booking form', 'ltl-bookings' ); ?>">
+                        <?php echo esc_html__( 'Confirm booking', 'ltl-bookings' ); ?>
+                    </button>
                 </div>
             </fieldset>
         </div>

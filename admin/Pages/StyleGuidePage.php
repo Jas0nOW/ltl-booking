@@ -16,6 +16,61 @@ class LTLB_Admin_StyleGuidePage {
             wp_die( esc_html__( 'You do not have permission to view this page.', 'ltl-bookings' ) );
         }
         ?>
+        <style>
+            /* Style Guide specific overrides for better readability */
+            .ltlb-admin code {
+                background: #f0f0f1;
+                color: #d63638;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 13px;
+            }
+            .ltlb-admin pre {
+                background: #f6f7f7;
+                border: 1px solid #c3c4c7;
+                border-radius: 4px;
+                padding: 12px;
+                overflow-x: auto;
+            }
+            .ltlb-admin pre code {
+                background: transparent;
+                color: #1d2327;
+                padding: 0;
+                font-size: 13px;
+                line-height: 1.6;
+            }
+            /* Color display boxes */
+            .ltlb-color-display {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 8px;
+            }
+            .ltlb-color-box {
+                width: 48px;
+                height: 48px;
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 4px;
+                flex-shrink: 0;
+            }
+            .ltlb-color-info {
+                display: flex;
+                flex-direction: column;
+            }
+            /* Spacing display */
+            .ltlb-spacing-display {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 8px;
+            }
+            .ltlb-spacing-bar {
+                height: 24px;
+                background: var(--ltlb-primary, #2271b1);
+                border-radius: 2px;
+            }
+        </style>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_styleguide'); } ?>
             
@@ -39,9 +94,13 @@ class LTLB_Admin_StyleGuidePage {
                                 'primary-rgb' => '34, 113, 177',
                             ];
                             foreach ($brand_colors as $name => $value) {
-                                echo '<div style="display: flex; align-items: center; gap: 12px;">';
-                                echo '<div style="width: 48px; height: 48px; background: ' . esc_attr($value) . '; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;"></div>';
-                                echo '<div><code>--ltlb-' . esc_html($name) . '</code><br><small>' . esc_html($value) . '</small></div>';
+                                echo '<div class="ltlb-color-display">';
+                                $bg = ($name === 'primary-rgb') ? 'rgb(' . $value . ')' : $value;
+                                echo '<div class="ltlb-color-box" style="background: ' . esc_attr($bg) . ';"></div>';
+                                echo '<div class="ltlb-color-info">';
+                                echo '<code style="background: #f0f0f1; color: #d63638;">--ltlb-' . esc_html($name) . '</code>';
+                                echo '<small style="color: #646970;">' . esc_html($value) . '</small>';
+                                echo '</div>';
                                 echo '</div>';
                             }
                             ?>
@@ -58,9 +117,12 @@ class LTLB_Admin_StyleGuidePage {
                                 'info' => '#3582c4',
                             ];
                             foreach ($semantic_colors as $name => $value) {
-                                echo '<div style="display: flex; align-items: center; gap: 12px;">';
-                                echo '<div style="width: 48px; height: 48px; background: ' . esc_attr($value) . '; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;"></div>';
-                                echo '<div><code>--ltlb-color-' . esc_html($name) . '</code><br><small>' . esc_html($value) . '</small></div>';
+                                echo '<div class="ltlb-color-display">';
+                                echo '<div class="ltlb-color-box" style="background: ' . esc_attr($value) . ';"></div>';
+                                echo '<div class="ltlb-color-info">';
+                                echo '<code style="background: #f0f0f1; color: #d63638;">--ltlb-color-' . esc_html($name) . '</code>';
+                                echo '<small style="color: #646970;">' . esc_html($value) . '</small>';
+                                echo '</div>';
                                 echo '</div>';
                             }
                             ?>
@@ -77,9 +139,12 @@ class LTLB_Admin_StyleGuidePage {
                                 'bg' => '#f0f0f1',
                             ];
                             foreach ($neutral_colors as $name => $value) {
-                                echo '<div style="display: flex; align-items: center; gap: 12px;">';
-                                echo '<div style="width: 48px; height: 48px; background: ' . esc_attr($value) . '; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;"></div>';
-                                echo '<div><code>--ltlb-color-' . esc_html($name) . '</code><br><small>' . esc_html($value) . '</small></div>';
+                                echo '<div class="ltlb-color-display">';
+                                echo '<div class="ltlb-color-box" style="background: ' . esc_attr($value) . ';"></div>';
+                                echo '<div class="ltlb-color-info">';
+                                echo '<code style="background: #f0f0f1; color: #d63638;">--ltlb-color-' . esc_html($name) . '</code>';
+                                echo '<small style="color: #646970;">' . esc_html($value) . '</small>';
+                                echo '</div>';
                                 echo '</div>';
                             }
                             ?>
@@ -287,28 +352,29 @@ class LTLB_Admin_StyleGuidePage {
                     <?php 
                     $spacings = [1 => '4px', 2 => '8px', 3 => '12px', 4 => '16px', 6 => '24px', 8 => '32px', 12 => '48px'];
                     foreach ($spacings as $unit => $px) {
-                        echo '<div style="display: flex; align-items: center; gap: 12px;">';
-                        echo '<div style="width: 100px;"><code>--ltlb-space-' . $unit . '</code></div>';
-                        echo '<div style="width: ' . esc_attr($px) . '; height: 24px; background: var(--ltlb-primary); border-radius: 2px;"></div>';
-                        echo '<div>' . esc_html($px) . '</div>';
+                        echo '<div class="ltlb-spacing-display">';
+                        echo '<div style="width: 100px;"><code style="background: #f0f0f1; color: #d63638;">--ltlb-space-' . $unit . '</code></div>';
+                        echo '<div class="ltlb-spacing-bar" style="width: ' . esc_attr($px) . ';"></div>';
+                        echo '<div style="color: #646970; font-size: 13px;">' . esc_html($px) . '</div>';
                         echo '</div>';
                     }
                     ?>
                 </div>
 
                 <h3><?php echo esc_html__('Grid Layouts', 'ltl-bookings'); ?></h3>
-                <p class="description"><?php echo esc_html__('Responsive grid classes:', 'ltl-bookings'); ?> <code>.ltlb-grid--2</code>, <code>.ltlb-grid--3</code>, <code>.ltlb-grid--4</code></p>
+                <p class="description">
+                    <?php echo esc_html__('Responsive grid classes:', 'ltl-bookings'); ?> 
+                    <code style="background: #f0f0f1; color: #d63638;">.ltlb-grid--2</code>, 
+                    <code style="background: #f0f0f1; color: #d63638;">.ltlb-grid--3</code>, 
+                    <code style="background: #f0f0f1; color: #d63638;">.ltlb-grid--4</code>
+                </p>
             <?php LTLB_Admin_Component::card_end(); ?>
 
             <!-- DOCUMENTATION LINK -->
             <?php LTLB_Admin_Component::card_start(__( 'Documentation', 'ltl-bookings' )); ?>
                 <p>
-                    <?php 
-                    printf(
-                        esc_html__('For complete documentation including all component variants, accessibility guidelines, and implementation notes, see %s', 'ltl-bookings'),
-                        '<code>/docs/DESIGN_SYSTEM.md</code>'
-                    ); 
-                    ?>
+                    <?php echo esc_html__('For complete documentation including all component variants, accessibility guidelines, and implementation notes, see', 'ltl-bookings'); ?>
+                    <code style="background: #f0f0f1; color: #d63638;">/docs/DESIGN_SYSTEM.md</code>
                 </p>
                 <p>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_design')); ?>" class="ltlb-btn ltlb-btn--secondary">

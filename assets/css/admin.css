@@ -252,6 +252,19 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity var(--lazy-transition-base) var(--lazy-ease-out);
+}
+
+.ltlb-header__brand:hover {
+    opacity: 0.85;
+}
+
+.ltlb-header__brand:focus {
+    outline: 2px solid var(--lazy-accent);
+    outline-offset: 4px;
+    border-radius: var(--lazy-radius-sm);
 }
 
 .ltlb-header__logo {
@@ -262,7 +275,7 @@
     transition: transform var(--lazy-transition-base) var(--lazy-ease-out);
 }
 
-.ltlb-header__logo:hover {
+.ltlb-header__brand:hover .ltlb-header__logo {
     transform: scale(1.05);
 }
 
