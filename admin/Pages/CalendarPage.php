@@ -27,7 +27,7 @@ class LTLB_Admin_CalendarPage {
 							<div class="ltlb-calendar-rooms__header">
 								<strong><?php echo esc_html__( 'Rooms', 'ltl-bookings' ); ?></strong>
 								<div class="ltlb-muted"><?php echo esc_html__( 'Room Types', 'ltl-bookings' ); ?></div>
-								<button type="button" id="ltlb-auto-sort-rooms" class="button button-small ltlb-auto-sort-button" style="margin-top: 8px;" title="<?php echo esc_attr__( 'Automatically sort rooms by name', 'ltl-bookings' ); ?>">
+								<button type="button" id="ltlb-auto-sort-rooms" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small ltlb-auto-sort-button" style="margin-top: 8px;" title="<?php echo esc_attr__( 'Automatically sort rooms by name', 'ltl-bookings' ); ?>">
 									<span class="dashicons dashicons-sort"></span>
 									<?php echo esc_html__( 'Auto-Sort', 'ltl-bookings' ); ?>
 								</button>

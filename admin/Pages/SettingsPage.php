@@ -387,7 +387,7 @@ class LTLB_Admin_SettingsPage {
                 <?php LTLB_Admin_Component::card_start(__( 'Setup Wizard', 'ltl-bookings' )); ?>
                     <p><?php echo esc_html__( 'Run the setup wizard again to reconfigure your basic settings.', 'ltl-bookings' ); ?></p>
                     <p>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_setup_wizard&restart=1' ) ); ?>" class="button button-secondary">
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_setup_wizard&restart=1' ) ); ?>" class="ltlb-btn ltlb-btn--secondary">
                             <span class="dashicons dashicons-update" style="vertical-align: middle;"></span>
                             <?php echo esc_html__( 'Restart Setup Wizard', 'ltl-bookings' ); ?>
                         </a>
@@ -396,7 +396,7 @@ class LTLB_Admin_SettingsPage {
 
                 <!-- ADVANCED SETTINGS (Collapsible) -->
                 <div class="ltlb-advanced-settings-toggle" style="margin: 20px 0 10px 0;">
-                    <button type="button" class="button button-secondary ltlb-toggle-advanced" data-target="ltlb-advanced-general">
+                    <button type="button" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small ltlb-toggle-advanced" data-target="ltlb-advanced-general">
                         <span class="dashicons dashicons-arrow-down-alt2"></span>
                         <?php echo esc_html__( 'Advanced Settings', 'ltl-bookings' ); ?>
                     </button>
@@ -475,7 +475,7 @@ class LTLB_Admin_SettingsPage {
 
                 <!-- ADVANCED SETTINGS (Collapsible) -->
                 <div class="ltlb-advanced-settings-toggle" style="margin: 20px 0 10px 0;">
-                    <button type="button" class="button button-secondary ltlb-toggle-advanced" data-target="ltlb-advanced-email">
+                    <button type="button" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small ltlb-toggle-advanced" data-target="ltlb-advanced-email">
                         <span class="dashicons dashicons-arrow-down-alt2"></span>
                         <?php echo esc_html__( 'Advanced Email Settings (SMTP)', 'ltl-bookings' ); ?>
                     </button>
@@ -551,7 +551,7 @@ class LTLB_Admin_SettingsPage {
                 <?php LTLB_Admin_Component::card_start( __( 'AI Settings', 'ltl-bookings' ) ); ?>
                     <p class="description"><?php echo esc_html__( 'AI settings (provider, model, business context, and operating mode) are managed under “AI & Automations”.', 'ltl-bookings' ); ?></p>
                     <p>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_ai' ) ); ?>"><?php echo esc_html__( 'Open AI Settings', 'ltl-bookings' ); ?></a>
+                        <a class="ltlb-btn ltlb-btn--primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_ai' ) ); ?>"><?php echo esc_html__( 'Open AI Settings', 'ltl-bookings' ); ?></a>
                     </p>
                 <?php LTLB_Admin_Component::card_end(); ?>
                 <?php endif; ?>

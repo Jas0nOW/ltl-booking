@@ -101,10 +101,14 @@ class LTLB_ICS_Export {
      * Escape text for ICS format
      */
     private static function escape_ics_text( string $text ): string {
-        $text = str_replace( '\\', '\\\\', $text );
-        $text = str_replace( ',', '\\,', $text );
-        $text = str_replace( ';', '\\;', $text );
-        $text = str_replace( "\n", '\\n', $text );
+        // Ensure text is a string (prevent deprecation warnings in PHP 8.1+)
+        if ( ! is_string( $text ) ) {
+            $text = '';
+        }
+        $text = str_replace( '\\', '\\\\', (string) $text );
+        $text = str_replace( ',', '\\,', (string) $text );
+        $text = str_replace( ';', '\\;', (string) $text );
+        $text = str_replace( "\n", '\\n', (string) $text );
         return $text;
     }
 

@@ -33,7 +33,7 @@ class LTLB_Admin_AutomationsPage {
 				<form method="post" style="margin:12px 0;">
 					<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
 					<input type="hidden" name="ltlb_automations_do" value="add_defaults">
-					<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Add Default Rules', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__( 'Add Default Rules', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<form method="post" style="margin:12px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
@@ -52,7 +52,7 @@ class LTLB_Admin_AutomationsPage {
 						<label for="ltlb_add_rule_name" class="ltlb-muted" style="display:block; margin-bottom:4px;"><?php echo esc_html__( 'Name (optional)', 'ltl-bookings' ); ?></label>
 						<input id="ltlb_add_rule_name" class="regular-text" type="text" name="name" value="" placeholder="<?php echo esc_attr__( 'e.g., Weekly report', 'ltl-bookings' ); ?>" />
 					</div>
-					<button type="submit" class="button button-primary"><?php echo esc_html__( 'Add Rule', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Add Rule', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<table class="widefat striped">
@@ -110,25 +110,25 @@ class LTLB_Admin_AutomationsPage {
 									<td><?php echo esc_html( $last ); ?></td>
 									<td><?php echo esc_html( $next ); ?></td>
 									<td>
-										<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit', 'ltl-bookings' ); ?></a>
-										<a class="button button-small" style="margin-left:6px;" href="<?php echo esc_url( $logs_url ); ?>"><?php echo esc_html__( 'Logs', 'ltl-bookings' ); ?></a>
+										<a class="ltlb-btn ltlb-btn--small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit', 'ltl-bookings' ); ?></a>
+										<a class="ltlb-btn ltlb-btn--small" style="margin-left:6px;" href="<?php echo esc_url( $logs_url ); ?>"><?php echo esc_html__( 'Logs', 'ltl-bookings' ); ?></a>
 										<form method="post" style="display:inline-block; margin-right:6px;">
 											<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
 											<input type="hidden" name="rule_id" value="<?php echo esc_attr( $rid ); ?>">
 											<input type="hidden" name="ltlb_automations_do" value="toggle">
-											<button class="button button-small" type="submit"><?php echo $enabled ? esc_html__( 'Disable', 'ltl-bookings' ) : esc_html__( 'Enable', 'ltl-bookings' ); ?></button>
+											<button class="ltlb-btn ltlb-btn--small" type="submit"><?php echo $enabled ? esc_html__( 'Disable', 'ltl-bookings' ) : esc_html__( 'Enable', 'ltl-bookings' ); ?></button>
 										</form>
 										<form method="post" style="display:inline-block;">
 											<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
 											<input type="hidden" name="rule_id" value="<?php echo esc_attr( $rid ); ?>">
 											<input type="hidden" name="ltlb_automations_do" value="run_now">
-											<button class="button button-small" type="submit"><?php echo esc_html__( 'Run Now', 'ltl-bookings' ); ?></button>
+										<button class="ltlb-btn ltlb-btn--small" type="submit"><?php echo esc_html__( 'Run Now', 'ltl-bookings' ); ?></button>
 										</form>
 										<form method="post" style="display:inline-block; margin-left:6px;">
 											<?php wp_nonce_field( 'ltlb_automations_action', 'ltlb_automations_nonce' ); ?>
 											<input type="hidden" name="rule_id" value="<?php echo esc_attr( $rid ); ?>">
 											<input type="hidden" name="ltlb_automations_do" value="delete">
-											<button class="button button-small" type="submit" onclick="return confirm('<?php echo esc_js( __( 'Delete this rule?', 'ltl-bookings' ) ); ?>')"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></button>
+										<button class="ltlb-btn ltlb-btn--small ltlb-btn--ghost" type="submit" onclick="return confirm('<?php echo esc_js( __( 'Delete this rule?', 'ltl-bookings' ) ); ?>')"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></button>
 										</form>
 									</td>
 								</tr>
@@ -264,8 +264,8 @@ class LTLB_Admin_AutomationsPage {
 					<?php endif; ?>
 				</tbody></table>
 				<p>
-					<button type="submit" class="button button-primary"><?php echo esc_html__( 'Save Rule', 'ltl-bookings' ); ?></button>
-					<a class="button" href="<?php echo esc_url( $back ); ?>"><?php echo esc_html__( 'Close', 'ltl-bookings' ); ?></a>
+					<button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Save Rule', 'ltl-bookings' ); ?></button>
+					<a class="ltlb-btn ltlb-btn--secondary" href="<?php echo esc_url( $back ); ?>"><?php echo esc_html__( 'Close', 'ltl-bookings' ); ?></a>
 				</p>
 			</form>
 		<?php LTLB_Admin_Component::card_end(); ?>
@@ -329,7 +329,7 @@ class LTLB_Admin_AutomationsPage {
 			$rule_id = wp_generate_uuid4();
 			$base = [
 				'id' => $rule_id,
-				'name' => $name !== '' ? $name : ucfirst( str_replace( '_', ' ', $type ) ),
+				'name' => (string) $name !== '' ? (string) $name : ucfirst( str_replace( '_', ' ', (string)$type ) ),
 				'type' => $type,
 				'enabled' => 1,
 				'mode' => 'inherit',

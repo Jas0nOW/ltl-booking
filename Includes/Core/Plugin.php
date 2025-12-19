@@ -142,6 +142,7 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Pages/CalendarPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
+        require_once LTLB_PATH . 'admin/Pages/StyleGuidePage.php';
         require_once LTLB_PATH . 'admin/Pages/AIPage.php';
         require_once LTLB_PATH . 'admin/Pages/OutboxPage.php';
         require_once LTLB_PATH . 'admin/Pages/RoomAssistantPage.php';
@@ -427,6 +428,16 @@ class LTLB_Plugin {
             [ $this, 'render_design_page' ]
         );
 
+        // Style Guide (Design System Reference)
+        add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Style Guide', 'ltl-bookings' ),
+            __( 'Style Guide', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_styleguide',
+            [ $this, 'render_styleguide_page' ]
+        );
+
         // Settings
         add_submenu_page(
             'ltlb_dashboard',
@@ -585,6 +596,15 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Design', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_styleguide_page(): void {
+        if ( class_exists('LTLB_Admin_StyleGuidePage') ) {
+            $page = new LTLB_Admin_StyleGuidePage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Style Guide', 'ltl-bookings' ) . '</h1></div>';
     }
 
     public function render_staff_page(): void {
@@ -2217,15 +2237,28 @@ class LTLB_Plugin {
         if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
 
         $debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
-        $admin_css_ver = LTLB_VERSION;
-        if ( $debug_assets ) {
-            $mtime = @filemtime( LTLB_PATH . 'assets/css/admin.css' );
-            if ( $mtime ) {
-                $admin_css_ver = (string) $mtime;
+        
+        // Helper function for versioning
+        $get_version = function( $file ) use ( $debug_assets ) {
+            if ( $debug_assets ) {
+                $mtime = @filemtime( LTLB_PATH . $file );
+                if ( $mtime ) {
+                    return (string) $mtime;
+                }
             }
-        }
+            return LTLB_VERSION;
+        };
 
-        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], $admin_css_ver );
+        // Determine if we should use minified files
+        $min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+        $css_dir = $debug_assets ? 'assets/css/' : 'assets/css/dist/';
+
+        // Design System CSS (in dependency order)
+        wp_enqueue_style( 'ltlb-tokens', LTLB_URL . $css_dir . "tokens{$min}.css", [], $get_version( $css_dir . "tokens{$min}.css" ) );
+        wp_enqueue_style( 'ltlb-base', LTLB_URL . $css_dir . "base{$min}.css", [ 'ltlb-tokens' ], $get_version( $css_dir . "base{$min}.css" ) );
+        wp_enqueue_style( 'ltlb-components', LTLB_URL . $css_dir . "components{$min}.css", [ 'ltlb-tokens', 'ltlb-base' ], $get_version( $css_dir . "components{$min}.css" ) );
+        wp_enqueue_style( 'ltlb-layout', LTLB_URL . $css_dir . "layout{$min}.css", [ 'ltlb-tokens', 'ltlb-base' ], $get_version( $css_dir . "layout{$min}.css" ) );
+        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . $css_dir . "admin{$min}.css", [ 'ltlb-tokens', 'ltlb-base', 'ltlb-components', 'ltlb-layout' ], $get_version( $css_dir . "admin{$min}.css" ) );
 
         if ( $page === 'ltlb_ai' ) {
             $ai_ver = LTLB_VERSION;

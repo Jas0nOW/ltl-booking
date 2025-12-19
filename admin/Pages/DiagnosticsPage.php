@@ -186,7 +186,7 @@ class LTLB_DiagnosticsPage {
                 <form method="post">
                     <?php wp_nonce_field('ltlb_run_migrations', 'ltlb_migrations_nonce'); ?>
                     <p>
-                        <button type="submit" name="ltlb_run_migrations" class="button button-secondary">
+                        <button type="submit" name="ltlb_run_migrations" class="ltlb-btn ltlb-btn--secondary">
                             <?php echo esc_html__( 'Run migrations', 'ltl-bookings' ); ?>
                         </button>
                         <span class="description"><?php echo esc_html__( 'Runs database migrations again. Can be run multiple times (uses dbDelta).', 'ltl-bookings' ); ?></span>
@@ -196,7 +196,7 @@ class LTLB_DiagnosticsPage {
                 <form method="post" style="margin-top: 10px;">
                     <?php wp_nonce_field('ltlb_run_doctor', 'ltlb_doctor_nonce'); ?>
                     <p>
-                        <button type="submit" name="ltlb_run_doctor" class="button button-secondary">
+                        <button type="submit" name="ltlb_run_doctor" class="ltlb-btn ltlb-btn--secondary">
                             <?php echo esc_html__( 'Run system check', 'ltl-bookings' ); ?>
                         </button>
                         <span class="description"><?php echo esc_html__( 'Run system diagnostics (read-only).', 'ltl-bookings' ); ?></span>
@@ -285,7 +285,7 @@ class LTLB_DiagnosticsPage {
                                 <option value="<?php echo esc_attr( $bn ); ?>" <?php selected( $bn, $picked_name ); ?>><?php echo esc_html( $bn ); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="submit" class="button"><?php echo esc_html__( 'View', 'ltl-bookings' ); ?></button>
+                        <button type="submit" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__( 'View', 'ltl-bookings' ); ?></button>
                         <?php
                         $dl_url = add_query_arg(
                             [
@@ -297,7 +297,7 @@ class LTLB_DiagnosticsPage {
                             $base_url
                         );
                         ?>
-                        <a class="button button-secondary" href="<?php echo esc_url( $dl_url ); ?>"><?php echo esc_html__( 'Download', 'ltl-bookings' ); ?></a>
+                        <a class="ltlb-btn ltlb-btn--secondary" href="<?php echo esc_url( $dl_url ); ?>"><?php echo esc_html__( 'Download', 'ltl-bookings' ); ?></a>
                     </form>
 
                     <?php
@@ -326,7 +326,8 @@ class LTLB_DiagnosticsPage {
         if ( is_array( $cron_array ) ) {
             foreach ( $cron_array as $timestamp => $hooks ) {
                 foreach ( $hooks as $hook => $info ) {
-                    if ( strpos( $hook, 'ltlb_' ) === 0 ) {
+                    // Ensure hook is a string before strpos
+                    if ( is_string( $hook ) && strpos( (string) $hook, 'ltlb_' ) === 0 ) {
                         $next_ltlb_cron = $timestamp;
                         break 2;
                     }
@@ -540,7 +541,7 @@ class LTLB_DiagnosticsPage {
             'ltlb_export_debug' => '1',
             '_wpnonce' => wp_create_nonce( 'ltlb_export_debug' ),
         ], admin_url('admin.php'));
-        echo '<p><a href="' . esc_url($export_url) . '" class="button button-secondary">' . esc_html__( 'Export Debug Bundle', 'ltl-bookings' ) . '</a></p>';
+        echo '<p><a href="' . esc_url($export_url) . '" class="ltlb-btn ltlb-btn--secondary">' . esc_html__( 'Export Debug Bundle', 'ltl-bookings' ) . '</a></p>';
         
         echo '</div>';
     }

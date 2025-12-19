@@ -136,7 +136,7 @@ class LTLB_PrivacyPage {
                             </tr>
                         </tbody>
                     </table>
-                    <p><button type="submit" name="ltlb_anonymize_customer" class="button button-secondary" onclick="return confirm('<?php echo esc_js(__('Are you sure you want to anonymize this customer? This cannot be undone.', 'ltl-bookings')); ?>');"><?php echo esc_html__('Anonymize Customer', 'ltl-bookings'); ?></button></p>
+                    <p><button type="submit" name="ltlb_anonymize_customer" class="ltlb-btn ltlb-btn--secondary" onclick="return confirm('<?php echo esc_js(__('Are you sure you want to anonymize this customer? This cannot be undone.', 'ltl-bookings')); ?>');"><?php echo esc_html__('Anonymize Customer', 'ltl-bookings'); ?></button></p>
                 </form>
             </div>
 
@@ -144,7 +144,7 @@ class LTLB_PrivacyPage {
                 <h2><?php echo esc_html__('Run Retention Cleanup', 'ltl-bookings'); ?></h2>
                 <p><?php echo esc_html__('Retention policies are automatically applied via scheduled tasks. You can manually trigger cleanup here:', 'ltl-bookings'); ?></p>
                 <p>
-                    <a href="<?php echo esc_attr(add_query_arg(['page' => 'ltlb_privacy', 'action' => 'run_cleanup', 'nonce' => wp_create_nonce('ltlb_run_cleanup')], admin_url('admin.php'))); ?>" class="button button-secondary" onclick="return confirm('<?php echo esc_js(__('Run retention cleanup now?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Run Cleanup Now', 'ltl-bookings'); ?></a>
+                    <a href="<?php echo esc_attr(add_query_arg(['page' => 'ltlb_privacy', 'action' => 'run_cleanup', 'nonce' => wp_create_nonce('ltlb_run_cleanup')], admin_url('admin.php'))); ?>" class="ltlb-btn ltlb-btn--secondary" onclick="return confirm('<?php echo esc_js(__('Run retention cleanup now?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Run Cleanup Now', 'ltl-bookings'); ?></a>
                 </p>
             </div>
         </div>

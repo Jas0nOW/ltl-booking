@@ -527,9 +527,11 @@ class LTLB_Import_Export {
      * @param string $value
      * @return string Escaped value
      */
-    private function escape_csv( $value ): string {
-        $value = str_replace( '"', '""', $value );
-        if ( strpos( $value, ',' ) !== false || strpos( $value, "\n" ) !== false ) {
+    private function escape_csv( $value ): string {        // Ensure value is a string (handle null from database queries)
+        if ( ! is_string( $value ) ) {
+            $value = (string) $value ?? '';
+        }        $value = str_replace( '"', '""', (string) $value );
+        if ( strpos( (string) $value, ',' ) !== false || strpos( (string) $value, "\n" ) !== false ) {
             $value = '"' . $value . '"';
         }
         return $value;

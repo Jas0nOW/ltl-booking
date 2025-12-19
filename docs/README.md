@@ -1,105 +1,41 @@
-# 📚 LazyBookings Dokumentation (v1.1.0)
+# 📚 LazyBookings Documentation Index
 
-Willkommen zur LazyBookings-Dokumentation! Diese README hilft Ihnen, sich in der Dokumentationsstruktur zurechtzufinden.
-
-## 📖 Dokumentations-Struktur
-
-### 🎯 Schnellstart
-- **[API.md](API.md)** - Public API-Dokumentation (REST + Form Submission)
-
-### 🏗️ Architektur & Design
-- **[DB_SCHEMA.md](DB_SCHEMA.md)** - Datenbankschema (aktuelle Tables + Planung)
-- **[DESIGN_GUIDE.md](DESIGN_GUIDE.md)** - Design Tokens (lazy_design) & CSS Variablen
-- **[ERROR_HANDLING.md](ERROR_HANDLING.md)** - Error-Handling-Konventionen
-
-### 🔧 Entwicklung
-- **[archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)** - Performance-Ideen (Archiv)
-- **[archive/ADMIN_COLUMNS.md](archive/ADMIN_COLUMNS.md)** - Admin-UI-Ideen (Archiv)
-
-### 🗂️ Archiv & Ideen
-- **[archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)** - Performance-Optimierung (optional)
-- **[archive/ADMIN_COLUMNS.md](archive/ADMIN_COLUMNS.md)** - Geplante Admin-UI-Verbesserungen
-- **[archive/DOC_OPTIMIZATION_SUMMARY.md](archive/DOC_OPTIMIZATION_SUMMARY.md)** - Historie der Doku-Aufräumaktion
+Welcome to the LazyBookings documentation. This index helps you find the right information based on your needs, following the **Diátaxis** framework.
 
 ---
 
-## 🚀 Für neue Entwickler
+## 🎯 Tutorials & Getting Started
+- **[Quickstart Guide](quickstart.md)**: Initial installation and first booking.
+- **[Architecture Overview](architecture.md)**: High-level system design.
+- **[Security Policy](security.md)**: Authentication, sanitization, and GDPR.
 
-**Empfohlene Lese-Reihenfolge:**
+## 🛠️ How-to Guides
+- **[Testing & Diagnostics](how-to/testing.md)**: How to verify system health and run migrations.
+- **[CSS Optimization](how-to/css-optimization.md)**: How to optimize assets for production.
+- **[Design System Implementation](how-to/design-system-implementation.md)**: How to apply the design system to new pages.
+- **[Screenshots Guide](how-to/screenshots.md)**: How to capture consistent UI screenshots.
 
-2. **[DB_SCHEMA.md](DB_SCHEMA.md)** → Lerne die Datenstruktur kennen
-3. **[API.md](API.md)** → Verstehe die öffentliche API
-4. **[ERROR_HANDLING.md](ERROR_HANDLING.md)** → Lerne Code-Konventionen
+## 📚 Reference
+- **[API Reference](reference/api.md)**: Detailed REST API documentation.
+- **[Database Schema](reference/db-schema.md)**: Table structures, indexes, and relations.
+- **[Roles & Capabilities](reference/roles-capabilities.md)**: User roles and permission mapping.
+- **[Shortcodes](reference/shortcodes.md)**: Available shortcodes and their attributes.
+- **[Changelog](changelog.md)**: History of changes and releases.
 
----
+## 💡 Explanation
+- **[Design System](explanation/design-system.md)**: Principles, tokens, component library, and frontend customization.
+- **[AI Integration](explanation/ai-integration.md)**: Architecture of the AI Room Assistant.
+- **[Automations](explanation/automations.md)**: How the automation engine works.
+- **[Error Handling](explanation/error-handling.md)**: Coding standards for errors and logging.
+- **[Build System](explanation/build-system.md)**: Overview of the asset compilation process.
 
-## 📝 Dokumentations-Konventionen
-
-### Status-Labels
-- ✅ **IMPLEMENTED** - Feature ist live
-- 🚧 **IN PROGRESS** - Wird aktuell entwickelt
-- ⏳ **DEFERRED** - Geplant, aber zurückgestellt
-- 📋 **PLANNED** - Roadmap-Feature
-
-### Version-Referenzen
-Alle Dokumente sollten die aktuelle Plugin-Version referenzieren:
-- Aktuell: **v1.1.0**
-- DB-Version: wird über die Option `ltlb_db_version` verfolgt (läuft typischerweise parallel zur Plugin-Version)
-
-### Update-Policy
-- **SPEC.md** ist Source of Truth - hier Updates zuerst
-- **DECISIONS.md** enthält die wichtigsten Architektur-Entscheidungen (kuratiert) + ggf. Legacy-Notizen
-- Technische Docs (API, DB_SCHEMA) bei Code-Änderungen updaten
-
----
-
-## 🔍 Schnellreferenz nach Thema
-
-### Datenbank
-→ [DB_SCHEMA.md](DB_SCHEMA.md)
-
-### REST API Endpunkte
-→ [API.md](API.md)
-
-### Fehlerbehandlung
-→ [ERROR_HANDLING.md](ERROR_HANDLING.md)
-
-### Testing
-→ [QA_CHECKLIST.md](QA_CHECKLIST.md)
-
-### Release
-→ [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
-
-### Architektur-Entscheidungen
-→ [DECISIONS.md](DECISIONS.md)  
-→ [archive/REPOSITORY_OPTIMIZATION.md](archive/REPOSITORY_OPTIMIZATION.md)
+## 🚀 Operations & Security
+- **[Security Policy](security.md)**: Authentication, sanitization, and GDPR.
+- **[Troubleshooting](troubleshooting.md)**: Common issues and resolution steps.
+- **[Runbook](runbook.md)**: Deployment, backup, and maintenance procedures.
+- **[Contributing](../CONTRIBUTING.md)**: Guidelines for developers.
 
 ---
 
-## 🛠️ Für Contributors
-
-### Vor dem Coden
-1. Lies [SPEC.md](SPEC.md) Kapitel 0 (Arbeitsvertrag)
-2. Prüfe [DECISIONS.md](DECISIONS.md) für Kontext
-3. Folge [ERROR_HANDLING.md](ERROR_HANDLING.md) Konventionen
-
-### Nach dem Coden
-1. Update relevante Docs (API, DB_SCHEMA)
-2. Füge Entry zu [DECISIONS.md](DECISIONS.md) hinzu
-3. Test mit [QA_CHECKLIST.md](QA_CHECKLIST.md)
-
-### Vor dem Release
-1. Vollständiger [QA_CHECKLIST.md](QA_CHECKLIST.md) Durchlauf
-2. Folge [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
-3. Update Version in SPEC.md + ltl-booking.php
-
----
-
-## 📞 Hilfe & Support
-
-Bei Fragen zur Dokumentation:
-1. Prüfe relevante .md-Datei oben
-2. Suche in [DECISIONS.md](DECISIONS.md) nach Keyword
-3. Öffne Issue im Repository
-
-**Happy Coding! 🎉**
+## 🗂️ Archive
+Historical documents and audits can be found in the **[archive/](archive/)** directory.

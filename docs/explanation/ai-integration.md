@@ -1,6 +1,7 @@
-# LazyBookings – AI Integration & Automations
+# AI Integration
 
-**Ziel:** KI‑gestützte Automationen für Hotel/Appointments, human‑in‑the‑loop, sicherer Secrets‑Handling.
+**Scope:** Architecture of the AI Room Assistant, configuration options, and secret handling.  
+**Non-Scope:** Specific AI model training or external API documentation (e.g., Google Gemini API).
 
 ---
 

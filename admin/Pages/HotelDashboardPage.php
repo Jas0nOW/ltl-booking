@@ -40,11 +40,11 @@ class LTLB_Admin_HotelDashboardPage {
                 <h1 class="wp-heading-inline"><?php echo esc_html__('Hotel Dashboard', 'ltl-bookings'); ?></h1>
 				<?php if ( $can_manage ) : ?>
 				<div class="ltlb-quick-actions">
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="button button-primary" aria-label="<?php echo esc_attr__('Create new room type', 'ltl-bookings'); ?>">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="ltlb-btn ltlb-btn--primary" aria-label="<?php echo esc_attr__('Create new room type', 'ltl-bookings'); ?>">
 						<span class="dashicons dashicons-plus" aria-hidden="true"></span>
 						<?php echo esc_html__('New Room Type', 'ltl-bookings'); ?>
 					</a>
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="button" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="ltlb-btn ltlb-btn--secondary" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
 						<span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
 						<?php echo esc_html__('View Calendar', 'ltl-bookings'); ?>
 					</a>
@@ -69,7 +69,7 @@ class LTLB_Admin_HotelDashboardPage {
                 <?php if ( empty($latest_bookings) ) : ?>
                     <p><?php echo esc_html__('No bookings found.', 'ltl-bookings'); ?></p>
                 <?php else : ?>
-                    <table class="widefat striped">
+                    <table class="ltlb-table ltlb-table--hoverable">
                         <thead>
                             <tr>
                                 <th><?php echo esc_html__('Customer', 'ltl-bookings'); ?></th>
@@ -140,7 +140,7 @@ class LTLB_Admin_HotelDashboardPage {
             </div>
 
             <h4 style="margin-top:16px;"><?php echo esc_html__( 'Next 7 Days', 'ltl-bookings' ); ?></h4>
-            <table class="widefat striped">
+            <table class="ltlb-table">
                 <thead>
                     <tr>
                         <th><?php echo esc_html__( 'Date', 'ltl-bookings' ); ?></th>
@@ -193,8 +193,8 @@ class LTLB_Admin_HotelDashboardPage {
                 <form method="post" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
                     <?php wp_nonce_field( 'ltlb_generate_ai_insights_action', 'ltlb_generate_ai_insights_nonce' ); ?>
                     <input type="hidden" name="ltlb_generate_ai_insights" value="1" />
-                    <button type="submit" class="button button-primary"><?php echo esc_html__( 'Generate Report', 'ltl-bookings' ); ?></button>
-                    <a class="button" href="<?php echo esc_url( $outbox_url ); ?>"><?php echo esc_html__( 'Open Outbox', 'ltl-bookings' ); ?></a>
+                    <button type="submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--small"><?php echo esc_html__( 'Generate Report', 'ltl-bookings' ); ?></button>
+                    <a class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" href="<?php echo esc_url( $outbox_url ); ?>"><?php echo esc_html__( 'Open Outbox', 'ltl-bookings' ); ?></a>
                 </form>
             <?php else : ?>
                 <p class="description" style="margin-top:10px;">

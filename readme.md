@@ -76,9 +76,31 @@ Calendar-first variant:
 
 ## Documentation
 
-See `/docs` folder:
-- `DB_SCHEMA.md` - Database structure
-- `API.md` - REST API endpoints
+Comprehensive documentation is available in the `docs/` directory. We follow the **Diátaxis** framework to provide clear, purpose-driven information.
+
+### � Top 10 Docs (Must-Read)
+1.  **[Quickstart Guide](docs/quickstart.md)** – Get up and running in 15 minutes.
+2.  **[Architecture Overview](docs/architecture.md)** – High-level system design and data flow.
+3.  **[Security Policy](docs/security.md)** – Authentication, data protection, and GDPR.
+4.  **[API Reference](docs/reference/api.md)** – REST API endpoints and parameters.
+5.  **[Design System](docs/explanation/design-system.md)** – Principles, tokens, and component library.
+6.  **[Troubleshooting](docs/troubleshooting.md)** – Common issues and resolution steps.
+7.  **[Database Schema](docs/reference/db-schema.md)** – Table structures and relations.
+8.  **[Contributing](CONTRIBUTING.md)** – Guidelines for developers.
+9.  **[AI Integration](docs/explanation/ai-integration.md)** – How the Room Assistant works.
+10. **[Runbook](docs/runbook.md)** – Deployment, backup, and maintenance procedures.
+
+---
+
+## Contributing
+
+Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** for details on our code of conduct and the process for submitting pull requests.
+
+### 🚀 Operations
+- **[Security Policy](docs/security.md)** - Security measures and GDPR.
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and fixes.
+- **[Runbook](docs/runbook.md)** - Deployment and maintenance.
+- **[Contributing](CONTRIBUTING.md)** - How to help develop LazyBookings.
 
 ## Support
 

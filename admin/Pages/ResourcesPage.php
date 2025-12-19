@@ -65,7 +65,7 @@ class LTLB_Admin_ResourcesPage {
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_resources'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
             <?php if ( $action !== 'add' && ! $editing ) : ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
+                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <?php endif; ?>
             <hr class="wp-header-end">
             
@@ -128,7 +128,7 @@ class LTLB_Admin_ResourcesPage {
                             $submit_label = $editing ? esc_html__( 'Update', 'ltl-bookings' ) : esc_html__( 'Create', 'ltl-bookings' );
                             submit_button( $submit_label, 'primary', 'submit', false );
                             ?>
-                            <a href="<?php echo admin_url('admin.php?page=ltlb_resources'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+                            <a href="<?php echo admin_url('admin.php?page=ltlb_resources'); ?>" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>
                 </div>
@@ -143,7 +143,7 @@ class LTLB_Admin_ResourcesPage {
                             ?>
                         </p>
                         <p>
-                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="button button-primary">
+                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=add') ); ?>" class="ltlb-btn ltlb-btn--primary">
                                 <?php
                                 echo sprintf( esc_html__( 'Add New %s', 'ltl-bookings' ), $label_singular );
                                 ?>
@@ -185,7 +185,7 @@ class LTLB_Admin_ResourcesPage {
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=edit&id='.$r['id']) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_resources&action=edit&id='.$r['id']) ); ?>" class="ltlb-btn ltlb-btn--small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

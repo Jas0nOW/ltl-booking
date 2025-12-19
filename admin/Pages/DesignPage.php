@@ -9,7 +9,11 @@ class LTLB_Admin_DesignPage {
             return '#ffffff';
         }
 
-        $hex = str_replace( '#', '', $hex_color );
+        // Safely handle null or non-string hex_color
+        $hex = str_replace( '#', '', (string)$hex_color );
+        if ( ! is_string( $hex ) || strlen( $hex ) < 6 ) {
+            return '#ffffff';
+        }
 
         $r = hexdec( substr( $hex, 0, 2 ) ) / 255.0;
         $g = hexdec( substr( $hex, 2, 2 ) ) / 255.0;
@@ -71,8 +75,8 @@ class LTLB_Admin_DesignPage {
             foreach ( $color_fields as $f ) {
                 $val = LTLB_Sanitizer::text( $_POST[ $f ] ?? '' );
                 $val = trim( (string) $val );
-                if ( preg_match( '/^#?[0-9A-Fa-f]{6}$/', $val ) ) {
-                    if ( strpos( $val, '#' ) !== 0 ) {
+                if ( preg_match( '/^#?[0-9A-Fa-f]{6}$/', (string) $val ) ) {
+                    if ( strpos( (string) $val, '#' ) !== 0 ) {
                         $val = '#' . $val;
                     }
                     if ( $scope === 'backend' ) {
@@ -844,6 +848,68 @@ class LTLB_Admin_DesignPage {
             updatePreview();
         });
         </script>
+        
+        <!-- DESIGN SYSTEM SHOWCASE -->
+        <div class="ltlb-card" style="margin-top: 24px;">
+            <h2><?php echo esc_html__('Design System Components', 'ltl-bookings'); ?></h2>
+            <p class="description"><?php echo esc_html__('Preview of available components from the new design system.', 'ltl-bookings'); ?></p>
+            
+            <h3><?php echo esc_html__('Buttons', 'ltl-bookings'); ?></h3>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+                <button class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__('Primary', 'ltl-bookings'); ?></button>
+                <button class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__('Secondary', 'ltl-bookings'); ?></button>
+                <button class="ltlb-btn ltlb-btn--danger"><?php echo esc_html__('Danger', 'ltl-bookings'); ?></button>
+                <button class="ltlb-btn ltlb-btn--ghost"><?php echo esc_html__('Ghost', 'ltl-bookings'); ?></button>
+                <button class="ltlb-btn ltlb-btn--primary ltlb-btn--small"><?php echo esc_html__('Small', 'ltl-bookings'); ?></button>
+            </div>
+            
+            <h3><?php echo esc_html__('Badges', 'ltl-bookings'); ?></h3>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+                <span class="ltlb-badge ltlb-badge--success"><?php echo esc_html__('Confirmed', 'ltl-bookings'); ?></span>
+                <span class="ltlb-badge ltlb-badge--warning"><?php echo esc_html__('Pending', 'ltl-bookings'); ?></span>
+                <span class="ltlb-badge ltlb-badge--danger"><?php echo esc_html__('Cancelled', 'ltl-bookings'); ?></span>
+                <span class="ltlb-badge ltlb-badge--info"><?php echo esc_html__('Info', 'ltl-bookings'); ?></span>
+                <span class="ltlb-badge ltlb-badge--neutral"><?php echo esc_html__('Neutral', 'ltl-bookings'); ?></span>
+            </div>
+            
+            <h3><?php echo esc_html__('Alerts', 'ltl-bookings'); ?></h3>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <div class="ltlb-alert ltlb-alert--success">
+                    <strong><?php echo esc_html__('Success:', 'ltl-bookings'); ?></strong> <?php echo esc_html__('Your booking has been confirmed!', 'ltl-bookings'); ?>
+                </div>
+                <div class="ltlb-alert ltlb-alert--warning">
+                    <strong><?php echo esc_html__('Warning:', 'ltl-bookings'); ?></strong> <?php echo esc_html__('This action cannot be undone.', 'ltl-bookings'); ?>
+                </div>
+                <div class="ltlb-alert ltlb-alert--danger">
+                    <strong><?php echo esc_html__('Error:', 'ltl-bookings'); ?></strong> <?php echo esc_html__('Payment failed. Please try again.', 'ltl-bookings'); ?>
+                </div>
+                <div class="ltlb-alert ltlb-alert--info">
+                    <strong><?php echo esc_html__('Info:', 'ltl-bookings'); ?></strong> <?php echo esc_html__('You can change this setting later.', 'ltl-bookings'); ?>
+                </div>
+            </div>
+            
+            <h3><?php echo esc_html__('Form Elements', 'ltl-bookings'); ?></h3>
+            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 400px; margin-bottom: 24px;">
+                <input type="text" class="ltlb-input" placeholder="<?php echo esc_attr__('Enter your name', 'ltl-bookings'); ?>">
+                <input type="text" class="ltlb-input ltlb-input--error" placeholder="<?php echo esc_attr__('Error state', 'ltl-bookings'); ?>">
+                <select class="ltlb-input">
+                    <option><?php echo esc_html__('Select option', 'ltl-bookings'); ?></option>
+                    <option><?php echo esc_html__('Option 1', 'ltl-bookings'); ?></option>
+                    <option><?php echo esc_html__('Option 2', 'ltl-bookings'); ?></option>
+                </select>
+                <textarea class="ltlb-input" rows="3" placeholder="<?php echo esc_attr__('Enter message', 'ltl-bookings'); ?>"></textarea>
+            </div>
+            
+            <h3><?php echo esc_html__('Documentation', 'ltl-bookings'); ?></h3>
+            <p>
+                <?php 
+                printf(
+                    esc_html__('For complete documentation, see %s', 'ltl-bookings'),
+                    '<a href="' . esc_url(plugins_url('docs/DESIGN_SYSTEM.md', dirname(__DIR__))) . '" target="_blank">' . esc_html__('DESIGN_SYSTEM.md', 'ltl-bookings') . '</a>'
+                ); 
+                ?>
+            </p>
+        </div>
         <?php
     }
 }

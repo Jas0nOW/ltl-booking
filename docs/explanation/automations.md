@@ -1,6 +1,7 @@
-# LazyBookings – Automations & Outbox
+# Automations & Outbox
 
-**Ziel:** Zentrale Verwaltung AI‑generierter Aktionen mit Approval‑Workflow.
+**Scope:** Workflow engine for AI-generated actions, approval processes, and the Outbox architecture.  
+**Non-Scope:** General email notification logic (see [Runbook](../runbook.md)).
 
 ---
 

@@ -31,7 +31,8 @@ class LTLB_Accessibility {
      * Enqueue admin accessibility styles and scripts
      */
     public static function enqueue_admin_a11y(): void {
-        if ( ! isset( $_GET['page'] ) || strpos( $_GET['page'], 'ltlb_' ) !== 0 ) {
+        $page = isset( $_GET['page'] ) ? (string) $_GET['page'] : '';
+        if ( $page === '' || strpos( $page, 'ltlb_' ) !== 0 ) {
             return;
         }
         

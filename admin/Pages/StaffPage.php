@@ -112,7 +112,7 @@ class LTLB_Admin_StaffPage {
                                     <p style="margin: 0 0 8px;">
                                         <?php echo esc_html__( 'No staff members found.', 'ltl-bookings' ); ?>
                                     </p>
-                                    <a class="button button-primary" href="<?php echo esc_attr( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>">
+                                    <a class="ltlb-btn ltlb-btn--primary" href="<?php echo esc_attr( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>">
                                         <?php echo esc_html__( 'Add staff member', 'ltl-bookings' ); ?>
                                     </a>
                                 </td>
@@ -122,7 +122,7 @@ class LTLB_Admin_StaffPage {
                                 <tr>
                                     <td><?php echo esc_html( $u->display_name ); ?></td>
                                     <td><?php echo esc_html( $u->user_email ); ?></td>
-                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
+                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -203,7 +203,7 @@ class LTLB_Admin_StaffPage {
                                                 <input type="hidden" name="ltlb_exception_delete" value="1">
                                                 <input type="hidden" name="exception_id" value="<?php echo esc_attr( intval($e['id']) ); ?>">
                                                 <input type="hidden" name="user_id" value="<?php echo esc_attr( $user_id ); ?>">
-                                                <button class="button button-secondary" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
+                                                <button class="ltlb-btn ltlb-btn--danger ltlb-btn--small" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');">< ?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
                                             </form>
                                         </td>
                                     </tr>

@@ -27,7 +27,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 		<div class="wrap ltlb-admin">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_reply_templates'); } ?>
 			<h1 class="wp-heading-inline"><?php echo esc_html__( 'Reply Templates', 'ltl-bookings' ); ?></h1>
-			<a class="page-title-action" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_reply_templates&action=add' ) ); ?>"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></a>
+			<a class="ltlb-btn ltlb-btn--small ltlb-btn--primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_reply_templates&action=add' ) ); ?>"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></a>
 			<hr class="wp-header-end">
 
 			<?php LTLB_Admin_Component::card_start( __( 'Templates', 'ltl-bookings' ) ); ?>
@@ -36,7 +36,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 				<form method="post" style="margin:12px 0;">
 					<?php wp_nonce_field( 'ltlb_templates_action', 'ltlb_templates_nonce' ); ?>
 					<input type="hidden" name="ltlb_templates_do" value="add_default">
-					<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Load default templates', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__( 'Load default templates', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<table class="widefat striped">
@@ -62,12 +62,12 @@ class LTLB_Admin_ReplyTemplatesPage {
 									<td><?php echo esc_html( $name ); ?></td>
 									<td><?php echo esc_html( $subject ); ?></td>
 									<td>
-										<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit', 'ltl-bookings' ); ?></a>
+										<a class="ltlb-btn ltlb-btn--small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit', 'ltl-bookings' ); ?></a>
 										<form method="post" style="display:inline-block; margin-left:6px;">
 											<?php wp_nonce_field( 'ltlb_templates_action', 'ltlb_templates_nonce' ); ?>
 											<input type="hidden" name="ltlb_templates_do" value="delete">
 											<input type="hidden" name="id" value="<?php echo esc_attr( $tid ); ?>">
-											<button type="submit" class="button button-small"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></button>
+											<button type="submit" class="ltlb-btn ltlb-btn--small ltlb-btn--ghost"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></button>
 										</form>
 									</td>
 								</tr>
@@ -211,7 +211,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 		<div class="wrap ltlb-admin">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_reply_templates'); } ?>
 			<h1 class="wp-heading-inline"><?php echo esc_html( $title ); ?></h1>
-			<a class="page-title-action" href="<?php echo esc_url( $back ); ?>"><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></a>
+			<a class="ltlb-btn ltlb-btn--small ltlb-btn--secondary" href="<?php echo esc_url( $back ); ?>"><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></a>
 			<hr class="wp-header-end">
 			<?php LTLB_Admin_Component::card_start( __( 'Template', 'ltl-bookings' ) ); ?>
 				<form method="post">
@@ -235,7 +235,7 @@ class LTLB_Admin_ReplyTemplatesPage {
 							</td>
 						</tr>
 					</tbody></table>
-					<p><button type="submit" class="button button-primary"><?php echo esc_html__( 'Save', 'ltl-bookings' ); ?></button></p>
+					<p><button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Save', 'ltl-bookings' ); ?></button></p>
 				</form>
 			<?php LTLB_Admin_Component::card_end(); ?>
 		</div>

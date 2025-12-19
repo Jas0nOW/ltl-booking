@@ -112,7 +112,7 @@ class LTLB_Admin_AppointmentsPage {
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_appointments'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__( 'Appointment', 'ltl-bookings' ); ?> #<?php echo esc_html( (string) $id ); ?></h1>
-            <a class="page-title-action" href="<?php echo esc_url( $back_url ); ?>"><?php echo esc_html__( 'Back to Appointments', 'ltl-bookings' ); ?></a>
+            <a class="ltlb-btn ltlb-btn--small ltlb-btn--secondary" href="<?php echo esc_url( $back_url ); ?>"><?php echo esc_html__( 'Back to Appointments', 'ltl-bookings' ); ?></a>
             <hr class="wp-header-end">
 
             <?php LTLB_Admin_Component::card_start( __( 'Overview', 'ltl-bookings' ) ); ?>
@@ -165,7 +165,7 @@ class LTLB_Admin_AppointmentsPage {
                 </tbody></table>
                 <?php if ( $can_refund ) : ?>
                     <div style="margin-top: 16px;">
-                        <button type="button" class="button button-secondary" id="ltlb-refund-btn"><?php echo esc_html__( 'Process Refund', 'ltl-bookings' ); ?></button>
+                        <button type="button" class="ltlb-btn ltlb-btn--danger" id="ltlb-refund-btn"><?php echo esc_html__( 'Process Refund', 'ltl-bookings' ); ?></button>
                         <div id="ltlb-refund-form" style="display: none; margin-top: 12px;">
                             <label>
                                 <?php echo esc_html__( 'Refund amount (cents)', 'ltl-bookings' ); ?>:
@@ -175,8 +175,8 @@ class LTLB_Admin_AppointmentsPage {
                                 <?php echo esc_html__( 'Reason', 'ltl-bookings' ); ?>:
                                 <input type="text" id="ltlb-refund-reason" value="requested_by_customer" style="width: 200px; margin-left: 8px;">
                             </label>
-                            <button type="button" class="button button-primary" id="ltlb-refund-submit" style="margin-left: 16px;"><?php echo esc_html__( 'Confirm Refund', 'ltl-bookings' ); ?></button>
-                            <button type="button" class="button" id="ltlb-refund-cancel" style="margin-left: 8px;"><?php echo esc_html__( 'Cancel', 'ltl-bookings' ); ?></button>
+                            <button type="button" class="ltlb-btn ltlb-btn--primary" id="ltlb-refund-submit" style="margin-left: 16px;"><?php echo esc_html__( 'Confirm Refund', 'ltl-bookings' ); ?></button>
+                            <button type="button" class="ltlb-btn ltlb-btn--secondary" id="ltlb-refund-cancel" style="margin-left: 8px;"><?php echo esc_html__( 'Cancel', 'ltl-bookings' ); ?></button>
                             <span id="ltlb-refund-status" style="margin-left: 16px; font-weight: 600;"></span>
                         </div>
                     </div>
@@ -335,8 +335,9 @@ class LTLB_Admin_AppointmentsPage {
                 } else {
                     $start_raw = isset( $_POST['start_at'] ) ? sanitize_text_field( (string) $_POST['start_at'] ) : '';
                     $end_raw = isset( $_POST['end_at'] ) ? sanitize_text_field( (string) $_POST['end_at'] ) : '';
-                    $start_raw = str_replace( 'T', ' ', $start_raw );
-                    $end_raw = str_replace( 'T', ' ', $end_raw );
+                    // Ensure strings before using str_replace to avoid null deprecation
+                    $start_raw = is_string( $start_raw ) ? str_replace( 'T', ' ', (string) $start_raw ) : '';
+                    $end_raw = is_string( $end_raw ) ? str_replace( 'T', ' ', (string) $end_raw ) : '';
                     $start_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::create_datetime_immutable( $start_raw ) : null;
                     $end_dt = class_exists( 'LTLB_Time' ) ? LTLB_Time::create_datetime_immutable( $end_raw ) : null;
                 }
@@ -465,7 +466,7 @@ class LTLB_Admin_AppointmentsPage {
                         </tbody></table>
                         <p class="submit">
                             <?php submit_button( esc_html__( 'Create', 'ltl-bookings' ), 'primary', 'submit', false ); ?>
-                            <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments' ) ); ?>"><?php echo esc_html__( 'Cancel', 'ltl-bookings' ); ?></a>
+                            <a class="ltlb-btn ltlb-btn--secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments' ) ); ?>"><?php echo esc_html__( 'Cancel', 'ltl-bookings' ); ?></a>
                         </p>
                     </form>
                 </div>
@@ -490,7 +491,7 @@ class LTLB_Admin_AppointmentsPage {
 			if (!check_admin_referer('ltlb_appointments_bulk_action')) {
 				wp_die('Security check failed');
 			}
-			$action = sanitize_text_field($_POST['action']);
+			$action = (string) sanitize_text_field($_POST['action']);
 			$ids = array_map('intval', $_POST['appointment_ids']);
 
 			if ($action === 'delete') {
@@ -510,9 +511,9 @@ class LTLB_Admin_AppointmentsPage {
                         LTLB_Notices::add( sprintf( _n( '%d appointment deleted.', '%d appointments deleted.', count( $ids ), 'ltl-bookings' ), count( $ids ) ), 'success' );
                     }
                 }
-			} else if (strpos($action, 'set_status_') === 0) {
-				$status = str_replace('set_status_', '', $action);
-				if (in_array($status, ['pending', 'confirmed', 'cancelled'])) {
+			} else if (strpos((string)$action, 'set_status_') === 0) {
+				$status = str_replace('set_status_', '', (string)$action);
+				if (in_array((string)$status, ['pending', 'confirmed', 'cancelled'])) {
 					$appointment_repo->update_status_bulk($ids, $status);
 					LTLB_Notices::add(count($ids) . ' ' . __('appointments updated.', 'ltl-bookings'), 'success');
 				}
@@ -547,7 +548,7 @@ class LTLB_Admin_AppointmentsPage {
         <div class="wrap ltlb-admin">
             <?php LTLB_Admin_Header::render('ltlb_appointments'); ?>
             <h1 class="wp-heading-inline"><?php echo esc_html__( 'Appointments', 'ltl-bookings' ); ?></h1>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments&action=add' ) ); ?>" class="page-title-action"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments&action=add' ) ); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__( 'Add New', 'ltl-bookings' ); ?></a>
             <hr class="wp-header-end">
             
             <form method="post">
@@ -566,11 +567,11 @@ class LTLB_Admin_AppointmentsPage {
                             <span id="bulk-action-help" class="screen-reader-text"><?php esc_html_e( 'Select appointments using checkboxes, choose an action, then click Apply', 'ltl-bookings' ); ?></span>
                         </div>
                         <div class="ltlb-table-toolbar__export">
-							<button type="button" class="button ltlb-column-toggle-btn" id="ltlb-column-toggle-btn" aria-label="<?php esc_attr_e( 'Show/hide columns', 'ltl-bookings' ); ?>">
+							<button type="button" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small ltlb-column-toggle-btn" id="ltlb-column-toggle-btn" aria-label="<?php esc_attr_e( 'Show/hide columns', 'ltl-bookings' ); ?>">
                                 <span class="dashicons dashicons-visibility"></span>
 								<?php esc_html_e( 'Manage columns', 'ltl-bookings' ); ?>
                             </button>
-                            <a href="<?php echo esc_url( LTLB_ICS_Export::get_feed_url() ); ?>" class="button" target="_blank">
+                            <a href="<?php echo esc_url( LTLB_ICS_Export::get_feed_url() ); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" target="_blank">
                                 <span class="dashicons dashicons-calendar-alt"></span>
                                 <?php esc_html_e('Calendar Feed (iCal)', 'ltl-bookings'); ?>
                             </a>
@@ -585,11 +586,11 @@ class LTLB_Admin_AppointmentsPage {
                                 <option value="confirmed" <?php selected($status, 'confirmed'); ?>><?php echo esc_html__( 'Confirmed', 'ltl-bookings' ); ?></option>
                                 <option value="cancelled" <?php selected($status, 'cancelled'); ?>><?php echo esc_html__( 'Cancelled', 'ltl-bookings' ); ?></option>
                             </select>
-                            <button type="submit" class="button">
+                            <button type="submit" class="ltlb-btn ltlb-btn--secondary">
                                 <span class="dashicons dashicons-filter" aria-hidden="true"></span>
                                 <?php echo esc_html__( 'Filter', 'ltl-bookings' ); ?>
                             </button>
-                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments' ) ); ?>" class="button">
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_appointments' ) ); ?>" class="ltlb-btn ltlb-btn--ghost">
                                 <span class="dashicons dashicons-undo" aria-hidden="true"></span>
                                 <?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?>
                             </a>

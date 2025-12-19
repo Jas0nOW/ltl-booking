@@ -97,10 +97,13 @@ class LTLB_Mailer {
         $search = [];
         $replace = [];
         foreach ( $placeholders as $key => $val ) {
-            $search[] = '{' . $key . '}';
-            $replace[] = $val;
+            // Only add non-null values to prevent deprecation warnings in PHP 8.1+
+            if ( $val !== null ) {
+                $search[] = '{' . $key . '}';
+                $replace[] = (string) $val;
+            }
         }
-        return str_replace( $search, $replace, $template );
+        return ! empty( $search ) ? str_replace( $search, $replace, (string) $template ) : (string) $template;
     }
 
     public static function send_booking_notifications( int $appointment_id, array $service, array $customer, string $start_at, string $end_at, string $status, int $seats = 1 ): array {

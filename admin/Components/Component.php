@@ -88,7 +88,7 @@ class LTLB_Admin_Component {
             <h3 class="ltlb-empty-state__title"><?php echo esc_html($title); ?></h3>
             <p class="ltlb-empty-state__message"><?php echo esc_html($message); ?></p>
             <?php if ( ! empty($button_label) && ! empty($button_url) ): ?>
-                <a href="<?php echo esc_url($button_url); ?>" class="button button-primary">
+                <a href="<?php echo esc_url($button_url); ?>" class="ltlb-btn ltlb-btn--primary">
                     <?php echo esc_html($button_label); ?>
                 </a>
             <?php endif; ?>
@@ -145,10 +145,10 @@ class LTLB_Admin_Component {
         }
         echo '<div class="ltlb-wizard-nav-buttons">';
         if (!$is_first) {
-            echo '<button type="button" class="button ltlb-wizard-prev">' . esc_html__('Back', 'ltl-bookings') . '</button>';
+            echo '<button type="button" class="ltlb-btn ltlb-btn--secondary ltlb-wizard-prev">' . esc_html__('Back', 'ltl-bookings') . '</button>';
         }
         if (!$is_last) {
-            echo '<button type="button" class="button button-primary ltlb-wizard-next">' . esc_html__('Next', 'ltl-bookings') . '</button>';
+            echo '<button type="button" class="ltlb-btn ltlb-btn--primary ltlb-wizard-next">' . esc_html__('Next', 'ltl-bookings') . '</button>';
         } else {
             submit_button($save_label, 'primary', 'submit', false);
         }

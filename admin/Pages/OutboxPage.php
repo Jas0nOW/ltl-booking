@@ -148,7 +148,7 @@ class LTLB_Admin_OutboxPage {
 									<td><?php echo esc_html( $st ); ?></td>
 									<td><?php echo esc_html( $created ); ?></td>
 									<td><?php echo esc_html( $user_label ); ?></td>
-									<td><a class="button button-small" href="<?php echo esc_url( $view_url ); ?>"><?php echo esc_html__( 'View', 'ltl-bookings' ); ?></a></td>
+									<td><a class="ltlb-btn ltlb-btn--small" href="<?php echo esc_url( $view_url ); ?>"><?php echo esc_html__( 'View', 'ltl-bookings' ); ?></a></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php endif; ?>
@@ -187,7 +187,7 @@ class LTLB_Admin_OutboxPage {
 		<div class="wrap ltlb-admin">
 			<?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_outbox'); } ?>
 			<h1 class="wp-heading-inline"><?php echo esc_html__( 'Outbox Item', 'ltl-bookings' ); ?> #<?php echo esc_html( (string) $id ); ?></h1>
-			<a class="page-title-action" href="<?php echo esc_url( $back_url ); ?>"><?php echo esc_html__( 'Back to Outbox', 'ltl-bookings' ); ?></a>
+			<a class="ltlb-btn ltlb-btn--small ltlb-btn--secondary" href="<?php echo esc_url( $back_url ); ?>"><?php echo esc_html__( 'Back to Outbox', 'ltl-bookings' ); ?></a>
 			<hr class="wp-header-end">
 
 			<?php LTLB_Admin_Component::card_start( __( 'Overview', 'ltl-bookings' ) ); ?>
@@ -231,7 +231,7 @@ class LTLB_Admin_OutboxPage {
 						</tbody></table>
 
 						<p>
-							<button type="submit" class="button button-primary"><?php echo esc_html__( 'Save Draft', 'ltl-bookings' ); ?></button>
+							<button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Save Draft', 'ltl-bookings' ); ?></button>
 						</p>
 					</form>
 				<?php LTLB_Admin_Component::card_end(); ?>
@@ -253,14 +253,14 @@ class LTLB_Admin_OutboxPage {
 					<?php wp_nonce_field( 'ltlb_outbox_action', 'ltlb_outbox_nonce' ); ?>
 					<input type="hidden" name="id" value="<?php echo esc_attr( (string) $id ); ?>">
 					<input type="hidden" name="ltlb_outbox_do" value="reject">
-					<button type="submit" class="button"><?php echo esc_html__( 'Reject', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--ghost"><?php echo esc_html__( 'Reject', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<form method="post" style="display:inline-block; margin-right:8px;">
 					<?php wp_nonce_field( 'ltlb_outbox_action', 'ltlb_outbox_nonce' ); ?>
 					<input type="hidden" name="id" value="<?php echo esc_attr( (string) $id ); ?>">
 					<input type="hidden" name="ltlb_outbox_do" value="approve_execute">
-					<button type="submit" class="button button-primary"><?php echo esc_html__( 'Approve & Execute', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Approve & Execute', 'ltl-bookings' ); ?></button>
 				</form>
 
 				<?php if ( ! $is_hitl || $row_status !== 'draft' ) : ?>
@@ -268,7 +268,7 @@ class LTLB_Admin_OutboxPage {
 						<?php wp_nonce_field( 'ltlb_outbox_action', 'ltlb_outbox_nonce' ); ?>
 						<input type="hidden" name="id" value="<?php echo esc_attr( (string) $id ); ?>">
 						<input type="hidden" name="ltlb_outbox_do" value="execute">
-						<button type="submit" class="button"><?php echo esc_html__( 'Execute', 'ltl-bookings' ); ?></button>
+						<button type="submit" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__( 'Execute', 'ltl-bookings' ); ?></button>
 					</form>
 				<?php endif; ?>
 

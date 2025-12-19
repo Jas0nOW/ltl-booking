@@ -1,9 +1,7 @@
-# LazyBookings DB Schema (v1.1.0)
+# Database Schema
 
-Alle Custom Tables nutzen Prefix: `$wpdb->prefix . 'lazy_' . <name>`.
-Schema wird per `dbDelta()` gepflegt und bei Versionswechsel automatisch migriert (siehe `LTLB_DB_Migrator`).
-
-Hinweis: WordPress entfernt via `dbDelta()` keine alten Spalten automatisch. Neue Spalten werden hinzugefügt.
+**Scope:** Custom database table structures, indexes, and migration logic.  
+**Non-Scope:** Standard WordPress tables (e.g., `wp_options`, `wp_users`).
 
 ---
 

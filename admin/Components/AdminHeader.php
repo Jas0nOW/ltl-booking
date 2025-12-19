@@ -134,7 +134,7 @@ class LTLB_Admin_Header {
 						<option value="en_US" <?php selected( $current_lang, 'en_US' ); ?>><?php echo esc_html__( 'English', 'ltl-bookings' ); ?></option>
 						<option value="de_DE" <?php selected( $current_lang, 'de_DE' ); ?>><?php echo esc_html__( 'German', 'ltl-bookings' ); ?></option>
 					</select>
-					<button type="submit" class="button button-small"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
+					<button type="submit" class="ltlb-btn ltlb-btn--small"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
 				</form>
 				<script>
 				(function(){

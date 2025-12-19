@@ -9,9 +9,25 @@ class LTLB_Shortcodes {
 		}
 		$done = true;
 
-		$css_ver = self::asset_version( 'assets/css/public.css' );
+		// Determine if we should use minified files
+		$debug_assets = defined( 'LTLB_DEBUG_ASSETS' ) && LTLB_DEBUG_ASSETS;
+		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$css_dir = $debug_assets ? 'assets/css/' : 'assets/css/dist/';
+
+		// Design System CSS (in dependency order)
+		$tokens_ver = self::asset_version( $css_dir . "tokens{$min}.css" );
+		$base_ver = self::asset_version( $css_dir . "base{$min}.css" );
+		$components_ver = self::asset_version( $css_dir . "components{$min}.css" );
+		$layout_ver = self::asset_version( $css_dir . "layout{$min}.css" );
+		$public_ver = self::asset_version( $css_dir . "public{$min}.css" );
 		$js_ver = self::asset_version( 'assets/js/public.js' );
-		wp_enqueue_style( 'ltlb-public', plugins_url( '../assets/css/public.css', __FILE__ ), [], $css_ver );
+		
+		wp_enqueue_style( 'ltlb-tokens', plugins_url( "../{$css_dir}tokens{$min}.css", __FILE__ ), [], $tokens_ver );
+		wp_enqueue_style( 'ltlb-base', plugins_url( "../{$css_dir}base{$min}.css", __FILE__ ), [ 'ltlb-tokens' ], $base_ver );
+		wp_enqueue_style( 'ltlb-components', plugins_url( "../{$css_dir}components{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base' ], $components_ver );
+		wp_enqueue_style( 'ltlb-layout', plugins_url( "../{$css_dir}layout{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base' ], $layout_ver );
+		wp_enqueue_style( 'ltlb-public', plugins_url( "../{$css_dir}public{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base', 'ltlb-components', 'ltlb-layout' ], $public_ver );
+		
 		wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), [ 'jquery' ], $js_ver, true );
 
 		wp_localize_script( 'ltlb-public', 'LTLB_PUBLIC', [
@@ -1266,7 +1282,7 @@ class LTLB_Shortcodes {
 				</div>
 
 				<div class="ltlb-trust__cta">
-					<a class="button button-primary" href="<?php echo esc_url( $button_url ); ?>"><?php echo esc_html( $button_text ); ?></a>
+					<a class="ltlb-btn ltlb-btn--primary" href="<?php echo esc_url( $button_url ); ?>"><?php echo esc_html( $button_text ); ?></a>
 				</div>
 			</div>
 		</section>

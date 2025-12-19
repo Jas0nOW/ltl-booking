@@ -1,4 +1,9 @@
-# Error Handling Strategie (v0.4.4)
+# Error Handling Strategy
+
+**Scope:** Coding conventions for error handling, logging, and user feedback within the plugin.  
+**Non-Scope:** Troubleshooting specific user issues (see [Troubleshooting](../troubleshooting.md)).
+
+---
 
 ## Übersicht
 LazyBookings verwendet eine **gemischte Error-Handling-Strategie**:

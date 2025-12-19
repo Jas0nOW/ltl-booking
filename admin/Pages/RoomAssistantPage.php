@@ -70,8 +70,8 @@ class LTLB_Admin_RoomAssistantPage {
 						</label>
 						<input id="ltlb_room_assistant_days" type="number" class="small-text" min="1" max="30" name="days" value="<?php echo esc_attr( (string) $days ); ?>" />
 					</div>
-					<button type="submit" class="button"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
-					<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_room_assistant' ) ); ?>"><?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?></a>
+					<button type="submit" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__( 'Update', 'ltl-bookings' ); ?></button>
+					<a class="ltlb-btn ltlb-btn--ghost" href="<?php echo esc_url( admin_url( 'admin.php?page=ltlb_room_assistant' ) ); ?>"><?php echo esc_html__( 'Reset', 'ltl-bookings' ); ?></a>
 				</form>
 			<?php LTLB_Admin_Component::card_end(); ?>
 
@@ -149,7 +149,7 @@ class LTLB_Admin_RoomAssistantPage {
 												<?php endforeach; ?>
 											</select>
 											<input type="text" name="notes" class="regular-text" placeholder="<?php echo esc_attr__( 'Notes (optional)', 'ltl-bookings' ); ?>" />
-											<button type="submit" class="button button-primary"><?php echo esc_html__( 'Propose', 'ltl-bookings' ); ?></button>
+											<button type="submit" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__( 'Propose', 'ltl-bookings' ); ?></button>
 										</form>
 									<?php else : ?>
 										<span class="ltlb-muted"><?php echo esc_html__( 'No action available', 'ltl-bookings' ); ?></span>

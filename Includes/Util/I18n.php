@@ -13,8 +13,8 @@ class LTLB_I18n {
 	public static function is_ltlb_admin_page_request(): bool {
 		if ( ! is_admin() ) return false;
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-		if ( ! $page ) return false;
-		return strpos( $page, 'ltlb_' ) === 0;
+		if ( ! is_string( $page ) || ! $page ) return false;
+		return strpos( (string) $page, 'ltlb_' ) === 0;
 	}
 
 	public static function get_user_admin_locale( ?int $user_id = null ): string {
@@ -646,33 +646,33 @@ class LTLB_I18n {
 	 */
 	private static function parse_po_file( string $po_file ): array {
 		$content = @file_get_contents( $po_file );
-		if ( ! $content ) {
+		if ( ! is_string( $content ) || empty( $content ) ) {
 			return [];
 		}
 
 		// Fix encoding issues - convert from UTF-8 to UTF-8 (fixes double-encoding)
 		if ( function_exists( 'mb_convert_encoding' ) ) {
-			$content = mb_convert_encoding( $content, 'UTF-8', 'UTF-8' );
+			$content = mb_convert_encoding( (string) $content, 'UTF-8', 'UTF-8' );
 		}
 
 		// Fix common broken UTF-8 sequences
-		$content = str_replace( 'Ã¤', 'ä', $content );
-		$content = str_replace( 'Ã¶', 'ö', $content );
-		$content = str_replace( 'Ã¼', 'ü', $content );
-		$content = str_replace( 'Ã„', 'Ä', $content );
-		$content = str_replace( 'Ã–', 'Ö', $content );
-		$content = str_replace( 'Ãœ', 'Ü', $content );
-		$content = str_replace( 'ÃŸ', 'ß', $content );
-		$content = str_replace( 'ÃƒÂ¤', 'ä', $content );
-		$content = str_replace( 'ÃƒÂ¶', 'ö', $content );
-		$content = str_replace( 'ÃƒÂ¼', 'ü', $content );
-		$content = str_replace( 'ÃƒÂ„', 'Ä', $content );
-		$content = str_replace( 'ÃƒÂ–', 'Ö', $content );
-		$content = str_replace( 'ÃƒÅ"', 'Ü', $content );
-		$content = str_replace( 'ÃƒÅ¸', 'ß', $content );
-		$content = str_replace( 'Ã©', 'é', $content );
-		$content = str_replace( 'Ã¨', 'è', $content );
-		$content = str_replace( 'Ã ', 'à', $content );
+		$content = str_replace( 'Ã¤', 'ä', (string) $content );
+		$content = str_replace( 'Ã¶', 'ö', (string) $content );
+		$content = str_replace( 'Ã¼', 'ü', (string) $content );
+		$content = str_replace( 'Ã„', 'Ä', (string) $content );
+		$content = str_replace( 'Ã–', 'Ö', (string) $content );
+		$content = str_replace( 'Ãœ', 'Ü', (string) $content );
+		$content = str_replace( 'ÃŸ', 'ß', (string) $content );
+		$content = str_replace( 'ÃƒÂ¤', 'ä', (string) $content );
+		$content = str_replace( 'ÃƒÂ¶', 'ö', (string) $content );
+		$content = str_replace( 'ÃƒÂ¼', 'ü', (string) $content );
+		$content = str_replace( 'ÃƒÂ„', 'Ä', (string) $content );
+		$content = str_replace( 'ÃƒÂ–', 'Ö', (string) $content );
+		$content = str_replace( 'ÃƒÅ"', 'Ü', (string) $content );
+		$content = str_replace( 'ÃƒÅ¸', 'ß', (string) $content );
+		$content = str_replace( 'Ã©', 'é', (string) $content );
+		$content = str_replace( 'Ã¨', 'è', (string) $content );
+		$content = str_replace( 'Ã ', 'à', (string) $content );
 
 		$translations = [];
 		$lines = explode( "\n", $content );
@@ -682,28 +682,28 @@ class LTLB_I18n {
 		$in_msgstr = false;
 
 		foreach ( $lines as $line ) {
-			$line = trim( $line );
+			$line = trim( (string) $line );
 
 			// Start of msgid
-			if ( strpos( $line, 'msgid "' ) === 0 ) {
+			if ( strpos( (string) $line, 'msgid "' ) === 0 ) {
 				// Save previous entry
 				if ( $msgid !== '' && $msgstr !== '' ) {
 					$translations[ $msgid ] = $msgstr;
 				}
-				$msgid = substr( $line, 7, -1 );
+				$msgid = substr( (string) $line, 7, -1 );
 				$msgstr = '';
 				$in_msgid = true;
 				$in_msgstr = false;
 			}
 			// Start of msgstr
-			elseif ( strpos( $line, 'msgstr "' ) === 0 ) {
-				$msgstr = substr( $line, 8, -1 );
+			elseif ( strpos( (string) $line, 'msgstr "' ) === 0 ) {
+				$msgstr = substr( (string) $line, 8, -1 );
 				$in_msgid = false;
 				$in_msgstr = true;
 			}
 			// Continuation line
-			elseif ( strpos( $line, '"' ) === 0 && strlen( $line ) > 1 ) {
-				$value = substr( $line, 1, -1 );
+			elseif ( strpos( (string) $line, '"' ) === 0 && strlen( (string) $line ) > 1 ) {
+				$value = substr( (string) $line, 1, -1 );
 				if ( $in_msgid ) {
 					$msgid .= $value;
 				} elseif ( $in_msgstr ) {
@@ -711,7 +711,7 @@ class LTLB_I18n {
 				}
 			}
 			// Empty line or comment - reset
-			elseif ( $line === '' || strpos( $line, '#' ) === 0 ) {
+			elseif ( $line === '' || strpos( (string) $line, '#' ) === 0 ) {
 				if ( $msgid !== '' && $msgstr !== '' ) {
 					$translations[ $msgid ] = $msgstr;
 				}

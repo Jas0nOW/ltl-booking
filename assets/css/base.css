@@ -1,0 +1,223 @@
+/**
+ * LazyBookings Design System - Base Styles
+ * Version: 2.0.0
+ * 
+ * Normalize, typography, focus management, and basic utilities.
+ */
+
+/* ===== BOX SIZING RESET ===== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ===== FOCUS MANAGEMENT ===== */
+
+/* Remove default outline, use modern :focus-visible */
+*:focus {
+  outline: none;
+}
+
+/* Keyboard-only focus indicator */
+*:focus-visible {
+  outline: 2px solid var(--ltlb-primary);
+  outline-offset: 2px;
+}
+
+/* Ensure focus is visible in high-contrast mode */
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+/* ===== TYPOGRAPHY BASE ===== */
+
+.ltlb-admin,
+.ltlb-booking,
+.ltlb-booking-wizard {
+  font-family: var(--ltlb-font-sans);
+  font-size: var(--ltlb-text-base);
+  line-height: var(--ltlb-leading-normal);
+  color: var(--ltlb-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== HEADINGS ===== */
+
+.ltlb-h1,
+.ltlb-admin h1,
+.ltlb-booking h1 {
+  font-size: var(--ltlb-text-3xl);
+  font-weight: var(--ltlb-font-extrabold);
+  line-height: var(--ltlb-leading-tight);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-5) 0;
+}
+
+.ltlb-h2,
+.ltlb-admin h2,
+.ltlb-booking h2 {
+  font-size: var(--ltlb-text-2xl);
+  font-weight: var(--ltlb-font-bold);
+  line-height: var(--ltlb-leading-tight);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+.ltlb-h3,
+.ltlb-admin h3,
+.ltlb-booking h3 {
+  font-size: var(--ltlb-text-xl);
+  font-weight: var(--ltlb-font-bold);
+  line-height: var(--ltlb-leading-snug);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-3) 0;
+}
+
+.ltlb-h4,
+.ltlb-admin h4,
+.ltlb-booking h4 {
+  font-size: var(--ltlb-text-lg);
+  font-weight: var(--ltlb-font-semibold);
+  line-height: var(--ltlb-leading-snug);
+  margin: 0 0 var(--ltlb-space-3) 0;
+}
+
+/* ===== PARAGRAPHS & LISTS ===== */
+
+.ltlb-admin p,
+.ltlb-booking p {
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+.ltlb-admin ul,
+.ltlb-admin ol,
+.ltlb-booking ul,
+.ltlb-booking ol {
+  margin: 0 0 var(--ltlb-space-4) 0;
+  padding-left: var(--ltlb-space-6);
+}
+
+.ltlb-admin li,
+.ltlb-booking li {
+  margin-bottom: var(--ltlb-space-2);
+}
+
+/* ===== LINKS ===== */
+
+.ltlb-admin a,
+.ltlb-booking a {
+  color: var(--ltlb-primary);
+  text-decoration: none;
+  transition: color var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-admin a:hover,
+.ltlb-booking a:hover {
+  color: var(--ltlb-primary-hover);
+  text-decoration: underline;
+}
+
+/* ===== CODE ===== */
+
+.ltlb-admin code,
+.ltlb-booking code {
+  font-family: var(--ltlb-font-mono);
+  font-size: 0.875em;
+  background: var(--ltlb-bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--ltlb-radius-sm);
+  border: 1px solid var(--ltlb-border-light);
+}
+
+.ltlb-admin pre,
+.ltlb-booking pre {
+  font-family: var(--ltlb-font-mono);
+  font-size: var(--ltlb-text-sm);
+  background: var(--ltlb-bg-tertiary);
+  padding: var(--ltlb-space-4);
+  border-radius: var(--ltlb-radius-md);
+  border: 1px solid var(--ltlb-border-medium);
+  overflow-x: auto;
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Text Alignment */
+.ltlb-text-left { text-align: left; }
+.ltlb-text-center { text-align: center; }
+.ltlb-text-right { text-align: right; }
+
+/* Font Weights */
+.ltlb-font-normal { font-weight: var(--ltlb-font-normal); }
+.ltlb-font-medium { font-weight: var(--ltlb-font-medium); }
+.ltlb-font-semibold { font-weight: var(--ltlb-font-semibold); }
+.ltlb-font-bold { font-weight: var(--ltlb-font-bold); }
+
+/* Text Colors */
+.ltlb-text-primary { color: var(--ltlb-text-primary); }
+.ltlb-text-secondary { color: var(--ltlb-text-secondary); }
+.ltlb-text-muted { color: var(--ltlb-text-muted); }
+.ltlb-text-success { color: var(--ltlb-success); }
+.ltlb-text-warning { color: var(--ltlb-warning); }
+.ltlb-text-danger { color: var(--ltlb-danger); }
+.ltlb-text-info { color: var(--ltlb-info); }
+
+/* Display */
+.ltlb-block { display: block; }
+.ltlb-inline-block { display: inline-block; }
+.ltlb-inline { display: inline; }
+.ltlb-flex { display: flex; }
+.ltlb-inline-flex { display: inline-flex; }
+.ltlb-grid { display: grid; }
+.ltlb-hidden { display: none; }
+
+/* Visibility (for SR-only) */
+.ltlb-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Margin Utilities */
+.ltlb-m-0 { margin: 0; }
+.ltlb-mt-2 { margin-top: var(--ltlb-space-2); }
+.ltlb-mt-4 { margin-top: var(--ltlb-space-4); }
+.ltlb-mt-6 { margin-top: var(--ltlb-space-6); }
+.ltlb-mb-2 { margin-bottom: var(--ltlb-space-2); }
+.ltlb-mb-4 { margin-bottom: var(--ltlb-space-4); }
+.ltlb-mb-6 { margin-bottom: var(--ltlb-space-6); }
+.ltlb-ml-2 { margin-left: var(--ltlb-space-2); }
+.ltlb-mr-2 { margin-right: var(--ltlb-space-2); }
+
+/* Padding Utilities */
+.ltlb-p-0 { padding: 0; }
+.ltlb-p-2 { padding: var(--ltlb-space-2); }
+.ltlb-p-4 { padding: var(--ltlb-space-4); }
+.ltlb-p-6 { padding: var(--ltlb-space-6); }
+
+/* Gap (for flex/grid) */
+.ltlb-gap-2 { gap: var(--ltlb-space-2); }
+.ltlb-gap-4 { gap: var(--ltlb-space-4); }
+.ltlb-gap-6 { gap: var(--ltlb-space-6); }
+
+/* Responsive Utilities */
+@media (max-width: 767px) {
+  .ltlb-hidden-mobile { display: none; }
+}
+
+@media (min-width: 768px) {
+  .ltlb-hidden-desktop { display: none; }
+}

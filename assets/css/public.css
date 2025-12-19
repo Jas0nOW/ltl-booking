@@ -2,9 +2,22 @@
 /**
  * LazyBookings Public Styles
  * Mobile-first, using CSS variables from plugin
+ * 
+ * ⚠️ MIGRATION NOTE (v2.0.0):
+ * This file contains legacy styles. New implementations should use:
+ * - tokens.css    (CSS custom properties)
+ * - base.css      (reset, typography, utilities)
+ * - components.css (UI components)
+ * - layout.css    (page layouts)
+ * 
+ * Legacy token aliases (--lazy-*) will be removed in v3.0.0.
+ * Update your code to use --ltlb-* tokens instead.
+ * 
  * Variables: --lazy-bg, --lazy-primary, --lazy-text, --lazy-accent
  *           --lazy-border-color, --lazy-border-width, --lazy-border-radius
  *           --lazy-box-shadow, --lazy-transition-duration
+ * 
+ * See /docs/DESIGN_SYSTEM.md for migration guide.
  */
 
 .ltlb-booking {

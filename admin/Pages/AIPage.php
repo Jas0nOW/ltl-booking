@@ -166,7 +166,7 @@ class LTLB_Admin_AIPage {
 								<tr>
 									<th><?php echo esc_html__('Test Connection', 'ltl-bookings'); ?></th>
 									<td>
-										<button type="button" class="button" id="ltlb-test-connection" aria-describedby="ltlb-test-desc">
+										<button type="button" class="ltlb-btn ltlb-btn--secondary" id="ltlb-test-connection" aria-describedby="ltlb-test-desc">
 											<?php echo esc_html__('Test Connection', 'ltl-bookings'); ?>
 										</button>
 										<span id="ltlb-test-status" role="status" aria-live="polite"></span>

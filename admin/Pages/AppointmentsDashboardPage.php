@@ -50,11 +50,11 @@ class LTLB_Admin_AppointmentsDashboardPage {
                 <h1 class="wp-heading-inline"><?php echo esc_html__('Appointments Dashboard', 'ltl-bookings'); ?></h1>
 				<?php if ( $can_manage ) : ?>
 				<div class="ltlb-quick-actions">
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments&action=add')); ?>" class="button button-primary" aria-label="<?php echo esc_attr__('Create new appointment', 'ltl-bookings'); ?>">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_appointments&action=add')); ?>" class="ltlb-btn ltlb-btn--primary" aria-label="<?php echo esc_attr__('Create new appointment', 'ltl-bookings'); ?>">
 						<span class="dashicons dashicons-plus" aria-hidden="true"></span>
 						<?php echo esc_html__('New Appointment', 'ltl-bookings'); ?>
 					</a>
-					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="button" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
+					<a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_calendar')); ?>" class="ltlb-btn ltlb-btn--secondary" aria-label="<?php echo esc_attr__('Open calendar view', 'ltl-bookings'); ?>">
 						<span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
 						<?php echo esc_html__('View Calendar', 'ltl-bookings'); ?>
 					</a>
@@ -75,7 +75,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
                         <?php if ( empty($latest_appointments) ) : ?>
                             <p><?php echo esc_html__('No appointments found.', 'ltl-bookings'); ?></p>
                         <?php else : ?>
-                            <table class="widefat striped">
+                            <table class="ltlb-table ltlb-table--hoverable">
                                 <thead>
                                     <tr>
                                         <th><?php echo esc_html__('Customer', 'ltl-bookings'); ?></th>
@@ -255,7 +255,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
             <?php endif; ?>
             
             <div class="ltlb-analytics-actions" style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08);">
-                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=ltlb_appointments&ltlb_export=csv&start=' . $start_date . '&end=' . $end_date), 'ltlb_export')); ?>" class="button button-secondary" download>
+                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=ltlb_appointments&ltlb_export=csv&start=' . $start_date . '&end=' . $end_date), 'ltlb_export')); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" download>
                     <span class="dashicons dashicons-download" aria-hidden="true"></span>
                     <?php echo esc_html__('Export CSV', 'ltl-bookings'); ?>
                 </a>
@@ -293,8 +293,8 @@ class LTLB_Admin_AppointmentsDashboardPage {
                 <form method="post" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
                     <?php wp_nonce_field( 'ltlb_generate_ai_insights_action', 'ltlb_generate_ai_insights_nonce' ); ?>
                     <input type="hidden" name="ltlb_generate_ai_insights" value="1" />
-                    <button type="submit" class="button button-primary"><?php echo esc_html__( 'Generate Report', 'ltl-bookings' ); ?></button>
-                    <a class="button" href="<?php echo esc_url( $outbox_url ); ?>"><?php echo esc_html__( 'Open Outbox', 'ltl-bookings' ); ?></a>
+                    <button type="submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--small"><?php echo esc_html__( 'Generate Report', 'ltl-bookings' ); ?></button>
+                    <a class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" href="<?php echo esc_url( $outbox_url ); ?>"><?php echo esc_html__( 'Open Outbox', 'ltl-bookings' ); ?></a>
                 </form>
             <?php else : ?>
                 <p class="description" style="margin-top:10px;">

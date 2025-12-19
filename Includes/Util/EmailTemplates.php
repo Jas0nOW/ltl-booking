@@ -223,7 +223,7 @@ class LTLB_Email_Templates {
             '{{support_email}}' => get_option( 'admin_email' ),
         ];
         
-        return str_replace( array_keys( $replacements ), array_values( $replacements ), $content );
+        return str_replace( array_keys( $replacements ), array_values( $replacements ), (string) $content );
     }
     
     /**

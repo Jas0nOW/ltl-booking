@@ -109,10 +109,10 @@ class Availability {
                 }
                 // Use exception hours if provided
                 if (!empty($exception['start_time']) && !empty($exception['end_time'])) {
-                    $parts_start = explode(':', $exception['start_time']);
-                    $parts_end = explode(':', $exception['end_time']);
-                    $window_start = $day_start->setTime(intval($parts_start[0]), intval($parts_start[1]));
-                    $window_end = $day_start->setTime(intval($parts_end[0]), intval($parts_end[1]));
+                    $parts_start = explode(':', (string)($exception['start_time'] ?? ''));
+                    $parts_end = explode(':', (string)($exception['end_time'] ?? ''));
+                    $window_start = $day_start->setTime(intval($parts_start[0] ?? 0), intval($parts_start[1] ?? 0));
+                    $window_end = $day_start->setTime(intval($parts_end[0] ?? 0), intval($parts_end[1] ?? 0));
                 }
             } else {
                 // Check weekly hours
@@ -120,10 +120,10 @@ class Availability {
                 $weekly_hours = $staff_hours_repo->get_weekly($staff_user_id);
                 foreach ($weekly_hours as $wh) {
                     if (intval($wh['weekday']) === $weekday && !empty($wh['is_active'])) {
-                        $parts_start = explode(':', $wh['start_time']);
-                        $parts_end = explode(':', $wh['end_time']);
-                        $window_start = $day_start->setTime(intval($parts_start[0]), intval($parts_start[1]));
-                        $window_end = $day_start->setTime(intval($parts_end[0]), intval($parts_end[1]));
+                        $parts_start = explode(':', (string)($wh['start_time'] ?? ''));
+                        $parts_end = explode(':', (string)($wh['end_time'] ?? ''));
+                        $window_start = $day_start->setTime(intval($parts_start[0] ?? 0), intval($parts_start[1] ?? 0));
+                        $window_end = $day_start->setTime(intval($parts_end[0] ?? 0), intval($parts_end[1] ?? 0));
                         break;
                     }
                 }

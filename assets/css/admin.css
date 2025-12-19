@@ -1,5 +1,18 @@
 /**
  * LazyBookings Admin Styles
+ * 
+ * ⚠️ MIGRATION NOTE (v2.0.0):
+ * This file contains legacy styles and is being gradually deprecated.
+ * New implementations should use the design system files:
+ * - tokens.css    (CSS custom properties)
+ * - base.css      (reset, typography, utilities)
+ * - components.css (UI components)
+ * - layout.css    (page layouts)
+ * 
+ * Legacy token aliases (--lazy-*) will be removed in v3.0.0.
+ * Update your code to use --ltlb-* tokens instead.
+ * 
+ * See /docs/DESIGN_SYSTEM.md for migration guide.
  */
 
 /* Design tokens (scoped to plugin admin UI) */

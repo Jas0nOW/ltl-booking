@@ -1,6 +1,7 @@
-# LazyBookings Shortcodes
+# Shortcodes Reference
 
-... (voller bestehender Inhalt) ...
+**Scope:** Available shortcodes, their attributes, and usage examples.  
+**Non-Scope:** Custom shortcode development or PHP template tags.
 
 ---
 

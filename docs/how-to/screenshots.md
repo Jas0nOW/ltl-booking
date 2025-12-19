@@ -1,6 +1,9 @@
-# LazyBookings - Screenshots Documentation
+# Screenshots Documentation
 
-This document lists the required screenshots for WordPress.org submission and their descriptions.
+**Scope:** Requirements and descriptions for WordPress.org plugin screenshots.  
+**Non-Scope:** General marketing materials or video tutorials.
+
+---
 
 ## Required Screenshots (6 total)
 

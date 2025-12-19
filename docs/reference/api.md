@@ -1,4 +1,9 @@
-# LazyBookings API Reference (v0.4.4)
+# API Reference
+
+**Scope:** REST API endpoints, form submission parameters, and WP-CLI commands.  
+**Non-Scope:** Internal PHP class APIs or third-party integrations (e.g., Stripe API).
+
+---
 
 ## 📚 Overview
 

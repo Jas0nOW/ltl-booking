@@ -14,7 +14,7 @@ class LTLB_Admin_HelpPanel {
 
     public static function add_contextual_help(): void {
         $screen = get_current_screen();
-        if ( ! $screen || strpos( $screen->id, 'ltlb_' ) === false ) {
+        if ( ! $screen || ! is_string( $screen->id ) || strpos( (string) $screen->id, 'ltlb_' ) === false ) {
             return;
         }
 

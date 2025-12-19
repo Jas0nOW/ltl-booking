@@ -91,13 +91,13 @@ class LTLB_RateLimiter {
         
         foreach ( $ip_keys as $key ) {
             if ( ! empty( $_SERVER[ $key ] ) ) {
-                $ip = sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) );
+                $ip = (string) sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) );
                 // For X-Forwarded-For, take the first IP
-                if ( strpos( $ip, ',' ) !== false ) {
-                    $ips = explode( ',', $ip );
-                    $ip = trim( $ips[0] );
+                if ( strpos( (string) $ip, ',' ) !== false ) {
+                    $ips = explode( ',', (string) $ip );
+                    $ip = trim( (string) $ips[0] );
                 }
-                return $ip;
+                return (string) $ip;
             }
         }
         

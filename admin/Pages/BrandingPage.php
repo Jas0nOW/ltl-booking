@@ -212,7 +212,7 @@ class LTLB_Admin_BrandingPage {
                 </div>
 
                 <p class="submit">
-                    <button type="submit" name="ltlb_save_branding" class="button button-primary"><?php echo esc_html__('Save Branding Settings', 'ltl-bookings'); ?></button>
+                    <button type="submit" name="ltlb_save_branding" class="ltlb-btn ltlb-btn--primary"><?php echo esc_html__('Save Branding Settings', 'ltl-bookings'); ?></button>
                 </p>
             </form>
 
