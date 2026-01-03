@@ -23,6 +23,9 @@ class LTLB_BookingService {
 		);
 
 		$result = LTLB_LockManager::with_lock( $lock_key, function() use ( $data ) {
+			if ( ! class_exists( 'HotelEngine' ) ) {
+				return new WP_Error( 'mode_disabled', __( 'Hotel booking mode is currently disabled.', 'ltl-bookings' ) );
+			}
 			$engine = new HotelEngine();
 			return $engine->create_hotel_booking( $data );
 		} );

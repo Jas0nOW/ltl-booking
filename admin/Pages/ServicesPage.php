@@ -137,11 +137,26 @@ class LTLB_Admin_ServicesPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html($label_plural); ?></h1>
-            <?php if ( $action !== 'add' && ! $editing ) : ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
-            <?php endif; ?>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html($label_plural); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo $is_hotel ? esc_html__('Configure room types and their availability settings', 'ltl-bookings') : esc_html__('Configure your bookable services and their availability settings', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+                <?php if ( $action !== 'add' && ! $editing ) : ?>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=add') ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__('Add New', 'ltl-bookings'); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+            </div>
 
             <?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -338,12 +353,12 @@ class LTLB_Admin_ServicesPage {
                                     <div id="ltlb-fixed-slots" class="ltlb-settings-panel">
                                         <div class="ltlb-flex-header">
                                             <strong><?php echo esc_html__('Fixed weekly times', 'ltl-bookings'); ?></strong>
-                                            <button type="button" class="button" id="ltlb-add-fixed-slot"><?php echo esc_html__('Add time', 'ltl-bookings'); ?></button>
+                                            <button type="button" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small" id="ltlb-add-fixed-slot"><?php echo esc_html__('Add time', 'ltl-bookings'); ?></button>
                                         </div>
                                         <p class="description">
                                             <?php echo esc_html__('Add one or more weekly start times. Example: Fri 18:00. The customer will only see these times (still respecting staff/global hours and existing bookings).', 'ltl-bookings'); ?>
                                         </p>
-                                        <table class="widefat striped ltlb-narrow-table">
+                                        <table class="ltlb-table ltlb-narrow-table">
                                             <thead>
                                                 <tr>
                                                     <th><?php echo esc_html__('Weekday', 'ltl-bookings'); ?></th>
@@ -361,7 +376,7 @@ class LTLB_Admin_ServicesPage {
                                                     }
                                                     echo '</select></td>';
                                                     echo '<td><input type="time" name="fixed_slot_time[]" value="' . esc_attr($t) . '"></td>';
-                                                    echo '<td><button type="button" class="button ltlb-remove-fixed-slot">' . esc_html__('Remove', 'ltl-bookings') . '</button></td>';
+                                                    echo '<td><button type="button" class="ltlb-btn ltlb-btn--small ltlb-btn--ghost ltlb-remove-fixed-slot">' . esc_html__('Remove', 'ltl-bookings') . '</button></td>';
                                                     echo '</tr>';
                                                 };
 
@@ -458,7 +473,7 @@ class LTLB_Admin_ServicesPage {
 
                         <p class="submit">
                             <?php submit_button( esc_html__('Save', 'ltl-bookings'), 'primary', 'ltlb_service_save', false ); ?>
-                            <a href="<?php echo admin_url('admin.php?page=ltlb_services'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+                            <a href="<?php echo admin_url('admin.php?page=ltlb_services'); ?>" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>
                 </div>
@@ -490,11 +505,11 @@ class LTLB_Admin_ServicesPage {
                                         <option value="-1"><?php echo esc_html__( 'Bulk Actions', 'ltl-bookings' ); ?></option>
                                         <option value="bulk_delete"><?php echo esc_html__( 'Delete', 'ltl-bookings' ); ?></option>
                                     </select>
-                                    <button type="submit" class="button action" onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete the selected services?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__( 'Apply', 'ltl-bookings' ); ?></button>
+                                    <button type="submit" class="ltlb-btn ltlb-btn--secondary action" onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete the selected services?', 'ltl-bookings' ) ); ?>');"><?php echo esc_html__( 'Apply', 'ltl-bookings' ); ?></button>
                                 </div>
                             </div>
                             
-                            <table class="widefat striped">
+                            <table class="ltlb-table ltlb-table--hoverable">
                                 <thead>
                                     <tr>
                                         <td class="check-column"><input type="checkbox" id="cb-select-all-1" /></td>
@@ -535,7 +550,7 @@ class LTLB_Admin_ServicesPage {
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=edit&id='.$s['id']) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+                                            <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_services&action=edit&id='.$s['id']) ); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -600,11 +615,11 @@ class LTLB_Admin_ServicesPage {
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_services'); } ?>
             <h1 class="wp-heading-inline"><?php echo esc_html($service_label_plural); ?></h1>
-            <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
+            <a href="<?php echo esc_url(admin_url('admin.php?page=ltlb_services&action=add')); ?>" class="ltlb-btn ltlb-btn--small ltlb-btn--primary"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
             <hr class="wp-header-end">
 
             <div class="ltlb-table-actions" style="margin-top: 20px;">
-                <button type="button" class="button ltlb-column-toggle-btn" id="ltlb-services-column-toggle">
+                <button type="button" class="ltlb-btn ltlb-btn--small ltlb-btn--ghost ltlb-column-toggle-btn" id="ltlb-services-column-toggle">
                     <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
                     <?php echo esc_html__('Columns', 'ltl-bookings'); ?>
                 </button>
@@ -766,8 +781,8 @@ class LTLB_Admin_ServicesPage {
         $fixed_weekly_slots_json = $service['fixed_weekly_slots'] ?? '[]';
         $availability_mode = $service['availability_mode'] ?? 'window';
 
-        $available_weekdays_arr = !empty($available_weekdays) ? explode(',', $available_weekdays) : [];
-        $fixed_weekly_slots = json_decode($fixed_weekly_slots_json, true);
+        $available_weekdays_arr = !empty($available_weekdays) ? explode(',', (string) $available_weekdays) : [];
+        $fixed_weekly_slots = json_decode((string) $fixed_weekly_slots_json, true);
 
         $repo = new LTLB_ServiceRepository();
         $selected_resources = $is_edit ? $repo->get_assigned_resource_ids($service['id']) : [];
@@ -863,7 +878,7 @@ class LTLB_Admin_ServicesPage {
                                     <td>
                                         <div id="fixed-slots-container">
                                         </div>
-                                        <button type="button" class="button" id="add-fixed-slot"><?php echo esc_html__('Add Slot', 'ltl-bookings'); ?></button>
+                                        <button type="button" class="ltlb-btn ltlb-btn--secondary" id="add-fixed-slot"><?php echo esc_html__('Add Slot', 'ltl-bookings'); ?></button>
                                     </td>
                                 </tr>
                             </tbody>

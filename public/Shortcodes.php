@@ -9,9 +9,17 @@ class LTLB_Shortcodes {
 		}
 		$done = true;
 
-		$css_ver = self::asset_version( 'assets/css/public.css' );
+		// Determine if we should use minified files
+		$debug_assets = defined( 'LTLB_DEBUG_ASSETS' ) && LTLB_DEBUG_ASSETS;
+		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$css_dir = $debug_assets ? 'assets/css/' : 'assets/css/dist/';
+
+		// Design System CSS (consolidated)
+		$public_ver = self::asset_version( $css_dir . "public{$min}.css" );
 		$js_ver = self::asset_version( 'assets/js/public.js' );
-		wp_enqueue_style( 'ltlb-public', plugins_url( '../assets/css/public.css', __FILE__ ), [], $css_ver );
+		
+		wp_enqueue_style( 'ltlb-public', plugins_url( "../{$css_dir}public{$min}.css", __FILE__ ), [], $public_ver );
+		
 		wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), [ 'jquery' ], $js_ver, true );
 
 		wp_localize_script( 'ltlb-public', 'LTLB_PUBLIC', [
@@ -102,6 +110,8 @@ class LTLB_Shortcodes {
 		// Kept for backward compatibility, but no longer uses comments/testimonials.
 		add_shortcode( 'lazy_testimonials', [ __CLASS__, 'render_trust_section' ] );
 		add_shortcode( 'lazy_trust', [ __CLASS__, 'render_trust_section' ] );
+		// Language Switcher Shortcode
+		add_shortcode( 'lazy_lang_switcher', [ __CLASS__, 'render_language_switcher' ] );
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'maybe_enqueue_assets' ] );
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
@@ -1266,10 +1276,82 @@ class LTLB_Shortcodes {
 				</div>
 
 				<div class="ltlb-trust__cta">
-					<a class="button button-primary" href="<?php echo esc_url( $button_url ); ?>"><?php echo esc_html( $button_text ); ?></a>
+					<a class="ltlb-btn ltlb-btn--primary" href="<?php echo esc_url( $button_url ); ?>"><?php echo esc_html( $button_text ); ?></a>
 				</div>
 			</div>
 		</section>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Language Switcher Shortcode
+	 * Usage: [lazy_lang_switcher style="dropdown"] or [lazy_lang_switcher style="buttons"]
+	 */
+	public static function render_language_switcher( $atts ): string {
+		self::enqueue_public_assets();
+		
+		$atts = shortcode_atts( [
+			'style'   => 'dropdown', // 'dropdown' or 'buttons'
+			'show_flags' => 'yes',   // 'yes' or 'no'
+		], $atts, 'lazy_lang_switcher' );
+
+		$current_locale = LTLB_I18n::get_frontend_locale();
+		
+		$languages = [
+			'de_DE' => [
+				'name'  => 'Deutsch',
+				'short' => 'DE',
+				'flag'  => '🇩🇪',
+			],
+			'en_US' => [
+				'name'  => 'English',
+				'short' => 'EN',
+				'flag'  => '🇬🇧',
+			],
+			'es_ES' => [
+				'name'  => 'Español',
+				'short' => 'ES',
+				'flag'  => '🇪🇸',
+			],
+		];
+
+		ob_start();
+		?>
+		<div class="ltlb-lang-switcher ltlb-lang-switcher--<?php echo esc_attr( $atts['style'] ); ?>" data-current="<?php echo esc_attr( $current_locale ); ?>">
+			<?php if ( $atts['style'] === 'dropdown' ) : ?>
+				<button type="button" class="ltlb-lang-switcher__toggle ltlb-btn ltlb-btn--secondary" aria-expanded="false">
+					<?php if ( $atts['show_flags'] === 'yes' ) : ?>
+						<span class="ltlb-lang-switcher__flag"><?php echo esc_html( $languages[ $current_locale ]['flag'] ?? '🌐' ); ?></span>
+					<?php endif; ?>
+					<span class="ltlb-lang-switcher__current"><?php echo esc_html( $languages[ $current_locale ]['short'] ?? 'EN' ); ?></span>
+					<svg class="ltlb-lang-switcher__arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+				</button>
+				<ul class="ltlb-lang-switcher__dropdown" role="menu" hidden>
+					<?php foreach ( $languages as $locale => $lang ) : ?>
+						<li>
+							<button type="button" class="ltlb-lang-switcher__option<?php echo $locale === $current_locale ? ' ltlb-lang-switcher__option--active' : ''; ?>" data-locale="<?php echo esc_attr( $locale ); ?>" role="menuitem">
+								<?php if ( $atts['show_flags'] === 'yes' ) : ?>
+									<span class="ltlb-lang-switcher__flag"><?php echo esc_html( $lang['flag'] ); ?></span>
+								<?php endif; ?>
+								<span class="ltlb-lang-switcher__name"><?php echo esc_html( $lang['name'] ); ?></span>
+							</button>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			<?php else : /* buttons style */ ?>
+				<div class="ltlb-lang-switcher__buttons" role="group" aria-label="<?php esc_attr_e( 'Select language', 'ltl-bookings' ); ?>">
+					<?php foreach ( $languages as $locale => $lang ) : ?>
+						<button type="button" class="ltlb-lang-switcher__btn ltlb-btn<?php echo $locale === $current_locale ? ' ltlb-btn--primary' : ' ltlb-btn--secondary'; ?>" data-locale="<?php echo esc_attr( $locale ); ?>">
+							<?php if ( $atts['show_flags'] === 'yes' ) : ?>
+								<span class="ltlb-lang-switcher__flag"><?php echo esc_html( $lang['flag'] ); ?></span>
+							<?php endif; ?>
+							<span class="ltlb-lang-switcher__short"><?php echo esc_html( $lang['short'] ); ?></span>
+						</button>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
+		</div>
 		<?php
 		return ob_get_clean();
 	}

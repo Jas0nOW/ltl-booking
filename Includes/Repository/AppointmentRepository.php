@@ -291,14 +291,14 @@ class LTLB_AppointmentRepository {
 		}
 		// start_at / end_at may be DateTimeInterface or strings (local); persist in UTC.
 		if ( isset( $data['start_at'] ) ) {
-			$normalized = class_exists( 'LTLB_DateTime' )
-				? LTLB_DateTime::normalize_to_utc_mysql( $data['start_at'], $timezone_string )
+			$normalized = class_exists( 'LTLB_Time' )
+				? LTLB_Time::normalize_to_utc_mysql( $data['start_at'], $timezone_string )
 				: ( $data['start_at'] instanceof DateTimeInterface ? LTLB_Time::format_utc_mysql( $data['start_at'] ) : sanitize_text_field( (string) $data['start_at'] ) );
 			$insert['start_at'] = $normalized ? $normalized : '';
 		}
 		if ( isset( $data['end_at'] ) ) {
-			$normalized = class_exists( 'LTLB_DateTime' )
-				? LTLB_DateTime::normalize_to_utc_mysql( $data['end_at'], $timezone_string )
+			$normalized = class_exists( 'LTLB_Time' )
+				? LTLB_Time::normalize_to_utc_mysql( $data['end_at'], $timezone_string )
 				: ( $data['end_at'] instanceof DateTimeInterface ? LTLB_Time::format_utc_mysql( $data['end_at'] ) : sanitize_text_field( (string) $data['end_at'] ) );
 			$insert['end_at'] = $normalized ? $normalized : '';
 		}
@@ -562,8 +562,8 @@ class LTLB_AppointmentRepository {
 
 		$existing = $this->get_by_id( $id );
 		$timezone_string = is_array( $existing ) && ! empty( $existing['timezone'] ) ? (string) $existing['timezone'] : LTLB_Time::wp_timezone()->getName();
-		$start_utc = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::normalize_to_utc_mysql( $start_at, $timezone_string ) : $start_at;
-		$end_utc = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::normalize_to_utc_mysql( $end_at, $timezone_string ) : $end_at;
+		$start_utc = class_exists( 'LTLB_Time' ) ? LTLB_Time::normalize_to_utc_mysql( $start_at, $timezone_string ) : $start_at;
+		$end_utc = class_exists( 'LTLB_Time' ) ? LTLB_Time::normalize_to_utc_mysql( $end_at, $timezone_string ) : $end_at;
 		if ( ! $start_utc || ! $end_utc ) {
 			return false;
 		}
@@ -583,4 +583,5 @@ class LTLB_AppointmentRepository {
 		return $result !== false;
 	}
 }
+
 

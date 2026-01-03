@@ -268,9 +268,9 @@ class LTLB_DB_Migrator {
         
         if (empty($key_info)) {
             // No PRIMARY KEY exists - add it manually
-            if (strpos($table_name, 'appointment_resources') !== false) {
+            if (strpos((string) $table_name, 'appointment_resources') !== false) {
                 $wpdb->query("ALTER TABLE {$table_name} ADD PRIMARY KEY (appointment_id,resource_id)");
-            } elseif (strpos($table_name, 'service_resources') !== false) {
+            } elseif (strpos((string) $table_name, 'service_resources') !== false) {
                 $wpdb->query("ALTER TABLE {$table_name} ADD PRIMARY KEY (service_id,resource_id)");
             }
         } elseif (count($key_info) !== 2) {
@@ -293,9 +293,9 @@ class LTLB_DB_Migrator {
             // Restore data (only if backup was successful and not empty)
             if ($row_count > 0) {
                 // Determine column names based on table type
-                if (strpos($table_name, 'appointment_resources') !== false) {
+                if (strpos((string) $table_name, 'appointment_resources') !== false) {
                     $wpdb->query("INSERT INTO {$table_name} (appointment_id, resource_id) SELECT appointment_id, resource_id FROM {$backup_table}");
-                } elseif (strpos($table_name, 'service_resources') !== false) {
+                } elseif (strpos((string) $table_name, 'service_resources') !== false) {
                     $wpdb->query("INSERT INTO {$table_name} (service_id, resource_id) SELECT service_id, resource_id FROM {$backup_table}");
                 }
                 error_log("LTLB: Restored {$row_count} rows to {$table_name}");

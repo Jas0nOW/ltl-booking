@@ -186,7 +186,7 @@ class LTLB_AuditLog {
         } elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
             $ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
             // X-Forwarded-For can contain multiple IPs; take the first.
-            $ips = explode( ',', $ip );
+            $ips = explode( ',', (string) $ip );
             $ip = trim( $ips[0] );
         } elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
             $ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );

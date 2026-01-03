@@ -1,6 +1,12 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
+/**
+ * Centralized timezone-safe date/time helpers.
+ * 
+ * Storage convention: appointments are stored as UTC MySQL DATETIME strings.
+ * Conversion happens only at boundaries (UI / emails / exports).
+ */
 class LTLB_Time {
 
     public static function utc_timezone(): DateTimeZone {
@@ -39,7 +45,6 @@ class LTLB_Time {
 
     /**
      * Create DateTimeImmutable from various formats in site timezone.
-     * Accepts 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d'.
      */
     public static function create_datetime_immutable( string $datetime ): ?DateTimeImmutable {
         $tz = self::wp_timezone();
@@ -50,7 +55,6 @@ class LTLB_Time {
             if ( $dt !== false ) return $dt->setTimezone( $tz );
         }
 
-        // Try generic parse
         try {
             $dt2 = new DateTimeImmutable( $datetime, $tz );
             return $dt2->setTimezone( $tz );
@@ -59,35 +63,31 @@ class LTLB_Time {
         }
     }
 
-    public static function parse_date_and_time( string $date, string $time ): ?DateTimeImmutable {
-        $tz = self::wp_timezone();
-        $combined = trim( $date . ' ' . $time );
-        // Try common formats
-        $fmts = [ 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d' ];
-        foreach ( $fmts as $fmt ) {
-            $dt = DateTimeImmutable::createFromFormat( $fmt, $combined, $tz );
-            if ( $dt !== false ) return $dt->setTimezone( $tz );
+    /**
+     * Parse a MySQL DATETIME string that is known to be UTC.
+     */
+    public static function parse_utc_mysql( string $mysql_datetime ): ?DateTimeImmutable {
+        $mysql_datetime = trim( $mysql_datetime );
+        if ( $mysql_datetime === '' ) return null;
+
+        $tz = self::utc_timezone();
+        $dt = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $mysql_datetime, $tz );
+        if ( $dt !== false ) {
+            return $dt->setTimezone( $tz );
         }
 
         try {
-            $dt = new DateTimeImmutable( $combined, $tz );
-            return $dt->setTimezone( $tz );
+            $dt2 = new DateTimeImmutable( $mysql_datetime, $tz );
+            return $dt2->setTimezone( $tz );
         } catch ( Exception $e ) {
             return null;
         }
-    }
-
-    public static function format_wp_datetime( DateTimeInterface $dt ): string {
-        return $dt->format('Y-m-d H:i:s');
     }
 
     /**
      * Format a DateTimeInterface as a UTC MySQL DATETIME string.
      */
     public static function format_utc_mysql( DateTimeInterface $dt ): string {
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            return LTLB_DateTime::format_utc_mysql( $dt );
-        }
         $utc = self::utc_timezone();
         return ( new DateTimeImmutable( $dt->format( DATE_ATOM ) ) )
             ->setTimezone( $utc )
@@ -95,23 +95,77 @@ class LTLB_Time {
     }
 
     /**
-     * Parse a UTC MySQL DATETIME string into a DateTimeImmutable (UTC).
+     * Normalize a date/time value to a UTC MySQL DATETIME string.
      */
-    public static function create_datetime_immutable_utc( string $datetime ): ?DateTimeImmutable {
-        $datetime = trim( $datetime );
-        if ( $datetime === '' ) return null;
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            return LTLB_DateTime::parse_utc_mysql( $datetime );
+    public static function normalize_to_utc_mysql( $value, ?string $local_tz_string = null ): ?string {
+        if ( $value instanceof DateTimeInterface ) {
+            return self::format_utc_mysql( $value );
         }
-        $tz = self::utc_timezone();
-        $dt = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $datetime, $tz );
-        if ( $dt !== false ) return $dt->setTimezone( $tz );
-        try {
-            $dt2 = new DateTimeImmutable( $datetime, $tz );
-            return $dt2->setTimezone( $tz );
-        } catch ( Exception $e ) {
+        if ( ! is_string( $value ) ) {
             return null;
         }
+
+        $raw = trim( $value );
+        if ( $raw === '' ) return null;
+
+        if ( preg_match( '/[zZ]$|[+-]\d{2}:?\d{2}$/', $raw ) ) {
+            try {
+                $dt = new DateTimeImmutable( $raw );
+                return self::format_utc_mysql( $dt );
+            } catch ( Exception $e ) {
+                return null;
+            }
+        }
+
+        try {
+            $local_tz = $local_tz_string ? new DateTimeZone( $local_tz_string ) : self::wp_timezone();
+        } catch ( Exception $e ) {
+            $local_tz = self::wp_timezone();
+        }
+
+        $dt = DateTimeImmutable::createFromFormat( 'Y-m-d H:i:s', $raw, $local_tz );
+        if ( $dt === false ) $dt = DateTimeImmutable::createFromFormat( 'Y-m-d H:i', $raw, $local_tz );
+        if ( $dt === false ) $dt = DateTimeImmutable::createFromFormat( 'Y-m-d', $raw, $local_tz );
+
+        if ( $dt === false ) {
+            try {
+                $dt = new DateTimeImmutable( $raw, $local_tz );
+            } catch ( Exception $e ) {
+                return null;
+            }
+        }
+
+        return self::format_utc_mysql( $dt );
+    }
+
+    /**
+     * Convert a UTC MySQL DATETIME string into a DateTimeImmutable in the given timezone.
+     */
+    public static function utc_mysql_to_local_dt( string $mysql_datetime_utc, ?string $tz_string = null ): ?DateTimeImmutable {
+        $utc_dt = self::parse_utc_mysql( $mysql_datetime_utc );
+        if ( ! $utc_dt ) return null;
+
+        try {
+            $tz = $tz_string ? new DateTimeZone( $tz_string ) : self::wp_timezone();
+        } catch ( Exception $e ) {
+            $tz = self::wp_timezone();
+        }
+
+        return $utc_dt->setTimezone( $tz );
+    }
+
+    /**
+     * Render a UTC MySQL DATETIME string in WP/site timezone for display.
+     */
+    public static function format_local_display_from_utc_mysql( string $mysql_datetime_utc, string $format, ?string $tz_string = null ): string {
+        $dt = self::utc_mysql_to_local_dt( $mysql_datetime_utc, $tz_string );
+        if ( ! $dt ) return '';
+
+        if ( function_exists( 'wp_date' ) ) {
+            return wp_date( $format, $dt->getTimestamp(), $dt->getTimezone() );
+        }
+
+        return $dt->format( $format );
     }
 
     public static function day_start( DateTimeInterface $dt ): DateTimeImmutable {
@@ -126,7 +180,6 @@ class LTLB_Time {
 
     /**
      * Generate slot start DateTimeImmutable objects for a given day.
-     * $start_hour and $end_hour are integers (24h). $end_hour is exclusive.
      */
     public static function generate_slots_for_day( DateTimeInterface $day, int $start_hour = 9, int $end_hour = 17, int $slot_minutes = 60 ): array {
         $tz = $day->getTimezone();
@@ -142,37 +195,13 @@ class LTLB_Time {
         return $slots;
     }
 
-
-    /**
-     * Combine a date (Y-m-d) and time (H:i or H:i:s) into DateTimeImmutable.
-     * Used for hotel check-in/check-out calculations.
-     */
-    public static function combine_date_time( string $date_ymd, string $time_hi ): ?DateTimeImmutable {
-        $tz = self::wp_timezone();
-        $combined = $date_ymd . ' ' . $time_hi;
-        // Try formats: HH:MM or HH:MM:SS
-        $formats = [ 'Y-m-d H:i', 'Y-m-d H:i:s' ];
-        foreach ( $formats as $fmt ) {
-            $dt = DateTimeImmutable::createFromFormat( $fmt, $combined, $tz );
-            if ( $dt !== false ) return $dt->setTimezone( $tz );
-        }
-        return null;
-    }
-
-    /**
-     * Calculate number of nights between two dates (date-only, checkout exclusive).
-     * e.g., checkin 2025-12-20, checkout 2025-12-22 → 2 nights
-     */
     public static function nights_between( string $checkin_date, string $checkout_date ): int {
         $tz = self::wp_timezone();
         try {
             $checkin = DateTimeImmutable::createFromFormat( 'Y-m-d', $checkin_date, $tz );
             $checkout = DateTimeImmutable::createFromFormat( 'Y-m-d', $checkout_date, $tz );
-            if ( $checkin === false || $checkout === false ) {
-                return 0;
-            }
-            $interval = $checkout->diff( $checkin );
-            return $interval->days;
+            if ( $checkin === false || $checkout === false ) return 0;
+            return $checkout->diff( $checkin )->days;
         } catch ( Exception $e ) {
             return 0;
         }

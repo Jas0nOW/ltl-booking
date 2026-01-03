@@ -9,6 +9,11 @@ if ( ! defined('ABSPATH') ) exit;
 class LTLB_Elementor_Integration {
 
     public static function init(): void {
+        // Only initialize if Elementor is actually loaded
+        if ( ! did_action( 'elementor/loaded' ) ) {
+            return;
+        }
+        
         add_action( 'elementor/widgets/register', [ __CLASS__, 'register_widgets' ] );
         add_action( 'elementor/elements/categories_registered', [ __CLASS__, 'register_category' ] );
     }
@@ -21,6 +26,11 @@ class LTLB_Elementor_Integration {
     }
 
     public static function register_widgets( $widgets_manager ): void {
+        // Double-check Elementor is loaded before requiring widget files
+        if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
+            return;
+        }
+        
         $widget_files = [
             'booking_form' => __DIR__ . '/BookingFormWidget.php',
             'calendar' => __DIR__ . '/CalendarWidget.php',

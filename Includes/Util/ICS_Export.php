@@ -82,8 +82,8 @@ class LTLB_ICS_Export {
         }
 
         // Appointment times are stored as UTC MySQL DATETIME.
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            $dt = LTLB_DateTime::parse_utc_mysql( $datetime );
+        if ( class_exists( 'LTLB_Time' ) ) {
+            $dt = LTLB_Time::parse_utc_mysql( $datetime );
             if ( $dt ) {
                 return $dt->format( 'Ymd\THis\Z' );
             }
@@ -101,10 +101,14 @@ class LTLB_ICS_Export {
      * Escape text for ICS format
      */
     private static function escape_ics_text( string $text ): string {
-        $text = str_replace( '\\', '\\\\', $text );
-        $text = str_replace( ',', '\\,', $text );
-        $text = str_replace( ';', '\\;', $text );
-        $text = str_replace( "\n", '\\n', $text );
+        // Ensure text is a string (prevent deprecation warnings in PHP 8.1+)
+        if ( ! is_string( $text ) ) {
+            $text = '';
+        }
+        $text = str_replace( '\\', '\\\\', (string) $text );
+        $text = str_replace( ',', '\\,', (string) $text );
+        $text = str_replace( ';', '\\;', (string) $text );
+        $text = str_replace( "\n", '\\n', (string) $text );
         return $text;
     }
 
@@ -182,3 +186,4 @@ class LTLB_ICS_Export {
         return $user_id ? intval($user_id) : null;
     }
 }
+

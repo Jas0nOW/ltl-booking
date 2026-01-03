@@ -92,8 +92,8 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                 </div>
 
                 <div class="ltlb-step-nav">
-                    <button type="button" class="button-secondary" data-ltlb-back disabled><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                    <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
+                    <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back disabled><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
+                    <button type="button" class="ltlb-btn ltlb-btn--primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
                 </div>
             </fieldset>
 
@@ -123,8 +123,8 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                     </div>
 
                     <div class="ltlb-step-nav">
-                        <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                        <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
+                        <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
+                        <button type="button" class="ltlb-btn ltlb-btn--primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
                     </div>
                 </fieldset>
             <?php else : ?>
@@ -147,8 +147,8 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                     </div>
 
                     <div class="ltlb-step-nav">
-                        <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                        <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
+                        <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
+                        <button type="button" class="ltlb-btn ltlb-btn--primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
                     </div>
                 </fieldset>
             <?php endif; ?>
@@ -166,8 +166,8 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                 </div>
 
                 <div class="ltlb-step-nav">
-                    <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                    <button type="button" class="button-primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
+                    <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
+                    <button type="button" class="ltlb-btn ltlb-btn--primary" data-ltlb-next><?php echo esc_html__( 'Next', 'ltl-bookings' ); ?></button>
                 </div>
             </fieldset>
 
@@ -217,7 +217,7 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                             <?php foreach ( $ltlb_payment_methods as $m ) :
                                 $m = sanitize_key( (string) $m );
                                 if ( $m === '' ) continue;
-                                $label = $labels[ $m ] ?? ucfirst( str_replace( '_', ' ', $m ) );
+                                $label = $labels[ $m ] ?? ucfirst( str_replace( '_', ' ', (string) $m ) );
                                 $checked = ( $m === $ltlb_default_payment_method ) ? ' checked' : '';
                             ?>
                                 <label style="display:block;margin:6px 0;">
@@ -240,8 +240,10 @@ $prefill_guests = isset( $prefill_guests ) ? max( 1, intval( $prefill_guests ) )
                 <?php endif; ?>
 
                 <div class="ltlb-step-nav">
-                    <button type="button" class="button-secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
-                    <?php submit_button( esc_html__( 'Confirm booking', 'ltl-bookings' ), 'primary', 'ltlb_book_submit', false, [ 'aria-label' => esc_attr__( 'Submit booking form', 'ltl-bookings' ) ] ); ?>
+                    <button type="button" class="ltlb-btn ltlb-btn--secondary" data-ltlb-back><?php echo esc_html__( 'Back', 'ltl-bookings' ); ?></button>
+                    <button type="submit" name="ltlb_book_submit" class="ltlb-btn ltlb-btn--primary" aria-label="<?php echo esc_attr__( 'Submit booking form', 'ltl-bookings' ); ?>">
+                        <?php echo esc_html__( 'Confirm booking', 'ltl-bookings' ); ?>
+                    </button>
                 </div>
             </fieldset>
         </div>

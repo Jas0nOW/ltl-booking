@@ -35,8 +35,8 @@ class LTLB_EmailNotifications {
         $price_label = $amount_cents > 0 ? number_format( $amount_cents / 100, 2 ) . ' ' . $currency : __( 'Free', 'ltl-bookings' );
 
         $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
-        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
-        $end_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
+        $start_display = class_exists( 'LTLB_Time' ) ? LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+        $end_display = class_exists( 'LTLB_Time' ) ? LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
 
         $body = self::get_template( 'customer-booking-confirmation', [
             'customer_name' => $appointment['customer_name'] ?? '',
@@ -82,8 +82,8 @@ class LTLB_EmailNotifications {
         $price_label = $amount_cents > 0 ? number_format( $amount_cents / 100, 2 ) . ' ' . $currency : __( 'Free', 'ltl-bookings' );
 
         $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
-        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
-        $end_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
+        $start_display = class_exists( 'LTLB_Time' ) ? LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+        $end_display = class_exists( 'LTLB_Time' ) ? LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option('time_format'), $tz_string ) : (string) ( $appointment['end_at'] ?? '' );
 
         $admin_url = admin_url( 'admin.php?page=ltlb_appointments&action=view&id=' . $appointment_id );
 
@@ -137,7 +137,7 @@ class LTLB_EmailNotifications {
         $service_name = $service ? $service['name'] : __( 'Service', 'ltl-bookings' );
 
         $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
-        $start_display = class_exists( 'LTLB_DateTime' ) ? LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
+        $start_display = class_exists( 'LTLB_Time' ) ? LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $tz_string ) : (string) ( $appointment['start_at'] ?? '' );
 
         $body = self::get_template( 'customer-status-change', [
             'customer_name' => $appointment['customer_name'] ?? '',
@@ -317,3 +317,4 @@ class LTLB_EmailNotifications {
         return wp_mail( $to, $subject, $body, $headers );
     }
 }
+

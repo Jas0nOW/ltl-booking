@@ -912,9 +912,81 @@
         });
     }
 
+    /**
+     * Language Switcher Component
+     */
+    function initLanguageSwitcher($root) {
+        var $toggle = $root.find('.ltlb-lang-switcher__toggle');
+        var $dropdown = $root.find('.ltlb-lang-switcher__dropdown');
+        var $options = $root.find('.ltlb-lang-switcher__option');
+        var $buttons = $root.find('.ltlb-lang-switcher__btn');
+
+        // Dropdown toggle
+        $toggle.on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var expanded = $toggle.attr('aria-expanded') === 'true';
+            $toggle.attr('aria-expanded', !expanded);
+            if (!expanded) {
+                $dropdown.removeAttr('hidden').addClass('ltlb-lang-switcher__dropdown--open');
+            } else {
+                $dropdown.attr('hidden', 'hidden').removeClass('ltlb-lang-switcher__dropdown--open');
+            }
+        });
+
+        // Close dropdown on outside click
+        $(document).on('click', function(e) {
+            if (!$root.is(e.target) && $root.has(e.target).length === 0) {
+                $toggle.attr('aria-expanded', 'false');
+                $dropdown.attr('hidden', 'hidden').removeClass('ltlb-lang-switcher__dropdown--open');
+            }
+        });
+
+        // Dropdown option selection
+        $options.on('click', function(e) {
+            e.preventDefault();
+            var locale = $(this).data('locale');
+            setFrontendLanguage(locale);
+        });
+
+        // Button style selection
+        $buttons.on('click', function(e) {
+            e.preventDefault();
+            var locale = $(this).data('locale');
+            setFrontendLanguage(locale);
+        });
+
+        function setFrontendLanguage(locale) {
+            $.ajax({
+                url: (window.LTLB_PUBLIC && window.LTLB_PUBLIC.restRoot) 
+                     ? window.LTLB_PUBLIC.restRoot.replace('/ltlb/v1', '/wp-admin/admin-ajax.php')
+                     : '/wp-admin/admin-ajax.php',
+                method: 'POST',
+                data: {
+                    action: 'ltlb_set_frontend_lang',
+                    locale: locale
+                },
+                success: function() {
+                    // Reload page to apply new language
+                    window.location.reload();
+                },
+                error: function() {
+                    // Fallback: set cookie directly and reload
+                    document.cookie = 'ltlb_frontend_lang=' + locale + '; path=/; max-age=' + (30 * 24 * 60 * 60);
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
     $(function() {
         $('.ltlb-booking').each(function() {
             initWidget($(this));
+        });
+
+        // Initialize language switchers
+        $('.ltlb-lang-switcher').each(function() {
+            initLanguageSwitcher($(this));
         });
     });
 

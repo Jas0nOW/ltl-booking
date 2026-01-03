@@ -1,6 +1,11 @@
 <?php
 if ( ! defined('ABSPATH') ) exit;
 
+// Prevent fatal error if Elementor is not loaded
+if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
+    return;
+}
+
 class LTLB_Elementor_Calendar_Widget extends \Elementor\Widget_Base {
 
     public function get_name(): string {

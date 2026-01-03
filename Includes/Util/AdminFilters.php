@@ -232,6 +232,8 @@ class LTLB_Admin_Filters {
             echo '</select>';
         }
         
+        // Ensure value is a string before explode
+        $value = is_string( $value ) ? $value : '';
         $parts = explode( '|', $value );
         $from = $parts[0] ?? '';
         $to = $parts[1] ?? '';

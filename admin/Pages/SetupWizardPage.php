@@ -51,7 +51,7 @@ class LTLB_Admin_SetupWizardPage {
             </div>
 
             <p style="margin-top: 20px; text-align: center;">
-                <a href="<?php echo esc_url( add_query_arg( 'skip_wizard', '1' ) ); ?>" class="button button-link"><?php echo esc_html__('Skip wizard and configure manually', 'ltl-bookings'); ?></a>
+                <a href="<?php echo esc_url( add_query_arg( 'skip_wizard', '1' ) ); ?>" class="ltlb-btn ltlb-btn--ghost"><?php echo esc_html__('Skip wizard and configure manually', 'ltl-bookings'); ?></a>
             </p>
         </div>
 
@@ -167,7 +167,7 @@ class LTLB_Admin_SetupWizardPage {
             </label>
 
             <p style="margin-top: 30px;">
-                <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
+                <button type="submit" name="ltlb_wizard_submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
             </p>
         </form>
         <?php
@@ -205,7 +205,7 @@ class LTLB_Admin_SetupWizardPage {
             </table>
 
             <p style="margin-top: 30px;">
-                <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
+                <button type="submit" name="ltlb_wizard_submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
             </p>
         </form>
         <?php
@@ -237,7 +237,7 @@ class LTLB_Admin_SetupWizardPage {
             </label>
 
             <p style="margin-top: 30px;">
-                <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
+                <button type="submit" name="ltlb_wizard_submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
             </p>
         </form>
         <?php
@@ -265,7 +265,7 @@ class LTLB_Admin_SetupWizardPage {
             </label>
 
             <p style="margin-top: 30px;">
-                <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
+                <button type="submit" name="ltlb_wizard_submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
             </p>
         </form>
         <?php
@@ -291,7 +291,7 @@ class LTLB_Admin_SetupWizardPage {
             </label>
 
             <p style="margin-top: 30px;">
-                <button type="submit" name="ltlb_wizard_submit" class="button button-primary button-large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
+                <button type="submit" name="ltlb_wizard_submit" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Continue', 'ltl-bookings'); ?></button>
             </p>
         </form>
         <?php
@@ -310,8 +310,8 @@ class LTLB_Admin_SetupWizardPage {
         </ul>
 
         <p style="margin-top: 30px;">
-            <a href="<?php echo esc_url( admin_url('admin.php?page=ltlb_dashboard') ); ?>" class="button button-primary button-large"><?php echo esc_html__('Go to Dashboard', 'ltl-bookings'); ?></a>
-            <a href="<?php echo esc_url( admin_url('admin.php?page=ltlb_services') ); ?>" class="button button-secondary button-large"><?php echo esc_html__('Add Services', 'ltl-bookings'); ?></a>
+            <a href="<?php echo esc_url( admin_url('admin.php?page=ltlb_dashboard') ); ?>" class="ltlb-btn ltlb-btn--primary ltlb-btn--large"><?php echo esc_html__('Go to Dashboard', 'ltl-bookings'); ?></a>
+            <a href="<?php echo esc_url( admin_url('admin.php?page=ltlb_services') ); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--large"><?php echo esc_html__('Add Services', 'ltl-bookings'); ?></a>
         </p>
         <?php
     }

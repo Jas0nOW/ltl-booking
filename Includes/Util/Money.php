@@ -130,14 +130,14 @@ class LTLB_Money {
         $config = self::get_currency_config( $currency );
         
         // Remove currency symbol and spaces
-        $cleaned = str_replace( $config['symbol'], '', $formatted );
-        $cleaned = str_replace( ' ', '', $cleaned );
+        $cleaned = str_replace( (string) $config['symbol'], '', (string) $formatted );
+        $cleaned = str_replace( ' ', '', (string) $cleaned );
         
         // Remove thousands separator
-        $cleaned = str_replace( $config['thousands_separator'], '', $cleaned );
+        $cleaned = str_replace( (string) $config['thousands_separator'], '', (string) $cleaned );
         
         // Replace decimal separator with dot
-        $cleaned = str_replace( $config['decimal_separator'], '.', $cleaned );
+        $cleaned = str_replace( (string) $config['decimal_separator'], '.', (string) $cleaned );
         
         // Convert to float then to cents
         $amount = floatval( $cleaned );

@@ -17,9 +17,9 @@ class LTLB_Plugin {
         add_action('rest_api_init', [ $this, 'register_rest_routes' ]);
 		add_action( 'template_redirect', [ $this, 'handle_payment_return' ] );
 		add_action( 'ltlb_retention_cleanup', [ 'LTLB_Retention', 'run' ] );
-        add_action( 'ltlb_automation_runner', [ 'LTLB_Automations', 'run_due_rules' ] );
+        // add_action( 'ltlb_automation_runner', [ 'LTLB_Automations', 'run_due_rules' ] );
         add_action('admin_init', [ $this, 'handle_csv_export' ]);
-        add_action('wp_ajax_ltlb_test_ai_connection', [ $this, 'handle_test_ai_connection' ]);
+        // add_action('wp_ajax_ltlb_test_ai_connection', [ $this, 'handle_test_ai_connection' ]);
         
         // Notification queue processing (Action Scheduler integration)
         add_action( 'ltlb_process_notification', [ 'LTLB_NotificationQueue', 'process_notification' ] );
@@ -39,9 +39,7 @@ class LTLB_Plugin {
             LTLB_Mailer::init();
         }
 
-		if ( class_exists('LTLB_I18n') ) {
-			LTLB_I18n::init();
-		}
+		// I18n is now initialized early in ltl-booking.php
     }
 
     private function ensure_retention_cron(): void {
@@ -76,7 +74,7 @@ class LTLB_Plugin {
         // Utilities
         require_once LTLB_PATH . 'Includes/Util/Sanitizer.php';
         require_once LTLB_PATH . 'Includes/Util/Time.php';
-        require_once LTLB_PATH . 'Includes/Util/DateTime.php';
+        // require_once LTLB_PATH . 'Includes/Util/DateTime.php';
         require_once LTLB_PATH . 'Includes/Util/Notices.php';
         require_once LTLB_PATH . 'Includes/Util/LockManager.php';
         require_once LTLB_PATH . 'Includes/Util/Logger.php';
@@ -95,15 +93,15 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Util/RateLimiter.php';
         require_once LTLB_PATH . 'Includes/Util/NotificationQueue.php';
         require_once LTLB_PATH . 'Includes/Util/BookingMode.php';
-        require_once LTLB_PATH . 'Includes/Util/AIOutbox.php';
-		require_once LTLB_PATH . 'Includes/Util/Automations.php';
+        // require_once LTLB_PATH . 'Includes/Util/AIOutbox.php';
+		// require_once LTLB_PATH . 'Includes/Util/Automations.php';
         require_once LTLB_PATH . 'Includes/Util/AuditLog.php';
         require_once LTLB_PATH . 'Includes/Util/AdminFilters.php';
         require_once LTLB_PATH . 'Includes/Util/Accessibility.php';
         require_once LTLB_PATH . 'Includes/Util/Webhooks.php';
-        require_once LTLB_PATH . 'Includes/Util/WaitlistEngine.php';
-        require_once LTLB_PATH . 'Includes/Util/GroupBooking.php';
-        require_once LTLB_PATH . 'Includes/Util/PackageEngine.php';
+        // require_once LTLB_PATH . 'Includes/Util/WaitlistEngine.php';
+        // require_once LTLB_PATH . 'Includes/Util/GroupBooking.php';
+        // require_once LTLB_PATH . 'Includes/Util/PackageEngine.php';
         require_once LTLB_PATH . 'Includes/Util/Money.php';
         require_once LTLB_PATH . 'Includes/Util/EmailTemplates.php';
         require_once LTLB_PATH . 'Includes/Util/DemoSeeder.php';
@@ -123,8 +121,8 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'Includes/Repository/StaffExceptionsRepository.php';
         
         // Hotel-specific repositories
-        require_once LTLB_PATH . 'Includes/Repository/RoomTypeRepository.php';
-        require_once LTLB_PATH . 'Includes/Repository/RoomRepository.php';
+        // require_once LTLB_PATH . 'Includes/Repository/RoomTypeRepository.php';
+        // require_once LTLB_PATH . 'Includes/Repository/RoomRepository.php';
 
 		// Availability depends on repositories.
 		require_once LTLB_PATH . 'Includes/Util/Availability.php';
@@ -135,32 +133,34 @@ class LTLB_Plugin {
         require_once LTLB_PATH . 'admin/Components/Component.php';
         require_once LTLB_PATH . 'admin/Components/HelpPanel.php';
         require_once LTLB_PATH . 'admin/Pages/AppointmentsDashboardPage.php';
-        require_once LTLB_PATH . 'admin/Pages/HotelDashboardPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/HotelDashboardPage.php';
         require_once LTLB_PATH . 'admin/Pages/ServicesPage.php';
         require_once LTLB_PATH . 'admin/Pages/CustomersPage.php';
         require_once LTLB_PATH . 'admin/Pages/AppointmentsPage.php';
         require_once LTLB_PATH . 'admin/Pages/CalendarPage.php';
         require_once LTLB_PATH . 'admin/Pages/SettingsPage.php';
         require_once LTLB_PATH . 'admin/Pages/DesignPage.php';
-        require_once LTLB_PATH . 'admin/Pages/AIPage.php';
-        require_once LTLB_PATH . 'admin/Pages/OutboxPage.php';
-        require_once LTLB_PATH . 'admin/Pages/RoomAssistantPage.php';
-        require_once LTLB_PATH . 'admin/Pages/AutomationsPage.php';
-        require_once LTLB_PATH . 'admin/Pages/ReplyTemplatesPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/StyleGuidePage.php';
+        require_once LTLB_PATH . 'admin/Pages/ShortcodesPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/AIPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/OutboxPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/RoomAssistantPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/AutomationsPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/ReplyTemplatesPage.php';
         require_once LTLB_PATH . 'admin/Pages/StaffPage.php';
         require_once LTLB_PATH . 'admin/Pages/ResourcesPage.php';
-        require_once LTLB_PATH . 'admin/Pages/DiagnosticsPage.php';
-        require_once LTLB_PATH . 'admin/Pages/PrivacyPage.php';
-        require_once LTLB_PATH . 'admin/Pages/BrandingPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/DiagnosticsPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/PrivacyPage.php';
+        // require_once LTLB_PATH . 'admin/Pages/BrandingPage.php';
         require_once LTLB_PATH . 'admin/Pages/SetupWizardPage.php';
         
         // Booking Engine (Hotel mode)
         require_once LTLB_PATH . 'Includes/Engine/BookingEngineInterface.php';
-        require_once LTLB_PATH . 'Includes/Engine/HotelEngine.php';
+        // require_once LTLB_PATH . 'Includes/Engine/HotelEngine.php';
         require_once LTLB_PATH . 'Includes/Engine/PaymentEngine.php';
-        require_once LTLB_PATH . 'Includes/Engine/AIProviderInterface.php';
-        require_once LTLB_PATH . 'Includes/Engine/AIGemini.php';
-        require_once LTLB_PATH . 'Includes/Engine/AIFactory.php';
+        // require_once LTLB_PATH . 'Includes/Engine/AIProviderInterface.php';
+        // require_once LTLB_PATH . 'Includes/Engine/AIGemini.php';
+        // require_once LTLB_PATH . 'Includes/Engine/AIFactory.php';
         // Admin: profile helpers
         require_once LTLB_PATH . 'Includes/Admin/StaffProfile.php';
         // Public: Shortcodes
@@ -169,10 +169,8 @@ class LTLB_Plugin {
         // Public: Gutenberg Blocks
         require_once LTLB_PATH . 'public/Blocks/GutenbergBlocks.php';
         
-        // Public: Elementor Integration
-        if ( did_action( 'elementor/loaded' ) ) {
-            require_once LTLB_PATH . 'public/Integrations/Elementor/ElementorIntegration.php';
-        }
+        // Public: Elementor Integration (always load, class handles Elementor check internally)
+        require_once LTLB_PATH . 'public/Integrations/Elementor/ElementorIntegration.php';
         
         // WP-CLI commands
         if ( defined('WP_CLI') && WP_CLI ) {
@@ -191,8 +189,8 @@ class LTLB_Plugin {
             LTLB_Gutenberg_Blocks::init();
         }
         
-        // Initialize Elementor Integration
-        if ( class_exists( 'LTLB_Elementor_Integration' ) && did_action( 'elementor/loaded' ) ) {
+        // Initialize Elementor Integration (class handles Elementor availability check internally)
+        if ( class_exists( 'LTLB_Elementor_Integration' ) ) {
             LTLB_Elementor_Integration::init();
         }
         
@@ -252,22 +250,67 @@ class LTLB_Plugin {
         }
     }
 
+    /**
+     * Register all admin menu pages
+     * 
+     * Menu structure (Agency-Level Organization):
+     * 
+     * MAIN OPERATIONS
+     * ├── Dashboard (Overview & KPIs)
+     * ├── Appointments/Bookings (Core transactions)
+     * ├── Calendar (Visual scheduling)
+     * └── Customers/Guests (CRM)
+     * 
+     * RESOURCES
+     * ├── Services/Room Types
+     * ├── Resources/Rooms
+     * └── Staff (Service mode only)
+     * 
+     * AI & AUTOMATION
+     * ├── AI Settings
+     * ├── Outbox (Draft center)
+     * ├── Automations (Rules)
+     * └── Templates (Reply templates)
+     * 
+     * SETTINGS
+     * ├── Design
+     * └── Settings
+     * 
+     * HIDDEN (Accessible via links)
+     * ├── Diagnostics
+     * ├── Privacy
+     * ├── Branding
+     * └── Style Guide
+     */
     public function register_admin_menu(): void {
         $settings = get_option( 'lazy_settings', [] );
 		$template_mode = is_array( $settings ) && isset( $settings['template_mode'] ) ? $settings['template_mode'] : 'service';
 		$wizard_completed = get_option( 'ltlb_wizard_completed', false );
 
-        add_menu_page(
-            __( 'Setup Wizard', 'ltl-bookings' ),
-            __( 'Setup Wizard', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_setup_wizard',
-            [ LTLB_Admin_SetupWizardPage::class, 'render' ],
-            'dashicons-admin-generic',
-            25
-        );
+        // Setup Wizard - Only show if not completed
+        if ( ! $wizard_completed ) {
+            add_menu_page(
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                '⚡ ' . __( 'Quick Setup', 'ltl-bookings' ),
+                'manage_options',
+                'ltlb_setup_wizard',
+                [ LTLB_Admin_SetupWizardPage::class, 'render' ],
+                'dashicons-admin-generic',
+                25
+            );
+        } else {
+            // Still register the page but don't add menu item (accessible via direct URL)
+            add_submenu_page(
+                null, // Hidden
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                __( 'Setup Wizard', 'ltl-bookings' ),
+                'manage_options',
+                'ltlb_setup_wizard',
+                [ LTLB_Admin_SetupWizardPage::class, 'render' ]
+            );
+        }
 
-        
+        // Main Menu - LazyBookings
         add_menu_page(
             __( 'LazyBookings', 'ltl-bookings' ),
             __( 'LazyBookings', 'ltl-bookings' ),
@@ -364,56 +407,56 @@ class LTLB_Plugin {
         // --- AI & Automation ---
 
 		// AI & Automations
-		add_submenu_page(
-			'ltlb_dashboard',
-			__( 'AI & Automations', 'ltl-bookings' ),
-			__( 'AI', 'ltl-bookings' ),
-			'manage_ai_settings',
-			'ltlb_ai',
-			[ $this, 'render_ai_page' ]
-		);
+		// add_submenu_page(
+		// 	'ltlb_dashboard',
+		// 	__( 'AI & Automations', 'ltl-bookings' ),
+		// 	__( 'AI', 'ltl-bookings' ),
+		// 	'manage_ai_settings',
+		// 	'ltlb_ai',
+		// 	[ $this, 'render_ai_page' ]
+		// );
 
         // Outbox (Draft Center)
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Outbox', 'ltl-bookings' ),
-            __( 'Outbox', 'ltl-bookings' ),
-            'approve_ai_drafts',
-            'ltlb_outbox',
-            [ $this, 'render_outbox_page' ]
-        );
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Outbox', 'ltl-bookings' ),
+        //     __( 'Outbox', 'ltl-bookings' ),
+        //     'approve_ai_drafts',
+        //     'ltlb_outbox',
+        //     [ $this, 'render_outbox_page' ]
+        // );
 
         // Hotel: Smart Room Assistant
         if ( $template_mode === 'hotel' ) {
-            add_submenu_page(
-                'ltlb_dashboard',
-                __( 'Smart Room Assistant', 'ltl-bookings' ),
-                __( 'Room Assistant', 'ltl-bookings' ),
-                'approve_ai_drafts',
-                'ltlb_room_assistant',
-                [ $this, 'render_room_assistant_page' ]
-            );
+            // add_submenu_page(
+            //     'ltlb_dashboard',
+            //     __( 'Smart Room Assistant', 'ltl-bookings' ),
+            //     __( 'Room Assistant', 'ltl-bookings' ),
+            //     'approve_ai_drafts',
+            //     'ltlb_room_assistant',
+            //     [ $this, 'render_room_assistant_page' ]
+            // );
         }
 
         // Automation rules
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Automations', 'ltl-bookings' ),
-            __( 'Automations', 'ltl-bookings' ),
-            'manage_ai_settings',
-            'ltlb_automations',
-            [ $this, 'render_automations_page' ]
-        );
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Automations', 'ltl-bookings' ),
+        //     __( 'Automations', 'ltl-bookings' ),
+        //     'manage_ai_settings',
+        //     'ltlb_automations',
+        //     [ $this, 'render_automations_page' ]
+        // );
 
         // Reply templates
-        add_submenu_page(
-            'ltlb_dashboard',
-            __( 'Reply Templates', 'ltl-bookings' ),
-            __( 'Templates', 'ltl-bookings' ),
-            'manage_ai_settings',
-            'ltlb_reply_templates',
-            [ $this, 'render_reply_templates_page' ]
-        );
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Reply Templates', 'ltl-bookings' ),
+        //     __( 'Templates', 'ltl-bookings' ),
+        //     'manage_ai_settings',
+        //     'ltlb_reply_templates',
+        //     [ $this, 'render_reply_templates_page' ]
+        // );
 
         // --- Design & Settings ---
 
@@ -427,8 +470,28 @@ class LTLB_Plugin {
             [ $this, 'render_design_page' ]
         );
 
-        // Settings
+        // Style Guide (Design System Reference)
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Style Guide', 'ltl-bookings' ),
+        //     __( 'Style Guide', 'ltl-bookings' ),
+        //     'manage_options',
+        //     'ltlb_styleguide',
+        //     [ $this, 'render_styleguide_page' ]
+        // );
+
+        // Shortcodes Reference
         add_submenu_page(
+            'ltlb_dashboard',
+            __( 'Shortcodes', 'ltl-bookings' ),
+            '<span class="dashicons dashicons-shortcode" style="font-size: 17px; vertical-align: middle; margin-right: 4px;"></span>' . __( 'Shortcodes', 'ltl-bookings' ),
+            'manage_options',
+            'ltlb_shortcodes',
+            [ $this, 'render_shortcodes_page' ]
+        );
+
+        // Settings
+        $settings_hook = add_submenu_page(
             'ltlb_dashboard',
             __( 'Settings', 'ltl-bookings' ),
             __( 'Settings', 'ltl-bookings' ),
@@ -436,38 +499,46 @@ class LTLB_Plugin {
             'ltlb_settings',
             [ $this, 'render_settings_page' ]
         );
+        if ( $settings_hook ) {
+            add_action( "load-$settings_hook", [ $this, 'handle_settings_save' ] );
+        }
 
         // --- Advanced (collapsed by default in our UI) ---
 
         // Branding (Design System) - Hidden from menu, accessible via Design page
-        add_submenu_page(
-            null, // parent_slug = null hides from menu
-            __( 'Branding', 'ltl-bookings' ),
-            __( 'Branding', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_branding',
-            [ $this, 'render_branding_page' ]
-        );
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Branding', 'ltl-bookings' ),
+        //     __( 'Branding', 'ltl-bookings' ),
+        //     'manage_options',
+        //     'ltlb_branding',
+        //     [ $this, 'render_branding_page' ]
+        // );
 
 		// Diagnostics - Hidden from menu, accessible via Settings
-		add_submenu_page(
-			null,
-			__( 'Diagnostics', 'ltl-bookings' ),
-			__( 'Diagnostics', 'ltl-bookings' ),
-			'manage_options',
-			'ltlb_diagnostics',
-			[ $this, 'render_diagnostics_page' ]
-		);
+		// add_submenu_page(
+		// 	'ltlb_dashboard',
+		// 	__( 'Diagnostics', 'ltl-bookings' ),
+		// 	__( 'Diagnostics', 'ltl-bookings' ),
+		// 	'manage_options',
+		// 	'ltlb_diagnostics',
+		// 	[ $this, 'render_diagnostics_page' ]
+		// );
 
         // Privacy - Hidden from menu, accessible via Settings
-        add_submenu_page(
-            null,
-            __( 'Privacy & GDPR', 'ltl-bookings' ),
-            __( 'Privacy', 'ltl-bookings' ),
-            'manage_options',
-            'ltlb_privacy',
-            [ $this, 'render_privacy_page' ]
-        );
+        // add_submenu_page(
+        //     'ltlb_dashboard',
+        //     __( 'Privacy & GDPR', 'ltl-bookings' ),
+        //     __( 'Privacy', 'ltl-bookings' ),
+        //     'manage_options',
+        //     'ltlb_privacy',
+        //     [ $this, 'render_privacy_page' ]
+        // );
+
+        // Hide internal pages from the visible submenu while keeping routes available.
+        // remove_submenu_page( 'ltlb_dashboard', 'ltlb_branding' );
+        // remove_submenu_page( 'ltlb_dashboard', 'ltlb_diagnostics' );
+        // remove_submenu_page( 'ltlb_dashboard', 'ltlb_privacy' );
     }
 
     public function render_dashboard_page(): void {
@@ -578,6 +649,15 @@ class LTLB_Plugin {
         echo '<div class="wrap"><h1>' . esc_html__( 'Settings', 'ltl-bookings' ) . '</h1></div>';
     }
 
+    public function handle_settings_save(): void {
+        if ( class_exists('LTLB_Admin_SettingsPage') ) {
+            $page = new LTLB_Admin_SettingsPage();
+            if ( method_exists( $page, 'handle_post' ) ) {
+                $page->handle_post();
+            }
+        }
+    }
+
     public function render_design_page(): void {
         if ( class_exists('LTLB_Admin_DesignPage') ) {
             $page = new LTLB_Admin_DesignPage();
@@ -585,6 +665,24 @@ class LTLB_Plugin {
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Design', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_styleguide_page(): void {
+        if ( class_exists('LTLB_Admin_StyleGuidePage') ) {
+            $page = new LTLB_Admin_StyleGuidePage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Style Guide', 'ltl-bookings' ) . '</h1></div>';
+    }
+
+    public function render_shortcodes_page(): void {
+        if ( class_exists('LTLB_Admin_ShortcodesPage') ) {
+            $page = new LTLB_Admin_ShortcodesPage();
+            $page->render();
+            return;
+        }
+        echo '<div class="wrap"><h1>' . esc_html__( 'Shortcodes', 'ltl-bookings' ) . '</h1></div>';
     }
 
     public function render_staff_page(): void {
@@ -904,7 +1002,7 @@ class LTLB_Plugin {
         $timestamp = 0;
         $v1_sigs = [];
         foreach ( $parts as $p ) {
-            if ( strpos( $p, '=' ) === false ) continue;
+            if ( strpos( (string) $p, '=' ) === false ) continue;
             list( $k, $v ) = array_map( 'trim', explode( '=', $p, 2 ) );
             if ( $k === 't' ) {
                 $timestamp = (int) $v;
@@ -1341,16 +1439,16 @@ class LTLB_Plugin {
         // Storage is UTC; convert to local for UI payloads.
         $appointment_for_ui = $appointment;
         $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : LTLB_Time::wp_timezone()->getName();
-        if ( ! empty( $appointment['start_at'] ) && class_exists( 'LTLB_DateTime' ) ) {
+        if ( ! empty( $appointment['start_at'] ) && class_exists( 'LTLB_Time' ) ) {
             $appointment_for_ui['start_at_utc'] = (string) $appointment['start_at'];
-            $start_local = LTLB_DateTime::utc_mysql_to_local_dt( (string) $appointment['start_at'], $tz_string );
+            $start_local = LTLB_Time::utc_mysql_to_local_dt( (string) $appointment['start_at'], $tz_string );
             if ( $start_local ) {
                 $appointment_for_ui['start_at'] = $start_local->format( 'Y-m-d H:i:s' );
             }
         }
-        if ( ! empty( $appointment['end_at'] ) && class_exists( 'LTLB_DateTime' ) ) {
+        if ( ! empty( $appointment['end_at'] ) && class_exists( 'LTLB_Time' ) ) {
             $appointment_for_ui['end_at_utc'] = (string) $appointment['end_at'];
-            $end_local = LTLB_DateTime::utc_mysql_to_local_dt( (string) $appointment['end_at'], $tz_string );
+            $end_local = LTLB_Time::utc_mysql_to_local_dt( (string) $appointment['end_at'], $tz_string );
             if ( $end_local ) {
                 $appointment_for_ui['end_at'] = $end_local->format( 'Y-m-d H:i:s' );
             }
@@ -2214,18 +2312,31 @@ class LTLB_Plugin {
     public function enqueue_admin_assets(): void {
         if ( ! is_admin() ) return;
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+        if ( ! $page || strpos( (string) $page, 'ltlb_' ) !== 0 ) return;
 
-        $debug_assets = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG );
-        $admin_css_ver = LTLB_VERSION;
-        if ( $debug_assets ) {
-            $mtime = @filemtime( LTLB_PATH . 'assets/css/admin.css' );
-            if ( $mtime ) {
-                $admin_css_ver = (string) $mtime;
-            }
+        // Force non-minified source files for development - ensures latest styles
+        // Production: Use minified files from dist/ folder
+        $use_source_files = true; // Set to false for production with minified files
+        
+        // Helper function for versioning with cache-busting
+        $get_version = function( $file ) {
+            $mtime = @filemtime( LTLB_PATH . $file );
+            return $mtime ? (string) $mtime : LTLB_VERSION . '.' . time();
+        };
+
+        // Always use source files for now to ensure styles load correctly
+        $css_dir = 'assets/css/';
+        $min = '';
+        
+        // Fallback check for file existence
+        if ( ! @file_exists( LTLB_PATH . $css_dir . 'admin.css' ) ) {
+            // Try dist folder with minified files
+            $css_dir = 'assets/css/dist/';
+            $min = '.min';
         }
 
-        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . 'assets/css/admin.css', [], $admin_css_ver );
+        // Design System CSS (in dependency order)
+        wp_enqueue_style( 'ltlb-admin-css', LTLB_URL . $css_dir . "admin{$min}.css", [], $get_version( $css_dir . "admin{$min}.css" ) );
 
         if ( $page === 'ltlb_ai' ) {
             $ai_ver = LTLB_VERSION;
@@ -2405,7 +2516,7 @@ class LTLB_Plugin {
         }
 
         // Remove # if present
-        $hex = str_replace( '#', '', $hex_color );
+        $hex = str_replace( '#', '', (string) $hex_color );
 
         // Convert to RGB
         $r = hexdec( substr( $hex, 0, 2 ) );
@@ -2544,7 +2655,7 @@ class LTLB_Plugin {
     public function print_design_css_admin(): void {
         if ( ! is_admin() ) return;
         $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-        if ( ! $page || strpos( $page, 'ltlb_' ) !== 0 ) return;
+        if ( ! $page || strpos( (string) $page, 'ltlb_' ) !== 0 ) return;
 
         $design = get_option( 'lazy_design', [] );
         if ( ! is_array( $design ) ) $design = [];
@@ -2727,3 +2838,4 @@ class LTLB_Plugin {
         }
     }
 }
+

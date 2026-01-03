@@ -96,8 +96,24 @@ class LTLB_Admin_StaffPage {
         ?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_staff'); } ?>
-            <h1 class="wp-heading-inline"><?php echo esc_html__('Staff', 'ltl-bookings'); ?></h1>
-            <hr class="wp-header-end">
+            
+            <!-- Page Header -->
+            <div class="ltlb-page-header">
+                <div class="ltlb-page-header__content">
+                    <h1 class="ltlb-page-header__title">
+                        <?php echo esc_html__('Staff', 'ltl-bookings'); ?>
+                    </h1>
+                    <p class="ltlb-page-header__subtitle">
+                        <?php echo esc_html__('Manage your team members and their working hours', 'ltl-bookings'); ?>
+                    </p>
+                </div>
+                <div class="ltlb-page-header__actions">
+                    <a href="<?php echo esc_url( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>" class="ltlb-btn ltlb-btn--primary">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <?php echo esc_html__( 'Add Staff', 'ltl-bookings' ); ?>
+                    </a>
+                </div>
+            </div>
 
             <div class="ltlb-card" style="margin-top:20px;">
                 <h2><?php echo esc_html__('Team', 'ltl-bookings'); ?></h2>
@@ -112,7 +128,7 @@ class LTLB_Admin_StaffPage {
                                     <p style="margin: 0 0 8px;">
                                         <?php echo esc_html__( 'No staff members found.', 'ltl-bookings' ); ?>
                                     </p>
-                                    <a class="button button-primary" href="<?php echo esc_attr( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>">
+                                    <a class="ltlb-btn ltlb-btn--primary" href="<?php echo esc_attr( admin_url( 'user-new.php?role=ltlb_staff' ) ); ?>">
                                         <?php echo esc_html__( 'Add staff member', 'ltl-bookings' ); ?>
                                     </a>
                                 </td>
@@ -122,7 +138,7 @@ class LTLB_Admin_StaffPage {
                                 <tr>
                                     <td><?php echo esc_html( $u->display_name ); ?></td>
                                     <td><?php echo esc_html( $u->user_email ); ?></td>
-                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
+                                    <td><a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_staff&user_id=' . intval($u->ID)) ); ?>" class="ltlb-btn ltlb-btn--secondary ltlb-btn--small"><?php echo esc_html__('Edit working hours', 'ltl-bookings'); ?></a></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -203,7 +219,7 @@ class LTLB_Admin_StaffPage {
                                                 <input type="hidden" name="ltlb_exception_delete" value="1">
                                                 <input type="hidden" name="exception_id" value="<?php echo esc_attr( intval($e['id']) ); ?>">
                                                 <input type="hidden" name="user_id" value="<?php echo esc_attr( $user_id ); ?>">
-                                                <button class="button button-secondary" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');"><?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
+                                                <button class="ltlb-btn ltlb-btn--danger ltlb-btn--small" type="submit" onclick="return confirm('<?php echo esc_js(__('Are you sure?', 'ltl-bookings')); ?>');">< ?php echo esc_html__('Delete', 'ltl-bookings'); ?></button>
                                             </form>
                                         </td>
                                     </tr>

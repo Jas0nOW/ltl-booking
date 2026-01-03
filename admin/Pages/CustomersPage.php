@@ -65,19 +65,32 @@ class LTLB_Admin_CustomersPage {
 		?>
         <div class="wrap ltlb-admin">
             <?php if ( class_exists('LTLB_Admin_Header') ) { LTLB_Admin_Header::render('ltlb_customers'); } ?>
-			<h1 class="wp-heading-inline"><?php echo esc_html( $page_title ); ?></h1>
-            <?php if ( $action !== 'add' && ! $editing ) : ?>
-                <a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="page-title-action"><?php echo esc_html__('Add New', 'ltl-bookings'); ?></a>
-                <?php if ( !empty($customers) ) : ?>
-                    <a href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=ltlb_customers&action=export_csv'), 'ltlb_export_customers' ) ); ?>" class="page-title-action">
-                        <span class="dashicons dashicons-download" style="vertical-align:middle;" aria-hidden="true"></span>
-                        <?php echo esc_html__('Export CSV', 'ltl-bookings'); ?>
-                    </a>
-                <?php endif; ?>
-            <?php endif; ?>
-            <hr class="wp-header-end">
 			
-            <p class="description" style="margin-bottom:20px;"><?php echo esc_html( $is_hotel_mode ? __( 'Guests are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) : __( 'Customers are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) ); ?></p>
+			<!-- Page Header -->
+			<div class="ltlb-page-header">
+				<div class="ltlb-page-header__content">
+					<h1 class="ltlb-page-header__title">
+						<?php echo esc_html( $page_title ); ?>
+					</h1>
+					<p class="ltlb-page-header__subtitle">
+						<?php echo esc_html( $is_hotel_mode ? __( 'Guests are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) : __( 'Customers are created automatically from bookings. You can also add them manually.', 'ltl-bookings' ) ); ?>
+					</p>
+				</div>
+				<?php if ( $action !== 'add' && ! $editing ) : ?>
+				<div class="ltlb-page-header__actions">
+					<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=add') ); ?>" class="ltlb-btn ltlb-btn--primary">
+						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+						<?php echo esc_html__('Add New', 'ltl-bookings'); ?>
+					</a>
+					<?php if ( !empty($customers) ) : ?>
+					<a href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=ltlb_customers&action=export_csv'), 'ltlb_export_customers' ) ); ?>" class="ltlb-btn ltlb-btn--secondary">
+						<span class="dashicons dashicons-download" aria-hidden="true"></span>
+						<?php echo esc_html__('Export CSV', 'ltl-bookings'); ?>
+					</a>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</div>
 
 			<?php // Notices are rendered via LTLB_Notices::render() hooked to admin_notices ?>
 
@@ -138,7 +151,7 @@ class LTLB_Admin_CustomersPage {
                             false
                         );
                         ?>
-						<a href="<?php echo admin_url('admin.php?page=ltlb_customers'); ?>" class="button"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
+						<a href="<?php echo admin_url('admin.php?page=ltlb_customers'); ?>" class="ltlb-btn ltlb-btn--secondary"><?php echo esc_html__('Cancel', 'ltl-bookings'); ?></a>
                         </p>
                     </form>
                 </div>
@@ -188,7 +201,7 @@ class LTLB_Admin_CustomersPage {
                                         </td>
                                         <td><?php echo esc_html( $c['phone'] ); ?></td>
                                         <td>
-									<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="button button-secondary"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
+									<a href="<?php echo esc_attr( admin_url('admin.php?page=ltlb_customers&action=edit&id='.$c['id']) ); ?>" class="ltlb-btn ltlb-btn--small"><?php echo esc_html__('Edit', 'ltl-bookings'); ?></a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

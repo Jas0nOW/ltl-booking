@@ -488,7 +488,7 @@ class LTLB_Package_Engine {
     public static function apply_package_discount( int $price, array $booking_data ): int {
         $payment_method = $booking_data['payment_method'] ?? '';
         
-        if ( strpos( $payment_method, 'package_' ) === 0 ) {
+        if ( strpos( (string) $payment_method, 'package_' ) === 0 ) {
             return 0; // Package covers full cost
         }
         

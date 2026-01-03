@@ -17,19 +17,14 @@ class LTLB_BookingMode {
      * Get current booking mode
      */
     public static function get_current_mode(): string {
-        $mode = get_option( self::OPTION_KEY, self::MODE_SERVICE );
-        return in_array( $mode, [ self::MODE_SERVICE, self::MODE_HOTEL ], true ) ? $mode : self::MODE_SERVICE;
+        return self::MODE_SERVICE;
     }
 
     /**
      * Set booking mode
      */
     public static function set_mode( string $mode ): bool {
-        if ( ! in_array( $mode, [ self::MODE_SERVICE, self::MODE_HOTEL ], true ) ) {
-            return false;
-        }
-        
-        return update_option( self::OPTION_KEY, $mode );
+        return false; // Disallow changing mode in MVP
     }
 
     /**
@@ -219,18 +214,12 @@ class LTLB_BookingMode {
      * @return object Repository instance
      */
     public static function get_repository( string $entity_type ) {
-        $mode = self::get_current_mode();
-        
         if ( $entity_type === 'item' ) {
-            return $mode === self::MODE_HOTEL 
-                ? new LTLB_RoomTypeRepository() 
-                : new LTLB_ServiceRepository();
+            return new LTLB_ServiceRepository();
         }
         
         if ( $entity_type === 'resource' ) {
-            return $mode === self::MODE_HOTEL 
-                ? new LTLB_RoomRepository() 
-                : new LTLB_ResourceRepository();
+            return new LTLB_ResourceRepository();
         }
         
         throw new InvalidArgumentException( "Unknown entity type: {$entity_type}" );

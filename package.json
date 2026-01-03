@@ -1,0 +1,31 @@
+{
+  "name": "ltl-bookings",
+  "version": "2.0.0",
+  "description": "WordPress booking plugin with modern design system",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-css.js",
+    "purge": "purgecss --config purgecss.config.js",
+    "minify": "npm run build",
+    "optimize": "npm run build && npm run purge",
+    "watch": "chokidar 'assets/css/*.css' -c 'npm run build'",
+    "test:css": "stylelint 'assets/css/*.css'",
+    "test:a11y": "echo 'Run: npm install -g @axe-core/cli && axe http://localhost'",
+    "test:lighthouse": "echo 'Run: npm install -g lighthouse && lighthouse http://localhost --output=html --output-path=./lighthouse-report.html'"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "purgecss": "^5.0.0",
+    "stylelint": "^15.10.0",
+    "stylelint-config-standard": "^34.0.0"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "booking",
+    "appointments",
+    "design-system"
+  ],
+  "author": "LazyBookings Team",
+  "license": "GPL-2.0-or-later"
+}
