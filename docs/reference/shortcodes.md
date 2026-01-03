@@ -28,7 +28,7 @@
 
 ### `lazy_book`
 
-Haupt-Buchungsformular mit Wizard-Interface (Schritt-für-Schritt Buchung).
+Haupt-Buchungsformular mit Wizard-Interface (Schritt-für-Schritt Buchung)
 
 **Verwendung:**
 ```
