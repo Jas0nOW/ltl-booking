@@ -327,8 +327,8 @@ class LTLB_Automations {
 
 			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
 			$start_display = (string) ( $appt['start_at'] ?? $from );
-			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
-				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			if ( class_exists( 'LTLB_Time' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
 			}
 
 			$placeholders = [
@@ -422,8 +422,8 @@ class LTLB_Automations {
 
 			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
 			$start_display = (string) ( $appt['start_at'] ?? '' );
-			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
-				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			if ( class_exists( 'LTLB_Time' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
 			}
 
 			$placeholders = [
@@ -519,8 +519,8 @@ class LTLB_Automations {
 
 			$tz_string = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
 			$start_display = (string) ( $appt['start_at'] ?? '' );
-			if ( class_exists( 'LTLB_DateTime' ) && ! empty( $appt['start_at'] ) ) {
-				$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+			if ( class_exists( 'LTLB_Time' ) && ! empty( $appt['start_at'] ) ) {
+				$start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) $appt['start_at'], get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
 			}
 
 			$placeholders = [
@@ -641,3 +641,4 @@ class LTLB_Automations {
 		return implode( "\n", $lines );
 	}
 }
+

@@ -82,8 +82,8 @@ class LTLB_ICS_Export {
         }
 
         // Appointment times are stored as UTC MySQL DATETIME.
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            $dt = LTLB_DateTime::parse_utc_mysql( $datetime );
+        if ( class_exists( 'LTLB_Time' ) ) {
+            $dt = LTLB_Time::parse_utc_mysql( $datetime );
             if ( $dt ) {
                 return $dt->format( 'Ymd\THis\Z' );
             }
@@ -186,3 +186,4 @@ class LTLB_ICS_Export {
         return $user_id ? intval($user_id) : null;
     }
 }
+

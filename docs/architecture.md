@@ -43,7 +43,7 @@ LazyBookings follows a modular architecture organized into the following layers:
 2. **REST API**: The wizard sends a request to the `bookings` endpoint.
 3. **Engine**: The Booking Engine validates availability and permissions.
 4. **Repository**: If valid, the booking is persisted to the database.
-5. **Integrations**: Notifications are triggered (Email, AI analysis).
+5. **Integrations**: Notifications are triggered (Email).
 
 ---
 

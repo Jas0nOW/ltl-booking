@@ -104,9 +104,9 @@ class LTLB_Admin_AppointmentsPage {
         $appt_tz = ! empty( $appt['timezone'] ) ? (string) $appt['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
         $start_display = (string) ( $appt['start_at'] ?? '' );
         $end_display = (string) ( $appt['end_at'] ?? '' );
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
-            $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+        if ( class_exists( 'LTLB_Time' ) ) {
+            $start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+            $end_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
         }
         ?>
         <div class="wrap ltlb-admin">
@@ -661,9 +661,9 @@ class LTLB_Admin_AppointmentsPage {
                                     $tz_string = ! empty( $appointment['timezone'] ) ? (string) $appointment['timezone'] : ( class_exists( 'LTLB_Time' ) ? LTLB_Time::wp_timezone()->getName() : 'UTC' );
                                     $start_display = (string) ( $appointment['start_at'] ?? '' );
                                     $end_display = (string) ( $appointment['end_at'] ?? '' );
-                                    if ( class_exists( 'LTLB_DateTime' ) ) {
-                                        $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
-                                        $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+                                    if ( class_exists( 'LTLB_Time' ) ) {
+                                        $start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
+                                        $end_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appointment['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $tz_string );
                                     }
                                 ?>
                                     <tr>
@@ -793,4 +793,5 @@ class LTLB_Admin_AppointmentsPage {
 		<?php
 	}
 }
+
 

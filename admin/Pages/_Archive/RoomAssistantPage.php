@@ -111,8 +111,8 @@ class LTLB_Admin_RoomAssistantPage {
 								if ( $appt_tz === '' ) {
 									$appt_tz = LTLB_Time::get_site_timezone_string();
 								}
-								$start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
-								$end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+								$start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
+								$end_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appt['end_at'] ?? '' ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $appt_tz );
 
 								$suggestion = $this->suggest_room( $appt, $guests, $include_pending, $svc_res_repo, $resource_repo, $appt_res_repo );
 								$fit_options = $suggestion['options'] ?? [];
@@ -261,3 +261,4 @@ class LTLB_Admin_RoomAssistantPage {
 		];
 	}
 }
+

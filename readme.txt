@@ -8,83 +8,51 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Professional booking system with dual-mode functionality: Appointments & Hotel/PMS management with premium admin UI.
+Professional booking system for appointment and resource management with premium admin UI.
 
 == Description ==
 
-**LazyBookings** is a comprehensive booking solution that combines the power of appointment scheduling and hotel property management in one elegant plugin. Switch seamlessly between two modes to match your business needs.
+**LazyBookings** is a high-end booking solution for service-based businesses. It provides a seamless, professional experience for both administrators and customers, handling everything from staff schedules to resource allocation.
 
 ### 🎯 Key Features
 
-**Dual Mode System:**
-* **Appointments Mode** - Perfect for studios, clinics, consultants, and service businesses
-* **Hotel Mode** - Complete property management for hotels, B&Bs, and vacation rentals
-
-**Appointments Mode Features:**
-* Service & Staff Management
-* Real-time Calendar with Drag & Drop
-* Customer Relationship Management
-* Email Notifications
-* Availability Rules & Time Slots
-* Resource Allocation
-
-**Hotel Mode Features:**
-* Room Type Management (Beds, Amenities, Occupancy)
-* Booking & Guest Management
-* Check-in/Check-out Dashboard
-* Room Resources & Capacity
-* Housekeeping Status
+* **Service & Staff Management** - Create bookable services and assign them to staff members.
+* **Real-time Calendar** - Interactive calendar with drag & drop rescheduling and quick status edits.
+* **Customer CRM** - Manage your customer database with ease, including booking history and CSV export.
+* **Guided Wizard** - A multi-step booking wizard for your frontend that guides users through the process.
+* **Email Notifications** - Automated confirmation and notification emails for customers and admins.
+* **Resource Allocation** - Manage rooms, equipment, or capacities linked to your services.
 
 **Premium Admin Interface:**
-* Modern SaaS-style UI with 8pt Grid Design
-* Intuitive Dashboards with KPIs & Week-over-Week Trends
-* Multi-step Wizards for Complex Tasks
-* Bulk Actions & CSV Export
-* Pagination & Column Visibility Toggles
-* Recently Viewed Items for Quick Navigation
-* Keyboard Shortcuts (Cmd/Ctrl+K for Search)
+* Modern SaaS-style UI with 8pt Grid Design.
+* Intuitive Dashboards with KPIs & Week-over-Week Trends.
+* Multi-step Wizards for Complex Tasks.
+* Bulk Actions & CSV Export.
+* Pagination & Column Visibility Toggles.
+* Recently Viewed Items for Quick Navigation.
 
 **Developer Friendly:**
-* Repository Pattern Architecture
-* REST API with Nonce Protection
-* Extensible Component Library
-* Comprehensive Error Handling
-* Full WordPress Coding Standards
-
-**Accessibility & i18n:**
-* WCAG 2.1 Level AA Compliant
-* ARIA Labels & Keyboard Navigation
-* Fully Translatable (English base, German ready)
-* Mode-aware Terminology
+* Repository Pattern Architecture.
+* REST API with Nonce Protection.
+* Extensible Component Library.
+* Full WordPress Coding Standards.
 
 ### 🚀 Perfect For
 
+* Yoga & Fitness Studios
 * Medical Practices & Clinics
-* Beauty Salons & Spas
-* Fitness Studios & Gyms
 * Consulting Services
-* Hotels & B&Bs
-* Vacation Rentals
-* Meeting Rooms
-* Equipment Rentals
+* Beauty Salons & Spas
+* Meeting Rooms & Equipment Rentals
 
 == Installation ==
 
 1. Upload the `ltl-bookings` folder to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Navigate to **LazyBookings → Settings** to configure your business mode
-4. Follow the setup wizard to configure your first service or room type
-
-**Minimum Requirements:**
-* WordPress 6.0 or higher
-* PHP 8.1 or higher
-* MySQL 5.6 or higher
+3. Navigate to **LazyBookings → Settings** to configure your options
+4. Follow the setup wizard to configure your first service
 
 == Frequently Asked Questions ==
-
-= Can I switch between Appointments and Hotel mode? =
-
-Yes! You can switch modes at any time from the admin header. Note that switching modes will hide data specific to the current mode (but doesn't delete it).
 
 = Does the plugin work with my theme? =
 
@@ -98,26 +66,17 @@ Yes, the plugin uses customizable templates. Advanced users can override templat
 
 Yes, the plugin includes privacy controls and data retention settings. You can configure automatic deletion of old customer data.
 
-= Can I export customer data? =
-
-Yes, the Customers page includes a CSV export feature with proper nonce protection.
-
 = Does it support multiple languages? =
 
-Yes, the plugin is fully translatable. English is the base language, with German translation ready. You can add more languages via .po/.mo files.
-
-= Can I use it for both appointments and hotel management? =
-
-While the plugin supports both modes, it's designed to operate in one mode at a time. Switching modes changes the entire admin experience.
+Yes, the plugin is fully translatable. English is the base language, with German translation ready.
 
 == Screenshots ==
 
-1. Appointments Dashboard - KPIs and quick actions for daily operations
-2. Calendar View - Drag & drop appointments with status colors
-3. Service/Room Type Wizard - Multi-step form for easy setup
-4. Customers/Guests Management - Pagination, bulk actions, and CSV export
-5. Settings Page - Configure booking rules, email, and design
-6. Hotel Dashboard - Check-ins, check-outs, and occupancy overview
+1. Appointments Dashboard - KPIs and quick actions
+2. Calendar View - Drag & drop appointments
+3. Service Creation Wizard - Multi-step setup
+4. Customer Management - Database with filtering
+5. Settings - Core configuration options
 
 == Changelog ==
 

@@ -116,8 +116,8 @@ class LTLB_Admin_HotelDashboardPage {
                                             if ( $appt_tz === '' ) {
                                                 $appt_tz = LTLB_Time::get_site_timezone_string();
                                             }
-                                            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['start_at'] ?? '' ), get_option('date_format'), $appt_tz );
-                                            $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $b['end_at'] ?? '' ), get_option('date_format'), $appt_tz );
+                                            $start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $b['start_at'] ?? '' ), get_option('date_format'), $appt_tz );
+                                            $end_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $b['end_at'] ?? '' ), get_option('date_format'), $appt_tz );
                                         ?>
                                             <tr>
                                                 <td><?php echo esc_html( $cust_name ); ?></td>
@@ -316,3 +316,4 @@ class LTLB_Admin_HotelDashboardPage {
         <?php
     }
 }
+

@@ -159,7 +159,8 @@ class LTLB_Admin_Header {
 					</div>
 				</a>
 
-				<!-- Mode Switcher -->
+				<!-- Mode Switcher (Disabled for MVP) -->
+				<!--
 				<div class="ltlb-header__mode-switch" role="tablist" aria-label="<?php echo esc_attr__( 'Booking Mode', 'ltl-bookings' ); ?>">
 					<a href="<?php echo esc_url(add_query_arg(['page' => $current_page, 'ltlb_template_mode' => 'service'])); ?>" 
 					   class="ltlb-mode-switch__btn <?php echo $template_mode === 'service' ? 'is-active' : ''; ?>"
@@ -176,6 +177,7 @@ class LTLB_Admin_Header {
 						<?php echo esc_html__('Hotel', 'ltl-bookings'); ?>
 					</a>
 				</div>
+				-->
 
 				<!-- Actions Bar -->
 				<div class="ltlb-header__actions">

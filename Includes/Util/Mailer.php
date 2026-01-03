@@ -130,15 +130,15 @@ class LTLB_Mailer {
 
         $start_display = $start_at;
         $end_display = $end_at;
-        if ( class_exists( 'LTLB_DateTime' ) ) {
-            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( $start_at, $date_time_format, $tz_string );
+        if ( class_exists( 'LTLB_Time' ) ) {
+            $start_display = LTLB_Time::format_local_display_from_utc_mysql( $start_at, $date_time_format, $tz_string );
             // For end, include date if it differs (e.g. hotel stays), otherwise time only.
-            $end_local_dt = LTLB_DateTime::utc_mysql_to_local_dt( $end_at, $tz_string );
-            $start_local_dt = LTLB_DateTime::utc_mysql_to_local_dt( $start_at, $tz_string );
+            $end_local_dt = LTLB_Time::utc_mysql_to_local_dt( $end_at, $tz_string );
+            $start_local_dt = LTLB_Time::utc_mysql_to_local_dt( $start_at, $tz_string );
             if ( $start_local_dt && $end_local_dt && $start_local_dt->format( 'Y-m-d' ) === $end_local_dt->format( 'Y-m-d' ) ) {
                 $end_display = function_exists( 'wp_date' ) ? wp_date( $time_format, $end_local_dt->getTimestamp(), $end_local_dt->getTimezone() ) : $end_local_dt->format( $time_format );
             } else {
-                $end_display = LTLB_DateTime::format_local_display_from_utc_mysql( $end_at, $date_time_format, $tz_string );
+                $end_display = LTLB_Time::format_local_display_from_utc_mysql( $end_at, $date_time_format, $tz_string );
             }
         }
 
@@ -193,3 +193,4 @@ class LTLB_Mailer {
         return $results;
     }
 }
+

@@ -1,3 +1,1645 @@
+﻿/**
+ * LazyBookings Design System - Tokens
+ * Version: 2.0.0
+ * 
+ * Foundation layer: All design tokens as CSS custom properties.
+ * DO NOT add component-specific styles here.
+ */
+
+:root {
+  /* ===== BRAND COLORS ===== */
+  
+  /* Primary (WP Admin Blue) */
+  --ltlb-primary: #2271b1;
+  --ltlb-primary-hover: #135e96;
+  --ltlb-primary-active: #0a3e5f;
+  
+  /* Accent (Lazy Yellow) */
+  --ltlb-accent: #ffcc00;
+  --ltlb-accent-hover: #e6b800;
+  --ltlb-accent-active: #cc9900;
+  
+  /* ===== SEMANTIC COLORS ===== */
+  
+  /* Success (Green) */
+  --ltlb-success: #2ea44f;
+  --ltlb-success-bg: #d1f4e0;
+  --ltlb-success-border: #81d49d;
+  --ltlb-success-hover: #2a8f47;
+  
+  /* Warning (Orange) */
+  --ltlb-warning: #fb8500;
+  --ltlb-warning-bg: #fff3cd;
+  --ltlb-warning-border: #ffca6b;
+  --ltlb-warning-hover: #e07700;
+  
+  /* Danger (Red) */
+  --ltlb-danger: #d1242f;
+  --ltlb-danger-bg: #ffdddf;
+  --ltlb-danger-border: #f98080;
+  --ltlb-danger-hover: #b01f29;
+  
+  /* Info (Blue) */
+  --ltlb-info: #0969da;
+  --ltlb-info-bg: #d8edff;
+  --ltlb-info-border: #61b7ff;
+  --ltlb-info-hover: #0757ba;
+  
+  /* ===== NEUTRAL COLORS (Light Mode) ===== */
+  
+  /* Backgrounds */
+  --ltlb-bg-primary: #ffffff;
+  --ltlb-bg-secondary: #f9f9f9;
+  --ltlb-bg-tertiary: #f4f4f4;
+  --ltlb-bg-inverse: #1d2327;
+  
+  /* Text */
+  --ltlb-text-primary: #1d2327;
+  --ltlb-text-secondary: #646970;
+  --ltlb-text-tertiary: #999999;
+  --ltlb-text-muted: #b4b9be;
+  --ltlb-text-inverse: #ffffff;
+  
+  /* Borders */
+  --ltlb-border-light: rgba(0, 0, 0, 0.06);
+  --ltlb-border-medium: rgba(0, 0, 0, 0.1);
+  --ltlb-border-strong: #ccd0d4;
+  
+  /* ===== SPACING (4px Grid) ===== */
+  
+  --ltlb-space-0: 0;
+  --ltlb-space-1: 4px;
+  --ltlb-space-2: 8px;
+  --ltlb-space-3: 12px;
+  --ltlb-space-4: 16px;
+  --ltlb-space-5: 20px;
+  --ltlb-space-6: 24px;
+  --ltlb-space-7: 28px;
+  --ltlb-space-8: 32px;
+  --ltlb-space-10: 40px;
+  --ltlb-space-12: 48px;
+  --ltlb-space-16: 64px;
+  --ltlb-space-20: 80px;
+  --ltlb-space-24: 96px;
+  
+  /* ===== BORDER RADIUS ===== */
+  
+  --ltlb-radius-none: 0;
+  --ltlb-radius-sm: 4px;
+  --ltlb-radius-md: 6px;
+  --ltlb-radius-lg: 8px;
+  --ltlb-radius-xl: 12px;
+  --ltlb-radius-2xl: 16px;
+  --ltlb-radius-full: 9999px;
+  
+  /* ===== SHADOWS ===== */
+  
+  --ltlb-shadow-none: none;
+  --ltlb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --ltlb-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --ltlb-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --ltlb-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --ltlb-shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.20);
+  
+  /* Focus Ring */
+  --ltlb-focus-ring: 0 0 0 3px rgba(34, 113, 177, 0.25);
+  --ltlb-focus-ring-danger: 0 0 0 3px rgba(209, 36, 47, 0.25);
+  
+  /* ===== TYPOGRAPHY ===== */
+  
+  /* Font Families */
+  --ltlb-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ltlb-font-mono: 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  
+  /* Font Sizes */
+  --ltlb-text-xs: 0.75rem;      /* 12px */
+  --ltlb-text-sm: 0.875rem;     /* 14px */
+  --ltlb-text-base: 1rem;       /* 16px */
+  --ltlb-text-lg: 1.125rem;     /* 18px */
+  --ltlb-text-xl: 1.25rem;      /* 20px */
+  --ltlb-text-2xl: 1.5rem;      /* 24px */
+  --ltlb-text-3xl: 1.875rem;    /* 30px */
+  --ltlb-text-4xl: 2.25rem;     /* 36px */
+  
+  /* Font Weights */
+  --ltlb-font-normal: 400;
+  --ltlb-font-medium: 500;
+  --ltlb-font-semibold: 600;
+  --ltlb-font-bold: 700;
+  --ltlb-font-extrabold: 800;
+  
+  /* Line Heights */
+  --ltlb-leading-none: 1;
+  --ltlb-leading-tight: 1.2;
+  --ltlb-leading-snug: 1.375;
+  --ltlb-leading-normal: 1.5;
+  --ltlb-leading-relaxed: 1.75;
+  --ltlb-leading-loose: 2;
+  
+  /* Letter Spacing */
+  --ltlb-tracking-tighter: -0.05em;
+  --ltlb-tracking-tight: -0.025em;
+  --ltlb-tracking-normal: 0;
+  --ltlb-tracking-wide: 0.025em;
+  --ltlb-tracking-wider: 0.05em;
+  --ltlb-tracking-widest: 0.1em;
+  
+  /* ===== ANIMATION ===== */
+  
+  --ltlb-transition-fast: 150ms;
+  --ltlb-transition-base: 200ms;
+  --ltlb-transition-slow: 300ms;
+  --ltlb-transition-slower: 500ms;
+  
+  --ltlb-ease-linear: linear;
+  --ltlb-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ltlb-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ltlb-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* ===== Z-INDEX LAYERS ===== */
+  
+  --ltlb-z-base: 0;
+  --ltlb-z-dropdown: 1000;
+  --ltlb-z-sticky: 1100;
+  --ltlb-z-fixed: 1200;
+  --ltlb-z-modal-backdrop: 1300;
+  --ltlb-z-modal: 1400;
+  --ltlb-z-popover: 1500;
+  --ltlb-z-toast: 1600;
+  
+  /* ===== BREAKPOINTS (for reference) ===== */
+  
+  --ltlb-breakpoint-sm: 640px;
+  --ltlb-breakpoint-md: 768px;
+  --ltlb-breakpoint-lg: 1024px;
+  --ltlb-breakpoint-xl: 1280px;
+  --ltlb-breakpoint-2xl: 1536px;
+}
+
+/* ===== DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds */
+    --ltlb-bg-primary: #1e1e1e;
+    --ltlb-bg-secondary: #2a2a2a;
+    --ltlb-bg-tertiary: #333333;
+    --ltlb-bg-inverse: #ffffff;
+    
+    /* Text */
+    --ltlb-text-primary: #e4e4e4;
+    --ltlb-text-secondary: #b4b4b4;
+    --ltlb-text-tertiary: #888888;
+    --ltlb-text-muted: #6b6b6b;
+    --ltlb-text-inverse: #1d2327;
+    
+    /* Borders */
+    --ltlb-border-light: rgba(255, 255, 255, 0.08);
+    --ltlb-border-medium: rgba(255, 255, 255, 0.15);
+    --ltlb-border-strong: rgba(255, 255, 255, 0.2);
+    
+    /* Primary (lighter for dark bg) */
+    --ltlb-primary: #4a9eff;
+    --ltlb-primary-hover: #6bb0ff;
+    --ltlb-primary-active: #8dc2ff;
+    
+    /* Shadows (darker in dark mode) */
+    --ltlb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --ltlb-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --ltlb-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --ltlb-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --ltlb-shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.7);
+    
+    /* Focus Ring */
+    --ltlb-focus-ring: 0 0 0 3px rgba(74, 158, 255, 0.4);
+  }
+}
+
+/* ===== LEGACY ALIASES (DEPRECATED) ===== */
+/* These will be removed in v3.0.0 */
+/* Use --ltlb-* tokens instead */
+
+:root {
+  /* Colors */
+  --lazy-primary: var(--ltlb-primary);
+  --lazy-primary-hover: var(--ltlb-primary-hover);
+  --lazy-accent: var(--ltlb-accent);
+  --lazy-accent-hover: var(--ltlb-accent-hover);
+  
+  --lazy-bg: var(--ltlb-bg-primary);
+  --lazy-bg-primary: var(--ltlb-bg-primary);
+  --lazy-bg-secondary: var(--ltlb-bg-secondary);
+  --lazy-bg-tertiary: var(--ltlb-bg-tertiary);
+  --lazy-panel-bg: var(--ltlb-bg-primary);
+  
+  --lazy-text: var(--ltlb-text-primary);
+  --lazy-text-primary: var(--ltlb-text-primary);
+  --lazy-text-secondary: var(--ltlb-text-secondary);
+  --lazy-text-muted: var(--ltlb-text-muted);
+  
+  --lazy-border-color: var(--ltlb-border-strong);
+  --lazy-border-light: var(--ltlb-border-light);
+  --lazy-border-medium: var(--ltlb-border-medium);
+  --lazy-border-strong: var(--ltlb-border-strong);
+  
+  /* Spacing */
+  --lazy-space-2: var(--ltlb-space-1);
+  --lazy-space-4: var(--ltlb-space-1);
+  --lazy-space-5: var(--ltlb-space-1);
+  --lazy-space-6: var(--ltlb-space-2);
+  --lazy-space-8: var(--ltlb-space-2);
+  --lazy-space-10: var(--ltlb-space-2);
+  --lazy-space-12: var(--ltlb-space-3);
+  --lazy-space-14: var(--ltlb-space-3);
+  --lazy-space-15: var(--ltlb-space-4);
+  --lazy-space-16: var(--ltlb-space-4);
+  --lazy-space-20: var(--ltlb-space-5);
+  --lazy-space-24: var(--ltlb-space-6);
+  --lazy-space-40: var(--ltlb-space-10);
+  
+  /* Spacing (frontend) */
+  --lazy-space-xxs: var(--ltlb-space-1);
+  --lazy-space-xs: var(--ltlb-space-2);
+  --lazy-space-sm: var(--ltlb-space-3);
+  --lazy-space-md: var(--ltlb-space-4);
+  --lazy-space-lg: var(--ltlb-space-5);
+  --lazy-space-xl: var(--ltlb-space-6);
+  --lazy-space-2xl: var(--ltlb-space-8);
+  
+  /* Radius */
+  --lazy-border-radius: var(--ltlb-radius-lg);
+  
+  /* Shadows */
+  --lazy-shadow-sm: var(--ltlb-shadow-sm);
+  --lazy-shadow-md: var(--ltlb-shadow-md);
+  --lazy-shadow-container: var(--ltlb-shadow-md);
+  --lazy-shadow-button: var(--ltlb-shadow-sm);
+  --lazy-shadow-input: var(--ltlb-shadow-sm);
+  --lazy-shadow-card: var(--ltlb-shadow-sm);
+  
+  /* Animation */
+  --lazy-transition-duration: var(--ltlb-transition-base);
+}
+/**
+ * LazyBookings Design System - Base Styles
+ * Version: 2.0.0
+ * 
+ * Normalize, typography, focus management, and basic utilities.
+ */
+
+/* ===== BOX SIZING RESET ===== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ===== FOCUS MANAGEMENT ===== */
+
+/* Remove default outline, use modern :focus-visible */
+*:focus {
+  outline: none;
+}
+
+/* Keyboard-only focus indicator */
+*:focus-visible {
+  outline: 2px solid var(--ltlb-primary);
+  outline-offset: 2px;
+}
+
+/* Ensure focus is visible in high-contrast mode */
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+/* ===== TYPOGRAPHY BASE ===== */
+
+.ltlb-admin,
+.ltlb-booking,
+.ltlb-booking-wizard {
+  font-family: var(--ltlb-font-sans);
+  font-size: var(--ltlb-text-base);
+  line-height: var(--ltlb-leading-normal);
+  color: var(--ltlb-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== HEADINGS ===== */
+
+.ltlb-h1,
+.ltlb-admin h1,
+.ltlb-booking h1 {
+  font-size: var(--ltlb-text-3xl);
+  font-weight: var(--ltlb-font-extrabold);
+  line-height: var(--ltlb-leading-tight);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-5) 0;
+}
+
+.ltlb-h2,
+.ltlb-admin h2,
+.ltlb-booking h2 {
+  font-size: var(--ltlb-text-2xl);
+  font-weight: var(--ltlb-font-bold);
+  line-height: var(--ltlb-leading-tight);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+.ltlb-h3,
+.ltlb-admin h3,
+.ltlb-booking h3 {
+  font-size: var(--ltlb-text-xl);
+  font-weight: var(--ltlb-font-bold);
+  line-height: var(--ltlb-leading-snug);
+  letter-spacing: var(--ltlb-tracking-tight);
+  margin: 0 0 var(--ltlb-space-3) 0;
+}
+
+.ltlb-h4,
+.ltlb-admin h4,
+.ltlb-booking h4 {
+  font-size: var(--ltlb-text-lg);
+  font-weight: var(--ltlb-font-semibold);
+  line-height: var(--ltlb-leading-snug);
+  margin: 0 0 var(--ltlb-space-3) 0;
+}
+
+/* ===== PARAGRAPHS & LISTS ===== */
+
+.ltlb-admin p,
+.ltlb-booking p {
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+.ltlb-admin ul,
+.ltlb-admin ol,
+.ltlb-booking ul,
+.ltlb-booking ol {
+  margin: 0 0 var(--ltlb-space-4) 0;
+  padding-left: var(--ltlb-space-6);
+}
+
+.ltlb-admin li,
+.ltlb-booking li {
+  margin-bottom: var(--ltlb-space-2);
+}
+
+/* ===== LINKS ===== */
+
+.ltlb-admin a,
+.ltlb-booking a {
+  color: var(--ltlb-primary);
+  text-decoration: none;
+  transition: color var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-admin a:hover,
+.ltlb-booking a:hover {
+  color: var(--ltlb-primary-hover);
+  text-decoration: underline;
+}
+
+/* ===== CODE ===== */
+
+.ltlb-admin code,
+.ltlb-booking code {
+  font-family: var(--ltlb-font-mono);
+  font-size: 0.875em;
+  background: var(--ltlb-bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--ltlb-radius-sm);
+  border: 1px solid var(--ltlb-border-light);
+}
+
+.ltlb-admin pre,
+.ltlb-booking pre {
+  font-family: var(--ltlb-font-mono);
+  font-size: var(--ltlb-text-sm);
+  background: var(--ltlb-bg-tertiary);
+  padding: var(--ltlb-space-4);
+  border-radius: var(--ltlb-radius-md);
+  border: 1px solid var(--ltlb-border-medium);
+  overflow-x: auto;
+  margin: 0 0 var(--ltlb-space-4) 0;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Text Alignment */
+.ltlb-text-left { text-align: left; }
+.ltlb-text-center { text-align: center; }
+.ltlb-text-right { text-align: right; }
+
+/* Font Weights */
+.ltlb-font-normal { font-weight: var(--ltlb-font-normal); }
+.ltlb-font-medium { font-weight: var(--ltlb-font-medium); }
+.ltlb-font-semibold { font-weight: var(--ltlb-font-semibold); }
+.ltlb-font-bold { font-weight: var(--ltlb-font-bold); }
+
+/* Text Colors */
+.ltlb-text-primary { color: var(--ltlb-text-primary); }
+.ltlb-text-secondary { color: var(--ltlb-text-secondary); }
+.ltlb-text-muted { color: var(--ltlb-text-muted); }
+.ltlb-text-success { color: var(--ltlb-success); }
+.ltlb-text-warning { color: var(--ltlb-warning); }
+.ltlb-text-danger { color: var(--ltlb-danger); }
+.ltlb-text-info { color: var(--ltlb-info); }
+
+/* Display */
+.ltlb-block { display: block; }
+.ltlb-inline-block { display: inline-block; }
+.ltlb-inline { display: inline; }
+.ltlb-flex { display: flex; }
+.ltlb-inline-flex { display: inline-flex; }
+.ltlb-grid { display: grid; }
+.ltlb-hidden { display: none; }
+
+/* Visibility (for SR-only) */
+.ltlb-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Margin Utilities */
+.ltlb-m-0 { margin: 0; }
+.ltlb-mt-2 { margin-top: var(--ltlb-space-2); }
+.ltlb-mt-4 { margin-top: var(--ltlb-space-4); }
+.ltlb-mt-6 { margin-top: var(--ltlb-space-6); }
+.ltlb-mb-2 { margin-bottom: var(--ltlb-space-2); }
+.ltlb-mb-4 { margin-bottom: var(--ltlb-space-4); }
+.ltlb-mb-6 { margin-bottom: var(--ltlb-space-6); }
+.ltlb-ml-2 { margin-left: var(--ltlb-space-2); }
+.ltlb-mr-2 { margin-right: var(--ltlb-space-2); }
+
+/* Padding Utilities */
+.ltlb-p-0 { padding: 0; }
+.ltlb-p-2 { padding: var(--ltlb-space-2); }
+.ltlb-p-4 { padding: var(--ltlb-space-4); }
+.ltlb-p-6 { padding: var(--ltlb-space-6); }
+
+/* Gap (for flex/grid) */
+.ltlb-gap-2 { gap: var(--ltlb-space-2); }
+.ltlb-gap-4 { gap: var(--ltlb-space-4); }
+.ltlb-gap-6 { gap: var(--ltlb-space-6); }
+
+/* Responsive Utilities */
+@media (max-width: 767px) {
+  .ltlb-hidden-mobile { display: none; }
+}
+
+@media (min-width: 768px) {
+  .ltlb-hidden-desktop { display: none; }
+}
+/**
+ * LazyBookings Design System - Components
+ * Version: 2.0.0
+ * 
+ * Reusable UI components: buttons, badges, alerts, cards, forms, tables, etc.
+ */
+
+/* ===== BUTTONS ===== */
+
+.ltlb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ltlb-space-2);
+  padding: var(--ltlb-space-2) var(--ltlb-space-4);
+  border: 2px solid transparent;
+  border-radius: var(--ltlb-radius-md);
+  font-family: var(--ltlb-font-sans);
+  font-size: var(--ltlb-text-base);
+  font-weight: var(--ltlb-font-semibold);
+  line-height: var(--ltlb-leading-tight);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.ltlb-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ltlb-focus-ring);
+}
+
+.ltlb-btn:disabled,
+.ltlb-btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ltlb-btn.is-loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.ltlb-btn.is-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: ltlb-spin 600ms linear infinite;
+}
+
+/* Button Variants */
+
+.ltlb-btn--primary {
+  background: var(--ltlb-primary);
+  color: var(--ltlb-text-inverse);
+  border-color: var(--ltlb-primary);
+  box-shadow: var(--ltlb-shadow-sm);
+}
+
+.ltlb-btn--primary:hover:not(:disabled):not(.is-disabled):not(.is-loading) {
+  background: var(--ltlb-primary-hover);
+  border-color: var(--ltlb-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--ltlb-shadow-md);
+}
+
+.ltlb-btn--primary:active:not(:disabled):not(.is-disabled):not(.is-loading) {
+  transform: translateY(0);
+  box-shadow: var(--ltlb-shadow-sm);
+}
+
+.ltlb-btn--secondary {
+  background: transparent;
+  color: var(--ltlb-primary);
+  border-color: var(--ltlb-primary);
+}
+
+.ltlb-btn--secondary:hover:not(:disabled):not(.is-disabled):not(.is-loading) {
+  background: var(--ltlb-primary);
+  color: var(--ltlb-text-inverse);
+  transform: translateY(-1px);
+}
+
+.ltlb-btn--ghost {
+  background: transparent;
+  color: var(--ltlb-text-secondary);
+  border-color: transparent;
+}
+
+.ltlb-btn--ghost:hover:not(:disabled):not(.is-disabled):not(.is-loading) {
+  background: var(--ltlb-bg-tertiary);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-btn--danger {
+  background: var(--ltlb-danger);
+  color: var(--ltlb-text-inverse);
+  border-color: var(--ltlb-danger);
+  box-shadow: var(--ltlb-shadow-sm);
+}
+
+.ltlb-btn--danger:hover:not(:disabled):not(.is-disabled):not(.is-loading) {
+  background: var(--ltlb-danger-hover);
+  border-color: var(--ltlb-danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--ltlb-shadow-md);
+}
+
+.ltlb-btn--danger:focus-visible {
+  box-shadow: var(--ltlb-focus-ring-danger);
+}
+
+/* Button Sizes */
+
+.ltlb-btn--sm,
+.ltlb-btn--small {
+  padding: var(--ltlb-space-1) var(--ltlb-space-3);
+  font-size: var(--ltlb-text-sm);
+}
+
+.ltlb-btn--lg,
+.ltlb-btn--large {
+  padding: var(--ltlb-space-3) var(--ltlb-space-6);
+  font-size: var(--ltlb-text-lg);
+}
+
+/* Full Width */
+.ltlb-btn--full {
+  width: 100%;
+}
+
+/* Icon-only button (square) */
+.ltlb-btn--icon {
+  padding: var(--ltlb-space-2);
+  aspect-ratio: 1;
+}
+
+/* ===== BADGES ===== */
+
+.ltlb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ltlb-space-1);
+  padding: var(--ltlb-space-1) var(--ltlb-space-2);
+  border-radius: var(--ltlb-radius-full);
+  font-size: var(--ltlb-text-xs);
+  font-weight: var(--ltlb-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--ltlb-tracking-wide);
+  line-height: var(--ltlb-leading-none);
+  white-space: nowrap;
+}
+
+.ltlb-badge--success {
+  background: var(--ltlb-success-bg);
+  color: var(--ltlb-success);
+  border: 1px solid var(--ltlb-success-border);
+}
+
+.ltlb-badge--warning {
+  background: var(--ltlb-warning-bg);
+  color: var(--ltlb-warning);
+  border: 1px solid var(--ltlb-warning-border);
+}
+
+.ltlb-badge--danger {
+  background: var(--ltlb-danger-bg);
+  color: var(--ltlb-danger);
+  border: 1px solid var(--ltlb-danger-border);
+}
+
+.ltlb-badge--info {
+  background: var(--ltlb-info-bg);
+  color: var(--ltlb-info);
+  border: 1px solid var(--ltlb-info-border);
+}
+
+.ltlb-badge--neutral {
+  background: var(--ltlb-bg-tertiary);
+  color: var(--ltlb-text-secondary);
+  border: 1px solid var(--ltlb-border-medium);
+}
+
+/* ===== ALERTS ===== */
+
+.ltlb-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ltlb-space-3);
+  padding: var(--ltlb-space-3) var(--ltlb-space-4);
+  border-radius: var(--ltlb-radius-md);
+  border-left: 4px solid transparent;
+  font-size: var(--ltlb-text-sm);
+  line-height: var(--ltlb-leading-normal);
+}
+
+.ltlb-alert__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.ltlb-alert__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ltlb-alert__title {
+  font-weight: var(--ltlb-font-semibold);
+  margin-bottom: var(--ltlb-space-1);
+}
+
+.ltlb-alert--success {
+  background: var(--ltlb-success-bg);
+  border-left-color: var(--ltlb-success);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-alert--warning {
+  background: var(--ltlb-warning-bg);
+  border-left-color: var(--ltlb-warning);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-alert--danger {
+  background: var(--ltlb-danger-bg);
+  border-left-color: var(--ltlb-danger);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-alert--info {
+  background: var(--ltlb-info-bg);
+  border-left-color: var(--ltlb-info);
+  color: var(--ltlb-text-primary);
+}
+
+/* ===== CARDS ===== */
+
+.ltlb-card {
+  background: var(--ltlb-bg-primary);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-lg);
+  padding: var(--ltlb-space-5);
+  box-shadow: var(--ltlb-shadow-sm);
+  transition: box-shadow var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-card:focus-within {
+  box-shadow: var(--ltlb-shadow-md);
+}
+
+.ltlb-card--elevated {
+  box-shadow: var(--ltlb-shadow-md);
+}
+
+.ltlb-card--elevated:hover {
+  box-shadow: var(--ltlb-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.ltlb-card--flat {
+  box-shadow: none;
+}
+
+.ltlb-card__header {
+  margin-bottom: var(--ltlb-space-4);
+  padding-bottom: var(--ltlb-space-3);
+  border-bottom: 1px solid var(--ltlb-border-light);
+}
+
+.ltlb-card__title {
+  font-size: var(--ltlb-text-lg);
+  font-weight: var(--ltlb-font-bold);
+  color: var(--ltlb-text-primary);
+  margin: 0;
+}
+
+.ltlb-card__body {
+  margin: 0;
+}
+
+.ltlb-card__footer {
+  margin-top: var(--ltlb-space-4);
+  padding-top: var(--ltlb-space-3);
+  border-top: 1px solid var(--ltlb-border-light);
+}
+
+/* ===== FORMS ===== */
+
+.ltlb-form-group {
+  margin-bottom: var(--ltlb-space-4);
+}
+
+.ltlb-label {
+  display: block;
+  margin-bottom: var(--ltlb-space-2);
+  font-size: var(--ltlb-text-sm);
+  font-weight: var(--ltlb-font-semibold);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-label--required::after {
+  content: '*';
+  color: var(--ltlb-danger);
+  margin-left: var(--ltlb-space-1);
+}
+
+.ltlb-input,
+.ltlb-select,
+.ltlb-textarea {
+  display: block;
+  width: 100%;
+  padding: var(--ltlb-space-2) var(--ltlb-space-3);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-md);
+  background: var(--ltlb-bg-primary);
+  color: var(--ltlb-text-primary);
+  font-family: var(--ltlb-font-sans);
+  font-size: var(--ltlb-text-base);
+  line-height: var(--ltlb-leading-normal);
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-input:focus-visible,
+.ltlb-select:focus-visible,
+.ltlb-textarea:focus-visible {
+  outline: none;
+  border-color: var(--ltlb-primary);
+  box-shadow: var(--ltlb-focus-ring);
+}
+
+.ltlb-input:disabled,
+.ltlb-select:disabled,
+.ltlb-textarea:disabled {
+  background: var(--ltlb-bg-tertiary);
+  color: var(--ltlb-text-muted);
+  cursor: not-allowed;
+}
+
+.ltlb-input.has-error,
+.ltlb-select.has-error,
+.ltlb-textarea.has-error {
+  border-color: var(--ltlb-danger);
+}
+
+.ltlb-input.has-error:focus-visible,
+.ltlb-select.has-error:focus-visible,
+.ltlb-textarea.has-error:focus-visible {
+  box-shadow: var(--ltlb-focus-ring-danger);
+}
+
+.ltlb-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.ltlb-help-text {
+  display: block;
+  margin-top: var(--ltlb-space-1);
+  font-size: var(--ltlb-text-xs);
+  color: var(--ltlb-text-secondary);
+  line-height: var(--ltlb-leading-normal);
+}
+
+.ltlb-error-text {
+  display: block;
+  margin-top: var(--ltlb-space-1);
+  font-size: var(--ltlb-text-xs);
+  color: var(--ltlb-danger);
+  font-weight: var(--ltlb-font-medium);
+}
+
+/* Checkbox & Radio */
+
+.ltlb-checkbox,
+.ltlb-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ltlb-space-2);
+  cursor: pointer;
+}
+
+.ltlb-checkbox input[type="checkbox"],
+.ltlb-radio input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ===== TABLES ===== */
+
+.ltlb-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ltlb-bg-primary);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-lg);
+  overflow: hidden;
+}
+
+.ltlb-table thead {
+  background: var(--ltlb-bg-secondary);
+}
+
+.ltlb-table th {
+  padding: var(--ltlb-space-3) var(--ltlb-space-4);
+  text-align: left;
+  font-size: var(--ltlb-text-sm);
+  font-weight: var(--ltlb-font-semibold);
+  color: var(--ltlb-text-secondary);
+  border-bottom: 1px solid var(--ltlb-border-medium);
+}
+
+.ltlb-table td {
+  padding: var(--ltlb-space-3) var(--ltlb-space-4);
+  font-size: var(--ltlb-text-sm);
+  color: var(--ltlb-text-primary);
+  border-bottom: 1px solid var(--ltlb-border-light);
+}
+
+.ltlb-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ltlb-table--striped tbody tr:nth-child(even) {
+  background: var(--ltlb-bg-secondary);
+}
+
+.ltlb-table--hoverable tbody tr {
+  transition: background var(--ltlb-transition-fast) var(--ltlb-ease-out);
+  cursor: pointer;
+}
+
+.ltlb-table--hoverable tbody tr:hover {
+  background: var(--ltlb-bg-tertiary);
+}
+
+.ltlb-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--ltlb-radius-lg);
+}
+
+/* ===== EMPTY STATES ===== */
+
+.ltlb-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ltlb-space-12) var(--ltlb-space-6);
+  text-align: center;
+}
+
+.ltlb-empty-state__icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--ltlb-space-4);
+  opacity: 0.3;
+  color: var(--ltlb-text-secondary);
+}
+
+.ltlb-empty-state__title {
+  font-size: var(--ltlb-text-xl);
+  font-weight: var(--ltlb-font-bold);
+  color: var(--ltlb-text-primary);
+  margin: 0 0 var(--ltlb-space-2) 0;
+}
+
+.ltlb-empty-state__description {
+  font-size: var(--ltlb-text-base);
+  color: var(--ltlb-text-secondary);
+  max-width: 460px;
+  margin: 0 0 var(--ltlb-space-5) 0;
+  line-height: var(--ltlb-leading-relaxed);
+}
+
+.ltlb-empty-state__action {
+  margin-top: var(--ltlb-space-4);
+}
+
+/* ===== SPINNERS ===== */
+
+.ltlb-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--ltlb-border-medium);
+  border-top-color: var(--ltlb-primary);
+  border-radius: 50%;
+  animation: ltlb-spin 600ms linear infinite;
+}
+
+.ltlb-spinner--sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.ltlb-spinner--lg {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+}
+
+@keyframes ltlb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== TOOLTIPS ===== */
+
+.ltlb-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.ltlb-tooltip__trigger {
+  cursor: help;
+}
+
+.ltlb-tooltip__content {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: var(--ltlb-space-2) var(--ltlb-space-3);
+  background: var(--ltlb-bg-inverse);
+  color: var(--ltlb-text-inverse);
+  font-size: var(--ltlb-text-xs);
+  line-height: var(--ltlb-leading-normal);
+  border-radius: var(--ltlb-radius-md);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ltlb-transition-base) var(--ltlb-ease-out);
+  z-index: var(--ltlb-z-popover);
+}
+
+.ltlb-tooltip:hover .ltlb-tooltip__content,
+.ltlb-tooltip__trigger:focus-visible + .ltlb-tooltip__content {
+  opacity: 1;
+}
+
+/* ===== PAGINATION ===== */
+
+.ltlb-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ltlb-space-2);
+  padding: var(--ltlb-space-4) 0;
+}
+
+.ltlb-pagination__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 var(--ltlb-space-2);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-md);
+  background: var(--ltlb-bg-primary);
+  color: var(--ltlb-text-primary);
+  font-size: var(--ltlb-text-sm);
+  font-weight: var(--ltlb-font-medium);
+  text-decoration: none;
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+  cursor: pointer;
+}
+
+.ltlb-pagination__item:hover:not(.is-active):not(:disabled) {
+  background: var(--ltlb-bg-tertiary);
+  border-color: var(--ltlb-border-strong);
+}
+
+.ltlb-pagination__item.is-active {
+  background: var(--ltlb-primary);
+  color: var(--ltlb-text-inverse);
+  border-color: var(--ltlb-primary);
+  cursor: default;
+}
+
+.ltlb-pagination__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== MODAL (BASIC) ===== */
+
+.ltlb-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--ltlb-z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ltlb-space-4);
+}
+
+.ltlb-modal {
+  background: var(--ltlb-bg-primary);
+  border-radius: var(--ltlb-radius-xl);
+  box-shadow: var(--ltlb-shadow-2xl);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  z-index: var(--ltlb-z-modal);
+}
+
+.ltlb-modal__header {
+  padding: var(--ltlb-space-5) var(--ltlb-space-6);
+  border-bottom: 1px solid var(--ltlb-border-light);
+}
+
+.ltlb-modal__title {
+  font-size: var(--ltlb-text-xl);
+  font-weight: var(--ltlb-font-bold);
+  margin: 0;
+}
+
+.ltlb-modal__body {
+  padding: var(--ltlb-space-6);
+}
+
+.ltlb-modal__footer {
+  padding: var(--ltlb-space-5) var(--ltlb-space-6);
+  border-top: 1px solid var(--ltlb-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ltlb-space-3);
+}
+/**
+ * LazyBookings Design System - Layout Patterns
+ * Version: 2.0.0
+ * 
+ * Reusable layout structures for admin and frontend pages.
+ */
+
+/* ===== PAGE HEADER (Admin) ===== */
+
+.ltlb-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ltlb-space-4);
+  margin-bottom: var(--ltlb-space-6);
+  padding: var(--ltlb-space-5) var(--ltlb-space-6);
+  background: var(--ltlb-bg-primary);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-lg);
+  box-shadow: var(--ltlb-shadow-sm);
+}
+
+.ltlb-page-header__breadcrumb {
+  font-size: var(--ltlb-text-sm);
+  color: var(--ltlb-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--ltlb-space-2);
+  flex-wrap: wrap;
+}
+
+.ltlb-page-header__breadcrumb a {
+  color: var(--ltlb-primary);
+  text-decoration: none;
+  transition: color var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-page-header__breadcrumb a:hover {
+  color: var(--ltlb-primary-hover);
+  text-decoration: underline;
+}
+
+.ltlb-page-header__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.ltlb-page-header__title h1 {
+  font-size: var(--ltlb-text-3xl);
+  font-weight: var(--ltlb-font-extrabold);
+  color: var(--ltlb-text-primary);
+  margin: 0;
+  line-height: var(--ltlb-leading-tight);
+  letter-spacing: var(--ltlb-tracking-tight);
+}
+
+.ltlb-page-header__actions {
+  display: flex;
+  gap: var(--ltlb-space-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .ltlb-page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .ltlb-page-header__breadcrumb {
+    position: absolute;
+    top: var(--ltlb-space-5);
+  }
+  
+  .ltlb-page-header__actions {
+    flex-wrap: nowrap;
+  }
+}
+
+/* ===== SETTINGS LAYOUT (Two-Column) ===== */
+
+.ltlb-settings-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ltlb-space-6);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .ltlb-settings-layout {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ltlb-settings-layout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+.ltlb-settings-sidebar {
+  position: sticky;
+  top: var(--ltlb-space-6);
+}
+
+@media (max-width: 767px) {
+  .ltlb-settings-sidebar {
+    position: static;
+  }
+}
+
+.ltlb-settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ltlb-space-1);
+}
+
+@media (max-width: 767px) {
+  .ltlb-settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--ltlb-space-2);
+  }
+}
+
+.ltlb-settings-nav__item {
+  display: block;
+  padding: var(--ltlb-space-2) var(--ltlb-space-3);
+  border-radius: var(--ltlb-radius-md);
+  font-size: var(--ltlb-text-sm);
+  font-weight: var(--ltlb-font-medium);
+  color: var(--ltlb-text-secondary);
+  text-decoration: none;
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+  white-space: nowrap;
+}
+
+.ltlb-settings-nav__item:hover {
+  background: var(--ltlb-bg-tertiary);
+  color: var(--ltlb-text-primary);
+}
+
+.ltlb-settings-nav__item.is-active {
+  background: var(--ltlb-primary);
+  color: var(--ltlb-text-inverse);
+  font-weight: var(--ltlb-font-semibold);
+}
+
+.ltlb-settings-content {
+  min-width: 0;
+}
+
+/* ===== BOOKING WIZARD (Frontend) ===== */
+
+.ltlb-booking-wizard {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--ltlb-space-6);
+  background: var(--ltlb-bg-primary);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-xl);
+  box-shadow: var(--ltlb-shadow-lg);
+}
+
+@media (max-width: 767px) {
+  .ltlb-booking-wizard {
+    padding: var(--ltlb-space-4);
+    border-radius: var(--ltlb-radius-lg);
+  }
+}
+
+.ltlb-wizard-progress {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--ltlb-space-8);
+  position: relative;
+}
+
+.ltlb-wizard-progress::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--ltlb-border-medium);
+  z-index: 0;
+}
+
+.ltlb-wizard-progress__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ltlb-space-2);
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.ltlb-wizard-progress__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ltlb-bg-primary);
+  border: 2px solid var(--ltlb-border-medium);
+  color: var(--ltlb-text-muted);
+  font-weight: var(--ltlb-font-bold);
+  font-size: var(--ltlb-text-sm);
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-wizard-progress__step.is-active .ltlb-wizard-progress__number {
+  background: var(--ltlb-primary);
+  border-color: var(--ltlb-primary);
+  color: var(--ltlb-text-inverse);
+  box-shadow: var(--ltlb-shadow-md);
+}
+
+.ltlb-wizard-progress__step.is-complete .ltlb-wizard-progress__number {
+  background: var(--ltlb-success);
+  border-color: var(--ltlb-success);
+  color: var(--ltlb-text-inverse);
+}
+
+.ltlb-wizard-progress__label {
+  font-size: var(--ltlb-text-xs);
+  color: var(--ltlb-text-secondary);
+  font-weight: var(--ltlb-font-medium);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .ltlb-wizard-progress__label {
+    display: none;
+  }
+  
+  .ltlb-wizard-progress {
+    margin-bottom: var(--ltlb-space-6);
+  }
+}
+
+.ltlb-wizard-progress__step.is-active .ltlb-wizard-progress__label {
+  color: var(--ltlb-text-primary);
+  font-weight: var(--ltlb-font-semibold);
+}
+
+.ltlb-wizard-content {
+  margin-bottom: var(--ltlb-space-6);
+  min-height: 300px;
+}
+
+.ltlb-wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ltlb-space-3);
+  padding-top: var(--ltlb-space-5);
+  border-top: 1px solid var(--ltlb-border-light);
+}
+
+@media (max-width: 480px) {
+  .ltlb-wizard-nav {
+    flex-direction: column-reverse;
+    gap: var(--ltlb-space-2);
+  }
+  
+  .ltlb-wizard-nav .ltlb-btn {
+    width: 100%;
+  }
+}
+
+/* ===== GRID UTILITIES ===== */
+
+.ltlb-grid {
+  display: grid;
+  gap: var(--ltlb-space-4);
+}
+
+.ltlb-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ltlb-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ltlb-grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 767px) {
+  .ltlb-grid--2,
+  .ltlb-grid--3,
+  .ltlb-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ltlb-grid--3,
+  .ltlb-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== KPI GRID (Dashboard) ===== */
+
+.ltlb-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--ltlb-space-4);
+  margin-bottom: var(--ltlb-space-6);
+}
+
+.ltlb-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: var(--ltlb-space-4);
+  padding: var(--ltlb-space-5);
+  background: var(--ltlb-bg-primary);
+  border: 1px solid var(--ltlb-border-medium);
+  border-radius: var(--ltlb-radius-lg);
+  box-shadow: var(--ltlb-shadow-sm);
+  transition: all var(--ltlb-transition-base) var(--ltlb-ease-out);
+}
+
+.ltlb-kpi-card:hover {
+  box-shadow: var(--ltlb-shadow-md);
+  transform: translateY(-2px);
+}
+
+.ltlb-kpi-card__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ltlb-radius-lg);
+  background: var(--ltlb-bg-secondary);
+  color: var(--ltlb-primary);
+  font-size: 24px;
+}
+
+.ltlb-kpi-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ltlb-kpi-card__label {
+  font-size: var(--ltlb-text-sm);
+  color: var(--ltlb-text-secondary);
+  font-weight: var(--ltlb-font-medium);
+  margin-bottom: var(--ltlb-space-1);
+}
+
+.ltlb-kpi-card__value {
+  font-size: var(--ltlb-text-2xl);
+  font-weight: var(--ltlb-font-extrabold);
+  color: var(--ltlb-text-primary);
+  line-height: var(--ltlb-leading-tight);
+}
+
+.ltlb-kpi-card__comparison {
+  font-size: var(--ltlb-text-xs);
+  font-weight: var(--ltlb-font-medium);
+  margin-top: var(--ltlb-space-1);
+}
+
+.ltlb-kpi-card__comparison.positive {
+  color: var(--ltlb-success);
+}
+
+.ltlb-kpi-card__comparison.negative {
+  color: var(--ltlb-danger);
+}
+
+/* ===== CONTAINER ===== */
+
+.ltlb-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--ltlb-space-4);
+  padding-right: var(--ltlb-space-4);
+}
+
+@media (min-width: 768px) {
+  .ltlb-container {
+    padding-left: var(--ltlb-space-6);
+    padding-right: var(--ltlb-space-6);
+  }
+}
+
+.ltlb-container--narrow {
+  max-width: 960px;
+}
+
+.ltlb-container--wide {
+  max-width: 1536px;
+}
+
+/* ===== STACK (Vertical Spacing) ===== */
+
+.ltlb-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.ltlb-stack--2 > * + * {
+  margin-top: var(--ltlb-space-2);
+}
+
+.ltlb-stack--4 > * + * {
+  margin-top: var(--ltlb-space-4);
+}
+
+.ltlb-stack--6 > * + * {
+  margin-top: var(--ltlb-space-6);
+}
+
+.ltlb-stack--8 > * + * {
+  margin-top: var(--ltlb-space-8);
+}
+
+/* ===== CLUSTER (Horizontal Spacing) ===== */
+
+.ltlb-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ltlb-cluster--2 {
+  gap: var(--ltlb-space-2);
+}
+
+.ltlb-cluster--4 {
+  gap: var(--ltlb-space-4);
+}
+
+.ltlb-cluster--6 {
+  gap: var(--ltlb-space-6);
+}
+
+/* ===== SPLIT (Space Between) ===== */
+
+.ltlb-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ltlb-space-4);
+  flex-wrap: wrap;
+}
+
+/* ===== STICKY FOOTER ===== */
+
+.ltlb-sticky-footer {
+  position: sticky;
+  bottom: 0;
+  padding: var(--ltlb-space-4) var(--ltlb-space-6);
+  background: var(--ltlb-bg-primary);
+  border-top: 1px solid var(--ltlb-border-medium);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: var(--ltlb-z-sticky);
+}
+
+/* ===== RESPONSIVE VISIBILITY ===== */
+
+@media (max-width: 767px) {
+  .ltlb-hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .ltlb-hide-desktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ltlb-hide-tablet {
+    display: none !important;
+  }
+}
 /**
  * LazyBookings Admin Styles
  * Agency-Level Premium Design v3.0.0
@@ -1554,7 +3196,7 @@
     border-color: var(--fc-border-color);
 }
 
-/* TimeGrid: remove “dotted stitches” by forcing solid lane separators */
+/* TimeGrid: remove â€œdotted stitchesâ€ by forcing solid lane separators */
 .ltlb-admin .fc .fc-timegrid-slot,
 .ltlb-admin .fc .fc-timegrid-slot-lane,
 .ltlb-admin .fc .fc-timegrid-divider {

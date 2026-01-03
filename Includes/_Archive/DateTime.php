@@ -7,7 +7,7 @@ if ( ! defined('ABSPATH') ) exit;
  * Storage convention (P0): appointments are stored as UTC MySQL DATETIME strings.
  * Conversion happens only at boundaries (UI / emails / exports).
  */
-class LTLB_DateTime {
+class LTLB_Time {
 
     public static function utc_timezone(): DateTimeZone {
         return new DateTimeZone( 'UTC' );
@@ -130,3 +130,4 @@ class LTLB_DateTime {
         return $dt->format( $format );
     }
 }
+

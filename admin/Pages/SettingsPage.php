@@ -282,9 +282,9 @@ class LTLB_Admin_SettingsPage {
                     'general' => __('General', 'ltl-bookings'),
                     'email' => __('Email', 'ltl-bookings'),
                 ];
-                if ( LTLB_Role_Manager::user_can('manage_ai_settings') ) {
-                    $tabs['ai'] = __('AI', 'ltl-bookings');
-                }
+                // if ( LTLB_Role_Manager::user_can('manage_ai_settings') ) {
+                //    $tabs['ai'] = __('AI', 'ltl-bookings');
+                // }
                 if ( LTLB_Role_Manager::user_can('manage_options') ) {
                     $tabs['security'] = __('Security', 'ltl-bookings');
                 }
@@ -355,6 +355,7 @@ class LTLB_Admin_SettingsPage {
                                     <p class="description" id="ltlb-pending-blocks-desc"><?php echo esc_html__( 'Useful to avoid double bookings before you confirm.', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
+                            <!--
                             <tr>
                                 <th><label for="template_mode"><?php echo esc_html__( 'Booking Template Mode', 'ltl-bookings' ); ?></label></th>
                                 <td>
@@ -365,6 +366,7 @@ class LTLB_Admin_SettingsPage {
                                     <p class="description" id="ltlb-template-mode-desc"><?php echo esc_html__( 'Switch between appointment-based booking (services) and date-range booking (hotel/rooms).', 'ltl-bookings' ); ?></p>
                                 </td>
                             </tr>
+                            -->
                             <tr>
                                 <th><label for="profit_margin_percent"><?php echo esc_html__( 'Profit Margin (%)', 'ltl-bookings' ); ?></label></th>
                                 <td>

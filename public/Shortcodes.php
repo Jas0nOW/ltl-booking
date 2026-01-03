@@ -14,19 +14,11 @@ class LTLB_Shortcodes {
 		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 		$css_dir = $debug_assets ? 'assets/css/' : 'assets/css/dist/';
 
-		// Design System CSS (in dependency order)
-		$tokens_ver = self::asset_version( $css_dir . "tokens{$min}.css" );
-		$base_ver = self::asset_version( $css_dir . "base{$min}.css" );
-		$components_ver = self::asset_version( $css_dir . "components{$min}.css" );
-		$layout_ver = self::asset_version( $css_dir . "layout{$min}.css" );
+		// Design System CSS (consolidated)
 		$public_ver = self::asset_version( $css_dir . "public{$min}.css" );
 		$js_ver = self::asset_version( 'assets/js/public.js' );
 		
-		wp_enqueue_style( 'ltlb-tokens', plugins_url( "../{$css_dir}tokens{$min}.css", __FILE__ ), [], $tokens_ver );
-		wp_enqueue_style( 'ltlb-base', plugins_url( "../{$css_dir}base{$min}.css", __FILE__ ), [ 'ltlb-tokens' ], $base_ver );
-		wp_enqueue_style( 'ltlb-components', plugins_url( "../{$css_dir}components{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base' ], $components_ver );
-		wp_enqueue_style( 'ltlb-layout', plugins_url( "../{$css_dir}layout{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base' ], $layout_ver );
-		wp_enqueue_style( 'ltlb-public', plugins_url( "../{$css_dir}public{$min}.css", __FILE__ ), [ 'ltlb-tokens', 'ltlb-base', 'ltlb-components', 'ltlb-layout' ], $public_ver );
+		wp_enqueue_style( 'ltlb-public', plugins_url( "../{$css_dir}public{$min}.css", __FILE__ ), [], $public_ver );
 		
 		wp_enqueue_script( 'ltlb-public', plugins_url( '../assets/js/public.js', __FILE__ ), [ 'jquery' ], $js_ver, true );
 

@@ -124,7 +124,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
                                             if ( $appt_tz === '' ) {
                                                 $appt_tz = LTLB_Time::get_site_timezone_string();
                                             }
-                                            $start_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $a['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
+                                            $start_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $a['start_at'] ?? '' ), get_option('date_format') . ' ' . get_option('time_format'), $appt_tz );
                                         ?>
                                             <tr>
                                                 <td>
@@ -385,7 +385,7 @@ class LTLB_Admin_AppointmentsDashboardPage {
                             if ( $appt_tz === '' ) {
                                 $appt_tz = LTLB_Time::get_site_timezone_string();
                             }
-                            $time_display = LTLB_DateTime::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option('time_format'), $appt_tz );
+                            $time_display = LTLB_Time::format_local_display_from_utc_mysql( (string) ( $appt['start_at'] ?? '' ), get_option('time_format'), $appt_tz );
                         ?>
                             <a href="<?php echo esc_url($view_url); ?>" class="ltlb-recent-item">
                                 <span class="ltlb-recent-item__name"><?php echo esc_html($cust_name); ?></span>
@@ -404,4 +404,5 @@ class LTLB_Admin_AppointmentsDashboardPage {
     public static function render_analytics(): void { self::render_analytics_card(); }
     public static function render_ai_insights( bool $can_generate = false ): void { self::render_ai_insights_card( $can_generate ); }
 }
+
 
